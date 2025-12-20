@@ -12,11 +12,4 @@ export interface Project {
   image: string;
 }
 
-export interface ServiceOption {
-  title: string;
-  priceDesc: string;
-  features: string[];
-  recommended?: boolean;
-}
-
 export type ViewState = 'home' | 'services' | 'contact';

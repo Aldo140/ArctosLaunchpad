@@ -5,12 +5,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate, useMotionValue } from 'framer-motion';
-import { ArrowRight, Check, Code, Coffee, Layers, Layout, Smartphone, Lock, Globe, Zap, Menu, X, Monitor, ChevronRight, Star, MousePointer2, Search } from 'lucide-react';
+import { ArrowRight, Check, Code, Layers, Layout, Smartphone, Lock, Globe, Zap, Menu, X, ChevronRight, Star, Search } from 'lucide-react';
 import FluidBackground from './components/FluidBackground';
-import ProjectCard from './components/ArtistCard';
 import ContactForm from './components/ContactForm';
 import CustomCursor from './components/CustomCursor';
-import GlitchText from './components/GlitchText';
 import AIChat from './components/AIChat';
 import { Project, ViewState } from './types';
 
@@ -141,8 +139,8 @@ const App: React.FC = () => {
       />
 
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 py-3 md:py-4 shadow-2xl scale-[0.99]' : 'bg-transparent py-6 md:py-8'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 py-3 md:py-4 shadow-2xl' : 'bg-transparent py-6 md:py-8'}`}>
+        <div className={`${scrolled ? 'w-full px-6 md:px-10' : 'max-w-7xl mx-auto px-6'} flex items-center justify-between`}>
           <div 
             onClick={() => navigateTo('home')} 
             className="font-heading text-xl md:text-2xl font-bold tracking-tighter text-white cursor-pointer flex items-center gap-3 group relative z-50 transition-transform duration-500"
