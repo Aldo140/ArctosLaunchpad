@@ -40,7 +40,7 @@ const PROJECTS: Project[] = [
   }
 ];
 
-const HERO_IMAGE = '/calgs.jpg';
+const HERO_IMAGE = new URL('/calgs.jpg', import.meta.env.BASE_URL).toString();
 
 // Animation Variants
 const fadeInUp = {
