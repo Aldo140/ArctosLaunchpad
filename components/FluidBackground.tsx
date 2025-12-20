@@ -6,7 +6,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const FluidBackground: React.FC = () => {
+interface FluidBackgroundProps {
+  reduceMotion?: boolean;
+}
+
+const FluidBackground: React.FC<FluidBackgroundProps> = ({ reduceMotion = false }) => {
+  if (reduceMotion) {
+    return (
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-[#0a0a0c]">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay pointer-events-none"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-cyan-600/10 rounded-full mix-blend-screen filter blur-[120px] opacity-30" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-indigo-600/10 rounded-full mix-blend-screen filter blur-[140px] opacity-30" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-[#0a0a0c]">
       {/* Deepest Indigo/Black Base */}

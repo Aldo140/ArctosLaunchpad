@@ -4,7 +4,7 @@
 */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Check, Code, Layers, Layout, Smartphone, Lock, Globe, Zap, Menu, X, ChevronRight, Star, Search } from 'lucide-react';
 import FluidBackground from './components/FluidBackground';
 import ContactForm from './components/ContactForm';
@@ -102,17 +102,50 @@ const SpotlightCard = ({ children, className = "" }: { children?: React.ReactNod
   );
 };
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return isMobile;
+};
+
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>('home');
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotion() || isMobile;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      return;
+    }
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [isMenuOpen]);
 
   const navigateTo = (newView: ViewState) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -128,9 +161,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-900 overflow-x-hidden">
-      <FluidBackground />
-      <CustomCursor />
-      <AIChat />
+      <FluidBackground reduceMotion={reduceMotion} />
+      <CustomCursor enabled={!reduceMotion} />
+      {!isMobile && <AIChat />}
       
       {/* Scroll Progress Bar */}
       <motion.div 
@@ -174,41 +207,109 @@ const App: React.FC = () => {
           {/* Mobile Nav Toggle */}
           <button 
             className="md:hidden relative z-50 text-white p-2 hover:text-cyan-400 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => setIsMenuOpen((open) => !open)}
           >
             {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
           </button>
         </div>
 
-        {/* Mobile Full Screen Menu */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial="closed"
-              animate="open"
-              exit="closed"
-              variants={menuVariants}
-              className="fixed inset-0 bg-slate-950 z-40 flex flex-col items-center justify-center gap-8 p-6"
-            >
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-              
-              <button onClick={() => navigateTo('home')} className="text-5xl font-heading font-bold text-white hover:text-cyan-400 transition-colors">WORK</button>
-              <button onClick={() => navigateTo('services')} className="text-5xl font-heading font-bold text-white hover:text-cyan-400 transition-colors">SERVICES</button>
-              <button 
-                onClick={scrollToContact}
-                className="mt-12 bg-white text-slate-900 px-10 py-5 rounded-full text-lg font-bold uppercase tracking-widest w-full max-w-xs shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:bg-cyan-400 transition-all"
-              >
-                Start Project
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
+
+      {/* Mobile Full Screen Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed left-0 top-0 w-screen h-[100dvh] z-[100] bg-[#0b1220]"
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `linear-gradient(180deg, rgba(8,12,22,0.92) 0%, rgba(10,15,26,0.96) 55%, rgba(11,18,32,1) 100%), url(${HERO_IMAGE})`,
+                }}
+              />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(60,90,150,0.18),transparent_45%),radial-gradient(circle_at_90%_0%,rgba(95,140,170,0.12),transparent_40%)] pointer-events-none"></div>
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 pointer-events-none"></div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              className="fixed left-0 top-0 w-screen h-[100dvh] z-[110] flex flex-col p-6 overflow-y-auto"
+            >
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center gap-3 text-white font-bold text-lg">
+                  <div className="w-9 h-9 bg-white text-black flex items-center justify-center rounded-sm">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  BaseLayer
+                </div>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="rounded-full border border-white/15 w-12 h-12 flex items-center justify-center text-white hover:text-slate-200 hover:border-white/40 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="relative z-10 mt-12 flex-1 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="text-[10px] uppercase tracking-[0.4em] text-slate-200/70">Navigation</div>
+                  <div className="flex flex-col gap-3">
+                    <button onClick={() => navigateTo('home')} className="w-full text-left text-4xl font-heading font-bold text-white hover:text-slate-200 transition-colors">
+                      Work
+                    </button>
+                    <button onClick={() => navigateTo('services')} className="w-full text-left text-4xl font-heading font-bold text-white hover:text-slate-200 transition-colors">
+                      Services
+                    </button>
+                    <button onClick={scrollToContact} className="w-full text-left text-4xl font-heading font-bold text-white hover:text-slate-200 transition-colors">
+                      Contact
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-10 rounded-3xl border border-white/10 bg-[#0f172a]/80 p-5">
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-slate-300/70">Signature</div>
+                  <div className="text-white font-bold text-lg mt-2">BaseLayer Studio</div>
+                  <p className="text-slate-300 text-sm mt-2">Custom-built digital assets for founders who care about ownership.</p>
+                  <div className="mt-4 text-[11px] uppercase tracking-[0.3em] text-slate-300/60">Calgary · Remote</div>
+                </div>
+
+                <button 
+                  onClick={scrollToContact}
+                  className="mt-6 bg-slate-200 text-slate-950 px-10 py-5 rounded-full text-lg font-bold uppercase tracking-widest w-full shadow-[0_0_40px_rgba(148,163,184,0.2)]"
+                >
+                  Start Project
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <main className="overflow-x-hidden">
         <AnimatePresence mode="wait">
           {view === 'home' ? (
-            <LandingPage key="landing" onLearnMore={() => navigateTo('services')} scrollToContact={scrollToContact} />
+            isMobile ? (
+              <MobileLandingPage
+                key="mobile-landing"
+                onLearnMore={() => navigateTo('services')}
+                scrollToContact={scrollToContact}
+              />
+            ) : (
+              <LandingPage
+                key="landing"
+                onLearnMore={() => navigateTo('services')}
+                scrollToContact={scrollToContact}
+                reduceMotion={reduceMotion}
+                isMobile={isMobile}
+              />
+            )
           ) : (
             <ServicesPage key="services" scrollToContact={scrollToContact} />
           )}
@@ -286,7 +387,26 @@ const App: React.FC = () => {
 };
 
 // --- Marquee Component ---
-const Marquee = () => {
+const Marquee: React.FC<{ reduceMotion?: boolean }> = ({ reduceMotion = false }) => {
+  if (reduceMotion) {
+    return (
+      <div className="relative flex overflow-x-hidden bg-slate-950 border-y border-slate-900 py-6 md:py-8 my-16">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-slate-950 z-10 pointer-events-none" />
+        <div className="flex gap-10 md:gap-16 whitespace-nowrap items-center px-6">
+          <span className="text-xl md:text-4xl font-heading font-bold text-slate-800 uppercase tracking-widest flex items-center gap-4">
+            Strategy <Star className="w-4 h-4 md:w-6 md:h-6 text-cyan-900 fill-cyan-900" />
+          </span>
+          <span className="text-xl md:text-4xl font-heading font-bold text-slate-700 uppercase tracking-widest flex items-center gap-4">
+            Design <Star className="w-4 h-4 md:w-6 md:h-6 text-cyan-900 fill-cyan-900" />
+          </span>
+          <span className="text-xl md:text-4xl font-heading font-bold text-white uppercase tracking-widest flex items-center gap-4">
+            Development <Star className="w-4 h-4 md:w-6 md:h-6 text-cyan-500 fill-cyan-500" />
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex overflow-x-hidden bg-slate-950 border-y border-slate-900 py-6 md:py-8 my-20">
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-slate-950 z-10 pointer-events-none" />
@@ -315,11 +435,253 @@ const Marquee = () => {
 
 // --- Sub-Views ---
 
-const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => void }> = ({ onLearnMore, scrollToContact }) => {
+const MobileLandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => void }> = ({
+  onLearnMore,
+  scrollToContact,
+}) => {
+  const projects = PROJECTS.slice(0, 2);
+
+  return (
+    <div className="w-full bg-[#0a0f1e] text-slate-100">
+      {/* Mobile Hero */}
+      <section className="relative min-h-[82vh] pt-28 pb-16 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={HERO_IMAGE}
+            alt="Calgary Tower skyline at sunset"
+            className="w-full h-full object-cover opacity-40"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,22,0.45)_0%,rgba(9,14,25,0.88)_55%,rgba(10,15,26,1)_100%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(66,85,140,0.18),transparent_55%),radial-gradient(circle_at_85%_0%,rgba(120,170,210,0.08),transparent_45%)]"></div>
+        </div>
+        <div className="absolute -top-10 -right-12 w-64 h-64 rounded-full bg-slate-400/10 blur-[100px] mobile-orbit"></div>
+        <div className="absolute bottom-10 -left-12 w-52 h-52 rounded-full bg-indigo-300/10 blur-[110px] mobile-orbit"></div>
+        <div className="absolute inset-0 opacity-20 mobile-pulse bg-[radial-gradient(circle_at_70%_30%,rgba(56,92,150,0.22),transparent_40%)]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-[#0a0f1e]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-10 bg-[#0a0f1e]"></div>
+
+        <div className="relative z-10 px-6">
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-slate-300/20 bg-white/5 backdrop-blur-md text-[11px] font-bold uppercase tracking-[0.28em] text-slate-200 shadow-[0_0_18px_rgba(148,163,184,0.15)]">
+            <span className="w-2 h-2 bg-slate-200 rounded-full shadow-[0_0_10px_rgba(148,163,184,0.6)]" />
+            Mobile‑First Studio
+          </div>
+
+          <h1 className="text-4xl leading-tight font-heading font-bold text-white tracking-tight">
+            DIGITAL ASSETS
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-white to-slate-200">
+              BUILT TO OWN
+            </span>
+          </h1>
+
+          <p className="mt-4 text-base text-slate-300 leading-relaxed max-w-md">
+            High-performance websites that load fast, rank well, and stay yours forever.
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              onClick={scrollToContact}
+              className="w-full px-6 py-4 bg-slate-200 text-slate-950 text-sm font-bold uppercase tracking-widest rounded-full shadow-[0_10px_24px_rgba(148,163,184,0.2)]"
+            >
+              Start a Project
+            </button>
+            <button
+              onClick={onLearnMore}
+              className="w-full px-6 py-4 border border-white/15 text-white text-sm font-bold uppercase tracking-widest rounded-full bg-white/5"
+            >
+              View Services
+            </button>
+          </div>
+
+          <div className="mt-10 grid grid-cols-3 gap-3 text-center">
+            {[
+              { label: "Speed", value: "99/100" },
+              { label: "Clients", value: "20+" },
+              { label: "Launch", value: "2-3 wks" }
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/8 to-white/5 backdrop-blur-md py-3">
+                <div className="text-white font-bold text-sm">{item.value}</div>
+                <div className="text-[10px] uppercase tracking-widest text-slate-300/70">{item.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 rounded-2xl border border-white/10 bg-[#0f172a]/70 p-4 backdrop-blur-md">
+            <div className="text-[10px] uppercase tracking-[0.35em] text-slate-300/70">Signal Stack</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {["Performance", "SEO", "Conversion", "Design System", "Ownership"].map((pill) => (
+                <span key={pill} className="text-[11px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 text-slate-200/90 bg-white/5">
+                  {pill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Logic Strip */}
+      <section className="px-6 py-12 bg-gradient-to-b from-[#0a0f1e] via-[#0c1833] to-[#0a0f1e] relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(125,211,252,0.08),transparent_50%)]"></div>
+        <h2 className="text-2xl font-heading font-bold text-white mb-4">Why it hits.</h2>
+        <div className="grid grid-cols-1 gap-4 relative">
+          {[
+            { title: "Instant load", text: "Static delivery + minimal bloat = speed on any network." },
+            { title: "Own the asset", text: "No platforms, no monthly lock-in, no surprises." },
+            { title: "Conversion first", text: "Clear hierarchy and CTA placement built for mobile." }
+          ].map((item) => (
+            <div key={item.title} className="rounded-2xl border border-white/10 bg-[#0f172a]/80 p-5 shadow-[0_10px_24px_rgba(15,23,42,0.4)]">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-slate-300/70">Edge</div>
+              <h3 className="text-white font-bold text-base mt-2">{item.title}</h3>
+              <p className="text-slate-300 text-sm mt-2 leading-relaxed">{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile Showcase Rail */}
+      <section className="px-6 py-12 bg-[#0b1324]">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-2xl font-heading font-bold text-white">The Feel</h2>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-sky-200/60">Swipe</span>
+        </div>
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 [-webkit-overflow-scrolling:touch]">
+          {[
+            { title: "Cinematic Hero", text: "Depth, contrast, and clarity." },
+            { title: "Glass UI", text: "Layered cards with subtle glow." },
+            { title: "Fast by Default", text: "No heavy motion on mobile." }
+          ].map((item) => (
+            <div key={item.title} className="min-w-[70%] snap-center rounded-3xl border border-white/10 bg-[#0f1a31]/80 p-5 mobile-sheen bg-[linear-gradient(120deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02),rgba(255,255,255,0.06))]">
+              <div className="text-[11px] uppercase tracking-[0.3em] text-sky-200/70">Module</div>
+              <div className="text-white font-bold text-lg mt-2">{item.title}</div>
+              <div className="text-slate-300 text-sm mt-2">{item.text}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile Work */}
+      <section className="px-6 py-12 bg-[#0b1324]">
+        <div className="flex items-end justify-between mb-6">
+          <h2 className="text-3xl font-heading font-bold text-white">Selected Work</h2>
+        </div>
+        <div className="flex flex-col gap-6">
+          {projects.map((project) => (
+            <div key={project.id} className="rounded-3xl border border-sky-400/15 overflow-hidden bg-[#0d1b33]/70 shadow-[0_18px_40px_rgba(59,130,246,0.12)]">
+              <div className="relative">
+                <img
+                  src={project.image.replace('w=1000', 'w=800')}
+                  alt={project.name}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#071329]/85 via-[#071329]/20 to-transparent"></div>
+                <div className="absolute bottom-4 left-4">
+                  <div className="text-[11px] uppercase tracking-widest text-sky-200 font-mono">
+                    {project.type}
+                  </div>
+                  <div className="text-xl font-heading font-bold text-white">{project.name}</div>
+                </div>
+              </div>
+              <div className="p-5">
+                <p className="text-sm text-slate-300 leading-relaxed">{project.description}</p>
+                <a
+                  href={`https://${project.url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-sky-200"
+                >
+                  Visit site <ArrowRight className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile Process */}
+      <section className="px-6 py-12 bg-gradient-to-b from-[#0b1324] via-[#0c1730] to-[#0b1324]">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-heading font-bold text-white">Process</h2>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-sky-200/60">4 Steps</span>
+        </div>
+        <div className="grid gap-4">
+          {[
+            { step: "01", title: "Strategy Sprint", text: "Clear goals, user flows, and quick wins." },
+            { step: "02", title: "Design System", text: "Mobile-first layout, typography, and rhythm." },
+            { step: "03", title: "Build + Optimize", text: "Fast code, SEO, and performance polish." },
+            { step: "04", title: "Launch + Handoff", text: "Ship, train, and support if needed." }
+          ].map((item) => (
+            <div key={item.step} className="rounded-2xl border border-white/10 bg-[#0d1a32]/80 p-5 flex gap-4">
+              <div className="text-sky-200/60 text-xs font-mono tracking-[0.3em]">{item.step}</div>
+              <div>
+                <div className="text-white font-bold text-base">{item.title}</div>
+                <div className="text-slate-300 text-sm mt-2">{item.text}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile Services */}
+      <section className="px-6 py-12 bg-gradient-to-b from-[#0b1324] via-[#0e1b36] to-[#0b1324]">
+        <h2 className="text-3xl font-heading font-bold text-white mb-6">Services</h2>
+        <div className="grid gap-4">
+          {[
+            { title: "Custom Static Site", desc: "Fast, secure, and fully owned. The flagship." },
+            { title: "Wix / Editor X", desc: "Editable by you. We design, you manage." },
+            { title: "Web App", desc: "Dashboards, portals, booking systems, and APIs." }
+          ].map((item) => (
+            <div key={item.title} className="rounded-2xl border border-sky-400/15 bg-[#0d1b33]/70 p-5 shadow-[0_12px_24px_rgba(59,130,246,0.12)]">
+              <div className="text-white font-bold text-base">{item.title}</div>
+              <div className="text-slate-300 text-sm mt-2">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Mobile Proof */}
+      <section className="px-6 py-12 bg-[#0b1324]">
+        <div className="rounded-3xl border border-white/10 bg-[#0f1a31]/80 p-6">
+          <div className="text-[10px] uppercase tracking-[0.3em] text-sky-200/70">Proof</div>
+          <h3 className="text-2xl font-heading font-bold text-white mt-2">Trusted by founders who care about speed.</h3>
+          <div className="mt-4 flex items-center gap-3">
+            {[1,2,3].map((i) => (
+              <div key={i} className="w-10 h-10 rounded-full bg-[#1a2743] border border-white/10"></div>
+            ))}
+            <div className="text-slate-300 text-sm">20+ clients · Calgary + Remote</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile CTA */}
+      <section className="px-6 py-16 bg-[#0b1324]">
+        <div className="rounded-[28px] border border-sky-300/30 bg-gradient-to-br from-[#1a2b4a] via-[#0d1b33] to-[#0b1324] p-6 shadow-[0_18px_50px_rgba(59,130,246,0.16)]">
+          <div className="text-sm uppercase tracking-widest text-sky-200 font-mono">Let’s build</div>
+          <h3 className="text-3xl font-heading font-bold text-white mt-2">
+            Your next site should feel premium on every screen.
+          </h3>
+          <button
+            onClick={scrollToContact}
+            className="mt-6 w-full px-6 py-4 bg-sky-200 text-slate-950 text-sm font-bold uppercase tracking-widest rounded-full shadow-[0_12px_30px_rgba(125,211,252,0.25)]"
+          >
+            Book a Build Call
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => void, reduceMotion?: boolean, isMobile?: boolean }> = ({
+  onLearnMore,
+  scrollToContact,
+  reduceMotion = false,
+  isMobile = false,
+}) => {
   const { scrollY } = useScroll();
   // Parallax: background moves slower than scroll
-  const backgroundY = useTransform(scrollY, [0, 500], [0, 200]);
-  const textY = useTransform(scrollY, [0, 300], [0, 50]);
+  const backgroundY = useTransform(scrollY, [0, 500], [0, reduceMotion ? 0 : 200]);
+  const textY = useTransform(scrollY, [0, 300], [0, reduceMotion ? 0 : 50]);
   const workTrackRef = useRef<HTMLDivElement>(null);
   const [workDragBounds, setWorkDragBounds] = useState(0);
 
@@ -358,8 +720,8 @@ const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => vo
         </motion.div>
          {/* Overlays don't parallax to keep effect grounded */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-[#0a0a0c]/88 to-[#0a0a0c]/30 z-0 pointer-events-none" />
-        <div className="absolute inset-0 hero-kinetic pointer-events-none" />
-        <div className="absolute inset-0 hero-mesh pointer-events-none" />
+        {!reduceMotion && <div className="absolute inset-0 hero-kinetic pointer-events-none" />}
+        {!reduceMotion && <div className="absolute inset-0 hero-mesh pointer-events-none" />}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-0 pointer-events-none" />
 
         <motion.div style={{ y: textY }} className="relative z-10 max-w-7xl mx-auto px-6 text-center mt-20">
@@ -411,8 +773,8 @@ const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => vo
         {/* Scroll Indicator */}
         <motion.div 
            style={{ x: "-50%" }}
-           animate={{ y: [0, 10, 0] }}
-           transition={{ repeat: Infinity, duration: 2 }}
+           animate={reduceMotion ? { y: 0 } : { y: [0, 10, 0] }}
+           transition={reduceMotion ? { duration: 0 } : { repeat: Infinity, duration: 2 }}
            className="absolute bottom-10 left-1/2 text-slate-500 flex flex-col items-center gap-2 opacity-50"
         >
            <span className="text-[10px] uppercase tracking-widest">Scroll</span>
@@ -420,7 +782,7 @@ const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => vo
         </motion.div>
       </header>
 
-      <Marquee />
+      <Marquee reduceMotion={reduceMotion} />
 
       {/* Bento Grid - "The Logic" */}
       <section className="max-w-7xl mx-auto px-6 py-20">
@@ -539,14 +901,14 @@ const LandingPage: React.FC<{ onLearnMore: () => void, scrollToContact: () => vo
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ delay: index * 0.08, duration: 0.6 }}
                   whileHover={{ y: -6 }}
-                  onMouseMove={(e) => {
+                  onMouseMove={isMobile ? undefined : (e) => {
                     const card = e.currentTarget;
                     const rect = card.getBoundingClientRect();
                     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
                     const y = ((e.clientY - rect.top) / rect.height - 0.5) * -8;
                     card.style.transform = `rotateX(${y}deg) rotateY(${x}deg) translateY(-6px)`;
                   }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0px)'; }}
+                  onMouseLeave={isMobile ? undefined : (e) => { e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0px)'; }}
                 >
                   <div className="relative aspect-[4/3] md:aspect-[21/9] w-full overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl shadow-cyan-500/5 transition-all duration-700">
                     <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700" />

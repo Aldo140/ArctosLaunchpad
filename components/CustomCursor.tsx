@@ -6,12 +6,20 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const CustomCursor: React.FC = () => {
+interface CustomCursorProps {
+  enabled?: boolean;
+}
+
+const CustomCursor: React.FC<CustomCursorProps> = ({ enabled = true }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [trailPosition, setTrailPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const mouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -31,9 +39,13 @@ const CustomCursor: React.FC = () => {
       window.removeEventListener('mousemove', mouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     let raf: number;
     const animateTrail = () => {
       setTrailPosition(prev => ({
@@ -44,7 +56,11 @@ const CustomCursor: React.FC = () => {
     };
     raf = requestAnimationFrame(animateTrail);
     return () => cancelAnimationFrame(raf);
-  }, [mousePosition.x, mousePosition.y]);
+  }, [enabled, mousePosition.x, mousePosition.y]);
+
+  if (!enabled) {
+    return null;
+  }
 
   return (
     <>
