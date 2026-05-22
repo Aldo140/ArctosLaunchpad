@@ -45,7 +45,7 @@ const TrustSection: React.FC = () => (
     {/* Bear as faint northern identity BG */}
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <img
-        src="/bear.png"
+        src="/bear.webp"
         alt=""
         aria-hidden
         className="w-[480px] md:w-[720px] object-contain opacity-[0.03] mix-blend-screen select-none"

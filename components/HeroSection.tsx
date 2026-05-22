@@ -14,7 +14,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
       {/* Static background: mountains image + gradient overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/bakcground-mountains.png"
+          src="/bakcground-mountains.webp"
           alt=""
           aria-hidden
           className="w-full h-full object-cover opacity-[0.18] mix-blend-screen"
@@ -114,7 +114,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
               Trusted by elite operations
             </p>
             <img
-              src="/logo-strip.png"
+              src="/logo-strip.webp"
               alt="Trusted partners"
               className="h-6 object-contain opacity-40 hover:opacity-70 transition-opacity duration-300"
               loading="eager"
@@ -132,7 +132,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           {/* Primary screenshot — Starlings desktop */}
           <div className="absolute top-0 right-0 w-[88%] rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_64px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.04]">
             <img
-              src="/starlings-landing-desktop.png"
+              src="/starlings-landing-desktop.webp"
               alt="Starlings — Youth Infrastructure Platform"
               className="w-full h-auto block object-cover"
               loading="eager"
@@ -151,7 +151,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
           >
             <img
-              src="/calgarywatch-map-desktop.png"
+              src="/calgarywatch-map-desktop.webp"
               alt="Calgary Watch — Civic Safety Intelligence System"
               className="w-full h-auto block object-cover"
               loading="eager"
