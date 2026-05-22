@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { useLenisGsap } from './hooks/useLenisGsap';
-import { ArrowRight, Check, Code, Layers, Layout, Smartphone, Lock, Globe, Zap, Menu, X, Star } from 'lucide-react';
+import { ArrowRight, Menu, X, Star } from 'lucide-react';
 import ContactForm from './components/ContactForm';
 import CustomCursor from './components/CustomCursor';
 import AIChat from './components/AIChat';
@@ -88,13 +88,13 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[var(--surface-2)] ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[var(--surface-2)] transition-all duration-300 hover:border-[var(--glacier)]/20 hover:shadow-[0_0_40px_rgba(14,165,233,0.08)] ${className}`}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
       <img
         src={project.image}
         alt={project.name}
-        className="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 ease-out group-hover:scale-[1.04] group-hover:opacity-75"
+        className="absolute inset-0 h-full w-full object-cover opacity-60 transition duration-700 ease-out group-hover:scale-[1.06] group-hover:opacity-75"
         loading="lazy"
       />
       <div className="relative z-20 mt-auto flex flex-col p-7 md:p-9">
@@ -152,10 +152,10 @@ const Marquee: React.FC = () => (
       {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
         <span
           key={i}
-          className="text-xl md:text-3xl font-heading font-semibold text-slate-700 uppercase tracking-widest flex items-center gap-6"
+          className="text-xl md:text-3xl font-heading font-semibold text-slate-600 uppercase tracking-widest flex items-center gap-6"
         >
           {item}
-          <Star className="w-3 h-3 md:w-4 md:h-4 text-[var(--glacier)]/30 fill-[var(--glacier)]/30 flex-shrink-0" />
+          <Star className="w-3 h-3 md:w-4 md:h-4 text-[var(--glacier)]/40 fill-[var(--glacier)]/40 flex-shrink-0" />
         </span>
       ))}
     </motion.div>
@@ -367,15 +367,21 @@ const App: React.FC = () => {
         <section id="work" className="relative w-full overflow-hidden border-t border-white/[0.05] bg-[var(--surface-1)] py-24 md:py-28">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(14,165,233,0.06),transparent)]" />
 
-          <div className="relative z-10 mx-auto max-w-[1280px] px-6 mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 mx-auto max-w-[1280px] px-6 mb-14"
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-px bg-[var(--glacier-glow)]" />
               <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--glacier-glow)]">
                 Showcase
               </span>
             </div>
-            <h2 className="font-heading text-5xl font-extrabold tracking-tight text-white md:text-7xl leading-[0.9]">
-              The{' '}
+            <h2 className="font-heading text-5xl font-extrabold tracking-[-0.04em] text-white md:text-7xl leading-none">
+              <span className="text-slate-500">The</span>{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--glacier-glow)] via-white to-[var(--frost)]">
                 Arsenal
               </span>
@@ -383,7 +389,7 @@ const App: React.FC = () => {
             <p className="mt-6 max-w-xl font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 font-bold border-l-2 border-[var(--glacier)] pl-4">
               Live systems — civic infrastructure, youth platforms, and flagship digital brands deployed in the wild.
             </p>
-          </div>
+          </motion.div>
 
           <div className="relative z-10 mx-auto max-w-[1280px] px-4 md:px-6">
             <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12">
@@ -440,9 +446,10 @@ const App: React.FC = () => {
             className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start"
           >
             <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-[var(--glacier)] mb-3">
-                Start here
-              </p>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-px bg-[var(--glacier)]" />
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-[var(--glacier)]">Start here</p>
+              </div>
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-heading font-extrabold text-white leading-[0.95] tracking-tight">
                 Engineer your
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--glacier-glow)] to-[var(--frost)]">
@@ -473,13 +480,12 @@ const App: React.FC = () => {
 
               <div className="mt-10 inline-flex items-center gap-4 rounded-2xl border border-white/[0.07] bg-black/30 p-3 pr-6 backdrop-blur-sm">
                 <div className="flex -space-x-2.5">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="w-9 h-9 rounded-full bg-[var(--surface-2)] border-2 border-[var(--surface-1)] flex items-center justify-center text-[10px] text-[var(--glacier)] font-bold"
-                    >
-                      ★
-                    </div>
+                  {[
+                    'bg-[var(--glacier)]',
+                    'bg-[var(--frost)]/60',
+                    'bg-[var(--glacier-glow)]',
+                  ].map((color, i) => (
+                    <div key={i} className={`w-9 h-9 rounded-full ${color} border-2 border-[var(--surface-1)] opacity-80`} />
                   ))}
                 </div>
                 <div>
@@ -498,6 +504,7 @@ const App: React.FC = () => {
 
       {/* ── Footer ── */}
       <footer className="relative border-t border-white/[0.06] bg-[var(--surface-0)] py-16 overflow-hidden">
+        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-[var(--glacier)]/20 to-transparent" />
         <div className="max-w-[1280px] mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 relative z-10">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">

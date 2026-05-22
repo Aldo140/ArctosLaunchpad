@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { HERO_STATS } from '../lib/siteContent';
 
 interface HeroSectionProps {
@@ -9,6 +9,35 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystems }) => {
+  const prefersReduced = useReducedMotion();
+
+  const fadeUp = (y = 20, delay = 0) =>
+    prefersReduced
+      ? {}
+      : {
+          initial: { opacity: 0, y },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
+        };
+
+  const fadeIn = (delay = 0) =>
+    prefersReduced
+      ? {}
+      : {
+          initial: { opacity: 0 },
+          animate: { opacity: 1 },
+          transition: { duration: 0.6, delay },
+        };
+
+  const slideRight = (delay = 0) =>
+    prefersReduced
+      ? {}
+      : {
+          initial: { opacity: 0, x: 24 },
+          animate: { opacity: 1, x: 0 },
+          transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay },
+        };
+
   return (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--surface-0)]">
       {/* Static background: mountains image + gradient overlay */}
@@ -26,47 +55,48 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
       {/* Subtle grid */}
       <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(rgba(14,165,233,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.035)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_70%_at_60%_40%,#000_30%,transparent_100%)]" />
 
+      {/* Right-column ambient radial glow */}
+      <div className="pointer-events-none absolute right-[-10%] top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--glacier)]/[0.04] blur-[120px] z-0" />
+
       {/* Main grid layout */}
       <div className="relative z-10 mx-auto w-full max-w-[1380px] px-6 pt-32 pb-24 grid md:grid-cols-2 gap-12 md:gap-8 items-center">
 
         {/* LEFT: Text + CTAs */}
         <div className="flex flex-col">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            {...fadeUp(12, 0)}
             className="mb-7 inline-flex items-center gap-2.5 self-start rounded-full border border-[var(--glacier)]/30 bg-[var(--surface-2)] px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--glacier-glow)]"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--glacier-glow)] animate-pulse" />
             Enterprise Digital Infrastructure · Canada
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-            className="font-heading text-[clamp(2.8rem,6vw,5rem)] font-extrabold leading-[1.02] tracking-tight text-white"
-          >
-            We build the systems
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--frost)] to-[var(--glacier)] mt-1">
-              behind modern businesses.
-            </span>
-          </motion.h1>
+          {/* H1 cinematic entrance with rotateX */}
+          <div style={{ perspective: '1000px' }}>
+            <motion.h1
+              initial={prefersReduced ? {} : { opacity: 0, y: 20, rotateX: 15 }}
+              animate={prefersReduced ? {} : { opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+              style={{ transformOrigin: 'bottom' }}
+              className="font-heading text-[clamp(2.8rem,6vw,5rem)] font-extrabold leading-[1.02] tracking-tight text-white"
+            >
+              We build the systems
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--frost)] to-[var(--glacier)] mt-1">
+                behind modern businesses.
+              </span>
+            </motion.h1>
+          </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+            {...fadeUp(12, 0.12)}
             className="mt-7 max-w-lg text-[15px] leading-relaxed text-slate-400 font-light"
           >
             ARCTOS LAUNCHPAD engineers custom operational platforms, AI workflows, and digital infrastructure for Canadian enterprises. You own everything we build — forever.
           </motion.p>
 
-          {/* CTAs — proper React buttons, no image buttons */}
+          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            {...fadeUp(10, 0.2)}
             className="mt-10 flex flex-wrap gap-3"
           >
             <button
@@ -86,28 +116,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             </button>
           </motion.div>
 
-          {/* Stats strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 flex gap-8 border-t border-white/[0.06] pt-8"
-          >
-            {HERO_STATS.map((stat) => (
-              <div key={stat.label} className="flex flex-col gap-1">
-                <span className="font-heading text-2xl font-extrabold text-white">{stat.value}</span>
+          {/* Stats strip — each stat staggered individually */}
+          <div className="mt-12 flex gap-8 border-t border-white/[0.06] pt-8">
+            {HERO_STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
+                animate={prefersReduced ? {} : { opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 + i * 0.07 }}
+                className="flex flex-col gap-1"
+              >
+                <span className="font-heading text-3xl font-extrabold text-white">{stat.value}</span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-600 leading-snug max-w-[7rem]">
                   {stat.label}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Logo strip */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            {...fadeIn(0.4)}
             className="mt-8"
           >
             <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-slate-700 mb-3 font-bold">
@@ -124,30 +153,35 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
         {/* RIGHT: Real project screenshot composition */}
         <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+          {...slideRight(0.15)}
           className="relative hidden md:flex items-center justify-center min-h-[480px]"
         >
-          {/* Primary screenshot — Starlings desktop */}
-          <div className="absolute top-0 right-0 w-[88%] rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_64px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.04]">
-            <img
-              src="/starlings-landing-desktop.webp"
-              alt="Starlings — Youth Infrastructure Platform"
-              className="w-full h-auto block object-cover"
-              loading="eager"
-            />
-            {/* Label overlay */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4">
-              <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[var(--glacier-glow)]">Youth Infrastructure Platform</p>
-              <p className="text-white text-sm font-bold mt-0.5">Starlings Support Map</p>
+          {/* Primary screenshot — 3D tilt wrapper */}
+          <div
+            style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
+            className="absolute top-0 right-0 w-[88%]"
+          >
+            <div
+              style={{ transform: 'rotateY(-6deg) rotateX(3deg)' }}
+              className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_64px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.04]"
+            >
+              <img
+                src="/starlings-landing-desktop.webp"
+                alt="Starlings — Youth Infrastructure Platform"
+                className="w-full h-auto block object-cover"
+                loading="eager"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4">
+                <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[var(--glacier-glow)]">Youth Infrastructure Platform</p>
+                <p className="text-white text-sm font-bold mt-0.5">Starlings Support Map</p>
+              </div>
             </div>
           </div>
 
-          {/* Secondary screenshot — Calgary Watch */}
+          {/* Secondary floating screenshot — stronger glow */}
           <motion.div
-            className="absolute bottom-0 left-0 w-[52%] rounded-xl overflow-hidden border border-white/[0.1] shadow-[0_16px_48px_rgba(0,0,0,0.8)] ring-1 ring-[var(--glacier)]/10 z-10"
-            animate={{ y: [0, -8, 0] }}
+            className="absolute bottom-0 left-0 w-[52%] rounded-xl overflow-hidden border border-white/[0.1] shadow-[0_16px_48px_rgba(0,0,0,0.8),0_0_40px_rgba(14,165,233,0.15)] ring-2 ring-[var(--glacier)]/20 z-10"
+            animate={prefersReduced ? {} : { y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
           >
             <img
@@ -162,18 +196,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             </div>
           </motion.div>
 
-          {/* Ambient glow behind composition */}
+          {/* Ambient glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] bg-[var(--glacier)]/8 blur-[100px] rounded-full pointer-events-none" />
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — more visible, with animated chevron */}
       <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30 hover:opacity-60 transition-opacity cursor-pointer z-20"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 hover:opacity-80 transition-opacity cursor-pointer z-20"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
         <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[var(--glacier-glow)]">Scroll</span>
         <div className="w-px h-12 bg-gradient-to-b from-[var(--glacier-glow)] to-transparent" />
+        <motion.div
+          animate={prefersReduced ? {} : { y: [0, 5, 0] }}
+          transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+        >
+          <ChevronDown className="h-3.5 w-3.5 text-[var(--glacier-glow)]" />
+        </motion.div>
       </div>
     </header>
   );
