@@ -4,8 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 export type FaqItem = { q: string; a: string };
 
@@ -23,47 +22,111 @@ const FaqSection: React.FC<FaqSectionProps> = ({
   className = '',
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const prefersReduced = useReducedMotion();
 
   return (
-    <section className={`relative ${className}`}>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(14,165,233,0.04),transparent_50%)] pointer-events-none" />
-      <div className="mb-14 max-w-2xl relative z-10">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-px bg-[var(--glacier)]" />
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--glacier-glow)]">Common Questions</p>
-        </div>
-        <h2 className="font-heading text-4xl font-extrabold tracking-tight text-white md:text-5xl">{heading}</h2>
-        <p className="mt-4 text-slate-400 md:text-lg font-light leading-relaxed">{subheading}</p>
-      </div>
+    <section
+      className={className}
+      style={{ background: 'var(--bg-1)' }}
+    >
+      <div
+        className="mx-auto px-6 md:px-12 py-24 md:py-32"
+        style={{ maxWidth: '840px' }}
+      >
+        {/* Section header */}
+        <motion.div
+          initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-16"
+        >
+          <p
+            className="font-mono uppercase tracking-widest mb-5"
+            style={{ fontSize: '10px', color: '#a1a1aa', letterSpacing: '0.22em' }}
+          >
+            06 / FAQ
+          </p>
+          <h2
+            className="font-heading font-normal leading-none mb-5"
+            style={{ fontSize: 'clamp(2.5rem, 4vw, 4rem)', color: 'var(--ink)' }}
+          >
+            {heading}
+          </h2>
+          <p
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '15px',
+              fontWeight: 300,
+              color: '#a1a1aa',
+              lineHeight: 1.6,
+            }}
+          >
+            {subheading}
+          </p>
+        </motion.div>
 
-      <div className="space-y-4 relative z-10">
-        {items.map((item, i) => {
-          const open = openIndex === i;
-          return (
-            <motion.div
-              key={item.q}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div
-                className={`relative glass-panel border rounded-2xl overflow-hidden transition-all duration-500 ${open ? 'border-[var(--glacier-glow)]/40 shadow-[0_10px_30px_rgba(14,165,233,0.12)]' : 'border-white/10 hover:border-white/20'}`}
+        {/* Accordion */}
+        <div>
+          {items.map((item, i) => {
+            const open = openIndex === i;
+            const isLast = i === items.length - 1;
+
+            return (
+              <motion.div
+                key={item.q}
+                initial={prefersReduced ? false : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  delay: i * 0.05,
+                  duration: 0.5,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
-                {open && (
-                  <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--glacier)] rounded-l-2xl" />
-                )}
+                {/* Top rule — changes color when open */}
+                <div
+                  style={{
+                    height: '1px',
+                    background: open
+                      ? 'rgba(59,130,246,0.25)'
+                      : 'var(--border)',
+                    transition: 'background 0.3s ease',
+                  }}
+                />
+
+                {/* Question row */}
                 <button
                   type="button"
                   onClick={() => setOpenIndex(open ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition hover:bg-white/[0.02]"
+                  className="flex w-full items-start justify-between gap-6 text-left"
+                  style={{ paddingTop: '1.5rem', paddingBottom: open ? '0.75rem' : '1.5rem', cursor: 'pointer' }}
                   aria-expanded={open}
                 >
-                  <span className={`font-bold transition-colors duration-300 ${open ? 'text-white' : 'text-slate-300'} md:text-lg tracking-wide`}>{item.q}</span>
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border transition-all duration-500 ${open ? 'bg-[var(--glacier)] border-[var(--glacier)] text-black rotate-45' : 'border-white/20 text-[var(--glacier-glow)] bg-black/50'}`}>
-                    <Plus className="h-4 w-4 shrink-0" />
-                  </div>
+                  <span
+                    className="font-heading font-normal leading-snug transition-colors duration-300"
+                    style={{
+                      fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
+                      color: open ? '#3b82f6' : 'var(--ink)',
+                    }}
+                  >
+                    {item.q}
+                  </span>
+                  <span
+                    className="font-mono shrink-0 transition-colors duration-300"
+                    style={{
+                      fontSize: '1.25rem',
+                      lineHeight: 1,
+                      marginTop: '0.15rem',
+                      color: open ? '#3b82f6' : '#a1a1aa',
+                    }}
+                    aria-hidden
+                  >
+                    {open ? '−' : '+'}
+                  </span>
                 </button>
+
+                {/* Answer — animated height */}
                 <AnimatePresence initial={false}>
                   {open && (
                     <motion.div
@@ -71,17 +134,41 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ overflow: 'hidden' }}
                     >
-                      <div className="px-6 pb-5 pr-12 text-[15px] leading-relaxed text-slate-400 font-light border-t border-white/5 pt-4">
+                      <p
+                        style={{
+                          fontFamily: "'Inter', system-ui, sans-serif",
+                          fontSize: '14px',
+                          fontWeight: 300,
+                          color: '#a1a1aa',
+                          lineHeight: 1.75,
+                          paddingBottom: '1.5rem',
+                          maxWidth: '42rem',
+                        }}
+                      >
                         {item.a}
-                      </div>
+                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
-            </motion.div>
-          );
-        })}
+
+                {/* Bottom rule — only on last item */}
+                {isLast && (
+                  <div
+                    style={{
+                      height: '1px',
+                      background: open
+                        ? 'rgba(59,130,246,0.25)'
+                        : 'var(--border)',
+                      transition: 'background 0.3s ease',
+                    }}
+                  />
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

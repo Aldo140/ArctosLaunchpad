@@ -1,139 +1,254 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Search, Layers, Code, Rocket } from 'lucide-react';
 
 const STEPS = [
   {
     num: '01',
     title: 'Discovery Sprint',
-    body: 'Architecture review, user flow mapping, and clear success criteria. Documented before writing a line of code.',
-    Icon: Search,
+    body: 'Architecture review, user flow mapping, and clear success criteria. Documented before a single line of code.',
   },
   {
     num: '02',
     title: 'System Design',
     body: 'Component architecture, data flows, integration specs, and full written scope with fixed milestones.',
-    Icon: Layers,
   },
   {
     num: '03',
     title: 'Build & Integrate',
     body: 'Staged delivery with weekly reviews, performance testing, security hardening, and full client visibility.',
-    Icon: Code,
   },
   {
     num: '04',
     title: 'Launch & Handoff',
-    body: 'Production deployment, full documentation, team training, and complete source code handoff.',
-    Icon: Rocket,
+    body: 'Production deployment, full documentation, team training, and complete source code transfer.',
   },
 ] as const;
 
 const WorkflowSection: React.FC = () => {
-  const shouldReduceMotion = useReducedMotion();
+  const reduced = useReducedMotion() ?? false;
 
   return (
-    <section className="relative py-24 md:py-28 bg-[var(--surface-1)] overflow-hidden">
-      {/* Subtle bottom glow */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_30%_at_50%_100%,rgba(14,165,233,0.04),transparent)]" />
+    <section
+      style={{ background: 'var(--bg-1)' }}
+      className="py-20 md:py-32 lg:py-40 overflow-hidden"
+    >
+      {/* Full-width rule above header area */}
+      <div style={{ borderTop: '1px solid var(--border)' }} />
 
-      <div className="relative max-w-[1280px] mx-auto px-6">
-        <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16"
+      {/* Header */}
+      <div className="max-w-[1320px] mx-auto px-6 md:px-12">
+        <div style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}
+          className="py-10 md:py-14"
         >
-          {/* Eyebrow with line prefix */}
-          <div className="flex items-center gap-3 mb-3">
-            <span className="w-8 h-px bg-[var(--glacier)]" />
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-[var(--glacier)]">
-              The Process
-            </p>
-          </div>
-          <h2 className="font-heading text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-            How we engineer your system.
-          </h2>
-        </motion.div>
-
-        {/* Desktop: horizontal */}
-        <div className="hidden md:grid grid-cols-4 gap-5 relative">
-          {/* Connecting line — primary layer */}
           <motion.div
-            initial={shouldReduceMotion ? false : { scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="absolute top-[2.8rem] left-[12%] right-[12%] h-[1.5px] bg-gradient-to-r from-transparent via-[var(--glacier-glow)]/60 to-transparent origin-left"
-          />
-          {/* Connecting line — secondary thinner layer */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-            className="absolute top-[calc(2.8rem+2px)] left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-[var(--glacier-glow)]/30 to-transparent origin-left opacity-30"
-          />
-
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={step.num}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center text-center group"
+            initial={reduced ? false : { opacity: 0, y: 20 }}
+            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Eyebrow */}
+            <p
+              className="mb-5"
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '10px',
+                fontWeight: 400,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: 'var(--ink-2)',
+              }}
             >
-              <div className="relative mb-7">
-                {/* Large faded watermark number */}
-                <span className="absolute -top-3 -left-3 font-heading text-[5rem] font-extrabold text-white/[0.04] leading-none select-none pointer-events-none">
+              THE PROCESS
+            </p>
+
+            {/* Heading */}
+            <h2
+              style={{
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontSize: 'clamp(3rem, 5vw, 5rem)',
+                fontWeight: 400,
+                lineHeight: 1.0,
+                letterSpacing: '-0.03em',
+                color: 'var(--ink)',
+              }}
+            >
+              How we engineer
+              <br />
+              <em style={{ fontStyle: 'italic' }}>your system.</em>
+            </h2>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ─── DESKTOP: 4-column horizontal timeline ─── */}
+      <div className="hidden md:block max-w-[1320px] mx-auto px-6 md:px-12 mt-0 relative">
+        {/* Connecting progress line — full-width, behind columns */}
+        <div className="relative">
+          <motion.div
+            initial={reduced ? false : { scaleX: 0 }}
+            whileInView={reduced ? undefined : { scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              position: 'absolute',
+              top: '4.9rem',
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: 'var(--border-2)',
+              transformOrigin: 'left center',
+              zIndex: 0,
+            }}
+          />
+
+          {/* 4-column grid */}
+          <div
+            style={{ borderTop: '1px solid var(--border)' }}
+            className="grid grid-cols-4 relative"
+          >
+            {STEPS.map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial={reduced ? false : { opacity: 0, y: 28 }}
+                whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  borderRight: i < STEPS.length - 1 ? '1px solid var(--border)' : undefined,
+                  position: 'relative',
+                }}
+                className="px-8 py-10 flex flex-col"
+              >
+                {/* Large step number */}
+                <span
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontSize: '5rem',
+                    fontWeight: 300,
+                    lineHeight: 1,
+                    color: 'var(--ink-3)',
+                    display: 'block',
+                    marginBottom: '0.75rem',
+                    userSelect: 'none',
+                  }}
+                >
                   {step.num}
                 </span>
-                {/* Outer ring — appears on hover */}
-                <div
-                  className="w-[5.5rem] h-[5.5rem] rounded-full border border-[var(--glacier)]/20 bg-[var(--surface-2)] flex items-center justify-center
-                    ring-2 ring-[var(--glacier)]/0
-                    group-hover:ring-[var(--glacier)]/20
-                    group-hover:border-[var(--glacier)]/50
-                    group-hover:bg-[var(--glacier)]/[0.06]
-                    group-hover:shadow-[0_0_40px_rgba(14,165,233,0.15)]
-                    transition-all duration-500"
-                >
-                  <step.Icon className="w-6 h-6 text-[var(--glacier-glow)]" />
-                </div>
-              </div>
-              <h3 className="font-heading text-base font-bold text-white mb-2 group-hover:text-[var(--glacier-glow)] transition-colors duration-200">
-                {step.title}
-              </h3>
-              <p className="text-slate-500 text-sm leading-relaxed font-light">{step.body}</p>
-            </motion.div>
-          ))}
-        </div>
 
-        {/* Mobile: vertical */}
-        <div className="md:hidden space-y-4 relative">
-          <div className="absolute left-5 top-5 bottom-5 w-px bg-gradient-to-b from-[var(--glacier)]/40 via-[var(--glacier-glow)]/30 to-transparent" />
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={step.num}
-              initial={shouldReduceMotion ? false : { opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.5 }}
-              className="flex gap-4 pl-12 relative"
-            >
-              <div className="absolute left-0 w-10 h-10 rounded-full border border-[var(--glacier)]/25 bg-[var(--surface-2)] flex items-center justify-center">
-                <step.Icon className="w-4 h-4 text-[var(--glacier-glow)]" />
-              </div>
-              <div className="rounded-xl border border-white/[0.06] bg-[var(--surface-2)] p-5 flex-1">
-                <span className="font-mono text-[9px] text-[var(--glacier)] uppercase tracking-[0.28em]">{step.num}</span>
-                <h3 className="font-heading text-base font-bold text-white mt-1.5 mb-1.5">{step.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed font-light">{step.body}</p>
-              </div>
-            </motion.div>
-          ))}
+                {/* Acid draw-in line */}
+                <div style={{ position: 'relative', height: '2px', marginBottom: '1.25rem' }}>
+                  <motion.div
+                    initial={reduced ? false : { scaleX: 0 }}
+                    whileInView={reduced ? undefined : { scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      delay: 0.3 + i * 0.1,
+                      duration: 0.5,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'var(--acid)',
+                      transformOrigin: 'left center',
+                    }}
+                  />
+                </div>
+
+                {/* Step title */}
+                <h3
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontSize: '1.5rem',
+                    fontWeight: 600,
+                    lineHeight: 1.15,
+                    color: 'var(--ink)',
+                    marginBottom: '0.75rem',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {step.title}
+                </h3>
+
+                {/* Step body */}
+                <p
+                  style={{
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: '13px',
+                    fontWeight: 300,
+                    lineHeight: 1.65,
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  {step.body}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
+      </div>
+
+      {/* ─── MOBILE: vertical list ─── */}
+      <div className="md:hidden max-w-[1320px] mx-auto px-6 mt-0">
+        {STEPS.map((step, i) => (
+          <motion.div
+            key={step.num}
+            initial={reduced ? false : { opacity: 0, y: 20 }}
+            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            style={{ borderTop: '1px solid var(--border)' }}
+            className="py-6"
+          >
+            <div
+              style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '1rem' }}
+            >
+              {/* Number */}
+              <span
+                style={{
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontSize: '1.875rem',
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  color: 'var(--ink-3)',
+                  paddingTop: '0.15rem',
+                }}
+              >
+                {step.num}
+              </span>
+
+              {/* Content */}
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontSize: '1.25rem',
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                    color: 'var(--ink)',
+                    marginBottom: '0.5rem',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: '13px',
+                    fontWeight: 300,
+                    lineHeight: 1.65,
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  {step.body}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+        {/* Bottom rule */}
+        <div style={{ borderTop: '1px solid var(--border)' }} />
       </div>
     </section>
   );

@@ -29,7 +29,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'How does the engagement process work?',
-    a: 'We start with an architecture discovery call, then deliver a written scope with operational milestones and transparent pricing. You get regular updates, staged deployments, and complete documentation.',
+    a: 'We start with an architecture discovery call, then deliver a written scope with operational milestones and transparent pricing. You receive regular updates, staged deployments, and complete documentation.',
   },
   {
     q: 'Do you work with existing infrastructure?',
@@ -41,7 +41,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: 'How long does a typical system take to build?',
-    a: 'Scope determines timeline. A custom static site ships in 2-3 weeks. A full-stack application or enterprise dashboard typically takes 6-12 weeks with staged delivery milestones. We scope everything in writing before work begins.',
+    a: 'Scope determines timeline. A custom static system ships in 2-3 weeks. A full-stack application or enterprise dashboard typically takes 6-12 weeks with staged delivery milestones. We scope everything in writing before work begins.',
   },
 ];
 

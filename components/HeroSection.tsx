@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { HERO_STATS } from '../lib/siteContent';
 
 interface HeroSectionProps {
@@ -11,210 +11,272 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystems }) => {
   const prefersReduced = useReducedMotion();
 
-  const fadeUp = (y = 20, delay = 0) =>
-    prefersReduced
-      ? {}
-      : {
-          initial: { opacity: 0, y },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
-        };
+  // Helper: return animation props or empty object if reduced motion
+  const a = <T extends object>(props: T): T | object =>
+    prefersReduced ? {} : props;
 
-  const fadeIn = (delay = 0) =>
-    prefersReduced
-      ? {}
-      : {
-          initial: { opacity: 0 },
-          animate: { opacity: 1 },
-          transition: { duration: 0.6, delay },
-        };
-
-  const slideRight = (delay = 0) =>
-    prefersReduced
-      ? {}
-      : {
-          initial: { opacity: 0, x: 24 },
-          animate: { opacity: 1, x: 0 },
-          transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay },
-        };
+  const headingLines = [
+    { text: 'We build the systems', weight: 'font-light', italic: false },
+    { text: 'behind modern', weight: 'font-light', italic: false },
+    { text: 'businesses.', weight: 'font-normal', italic: true },
+  ];
 
   return (
-    <header className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--surface-0)]">
-      {/* Static background: mountains image + gradient overlay */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/bakcground-mountains.webp"
-          alt=""
-          aria-hidden
-          className="w-full h-full object-cover opacity-[0.18] mix-blend-screen"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-0)] via-[var(--surface-0)]/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--surface-0)] via-transparent to-transparent" />
+    <header
+      className="relative min-h-screen flex flex-col justify-between overflow-hidden"
+      style={{ background: 'var(--bg)' }}
+    >
+      {/* ── Dot grid texture ──────────────────────────────── */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, rgba(59, 130, 246, 0.06) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          opacity: 0.4,
+        }}
+      />
+
+      {/* ── Decorative outlined circle ────────────────────── */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute z-0 w-[600px] h-[600px] rounded-full"
+        style={{
+          right: '-200px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          border: '1px solid rgba(59, 130, 246, 0.05)',
+        }}
+      />
+
+      {/* ── Main content ──────────────────────────────────── */}
+      <div className="relative z-10 flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-28 pb-16 sm:pt-32">
+
+        {/* Eyebrow */}
+        <motion.div
+          {...a({
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
+          })}
+          className="self-start mb-10 sm:mb-12"
+        >
+          <span
+            className="font-mono text-[9px] uppercase tracking-[0.22em] inline-flex items-center gap-2"
+            style={{
+              color: 'var(--ink-2)',
+              border: '1px solid var(--border-2)',
+              padding: '0.4rem 0.75rem',
+            }}
+          >
+            <span style={{ color: 'var(--acid)', fontSize: '8px' }}>●</span>
+            Enterprise Digital Infrastructure · Canada
+          </span>
+        </motion.div>
+
+        {/* H1 heading */}
+        <h1
+          className="leading-[0.92] tracking-[-0.02em]"
+          style={{
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
+            fontWeight: 600,
+            fontSize: 'clamp(3.2rem, 10vw, 5rem)',
+            color: 'var(--ink)',
+          }}
+        >
+          {/* Desktop: larger clamp */}
+          <span
+            className="hidden sm:block"
+            style={{ fontSize: 'clamp(4.5rem, 11vw, 11rem)' }}
+          >
+            {headingLines.map((line, i) => (
+              <span key={line.text} className="block overflow-hidden">
+                <motion.span
+                  className={`block ${line.weight}`}
+                  style={line.italic ? { fontStyle: 'italic' } : {}}
+                  {...a({
+                    initial: { y: '110%', opacity: 0 },
+                    animate: { y: '0%', opacity: 1 },
+                    transition: {
+                      duration: 0.8,
+                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.2 + i * 0.08,
+                    },
+                  })}
+                >
+                  {line.text}
+                </motion.span>
+              </span>
+            ))}
+          </span>
+          {/* Mobile: smaller clamp */}
+          <span
+            className="sm:hidden block"
+            style={{ fontSize: 'clamp(3rem, 10vw, 4.5rem)' }}
+          >
+            {headingLines.map((line, i) => (
+              <span key={line.text} className="block overflow-hidden">
+                <motion.span
+                  className={`block ${line.weight}`}
+                  style={line.italic ? { fontStyle: 'italic' } : {}}
+                  {...a({
+                    initial: { y: '110%', opacity: 0 },
+                    animate: { y: '0%', opacity: 1 },
+                    transition: {
+                      duration: 0.8,
+                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.2 + i * 0.08,
+                    },
+                  })}
+                >
+                  {line.text}
+                </motion.span>
+              </span>
+            ))}
+          </span>
+        </h1>
+
+        {/* Subtext */}
+        <motion.p
+          {...a({
+            initial: { opacity: 0, y: 16 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
+          })}
+          className="mt-8 sm:mt-10 font-light leading-relaxed max-w-md"
+          style={{
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontSize: '16px',
+            color: 'var(--ink-2)',
+          }}
+        >
+          ARCTOS LAUNCHPAD engineers custom operational platforms, AI workflows, and digital
+          infrastructure for Canadian enterprises. You own everything we build — forever.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          {...a({
+            initial: { opacity: 0, y: 16 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
+          })}
+          className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3"
+        >
+          <button
+            type="button"
+            onClick={scrollToContact}
+            className="inline-flex items-center justify-center gap-2.5 transition-opacity duration-200 hover:opacity-85 active:opacity-70 min-h-[48px]"
+            style={{
+              background: 'var(--acid)',
+              color: '#09090A',
+              padding: '1rem 1.75rem',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+            }}
+          >
+            Engineer Your Future
+            <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
+          </button>
+
+          <button
+            type="button"
+            onClick={onViewSystems}
+            className="inline-flex items-center justify-center gap-2 transition-colors duration-200 min-h-[48px] group"
+            style={{
+              border: '1px solid var(--border-2)',
+              color: 'var(--ink)',
+              padding: '1rem 1.75rem',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.borderColor = 'var(--ink)')
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.borderColor = 'var(--border-2)')
+            }
+          >
+            View Systems
+          </button>
+        </motion.div>
+
       </div>
 
-      {/* Subtle grid */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(rgba(14,165,233,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.035)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_70%_70%_at_60%_40%,#000_30%,transparent_100%)]" />
+      {/* ── Stats strip — pinned to bottom ────────────────── */}
+      <div className="relative z-10 max-w-[1360px] mx-auto w-full px-6 md:px-12 pb-12">
+        <motion.div
+          {...a({
+            initial: { opacity: 0, y: 12 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.6 },
+          })}
+        >
+          {/* Divider */}
+          <div
+            className="w-full mb-8"
+            style={{ height: '1px', background: 'var(--border)' }}
+          />
 
-      {/* Right-column ambient radial glow */}
-      <div className="pointer-events-none absolute right-[-10%] top-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--glacier)]/[0.04] blur-[120px] z-0" />
-
-      {/* Main grid layout */}
-      <div className="relative z-10 mx-auto w-full max-w-[1380px] px-6 pt-32 pb-24 grid md:grid-cols-2 gap-12 md:gap-8 items-center">
-
-        {/* LEFT: Text + CTAs */}
-        <div className="flex flex-col">
-          <motion.div
-            {...fadeUp(12, 0)}
-            className="mb-7 inline-flex items-center gap-2.5 self-start rounded-full border border-[var(--glacier)]/30 bg-[var(--surface-2)] px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--glacier-glow)]"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--glacier-glow)] animate-pulse" />
-            Enterprise Digital Infrastructure · Canada
-          </motion.div>
-
-          {/* H1 cinematic entrance with rotateX */}
-          <div style={{ perspective: '1000px' }}>
-            <motion.h1
-              initial={prefersReduced ? {} : { opacity: 0, y: 20, rotateX: 15 }}
-              animate={prefersReduced ? {} : { opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
-              style={{ transformOrigin: 'bottom' }}
-              className="font-heading text-[clamp(2.8rem,6vw,5rem)] font-extrabold leading-[1.02] tracking-tight text-white"
-            >
-              We build the systems
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--frost)] to-[var(--glacier)] mt-1">
-                behind modern businesses.
-              </span>
-            </motion.h1>
-          </div>
-
-          <motion.p
-            {...fadeUp(12, 0.12)}
-            className="mt-7 max-w-lg text-[15px] leading-relaxed text-slate-400 font-light"
-          >
-            ARCTOS LAUNCHPAD engineers custom operational platforms, AI workflows, and digital infrastructure for Canadian enterprises. You own everything we build — forever.
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            {...fadeUp(10, 0.2)}
-            className="mt-10 flex flex-wrap gap-3"
-          >
-            <button
-              type="button"
-              onClick={scrollToContact}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--glacier)] px-7 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--surface-0)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(14,165,233,0.45)] active:scale-[0.98]"
-            >
-              Start Your Infrastructure
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={onViewSystems}
-              className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-7 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm transition-all duration-200 hover:border-[var(--glacier)]/40 hover:text-[var(--glacier-glow)] active:scale-[0.98]"
-            >
-              View Our Systems
-            </button>
-          </motion.div>
-
-          {/* Stats strip — each stat staggered individually */}
-          <div className="mt-12 flex gap-8 border-t border-white/[0.06] pt-8">
-            {HERO_STATS.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={prefersReduced ? {} : { opacity: 0, y: 10 }}
-                animate={prefersReduced ? {} : { opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.3 + i * 0.07 }}
-                className="flex flex-col gap-1"
-              >
-                <span className="font-heading text-3xl font-extrabold text-white">{stat.value}</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-600 leading-snug max-w-[7rem]">
+          {/* Stats row */}
+          <div className="flex flex-wrap gap-x-12 gap-y-6">
+            {HERO_STATS.map((stat) => (
+              <div key={stat.label}>
+                <div
+                  className="font-semibold leading-none"
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontWeight: 600,
+                    fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                    color: 'var(--acid)',
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div
+                  className="mt-1.5 font-mono uppercase tracking-widest"
+                  style={{ fontSize: '10px', color: 'var(--ink-2)' }}
+                >
                   {stat.label}
-                </span>
-              </motion.div>
+                </div>
+              </div>
             ))}
           </div>
-
-          {/* Logo strip */}
-          <motion.div
-            {...fadeIn(0.4)}
-            className="mt-8"
-          >
-            <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-slate-700 mb-3 font-bold">
-              Trusted by elite operations
-            </p>
-            <img
-              src="/logo-strip.webp"
-              alt="Trusted partners"
-              className="h-6 object-contain opacity-40 hover:opacity-70 transition-opacity duration-300"
-              loading="eager"
-            />
-          </motion.div>
-        </div>
-
-        {/* RIGHT: Real project screenshot composition */}
-        <motion.div
-          {...slideRight(0.15)}
-          className="relative hidden md:flex items-center justify-center min-h-[480px]"
-        >
-          {/* Primary screenshot — 3D tilt wrapper */}
-          <div
-            style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
-            className="absolute top-0 right-0 w-[88%]"
-          >
-            <div
-              style={{ transform: 'rotateY(-6deg) rotateX(3deg)' }}
-              className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_24px_64px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.04]"
-            >
-              <img
-                src="/starlings-landing-desktop.webp"
-                alt="Starlings — Youth Infrastructure Platform"
-                className="w-full h-auto block object-cover"
-                loading="eager"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4">
-                <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-[var(--glacier-glow)]">Youth Infrastructure Platform</p>
-                <p className="text-white text-sm font-bold mt-0.5">Starlings Support Map</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary floating screenshot — stronger glow */}
-          <motion.div
-            className="absolute bottom-0 left-0 w-[52%] rounded-xl overflow-hidden border border-white/[0.1] shadow-[0_16px_48px_rgba(0,0,0,0.8),0_0_40px_rgba(14,165,233,0.15)] ring-2 ring-[var(--glacier)]/20 z-10"
-            animate={prefersReduced ? {} : { y: [0, -8, 0] }}
-            transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
-          >
-            <img
-              src="/calgarywatch-map-desktop.webp"
-              alt="Calgary Watch — Civic Safety Intelligence System"
-              className="w-full h-auto block object-cover"
-              loading="eager"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
-              <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-[var(--glacier-glow)]">Civic Safety System</p>
-              <p className="text-white text-xs font-bold mt-0.5">Calgary Watch</p>
-            </div>
-          </motion.div>
-
-          {/* Ambient glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] bg-[var(--glacier)]/8 blur-[100px] rounded-full pointer-events-none" />
         </motion.div>
       </div>
 
-      {/* Scroll indicator — more visible, with animated chevron */}
+      {/* ── Scroll indicator ──────────────────────────────── */}
       <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 hover:opacity-80 transition-opacity cursor-pointer z-20"
-        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+        aria-hidden
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-20"
+        style={{ opacity: 0.45 }}
       >
-        <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[var(--glacier-glow)]">Scroll</span>
-        <div className="w-px h-12 bg-gradient-to-b from-[var(--glacier-glow)] to-transparent" />
-        <motion.div
-          animate={prefersReduced ? {} : { y: [0, 5, 0] }}
-          transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+        <span
+          className="font-mono uppercase tracking-widest"
+          style={{ fontSize: '8px', color: 'var(--ink-2)' }}
         >
-          <ChevronDown className="h-3.5 w-3.5 text-[var(--glacier-glow)]" />
-        </motion.div>
+          Scroll
+        </span>
+        <motion.div
+          className="w-px"
+          style={{
+            height: '40px',
+            background: 'linear-gradient(to bottom, var(--ink-2), transparent)',
+          }}
+          {...a({
+            animate: { y: [0, 8, 0] },
+            transition: { repeat: Infinity, duration: 2.2, ease: 'easeInOut' },
+          })}
+        />
       </div>
+
     </header>
   );
 };

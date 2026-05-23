@@ -1,215 +1,366 @@
-import React from 'react';
-import { motion, useMotionValue, useMotionTemplate, useReducedMotion } from 'framer-motion';
-import { Code, Layout, Zap, Check, ArrowRight } from 'lucide-react';
+/**
+ * SystemsSection — Metalab-inspired editorial capabilities list
+ * Design: numbered row format, Space Grotesk / Inter / JetBrains Mono
+ */
 
-const SpotlightCard = ({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const bg = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(14,165,233,0.08), transparent 80%)`;
+import React, { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
-  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
+// ─── Design tokens ──────────────────────────────────────────────────────────
+const T = {
+  bg1:     '#070d14',
+  ink:     '#ffffff',
+  ink2:    '#a1a1aa',
+  ink3:    '#52525b',
+  acid:    '#3b82f6',
+  border:  'rgba(255, 255, 255, 0.07)',
+  border2: 'rgba(255, 255, 255, 0.12)',
+} as const;
 
-  return (
-    <div className={`group relative overflow-hidden ${className}`} onMouseMove={handleMouseMove}>
-      <motion.div
-        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 z-0"
-        style={{ background: bg }}
-      />
-      <div className="relative z-10 h-full">{children}</div>
-    </div>
-  );
-};
-
-interface CardProps {
-  icon: React.ReactNode;
-  badge?: string;
-  title: string;
-  body: string;
-  features: string[];
-  pricing: string;
-  pricingSub: string;
-  cta: string;
-  accentVar: string;
-  accentBar: string;
-  index: number;
-  flagship?: boolean;
-  onCta: () => void;
-  reducedMotion: boolean;
+// ─── Service data ────────────────────────────────────────────────────────────
+interface Service {
+  num:        string;
+  title:      string;
+  descriptor: string;
+  tags:       string[];
 }
 
-const Card: React.FC<CardProps> = ({
-  icon,
-  badge,
-  title,
-  body,
-  features,
-  pricing,
-  pricingSub,
-  cta,
-  accentVar,
-  accentBar,
-  index,
-  flagship,
-  onCta,
-  reducedMotion,
-}) => (
-  <motion.div
-    initial={reducedMotion ? false : { opacity: 0, y: 28 }}
-    whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-40px' }}
-    transition={reducedMotion ? undefined : { delay: index * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-    className="h-full"
-  >
-    <SpotlightCard
-      className={`h-full rounded-2xl border bg-gradient-to-b from-[var(--surface-2)] to-[#080e18] p-8 flex flex-col group transition-colors duration-300 ${
-        flagship
-          ? 'border-[var(--glacier)]/20 hover:border-[var(--glacier)]/35'
-          : 'border-white/[0.07] hover:border-[var(--glacier)]/20'
-      }`}
-    >
-      {/* Accent bar */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r"
-        style={{ backgroundImage: accentBar }}
-      />
+const SERVICES: Service[] = [
+  {
+    num:        '01',
+    title:      'Custom Operational Systems',
+    descriptor: 'Hand-built React/Next.js infrastructure. Zero platform rent. Full source ownership.',
+    tags:       ['React', 'Next.js', 'TypeScript'],
+  },
+  {
+    num:        '02',
+    title:      'Platform Hybrid',
+    descriptor: 'Wix Studio / Webflow for teams needing daily content control without sacrificing craft.',
+    tags:       ['Wix Studio', 'Webflow', 'CMS'],
+  },
+  {
+    num:        '03',
+    title:      'Application Systems',
+    descriptor: 'Dashboards, booking engines, AI pipelines, civic intelligence platforms, and APIs.',
+    tags:       ['Full-Stack', 'AI', 'Infrastructure'],
+  },
+];
 
-      <div className="flex items-start justify-between mb-10">
-        <div
-          className={`w-14 h-14 rounded-xl border border-white/[0.08] bg-[var(--surface-1)] flex items-center justify-center transition-all duration-300 group-hover:scale-105 ${
-            flagship ? 'group-hover:shadow-[0_0_20px_rgba(14,165,233,0.2)]' : ''
-          }`}
-          style={{ color: accentVar }}
-        >
-          {icon}
-        </div>
-        {badge && (
-          <span className="rounded-full bg-[var(--glacier)] text-[var(--surface-0)] px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-widest">
-            {badge}
-          </span>
-        )}
-      </div>
-
-      <h3 className="text-xl font-heading font-extrabold text-white mb-3">{title}</h3>
-      <p className="text-slate-500 text-sm leading-relaxed mb-8 font-light flex-1">{body}</p>
-
-      <div className="mt-auto">
-        <div className="flex items-baseline gap-2.5 mb-6 pb-6 border-b border-white/[0.06]">
-          <span className="font-heading text-3xl font-bold text-white">{pricing}</span>
-          <span className="text-slate-700" aria-hidden>●</span>
-          <span className="font-mono text-[10px] text-slate-600 uppercase tracking-wider">{pricingSub}</span>
-        </div>
-        <ul className="space-y-2.5 mb-8">
-          {features.map((f) => (
-            <li key={f} className="flex items-center gap-2.5 text-sm text-slate-400">
-              <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: accentVar }} />
-              {f}
-            </li>
-          ))}
-        </ul>
-        <button
-          onClick={onCta}
-          className="w-full py-4 rounded-xl font-mono text-[10px] font-extrabold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.01] hover:brightness-110 active:scale-[0.99] group/btn"
-          style={{ background: accentVar, color: 'var(--surface-0)' }}
-        >
-          {cta}
-          <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-        </button>
-      </div>
-    </SpotlightCard>
-  </motion.div>
-);
-
+// ─── Props ───────────────────────────────────────────────────────────────────
 interface SystemsSectionProps {
   scrollToContact: () => void;
 }
 
-const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
-  const reducedMotion = useReducedMotion() ?? false;
+// ─── Animation variants ──────────────────────────────────────────────────────
+const fadeUp = {
+  hidden:  { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: i * 0.06 },
+  }),
+};
+
+const headerFade = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+};
+
+// ─── ServiceRow ──────────────────────────────────────────────────────────────
+const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: boolean }> = ({
+  service,
+  index,
+  reduceMotion,
+}) => {
+  const [hovered, setHovered] = useState(false);
 
   return (
-    <section id="systems" className="relative py-24 md:py-28 bg-[var(--surface-1)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(14,165,233,0.06),transparent)]" />
-      <div className="max-w-[1280px] mx-auto px-6 relative z-10">
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={reducedMotion ? undefined : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16"
+    <motion.div
+      custom={index}
+      variants={reduceMotion ? undefined : fadeUp}
+      initial={reduceMotion ? undefined : 'hidden'}
+      whileInView={reduceMotion ? undefined : 'visible'}
+      viewport={{ once: true, margin: '-60px' }}
+    >
+      {/* Top rule */}
+      <div style={{ height: 1, background: T.border }} />
+
+      {/* Row */}
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          position: 'relative',
+          backgroundColor: hovered ? T.bg1 : 'transparent',
+          transition: 'background-color 0.3s ease',
+          cursor: 'default',
+          paddingTop: '2rem',
+          paddingBottom: '2rem',
+          paddingLeft: '0',
+          paddingRight: '0',
+        }}
+      >
+        {/* Acid bottom border on hover */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 1,
+            backgroundColor: T.acid,
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+
+        {/* Grid: number | content | tags */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr auto',
+            alignItems: 'center',
+            gap: '2rem',
+          }}
+          className="gap-x-8 md:gap-x-12"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-px bg-[var(--glacier)]" />
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.32em] text-[var(--glacier)]">
-              Operational Systems
-            </p>
+          {/* Number */}
+          <div
+            style={{
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
+              fontWeight: 300,
+              fontSize: 'clamp(3.5rem, 6vw, 5rem)',
+              lineHeight: 1,
+              color: hovered ? T.acid : T.ink3,
+              transition: 'color 0.3s ease',
+              userSelect: 'none',
+              minWidth: '4.5rem',
+            }}
+          >
+            {service.num}
           </div>
-          <h2 className="font-heading text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Built for the way modern businesses run.
+
+          {/* Title + descriptor */}
+          <motion.div
+            animate={reduceMotion ? undefined : { x: hovered ? 8 : 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            style={{ minWidth: 0 }}
+          >
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontWeight: 500,
+                fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)',
+                color: T.ink,
+                lineHeight: 1.15,
+                marginBottom: '0.4rem',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {service.title}
+            </div>
+            <div
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 13,
+                color: T.ink2,
+                lineHeight: 1.5,
+                fontWeight: 400,
+              }}
+            >
+              {service.descriptor}
+            </div>
+          </motion.div>
+
+          {/* Tags — hidden on mobile via inline media approach */}
+          <div
+            className="hidden md:flex"
+            style={{ flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', flexShrink: 0 }}
+          >
+            {service.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
+                  fontSize: 9,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  color: T.ink3,
+                  border: `1px solid ${T.border2}`,
+                  padding: '0.2rem 0.55rem',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.6,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─── CTARow ──────────────────────────────────────────────────────────────────
+const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> = ({
+  scrollToContact,
+  reduceMotion,
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const [btnHovered, setBtnHovered] = useState(false);
+
+  return (
+    <motion.div
+      custom={SERVICES.length}
+      variants={reduceMotion ? undefined : fadeUp}
+      initial={reduceMotion ? undefined : 'hidden'}
+      whileInView={reduceMotion ? undefined : 'visible'}
+      viewport={{ once: true, margin: '-60px' }}
+    >
+      {/* Top rule */}
+      <div style={{ height: 1, background: T.border2 }} />
+
+      {/* CTA content */}
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1.5rem',
+          padding: '2rem 0',
+          backgroundColor: hovered ? T.bg1 : 'transparent',
+          transition: 'background-color 0.3s ease',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 24,
+            color: T.ink,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Ready to engineer your infrastructure?
+        </div>
+
+        <button
+          onClick={scrollToContact}
+          onMouseEnter={() => setBtnHovered(true)}
+          onMouseLeave={() => setBtnHovered(false)}
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 13,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            backgroundColor: btnHovered ? '#60a5fa' : T.acid,
+            color: '#ffffff',
+            border: 'none',
+            padding: '0.85rem 2rem',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            whiteSpace: 'nowrap',
+            lineHeight: 1,
+          }}
+        >
+          Start Your Infrastructure →
+        </button>
+      </div>
+
+      {/* Bottom rule */}
+      <div style={{ height: 1, background: T.border }} />
+    </motion.div>
+  );
+};
+
+// ─── Main component ──────────────────────────────────────────────────────────
+const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
+  const prefersReducedMotion = useReducedMotion() ?? false;
+
+  return (
+    <section
+      style={{
+        backgroundColor: T.bg1,
+        width: '100%',
+        overflowX: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: '0 auto',
+          padding: 'clamp(5rem, 10vw, 10rem) clamp(1.25rem, 5vw, 3.5rem)',
+        }}
+      >
+        {/* ── Section header ── */}
+        <motion.div
+          variants={reduceVariants(headerFade, prefersReducedMotion)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          style={{ marginBottom: 'clamp(3.5rem, 6vw, 5rem)' }}
+        >
+          {/* Eyebrow */}
+          <div
+            style={{
+              fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
+              fontSize: 10,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: T.ink2,
+              marginBottom: '1.5rem',
+            }}
+          >
+            01 / Capabilities
+          </div>
+
+          {/* Heading */}
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
+              fontSize: 'clamp(3rem, 5vw, 5rem)',
+              fontWeight: 500,
+              color: T.ink,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              margin: 0,
+            }}
+          >
+            Built for the way
+            <br />
+            modern operations run.
           </h2>
-          <p className="text-slate-500 text-base max-w-xl font-light leading-relaxed">
-            Three deployment models. All engineered for performance, security, and full ownership.
-          </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-5">
-          <Card
-            index={0}
-            icon={<Code className="w-6 h-6" />}
-            badge="Flagship"
-            flagship
-            title="Custom Operational Systems"
-            body="Hand-built React/Next.js infrastructure for maximum performance and complete operational control. Zero platform rent. Full source ownership."
-            features={['Zero Platform Rent', '100/100 Core Web Vitals', 'Full Source Ownership']}
-            pricing="One-Time"
-            pricingSub="/ Fixed"
-            cta="Initiate"
-            accentVar="var(--glacier)"
-            accentBar="linear-gradient(to right, var(--glacier), transparent)"
-            onCta={scrollToContact}
-            reducedMotion={reducedMotion}
-          />
-          <Card
-            index={1}
-            icon={<Layout className="w-6 h-6" />}
-            title="Platform Hybrid"
-            body="Visually engineered on modern visual builders (Wix Studio / Webflow) for teams that need daily content control without sacrificing craft."
-            features={['Premium UI/UX Design', 'Seamless Handoff', 'Operational Training']}
-            pricing="Build"
-            pricingSub="/ Flat Rate"
-            cta="Configure This"
-            accentVar="var(--frost)"
-            accentBar="linear-gradient(to right, rgba(186,230,253,0.6), transparent)"
-            onCta={scrollToContact}
-            reducedMotion={reducedMotion}
-          />
-          <Card
-            index={2}
-            icon={<Zap className="w-6 h-6" />}
-            title="Application Systems"
-            body="Complex data-intensive software — dashboards, booking engines, civic intelligence platforms, AI pipelines, and robust API integrations."
-            features={['Full-Stack Engineering', 'Identity & Security', 'Scalable Infrastructure']}
-            pricing="Scope"
-            pricingSub="/ Evaluated"
-            cta="Consult With Us"
-            accentVar="var(--glacier-glow)"
-            accentBar="linear-gradient(to right, var(--glacier-glow), transparent)"
-            onCta={scrollToContact}
-            reducedMotion={reducedMotion}
-          />
+        {/* ── Service rows ── */}
+        <div>
+          {SERVICES.map((service, i) => (
+            <ServiceRow
+              key={service.num}
+              service={service}
+              index={i}
+              reduceMotion={prefersReducedMotion}
+            />
+          ))}
+
+          {/* ── CTA row ── */}
+          <CTARow scrollToContact={scrollToContact} reduceMotion={prefersReducedMotion} />
         </div>
       </div>
     </section>
   );
 };
+
+// Helper: strip motion variants when reduced motion is preferred
+function reduceVariants<T extends object>(variants: T, reduce: boolean): T | undefined {
+  return reduce ? undefined : variants;
+}
 
 export default SystemsSection;
