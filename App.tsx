@@ -130,9 +130,8 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-      className={`group relative overflow-hidden ${className}`}
+      className={`group relative overflow-hidden min-h-[260px] md:min-h-[320px] ${className}`}
       style={{
-        minHeight: '320px',
         backgroundImage: `url(${project.image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'top center',
@@ -232,7 +231,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
           <h3 style={{
             fontFamily: "'Syne', system-ui, sans-serif",
             fontWeight: 600,
-            fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+            fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
             color: 'var(--ink)',
             margin: 0,
             lineHeight: 1.2,
@@ -302,7 +301,7 @@ const Marquee: React.FC = () => (
           </span>
           <span
             className="flex-shrink-0"
-            style={{ fontSize: 'clamp(1.25rem, 2vw, 2rem)', color: 'var(--acid)' }}
+            style={{ fontSize: 'clamp(1.25rem, 2vw, 2rem)', color: 'var(--accent)' }}
           >
             ·
           </span>
