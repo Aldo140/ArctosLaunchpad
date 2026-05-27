@@ -1,6 +1,6 @@
 /**
  * SystemsSection — Metalab-inspired editorial capabilities list
- * Design: numbered row format, Space Grotesk / Inter / JetBrains Mono
+ * Design: numbered row format, Syne / DM Sans / IBM Plex Mono
  */
 
 import React, { useState } from 'react';
