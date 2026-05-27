@@ -2,40 +2,40 @@
 
 :root {
   /* Surfaces */
-  --bg: #0f1419;
-  --bg-1: #070d14;
-  --bg-2: #0d1520;
+  --bg: #080A0F;
+  --bg-1: #0C0F18;
+  --bg-2: #111827;
 
   /* Typography */
-  --ink: #ffffff;
-  --ink-2: #a1a1aa;
-  --ink-3: #52525b;
+  --ink: #F5F7FF;
+  --ink-2: #8B9CB8;
+  --ink-3: #3D5275;
 
-  /* Accent — glacier blue */
-  --acid: #3b82f6;
-  --acid-dim: rgba(59, 130, 246, 0.06);
-  --acid-glow: rgba(59, 130, 246, 0.20);
+  /* Accent — electric blue */
+  --accent: #2563FF;
+  --acid: #2563FF;
+  --acid-dim: rgba(37, 99, 255, 0.07);
+  --acid-glow: rgba(37, 99, 255, 0.22);
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.07);
-  --border-2: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-2: rgba(255, 255, 255, 0.11);
 
-  /* Legacy aliases */
-  --surface-0: #0f1419;
-  --surface-1: #070d14;
-  --surface-2: #0d1520;
-  --glacier: #3b82f6;
-  --glacier-glow: #60a5fa;
-  --frost: #bae6fd;
-  --zinc: #3f4651;
-  --accent: #3b82f6;
-  --accent-glow: #60a5fa;
-  --accent-warm: #93c5fd;
-  --accent-deep: #1d4ed8;
-  --ink-muted: #a1a1aa;
-  --cyan: #06b6d4;
+  /* Legacy aliases — kept so untouched components don't break */
+  --surface-0: #080A0F;
+  --surface-1: #0C0F18;
+  --surface-2: #111827;
+  --glacier: #2563FF;
+  --glacier-glow: #4D7FFF;
+  --frost: #C8E0FF;
+  --zinc: #3D5275;
+  --accent-glow: #4D7FFF;
+  --accent-warm: #93B8FD;
+  --accent-deep: #1340CC;
+  --ink-muted: #8B9CB8;
+  --cyan: #2563FF;
 
-  /* Easing — keep exactly as-is */
+  /* Easing */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
@@ -43,10 +43,10 @@
 
 /* ─── Glow utilities ───────────────────────────────── */
 .glow-glacier {
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.20);
+  box-shadow: 0 0 30px rgba(37, 99, 255, 0.22);
 }
 .glow-glacier-hover:hover {
-  box-shadow: 0 0 40px rgba(59, 130, 246, 0.30);
+  box-shadow: 0 0 40px rgba(37, 99, 255, 0.32);
   transition: box-shadow 0.3s ease;
 }
 
@@ -57,7 +57,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   background-color: var(--bg);
   color: var(--ink);
   margin: 0;
@@ -81,15 +81,15 @@ html {
 /* ─── Typography ───────────────────────────────────── */
 
 h1, h2, h3, h4, h5, h6, .font-heading {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: 'Syne', system-ui, sans-serif;
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.0;
 }
 
 .font-display {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-weight: 300;
+  font-family: 'Syne', system-ui, sans-serif;
+  font-weight: 800;
   letter-spacing: -0.04em;
 }
 
