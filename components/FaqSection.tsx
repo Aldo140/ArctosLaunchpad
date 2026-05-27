@@ -43,7 +43,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
         >
           <p
             className="font-mono uppercase tracking-widest mb-5"
-            style={{ fontSize: '10px', color: '#a1a1aa', letterSpacing: '0.22em' }}
+            style={{ fontSize: '10px', color: 'var(--ink-2)', letterSpacing: '0.22em' }}
           >
             06 / FAQ
           </p>
@@ -55,10 +55,10 @@ const FaqSection: React.FC<FaqSectionProps> = ({
           </h2>
           <p
             style={{
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'DM Sans', system-ui, sans-serif",
               fontSize: '15px',
               fontWeight: 300,
-              color: '#a1a1aa',
+              color: 'var(--ink-2)',
               lineHeight: 1.6,
             }}
           >
@@ -89,7 +89,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                   style={{
                     height: '1px',
                     background: open
-                      ? 'rgba(59,130,246,0.25)'
+                      ? 'rgba(37,99,255,0.25)'
                       : 'var(--border)',
                     transition: 'background 0.3s ease',
                   }}
@@ -107,7 +107,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                     className="font-heading font-normal leading-snug transition-colors duration-300"
                     style={{
                       fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
-                      color: open ? '#3b82f6' : 'var(--ink)',
+                      color: open ? 'var(--accent)' : 'var(--ink)',
                     }}
                   >
                     {item.q}
@@ -118,7 +118,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                       fontSize: '1.25rem',
                       lineHeight: 1,
                       marginTop: '0.15rem',
-                      color: open ? '#3b82f6' : '#a1a1aa',
+                      color: open ? 'var(--accent)' : 'var(--ink-2)',
                     }}
                     aria-hidden
                   >
@@ -138,10 +138,10 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                     >
                       <p
                         style={{
-                          fontFamily: "'Inter', system-ui, sans-serif",
+                          fontFamily: "'DM Sans', system-ui, sans-serif",
                           fontSize: '14px',
                           fontWeight: 300,
-                          color: '#a1a1aa',
+                          color: 'var(--ink-2)',
                           lineHeight: 1.75,
                           paddingBottom: '1.5rem',
                           maxWidth: '42rem',
@@ -159,7 +159,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                     style={{
                       height: '1px',
                       background: open
-                        ? 'rgba(59,130,246,0.25)'
+                        ? 'rgba(37,99,255,0.25)'
                         : 'var(--border)',
                       transition: 'background 0.3s ease',
                     }}
