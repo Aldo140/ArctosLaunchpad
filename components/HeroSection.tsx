@@ -50,7 +50,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           height: 'auto',
           zIndex: 1,
           pointerEvents: 'none',
-          mixBlendMode: 'multiply',
           userSelect: 'none',
         }}
       />
@@ -175,6 +174,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
               border: 'none',
               cursor: 'pointer',
               transition: 'opacity 0.2s',
+              opacity: 1,
               minHeight: '48px',
             }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
