@@ -8,13 +8,13 @@ import { motion, useReducedMotion } from 'framer-motion';
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 const T = {
-  bg1:     '#070d14',
-  ink:     '#ffffff',
-  ink2:    '#a1a1aa',
-  ink3:    '#52525b',
-  acid:    '#3b82f6',
-  border:  'rgba(255, 255, 255, 0.07)',
-  border2: 'rgba(255, 255, 255, 0.12)',
+  bg1:     '#0C0F18',
+  ink:     '#F5F7FF',
+  ink2:    '#8B9CB8',
+  ink3:    '#3D5275',
+  accent:  '#2563FF',
+  border:  'rgba(255, 255, 255, 0.06)',
+  border2: 'rgba(255, 255, 255, 0.11)',
 } as const;
 
 // ─── Service data ────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
             left: 0,
             right: 0,
             height: 1,
-            backgroundColor: T.acid,
+            backgroundColor: T.accent,
             opacity: hovered ? 1 : 0,
             transition: 'opacity 0.3s ease',
           }}
@@ -127,11 +127,11 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
           {/* Number */}
           <div
             style={{
-              fontFamily: "'Space Grotesk', system-ui, sans-serif",
+              fontFamily: "'Syne', system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 'clamp(3.5rem, 6vw, 5rem)',
               lineHeight: 1,
-              color: hovered ? T.acid : T.ink3,
+              color: hovered ? T.accent : T.ink3,
               transition: 'color 0.3s ease',
               userSelect: 'none',
               minWidth: '4.5rem',
@@ -148,7 +148,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
           >
             <div
               style={{
-                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontFamily: "'Syne', system-ui, sans-serif",
                 fontWeight: 500,
                 fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)',
                 color: T.ink,
@@ -161,7 +161,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
             </div>
             <div
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "'DM Sans', system-ui, sans-serif",
                 fontSize: 13,
                 color: T.ink2,
                 lineHeight: 1.5,
@@ -181,7 +181,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
               <span
                 key={tag}
                 style={{
-                  fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
+                  fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: 9,
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
@@ -239,7 +239,7 @@ const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> =
       >
         <div
           style={{
-            fontFamily: "'Space Grotesk', system-ui, sans-serif",
+            fontFamily: "'Syne', system-ui, sans-serif",
             fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 24,
@@ -255,12 +255,12 @@ const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> =
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
           style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'DM Sans', system-ui, sans-serif",
             fontSize: 13,
             fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
-            backgroundColor: btnHovered ? '#60a5fa' : T.acid,
+            backgroundColor: btnHovered ? '#4D7FFF' : T.accent,
             color: '#ffffff',
             border: 'none',
             padding: '0.85rem 2rem',
@@ -310,7 +310,7 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           {/* Eyebrow */}
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
+              fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 10,
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
@@ -324,7 +324,7 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           {/* Heading */}
           <h2
             style={{
-              fontFamily: "'Space Grotesk', system-ui, sans-serif",
+              fontFamily: "'Syne', system-ui, sans-serif",
               fontSize: 'clamp(3rem, 5vw, 5rem)',
               fontWeight: 500,
               color: T.ink,
