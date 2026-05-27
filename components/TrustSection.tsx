@@ -11,124 +11,181 @@ const TrustSection: React.FC = () => {
   const reduced = useReducedMotion() ?? false;
 
   return (
-    <section style={{ background: 'var(--bg)' }} className="relative overflow-hidden">
+    <section style={{ position: 'relative', overflow: 'hidden' }}>
 
-      {/* Top rule */}
-      <div className="w-full h-px" style={{ background: 'var(--border)' }} />
+      {/* ── Full-width CN Tower photographic moment ── */}
+      <div style={{ position: 'relative', minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
 
-      <div className="mx-auto px-6 md:px-12 py-24 md:py-36" style={{ maxWidth: '1280px' }}>
+        {/* Background: social-post-1.png (Toronto skyline) */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'url(/social-post-1.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 40%',
+            zIndex: 0,
+          }}
+        />
 
-        {/* ── Eyebrow ── */}
-        <motion.p
-          initial={reduced ? false : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="font-mono uppercase tracking-widest mb-8"
-          style={{ fontSize: '10px', color: 'var(--ink-2)', letterSpacing: '0.22em' }}
+        {/* Dark gradient overlay — text reads over image */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to bottom, rgba(8,10,15,0.45) 0%, rgba(8,10,15,0.65) 50%, rgba(8,10,15,0.96) 100%)',
+            zIndex: 1,
+          }}
+        />
+
+        {/* Content over image */}
+        <div
+          className="relative mx-auto w-full px-6 md:px-12"
+          style={{ maxWidth: '1280px', zIndex: 2, paddingBottom: 'clamp(3rem, 6vw, 6rem)', paddingTop: 'clamp(4rem, 8vw, 8rem)' }}
         >
-          05 / Proof
-        </motion.p>
-
-        {/* ── Large editorial statement ── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-20 md:mb-24"
-        >
-          <h2
-            className="font-heading font-light leading-none"
+          {/* Eyebrow */}
+          <motion.p
+            initial={reduced ? false : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             style={{
-              fontSize: 'clamp(3rem, 6.5vw, 7.5rem)',
-              letterSpacing: '-0.03em',
-              color: 'var(--ink)',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '10px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.22em',
+              color: 'var(--ink-2)',
+              marginBottom: '1.5rem',
             }}
           >
-            Canadian-built.
-            <br />
-            <em
-              className="font-normal"
-              style={{ fontStyle: 'italic', color: 'var(--ink-2)' }}
-            >
-              Enterprise-proven.
-            </em>
-          </h2>
-        </motion.div>
+            05 / Proof
+          </motion.p>
 
-        {/* ── Proof points — 3-column divided strip ── */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 mb-20"
-          style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}
-        >
-          {PROOF_POINTS.map((pt, i) => (
-            <motion.div
-              key={pt.label}
-              initial={reduced ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative py-10 px-8 md:px-10 flex flex-col gap-3"
+          {/* Headline */}
+          <motion.div
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            style={{ marginBottom: '3rem' }}
+          >
+            <h2
               style={{
-                borderRight: i < PROOF_POINTS.length - 1 ? '1px solid var(--border)' : undefined,
-                borderBottom: i < PROOF_POINTS.length - 1 ? undefined : undefined,
+                fontFamily: "'Syne', system-ui, sans-serif",
+                fontWeight: 800,
+                fontSize: 'clamp(3.5rem, 7vw, 8rem)',
+                lineHeight: 0.95,
+                letterSpacing: '-0.03em',
+                color: 'var(--ink)',
+                margin: 0,
               }}
             >
-              {/* Mobile divider */}
-              {i > 0 && (
-                <div
-                  className="md:hidden absolute top-0 left-0 right-0 h-px"
-                  style={{ background: 'var(--border)' }}
-                />
-              )}
-              <span
-                className="font-heading font-semibold leading-none"
-                style={{ fontSize: 'clamp(3.5rem, 6vw, 5.5rem)', color: 'var(--acid)' }}
+              Built to scale.
+              <br />
+              <span style={{ color: 'var(--accent)' }}>Built in Canada.</span>
+            </h2>
+          </motion.div>
+
+          {/* Proof stats strip */}
+          <div
+            className="grid grid-cols-1 sm:grid-cols-3"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '2rem' }}
+          >
+            {PROOF_POINTS.map((pt, i) => (
+              <motion.div
+                key={pt.label}
+                initial={reduced ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  padding: '1rem 0',
+                  borderRight: i < PROOF_POINTS.length - 1 ? '1px solid rgba(255,255,255,0.10)' : undefined,
+                  paddingRight: i < PROOF_POINTS.length - 1 ? '2rem' : 0,
+                  paddingLeft: i > 0 ? '2rem' : 0,
+                }}
+                className="border-b sm:border-b-0 border-white/10 last:border-b-0"
               >
-                {pt.value}
-                <span style={{ fontSize: '0.45em', color: 'var(--ink-3)', letterSpacing: '0.02em' }}>
-                  {pt.suffix}
+                <span
+                  style={{
+                    fontFamily: "'Syne', system-ui, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                    lineHeight: 1,
+                    color: 'var(--accent)',
+                    display: 'block',
+                  }}
+                >
+                  {pt.value}
+                  <span style={{ fontSize: '0.45em', color: 'var(--ink-3)', letterSpacing: '0.02em' }}>
+                    {pt.suffix}
+                  </span>
                 </span>
-              </span>
-              <span
-                className="font-mono uppercase tracking-widest"
-                style={{ fontSize: '10px', color: 'var(--ink-2)', letterSpacing: '0.2em' }}
-              >
-                {pt.label}
-              </span>
-            </motion.div>
-          ))}
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.2em',
+                    color: 'var(--ink-2)',
+                    display: 'block',
+                    marginTop: '0.5rem',
+                  }}
+                >
+                  {pt.label}
+                </span>
+              </motion.div>
+            ))}
+          </div>
         </div>
-
-        {/* ── Quote block ── */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-          className="flex flex-col gap-5 max-w-2xl"
-          style={{ borderLeft: '2px solid var(--acid)', paddingLeft: '1.5rem' }}
-        >
-          <p
-            className="font-heading italic font-normal leading-relaxed"
-            style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)', color: 'var(--ink)' }}
-          >
-            "Every system we ship meets enterprise standards for performance,
-            security, and scalability. Your data stays yours — permanently."
-          </p>
-          <span
-            className="font-mono uppercase tracking-widest"
-            style={{ fontSize: '9px', color: 'var(--ink-3)', letterSpacing: '0.22em' }}
-          >
-            Canada · Remote-first · Data Sovereign
-          </span>
-        </motion.div>
-
       </div>
 
-      {/* Bottom rule */}
-      <div className="w-full h-px" style={{ background: 'var(--border)' }} />
+      {/* ── Quote block — below image ── */}
+      <div style={{ background: 'var(--bg)' }}>
+        <div
+          className="mx-auto px-6 md:px-12"
+          style={{ maxWidth: '1280px', paddingTop: 'clamp(3rem, 5vw, 5rem)', paddingBottom: 'clamp(3rem, 5vw, 5rem)' }}
+        >
+          <motion.div
+            initial={reduced ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+            style={{ borderLeft: '2px solid var(--accent)', paddingLeft: '1.5rem', maxWidth: '42rem' }}
+          >
+            <p
+              style={{
+                fontFamily: "'Syne', system-ui, sans-serif",
+                fontStyle: 'italic',
+                fontWeight: 400,
+                fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+                color: 'var(--ink)',
+                lineHeight: 1.55,
+                margin: 0,
+              }}
+            >
+              "Every system we ship meets enterprise standards for performance,
+              security, and scalability. Your data stays yours — permanently."
+            </p>
+            <span
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '9px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.22em',
+                color: 'var(--ink-3)',
+                display: 'block',
+                marginTop: '1rem',
+              }}
+            >
+              Canada · Remote-first · Data Sovereign
+            </span>
+          </motion.div>
+        </div>
+      </div>
+
     </section>
   );
 };
