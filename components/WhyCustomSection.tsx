@@ -93,7 +93,7 @@ const WhyCustomSection: React.FC = () => {
           </p>
           <h2
             style={{
-              fontFamily: "'Space Grotesk', system-ui, sans-serif",
+              fontFamily: "'Syne', system-ui, sans-serif",
               fontSize: 'clamp(3rem, 5.5vw, 5.5rem)',
               fontWeight: 300,
               lineHeight: 0.92,
@@ -162,7 +162,7 @@ const WhyCustomSection: React.FC = () => {
                 >
                   <span
                     style={{
-                      fontFamily: "'Inter', system-ui, sans-serif",
+                      fontFamily: "'DM Sans', system-ui, sans-serif",
                       fontSize: '14px',
                       color: 'var(--ink)',
                     }}
@@ -199,7 +199,7 @@ const WhyCustomSection: React.FC = () => {
               </p>
               <div
                 style={{
-                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontFamily: "'Syne', system-ui, sans-serif",
                   fontSize: 'clamp(3.5rem, 6vw, 4.5rem)',
                   fontWeight: 600,
                   lineHeight: 1,
@@ -229,8 +229,8 @@ const WhyCustomSection: React.FC = () => {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
             className="p-8 md:p-14 flex flex-col"
             style={{
-              background: 'rgba(59,130,246,0.06)',
-              border: '1px solid rgba(59,130,246,0.12)',
+              background: 'rgba(37,99,255,0.06)',
+              border: '1px solid rgba(37,99,255,0.12)',
             }}
           >
             {/* Panel header */}
@@ -248,7 +248,7 @@ const WhyCustomSection: React.FC = () => {
               <Check
                 size={14}
                 strokeWidth={2}
-                style={{ color: '#3b82f6' }}
+                style={{ color: '#2563FF' }}
               />
             </div>
 
@@ -269,7 +269,7 @@ const WhyCustomSection: React.FC = () => {
                 >
                   <p
                     style={{
-                      fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                      fontFamily: "'Syne', system-ui, sans-serif",
                       fontSize: '1.25rem',
                       fontStyle: 'normal',
                       fontWeight: 500,
@@ -282,7 +282,7 @@ const WhyCustomSection: React.FC = () => {
                   </p>
                   <p
                     style={{
-                      fontFamily: "'Inter', system-ui, sans-serif",
+                      fontFamily: "'DM Sans', system-ui, sans-serif",
                       fontSize: '12px',
                       color: 'var(--ink-2)',
                       lineHeight: 1.5,
@@ -297,7 +297,7 @@ const WhyCustomSection: React.FC = () => {
             {/* Investment callout */}
             <div
               className="mt-8 pt-6"
-              style={{ borderTop: '1px solid rgba(59,130,246,0.12)' }}
+              style={{ borderTop: '1px solid rgba(37,99,255,0.12)' }}
             >
               <p
                 className="uppercase tracking-[0.18em] mb-3"
@@ -311,12 +311,12 @@ const WhyCustomSection: React.FC = () => {
               </p>
               <div
                 style={{
-                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontFamily: "'Syne', system-ui, sans-serif",
                   fontSize: 'clamp(3.5rem, 6vw, 4.5rem)',
                   fontWeight: 600,
                   lineHeight: 1,
                   letterSpacing: '-0.02em',
-                  color: '#3b82f6',
+                  color: '#2563FF',
                 }}
               >
                 Yours.
