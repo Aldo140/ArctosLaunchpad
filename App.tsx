@@ -660,26 +660,62 @@ const App: React.FC = () => {
       <div data-chapter="§ 08 / CONTACT">
         <section
           id="contact"
-          className="border-t border-[var(--border)] bg-[var(--bg)] py-20 md:py-28"
+          className="border-t border-[var(--border)]"
+          style={{ background: 'var(--bg)', position: 'relative' }}
         >
-          <div className="max-w-[1280px] mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start"
-            >
-              <div>
+          {/* Photo heading area — full-bleed background image on top portion */}
+          <div
+            style={{
+              position: 'relative',
+              backgroundImage: 'url(/header-for-socials.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              padding: 'clamp(5rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3.5rem) 0',
+            }}
+          >
+            {/* Dark gradient overlay */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to bottom, rgba(8,10,15,0.55) 0%, rgba(8,10,15,0.75) 60%, rgba(8,10,15,0.95) 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            {/* Heading content — rendered above overlay */}
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
                 <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--ink-2)] mb-4">
                   08 / Start here
                 </p>
                 <h2
-                  className="font-heading font-light text-[var(--ink)]"
-                  style={{ fontSize: 'clamp(3.5rem,6vw,7rem)', lineHeight: 0.95, letterSpacing: '-0.02em' }}
+                  style={{
+                    fontFamily: "'Syne', system-ui, sans-serif",
+                    fontWeight: 300,
+                    fontSize: 'clamp(3.5rem,6vw,7rem)',
+                    lineHeight: 0.95,
+                    letterSpacing: '-0.02em',
+                    color: 'var(--ink)',
+                    margin: 0,
+                  }}
                 >
                   Engineer your
-                  <span className="block italic" style={{ color: 'var(--acid)' }}>operational future.</span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontStyle: 'italic',
+                      color: 'var(--acid)',
+                    }}
+                  >
+                    operational future.
+                  </span>
                 </h2>
                 <p className="mt-6 text-[15px] text-[var(--ink-2)] leading-relaxed max-w-md font-light">
                   Book a free architecture discovery call. We'll map your operational needs, discuss
@@ -702,13 +738,30 @@ const App: React.FC = () => {
                     View Our Systems
                   </button>
                 </div>
-                <div className="mt-10">
+                <div className="mt-10 pb-12">
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[var(--ink-3)]">
                     <span className="text-[var(--acid)]">●</span>
                     {' '}Trusted by 50+ Canadian enterprises
                   </span>
                 </div>
-              </div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Form area — plain --bg background */}
+          <div
+            style={{
+              maxWidth: 1280,
+              margin: '0 auto',
+              padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(5rem, 10vw, 8rem)',
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
               <ContactForm />
             </motion.div>
           </div>
