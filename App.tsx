@@ -661,31 +661,36 @@ const App: React.FC = () => {
         <section
           id="contact"
           className="border-t border-[var(--border)]"
-          style={{ background: 'var(--bg)', position: 'relative' }}
+          style={{
+            position: 'relative',
+            backgroundImage: 'url(/header-for-socials.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
         >
-          {/* Photo heading area — full-bleed background image on top portion */}
+          {/* Dark gradient overlay */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to bottom, rgba(8,10,15,0.55) 0%, rgba(8,10,15,0.75) 60%, rgba(8,10,15,0.95) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* 2-column grid — heading left, form right */}
           <div
             style={{
               position: 'relative',
-              backgroundImage: 'url(/header-for-socials.png)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              padding: 'clamp(5rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3.5rem) 0',
+              zIndex: 1,
+              maxWidth: 1280,
+              margin: '0 auto',
+              padding: 'clamp(5rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3.5rem) clamp(5rem, 10vw, 8rem)',
             }}
           >
-            {/* Dark gradient overlay */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, rgba(8,10,15,0.55) 0%, rgba(8,10,15,0.75) 60%, rgba(8,10,15,0.95) 100%)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Heading content — rendered above overlay */}
-            <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              {/* Left column — eyebrow + heading + copy + CTAs */}
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -738,32 +743,24 @@ const App: React.FC = () => {
                     View Our Systems
                   </button>
                 </div>
-                <div className="mt-10 pb-12">
+                <div className="mt-10">
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[var(--ink-3)]">
                     <span className="text-[var(--acid)]">●</span>
                     {' '}Trusted by 50+ Canadian enterprises
                   </span>
                 </div>
               </motion.div>
-            </div>
-          </div>
 
-          {/* Form area — plain --bg background */}
-          <div
-            style={{
-              maxWidth: 1280,
-              margin: '0 auto',
-              padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(5rem, 10vw, 8rem)',
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <ContactForm />
-            </motion.div>
+              {/* Right column — contact form */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <ContactForm />
+              </motion.div>
+            </div>
           </div>
         </section>
       </div>
