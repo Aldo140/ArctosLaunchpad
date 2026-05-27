@@ -70,7 +70,7 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ enabled = true }) => {
           x: mousePosition.x - 16,
           y: mousePosition.y - 16,
           scale: isHovering ? 2.4 : 1,
-          backgroundColor: isHovering ? 'rgba(255,255,255,0.1)' : 'transparent',
+          backgroundColor: isHovering ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0)',
         }}
         transition={{
           type: 'spring',
@@ -79,7 +79,7 @@ const CustomCursor: React.FC<CustomCursorProps> = ({ enabled = true }) => {
         }}
       />
       <motion.div
-        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-cyan-300 mix-blend-screen pointer-events-none z-[9998] hidden md:block"
+        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-[var(--accent-glow)] mix-blend-screen pointer-events-none z-[9998] hidden md:block"
         animate={{
           x: trailPosition.x - 4,
           y: trailPosition.y - 4,
