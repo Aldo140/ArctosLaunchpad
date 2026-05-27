@@ -11,48 +11,55 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystems }) => {
   const prefersReduced = useReducedMotion();
 
-  // Helper: return animation props or empty object if reduced motion
   const a = <T extends object>(props: T): T | object =>
     prefersReduced ? {} : props;
 
-  const headingLines = [
-    { text: 'We build the systems', weight: 'font-light', italic: false },
-    { text: 'behind modern', weight: 'font-light', italic: false },
-    { text: 'businesses.', weight: 'font-normal', italic: true },
-  ];
+  const lines = ['Less chaos.', 'Better systems.'];
 
   return (
     <header
       className="relative min-h-screen flex flex-col justify-between overflow-hidden"
       style={{ background: 'var(--bg)' }}
     >
-      {/* ── Dot grid texture ──────────────────────────────── */}
+      {/* Mountain background — 7% opacity texture */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-0"
         style={{
-          backgroundImage:
-            'radial-gradient(circle, rgba(59, 130, 246, 0.06) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-          opacity: 0.4,
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url(/bakcground-mountains.webp)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: 'none',
         }}
       />
 
-      {/* ── Decorative outlined circle ────────────────────── */}
-      <div
+      {/* Bear mascot — bold, bottom-right, mix-blend removes white bg */}
+      <img
+        src="/website-landing.png"
+        alt=""
         aria-hidden
-        className="pointer-events-none absolute z-0 w-[600px] h-[600px] rounded-full"
+        className="hidden sm:block"
         style={{
-          right: '-200px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          border: '1px solid rgba(59, 130, 246, 0.05)',
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          width: 'clamp(420px, 50vw, 780px)',
+          height: 'auto',
+          zIndex: 1,
+          pointerEvents: 'none',
+          mixBlendMode: 'multiply',
+          userSelect: 'none',
         }}
       />
 
-      {/* ── Main content ──────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-28 pb-16 sm:pt-32">
-
+      {/* Main content */}
+      <div
+        className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-28 pb-16 sm:pt-32"
+        style={{ zIndex: 10 }}
+      >
         {/* Eyebrow */}
         <motion.div
           {...a({
@@ -63,74 +70,57 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           className="self-start mb-10 sm:mb-12"
         >
           <span
-            className="font-mono text-[9px] uppercase tracking-[0.22em] inline-flex items-center gap-2"
             style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '9px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.22em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
               color: 'var(--ink-2)',
               border: '1px solid var(--border-2)',
               padding: '0.4rem 0.75rem',
             }}
           >
-            <span style={{ color: 'var(--acid)', fontSize: '8px' }}>●</span>
+            <span style={{ color: 'var(--accent)', fontSize: '8px' }}>●</span>
             Enterprise Digital Infrastructure · Canada
           </span>
         </motion.div>
 
-        {/* H1 heading */}
-        <h1
-          className="leading-[0.92] tracking-[-0.02em]"
-          style={{
-            fontFamily: "'Space Grotesk', system-ui, sans-serif",
-            fontWeight: 600,
-            fontSize: 'clamp(3.2rem, 10vw, 5rem)',
-            color: 'var(--ink)',
-          }}
-        >
-          {/* Desktop: larger clamp */}
-          <span
-            className="hidden sm:block"
-            style={{ fontSize: 'clamp(4.5rem, 11vw, 11rem)' }}
-          >
-            {headingLines.map((line, i) => (
-              <span key={line.text} className="block overflow-hidden">
+        {/* H1 — desktop */}
+        <h1 style={{ fontFamily: "'Syne', system-ui, sans-serif", fontWeight: 800, lineHeight: 0.92, letterSpacing: '-0.03em', margin: 0 }}>
+          <span className="hidden sm:block" style={{ fontSize: 'clamp(4.5rem, 9vw, 10rem)' }}>
+            {lines.map((line, i) => (
+              <span key={line} className="block overflow-hidden">
                 <motion.span
-                  className={`block ${line.weight}`}
-                  style={line.italic ? { fontStyle: 'italic' } : {}}
+                  className="block"
+                  style={{ color: i === 1 ? 'var(--accent)' : 'var(--ink)' }}
                   {...a({
                     initial: { y: '110%', opacity: 0 },
                     animate: { y: '0%', opacity: 1 },
-                    transition: {
-                      duration: 0.8,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: 0.2 + i * 0.08,
-                    },
+                    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 + i * 0.08 },
                   })}
                 >
-                  {line.text}
+                  {line}
                 </motion.span>
               </span>
             ))}
           </span>
-          {/* Mobile: smaller clamp */}
-          <span
-            className="sm:hidden block"
-            style={{ fontSize: 'clamp(3rem, 10vw, 4.5rem)' }}
-          >
-            {headingLines.map((line, i) => (
-              <span key={line.text} className="block overflow-hidden">
+          {/* H1 — mobile */}
+          <span className="sm:hidden block" style={{ fontSize: 'clamp(3rem, 10vw, 4.5rem)' }}>
+            {lines.map((line, i) => (
+              <span key={line} className="block overflow-hidden">
                 <motion.span
-                  className={`block ${line.weight}`}
-                  style={line.italic ? { fontStyle: 'italic' } : {}}
+                  className="block"
+                  style={{ color: i === 1 ? 'var(--accent)' : 'var(--ink)' }}
                   {...a({
                     initial: { y: '110%', opacity: 0 },
                     animate: { y: '0%', opacity: 1 },
-                    transition: {
-                      duration: 0.8,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: 0.2 + i * 0.08,
-                    },
+                    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 + i * 0.08 },
                   })}
                 >
-                  {line.text}
+                  {line}
                 </motion.span>
               </span>
             ))}
@@ -144,11 +134,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
           })}
-          className="mt-8 sm:mt-10 font-light leading-relaxed max-w-md"
           style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
+            marginTop: '2rem',
+            fontFamily: "'DM Sans', system-ui, sans-serif",
             fontSize: '16px',
+            fontWeight: 300,
+            lineHeight: 1.65,
             color: 'var(--ink-2)',
+            maxWidth: '26rem',
           }}
         >
           ARCTOS LAUNCHPAD engineers custom operational platforms, AI workflows, and digital
@@ -162,56 +155,64 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
           })}
-          className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3"
+          style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}
         >
           <button
             type="button"
             onClick={scrollToContact}
-            className="inline-flex items-center justify-center gap-2.5 transition-opacity duration-200 hover:opacity-85 active:opacity-70 min-h-[48px]"
             style={{
-              background: 'var(--acid)',
-              color: '#09090A',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'var(--accent)',
+              color: '#fff',
               padding: '1rem 1.75rem',
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'DM Sans', system-ui, sans-serif",
               fontSize: '11px',
-              fontWeight: 600,
+              fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: '0.15em',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'opacity 0.2s',
+              minHeight: '48px',
             }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
           >
             Engineer Your Future
-            <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
+            <ArrowRight style={{ width: '14px', height: '14px', flexShrink: 0 }} />
           </button>
 
           <button
             type="button"
             onClick={onViewSystems}
-            className="inline-flex items-center justify-center gap-2 transition-colors duration-200 min-h-[48px] group"
             style={{
-              border: '1px solid var(--border-2)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              background: 'transparent',
               color: 'var(--ink)',
               padding: '1rem 1.75rem',
-              fontFamily: "'Inter', system-ui, sans-serif",
+              fontFamily: "'DM Sans', system-ui, sans-serif",
               fontSize: '11px',
-              fontWeight: 600,
+              fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: '0.15em',
+              border: '1px solid var(--border-2)',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s',
+              minHeight: '48px',
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.borderColor = 'var(--ink)')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.borderColor = 'var(--border-2)')
-            }
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--ink)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-2)')}
           >
             View Systems
           </button>
         </motion.div>
-
       </div>
 
-      {/* ── Stats strip — pinned to bottom ────────────────── */}
-      <div className="relative z-10 max-w-[1360px] mx-auto w-full px-6 md:px-12 pb-12">
+      {/* Stats strip */}
+      <div className="relative max-w-[1360px] mx-auto w-full px-6 md:px-12 pb-12" style={{ zIndex: 10 }}>
         <motion.div
           {...a({
             initial: { opacity: 0, y: 12 },
@@ -219,31 +220,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.6 },
           })}
         >
-          {/* Divider */}
-          <div
-            className="w-full mb-8"
-            style={{ height: '1px', background: 'var(--border)' }}
-          />
-
-          {/* Stats row */}
-          <div className="flex flex-wrap gap-x-12 gap-y-6">
-            {HERO_STATS.map((stat) => (
+          <div style={{ height: '1px', background: 'var(--border)', marginBottom: '2rem' }} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
+            {HERO_STATS.map(stat => (
               <div key={stat.label}>
-                <div
-                  className="font-semibold leading-none"
-                  style={{
-                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
-                    fontWeight: 600,
-                    fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
-                    color: 'var(--acid)',
-                  }}
-                >
+                <div style={{
+                  fontFamily: "'Syne', system-ui, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+                  lineHeight: 1,
+                  color: 'var(--accent)',
+                }}>
                   {stat.value}
                 </div>
-                <div
-                  className="mt-1.5 font-mono uppercase tracking-widest"
-                  style={{ fontSize: '10px', color: 'var(--ink-2)' }}
-                >
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '10px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.2em',
+                  color: 'var(--ink-2)',
+                  marginTop: '0.4rem',
+                }}>
                   {stat.label}
                 </div>
               </div>
@@ -252,31 +249,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         </motion.div>
       </div>
 
-      {/* ── Scroll indicator ──────────────────────────────── */}
+      {/* Scroll indicator */}
       <div
         aria-hidden
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-20"
-        style={{ opacity: 0.45 }}
+        style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.5rem',
+          pointerEvents: 'none',
+          zIndex: 20,
+          opacity: 0.45,
+        }}
       >
-        <span
-          className="font-mono uppercase tracking-widest"
-          style={{ fontSize: '8px', color: 'var(--ink-2)' }}
-        >
+        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '8px', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--ink-2)' }}>
           Scroll
         </span>
         <motion.div
-          className="w-px"
-          style={{
-            height: '40px',
-            background: 'linear-gradient(to bottom, var(--ink-2), transparent)',
-          }}
+          style={{ width: '1px', height: '40px', background: 'linear-gradient(to bottom, var(--ink-2), transparent)' }}
           {...a({
             animate: { y: [0, 8, 0] },
             transition: { repeat: Infinity, duration: 2.2, ease: 'easeInOut' },
           })}
         />
       </div>
-
     </header>
   );
 };
