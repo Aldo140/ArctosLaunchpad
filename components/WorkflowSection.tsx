@@ -64,7 +64,7 @@ const WorkflowSection: React.FC = () => {
             {/* Heading */}
             <h2
               style={{
-                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontFamily: "'Syne', system-ui, sans-serif",
                 fontSize: 'clamp(3rem, 5vw, 5rem)',
                 fontWeight: 400,
                 lineHeight: 1.0,
@@ -122,7 +122,7 @@ const WorkflowSection: React.FC = () => {
                 {/* Large step number */}
                 <span
                   style={{
-                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontFamily: "'Syne', system-ui, sans-serif",
                     fontSize: '5rem',
                     fontWeight: 300,
                     lineHeight: 1,
@@ -158,7 +158,7 @@ const WorkflowSection: React.FC = () => {
                 {/* Step title */}
                 <h3
                   style={{
-                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontFamily: "'Syne', system-ui, sans-serif",
                     fontSize: '1.5rem',
                     fontWeight: 600,
                     lineHeight: 1.15,
@@ -173,7 +173,7 @@ const WorkflowSection: React.FC = () => {
                 {/* Step body */}
                 <p
                   style={{
-                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
                     fontSize: '13px',
                     fontWeight: 300,
                     lineHeight: 1.65,
@@ -206,7 +206,7 @@ const WorkflowSection: React.FC = () => {
               {/* Number */}
               <span
                 style={{
-                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontFamily: "'Syne', system-ui, sans-serif",
                   fontSize: '1.875rem',
                   fontWeight: 400,
                   lineHeight: 1,
@@ -221,7 +221,7 @@ const WorkflowSection: React.FC = () => {
               <div>
                 <h3
                   style={{
-                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontFamily: "'Syne', system-ui, sans-serif",
                     fontSize: '1.25rem',
                     fontWeight: 600,
                     lineHeight: 1.2,
@@ -234,7 +234,7 @@ const WorkflowSection: React.FC = () => {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
                     fontSize: '13px',
                     fontWeight: 300,
                     lineHeight: 1.65,
