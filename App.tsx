@@ -660,6 +660,7 @@ const App: React.FC = () => {
       <div data-chapter="§ 08 / CONTACT">
         <section
           id="contact"
+          aria-labelledby="contact-heading"
           className="border-t border-[var(--border)]"
           style={{
             position: 'relative',
@@ -701,6 +702,7 @@ const App: React.FC = () => {
                   08 / Start here
                 </p>
                 <h2
+                  id="contact-heading"
                   style={{
                     fontFamily: "'Syne', system-ui, sans-serif",
                     fontWeight: 300,
