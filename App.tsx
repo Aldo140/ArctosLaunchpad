@@ -18,8 +18,7 @@ import TrustSection from './components/TrustSection';
 import { FAQ_ITEMS } from './lib/siteContent';
 import { Project } from './types';
 
-const POLAR_BEAR_LOGO =
-  'https://www.image2url.com/r2/default/images/1779334554589-8e1c8308-a058-4149-84d1-42e881122291.png';
+const POLAR_BEAR_LOGO = '/logo-no-text-2.png';
 
 const projectHref = (p: Project): string => {
   if (p.href?.trim()) return p.href.trim();
@@ -123,7 +122,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
   className = '',
 }) => {
   const href = projectHref(project);
-  const hasDesktop = project.imageMobile && project.image !== project.imageMobile;
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.article
@@ -131,111 +130,133 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-      className={`group flex flex-col overflow-hidden border border-[var(--border)] bg-[var(--bg-1)] ${className}`}
+      className={`group relative overflow-hidden ${className}`}
+      style={{
+        minHeight: '320px',
+        backgroundImage: `url(${project.image})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'top center',
+        cursor: 'default',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      {/* ── Screenshot area ── */}
+      {/* Hover overlay */}
       <div
-        className="relative overflow-hidden"
-        style={{ background: '#080809', minHeight: '240px' }}
-      >
-        {project.mobileOnly ? (
-          /* Mobile-only layout: two portrait screens side by side */
-          <div className="flex items-end justify-center gap-4 px-8 pt-6 h-full" style={{ minHeight: '240px' }}>
-            <div className="overflow-hidden shadow-xl transition-transform duration-700 ease-out group-hover:scale-[1.02]" style={{ width: '38%', maxWidth: '140px', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <img src={project.image} alt={`${project.name} screen 1`} className="w-full h-auto block" loading="lazy" />
-            </div>
-            {project.imageMobile && (
-              <div className="overflow-hidden shadow-xl transition-transform duration-700 ease-out group-hover:scale-[1.02]" style={{ width: '38%', maxWidth: '140px', border: '1px solid rgba(255,255,255,0.07)', marginBottom: '1rem' }}>
-                <img src={project.imageMobile} alt={`${project.name} screen 2`} className="w-full h-auto block" loading="lazy" />
-              </div>
-            )}
-          </div>
-        ) : (
-          /* Desktop + mobile layout: full-width desktop with portrait overlay */
-          <div className="relative flex items-center justify-center" style={{ padding: '1.5rem 1.5rem 0' }}>
-            <img
-              src={project.image}
-              alt={`${project.name} desktop`}
-              className="w-full h-auto object-contain block transition-transform duration-700 ease-out group-hover:scale-[1.015]"
-              style={{ maxHeight: '260px', objectPosition: 'top center' }}
-              loading="lazy"
-            />
-            {project.imageMobile && (
-              <div
-                className="absolute bottom-0 right-5 overflow-hidden shadow-[0_-8px_28px_rgba(0,0,0,0.7)]"
-                style={{ width: '76px', border: '1px solid rgba(255,255,255,0.08)' }}
-              >
-                <img src={project.imageMobile} alt={`${project.name} mobile`} className="w-full h-auto block" loading="lazy" />
-              </div>
-            )}
-          </div>
-        )}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(8,10,15,0.72)',
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity 0.35s ease',
+          zIndex: 1,
+        }}
+      />
 
-        {/* Device label pills */}
-        <div className="absolute top-3 left-3 flex gap-1.5">
-          {project.mobileOnly ? (
-            <span
-              className="font-mono text-[8px] uppercase tracking-[0.14em] px-1.5 py-0.5"
-              style={{ background: 'rgba(237,232,223,0.04)', border: '1px solid rgba(237,232,223,0.1)', color: 'var(--ink-3)' }}
-            >
-              Mobile
+      {/* Description — slides up on hover, sits above strip */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: '88px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          padding: '1.5rem',
+          zIndex: 2,
+          opacity: hovered ? 1 : 0,
+          transform: hovered ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'opacity 0.35s ease, transform 0.35s ease',
+        }}
+      >
+        <p style={{
+          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontSize: '13px',
+          lineHeight: 1.65,
+          color: 'rgba(245,247,255,0.82)',
+          fontWeight: 300,
+          marginBottom: '0.75rem',
+        }}>
+          {project.description}
+        </p>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          {project.tags?.map(tag => (
+            <span key={tag} style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '8px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: 'var(--ink-3)',
+              border: '1px solid var(--border-2)',
+              padding: '2px 6px',
+            }}>
+              {tag}
             </span>
-          ) : (
-            <>
-              <span
-                className="font-mono text-[8px] uppercase tracking-[0.14em] px-1.5 py-0.5"
-                style={{ background: 'rgba(200,241,53,0.08)', border: '1px solid rgba(200,241,53,0.2)', color: 'var(--acid)' }}
-              >
-                Desktop
-              </span>
-              {project.imageMobile && (
-                <span
-                  className="font-mono text-[8px] uppercase tracking-[0.14em] px-1.5 py-0.5"
-                  style={{ background: 'rgba(237,232,223,0.04)', border: '1px solid rgba(237,232,223,0.1)', color: 'var(--ink-3)' }}
-                >
-                  Mobile
-                </span>
-              )}
-            </>
-          )}
+          ))}
         </div>
       </div>
 
-      {/* ── Project info ── */}
-      <div className="flex flex-col p-6 md:p-7 flex-1">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--ink-2)]">
+      {/* Persistent bottom strip — always visible */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '88px',
+          background: 'rgba(8,10,15,0.84)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          padding: '0 1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: '0.25rem',
+          zIndex: 3,
+        }}
+      >
+        <p style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontSize: '8px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.18em',
+          color: 'var(--ink-3)',
+          margin: 0,
+        }}>
           {project.type}
         </p>
-        <h3
-          className="mt-2 font-heading font-normal text-[var(--ink)] leading-tight"
-          style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2rem)' }}
-        >
-          {project.name}
-        </h3>
-        <p className="mt-2 text-[13px] leading-relaxed text-[var(--ink-2)] line-clamp-2 font-light flex-1">
-          {project.description}
-        </p>
-        <div className="mt-4 flex items-end justify-between gap-4">
-          <div className="flex flex-wrap gap-1.5">
-            {project.tags?.map((tag) => (
-              <span
-                key={tag}
-                className="font-mono text-[8px] uppercase tracking-[0.12em]"
-                style={{
-                  color: 'var(--ink-3)',
-                  border: '1px solid var(--border-2)',
-                  padding: '2px 6px',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{
+            fontFamily: "'Syne', system-ui, sans-serif",
+            fontWeight: 600,
+            fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+            color: 'var(--ink)',
+            margin: 0,
+            lineHeight: 1.2,
+            letterSpacing: '-0.01em',
+          }}>
+            {project.name}
+          </h3>
           <a
             href={href}
             target="_blank"
             rel="noreferrer"
-            className="flex-shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--ink-2)] hover:text-[var(--acid)] transition-colors duration-200 whitespace-nowrap"
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '9px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: 'var(--ink-2)',
+              textDecoration: 'none',
+              flexShrink: 0,
+              transition: 'color 0.2s ease',
+              marginLeft: '1rem',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-2)')}
           >
             View →
           </a>
@@ -268,8 +289,14 @@ const Marquee: React.FC = () => (
       {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
         <React.Fragment key={i}>
           <span
-            className="font-heading italic font-normal flex-shrink-0"
-            style={{ fontSize: 'clamp(1.75rem, 3.5vw, 3rem)', color: 'var(--ink-3)' }}
+            style={{
+              fontFamily: "'Syne', system-ui, sans-serif",
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: 'clamp(2rem, 4vw, 3.5rem)',
+              color: 'var(--ink-3)',
+              flexShrink: 0,
+            }}
           >
             {item}
           </span>
@@ -414,7 +441,7 @@ const App: React.FC = () => {
           <img
             src={POLAR_BEAR_LOGO}
             alt="Arctos Launchpad"
-            className="h-16 w-16 object-contain"
+            className="h-9 w-auto object-contain"
             style={{
               filter: 'none',
               transition: 'filter 0.4s ease',
@@ -494,7 +521,7 @@ const App: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-3">
-                <img src={POLAR_BEAR_LOGO} alt="Arctos Launchpad" className="h-16 w-16 object-contain" />
+                <img src={POLAR_BEAR_LOGO} alt="Arctos Launchpad" className="h-9 w-auto object-contain" />
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink)]">
                   ARCTOS LAUNCHPAD
                 </span>
@@ -692,7 +719,7 @@ const App: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-start gap-10">
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
-                <img src={POLAR_BEAR_LOGO} alt="Arctos Launchpad" className="h-16 w-16 object-contain" />
+                <img src={POLAR_BEAR_LOGO} alt="Arctos Launchpad" className="h-12 w-auto object-contain" />
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink)]">
                   ARCTOS LAUNCHPAD
                 </span>
