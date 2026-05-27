@@ -253,6 +253,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
               flexShrink: 0,
               transition: 'color 0.2s ease',
               marginLeft: '1rem',
+              cursor: 'pointer',
             }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-2)')}
@@ -612,12 +613,14 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 gap-px lg:grid-cols-12" style={{ background: 'var(--border)' }}>
                 {featuredProjects[0] && (
                   <ProjectWorkCard
+                    key={featuredProjects[0].id}
                     project={featuredProjects[0]}
                     className="lg:col-span-7"
                   />
                 )}
                 {featuredProjects[1] && (
                   <ProjectWorkCard
+                    key={featuredProjects[1].id}
                     project={featuredProjects[1]}
                     className="lg:col-span-5"
                   />
