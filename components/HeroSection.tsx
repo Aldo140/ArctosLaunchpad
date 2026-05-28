@@ -213,6 +213,22 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             View Systems
           </button>
         </motion.div>
+
+        {/* Mobile bear — shows under buttons, fades at bottom */}
+        <motion.img
+          src={`${BASE}website-landing.png`}
+          alt="" aria-hidden
+          className="block sm:hidden w-full"
+          {...a({ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.8, delay: 0.6 } })}
+          style={{
+            marginTop: '1.5rem',
+            maxHeight: '45vw',
+            objectFit: 'contain',
+            objectPosition: 'center top',
+            maskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)',
+          }}
+        />
       </div>
 
       {/* Stats strip */}
