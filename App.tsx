@@ -384,7 +384,7 @@ const App: React.FC = () => {
   const otherProjects = PROJECTS.filter((p) => !p.featured);
 
   return (
-    <div className="min-h-screen text-[var(--ink)] font-sans selection:bg-[var(--acid)] selection:text-white overflow-x-hidden bg-[var(--bg)]">
+    <div className="min-h-screen text-[var(--ink)] font-sans selection:bg-[var(--acid)] selection:text-white bg-[var(--bg)]" style={{ overflowX: 'clip' }}>
       <div className="fixed inset-0 -z-10 bg-[var(--bg)]" />
 
       {!isMobile && <AIChat />}
