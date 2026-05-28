@@ -61,8 +61,26 @@ const WorkflowSection: React.FC = () => {
               THE PROCESS
             </p>
 
-            {/* Heading */}
+            {/* Heading — mobile */}
             <h2
+              className="md:hidden"
+              style={{
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontSize: 'clamp(2rem, 8vw, 2.75rem)',
+                fontWeight: 400,
+                lineHeight: 1.0,
+                letterSpacing: '-0.03em',
+                color: 'var(--ink)',
+              }}
+            >
+              How we engineer
+              <br />
+              <em style={{ fontStyle: 'italic' }}>your system.</em>
+            </h2>
+
+            {/* Heading — desktop */}
+            <h2
+              className="hidden md:block"
               style={{
                 fontFamily: "'Space Grotesk', system-ui, sans-serif",
                 fontSize: 'clamp(3rem, 5vw, 5rem)',
@@ -188,67 +206,105 @@ const WorkflowSection: React.FC = () => {
         </div>
       </div>
 
-      {/* ─── MOBILE: vertical list ─── */}
-      <div className="md:hidden max-w-[1320px] mx-auto px-6 mt-0">
-        {STEPS.map((step, i) => (
-          <motion.div
-            key={step.num}
-            initial={reduced ? false : { opacity: 0, y: 20 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            style={{ borderTop: '1px solid var(--border)' }}
-            className="py-6"
-          >
-            <div
-              style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '1rem' }}
-            >
-              {/* Number */}
-              <span
+      {/* ─── MOBILE: vertical timeline ─── */}
+      <div className="md:hidden max-w-[1320px] mx-auto px-6 mt-8">
+        <div style={{ position: 'relative', paddingLeft: '1.5rem' }}>
+          {/* Vertical connector line */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '19px',
+              top: '20px',
+              bottom: '20px',
+              width: '2px',
+              background: 'var(--border)',
+            }}
+          />
+
+          {STEPS.map((step, i) => {
+            const active = i === 0;
+            return (
+              <motion.div
+                key={step.num}
+                initial={reduced ? false : { opacity: 0, x: -12 }}
+                whileInView={reduced ? undefined : { opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                 style={{
-                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
-                  fontSize: '1.875rem',
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  color: 'var(--ink-3)',
-                  paddingTop: '0.15rem',
+                  display: 'flex',
+                  gap: '1rem',
+                  paddingBottom: i < STEPS.length - 1 ? '2rem' : 0,
+                  position: 'relative',
                 }}
               >
-                {step.num}
-              </span>
+                {/* Node */}
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: active ? 'var(--accent)' : 'var(--bg-1)',
+                    border: '2px solid',
+                    borderColor: active ? 'var(--accent)' : 'var(--border-2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    zIndex: 1,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: active ? '#fff' : 'var(--ink-3)',
+                    }}
+                  >
+                    {step.num}
+                  </span>
+                </div>
 
-              {/* Content */}
-              <div>
-                <h3
-                  style={{
-                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
-                    fontSize: '1.25rem',
-                    fontWeight: 600,
-                    lineHeight: 1.2,
-                    color: 'var(--ink)',
-                    marginBottom: '0.5rem',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  {step.title}
-                </h3>
-                <p
-                  style={{
-                    fontFamily: "'Inter', system-ui, sans-serif",
-                    fontSize: '13px',
-                    fontWeight: 300,
-                    lineHeight: 1.65,
-                    color: 'var(--ink-2)',
-                  }}
-                >
-                  {step.body}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-        {/* Bottom rule */}
-        <div style={{ borderTop: '1px solid var(--border)' }} />
+                {/* Content */}
+                <div style={{ paddingTop: '0.5rem' }}>
+                  <h3
+                    style={{
+                      fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                      fontSize: '1.2rem',
+                      fontWeight: 700,
+                      letterSpacing: '-0.01em',
+                      color: 'var(--ink)',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {step.title}
+                  </h3>
+
+                  {/* Acid line */}
+                  <div
+                    style={{
+                      height: '2px',
+                      width: '2rem',
+                      background: 'var(--acid)',
+                      margin: '0.5rem 0',
+                    }}
+                  />
+
+                  <p
+                    style={{
+                      fontFamily: "'Inter', system-ui, sans-serif",
+                      fontSize: '13px',
+                      color: 'var(--ink-2)',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {step.body}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
