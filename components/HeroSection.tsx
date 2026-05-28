@@ -222,7 +222,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           {...a({ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.8, delay: 0.6 } })}
           style={{
             marginTop: '1.5rem',
-            maxHeight: '45vw',
+            maxHeight: '90vw',
             objectFit: 'contain',
             objectPosition: 'center top',
             maskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)',
