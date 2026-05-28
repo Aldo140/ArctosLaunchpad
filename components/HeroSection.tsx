@@ -46,7 +46,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         className="hidden sm:block"
         style={{
           position: 'absolute',
-          right: 0,
+          right: '-5vw',
           top: '-25vh',
           height: '160vh',
           width: 'auto',
