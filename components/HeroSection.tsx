@@ -47,8 +47,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         style={{
           position: 'absolute',
           right: 0,
-          top: '8vh',
-          height: '145vh',
+          top: '-2vh',
+          height: '160vh',
           width: 'auto',
           zIndex: 1,
           pointerEvents: 'none',
