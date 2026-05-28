@@ -116,6 +116,20 @@ const useScramble = (text: string) => {
   return { display, trigger };
 };
 
+// ─── useIsMobile ─────────────────────────────────────────────────────────────
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  return isMobile;
+};
+
 // ─── Project Work Card ─────────────────────────────────────────────────────────
 
 const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
@@ -124,6 +138,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
 }) => {
   const href = projectHref(project);
   const [hovered, setHovered] = useState(false);
+  const isMobileCard = useIsMobile();
 
   return (
     <motion.article
@@ -131,7 +146,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-      className={`group relative overflow-hidden min-h-[260px] md:min-h-[320px] ${className}`}
+      className={`group relative overflow-hidden min-h-[280px] sm:min-h-[320px] ${className}`}
       style={{
         backgroundImage: `url(${project.image})`,
         backgroundSize: 'cover',
@@ -160,7 +175,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
           top: 0,
           left: 0,
           right: 0,
-          bottom: '88px',
+          bottom: isMobileCard ? '76px' : '88px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
@@ -205,7 +220,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
           bottom: 0,
           left: 0,
           right: 0,
-          height: '88px',
+          height: isMobileCard ? '76px' : '88px',
           background: 'rgba(8,10,15,0.84)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
@@ -220,7 +235,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
       >
         <p style={{
           fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '8px',
+          fontSize: isMobileCard ? '7px' : '8px',
           textTransform: 'uppercase',
           letterSpacing: '0.18em',
           color: 'var(--ink-3)',
@@ -232,7 +247,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
           <h3 style={{
             fontFamily: "'Space Grotesk', system-ui, sans-serif",
             fontWeight: 600,
-            fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
+            fontSize: isMobileCard ? '1.1rem' : 'clamp(1.25rem, 2vw, 1.5rem)',
             color: 'var(--ink)',
             margin: 0,
             lineHeight: 1.2,
@@ -314,18 +329,6 @@ const Marquee: React.FC = () => (
 );
 
 // ─── App ──────────────────────────────────────────────────────────────────────
-
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 768px)');
-    const update = () => setIsMobile(media.matches);
-    update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
-  return isMobile;
-};
 
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -590,7 +593,7 @@ const App: React.FC = () => {
 
         {/* ── Selected Work / Arsenal ── */}
         <div data-chapter="§ 05 / WORK">
-          <section id="work" className="w-full border-t border-[var(--border)] bg-[var(--bg-1)] py-24 md:py-28">
+          <section id="work" className="w-full border-t border-[var(--border)] bg-[var(--bg-1)] py-16 md:py-28">
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -601,8 +604,17 @@ const App: React.FC = () => {
               <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--ink-2)] mb-4">
                 04 / Selected Work
               </p>
+              {/* Mobile heading */}
               <h2
-                className="font-heading font-light text-[var(--ink)] leading-none"
+                className="sm:hidden font-heading font-light text-[var(--ink)] leading-none"
+                style={{ fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}
+              >
+                <span className="text-[var(--ink-3)]">The</span>{' '}
+                <span>Arsenal</span>
+              </h2>
+              {/* Desktop heading */}
+              <h2
+                className="hidden sm:block font-heading font-light text-[var(--ink)] leading-none"
                 style={{ fontSize: 'clamp(3rem,6vw,6rem)' }}
               >
                 <span className="text-[var(--ink-3)]">The</span>{' '}
@@ -683,12 +695,13 @@ const App: React.FC = () => {
 
           {/* 2-column grid — heading left, form right */}
           <div
+            className="contact-content-wrapper"
             style={{
               position: 'relative',
               zIndex: 1,
               maxWidth: 1280,
               margin: '0 auto',
-              padding: 'clamp(5rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3.5rem) clamp(5rem, 10vw, 8rem)',
+              padding: 'clamp(3rem, 8vw, 8rem) clamp(1.25rem, 5vw, 3.5rem) clamp(5rem, 10vw, 8rem)',
             }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
@@ -702,8 +715,34 @@ const App: React.FC = () => {
                 <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--ink-2)] mb-4">
                   08 / Start here
                 </p>
+                {/* Mobile heading */}
                 <h2
                   id="contact-heading"
+                  className="block md:hidden"
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontWeight: 300,
+                    fontSize: 'clamp(2.25rem, 9vw, 3rem)',
+                    lineHeight: 0.95,
+                    letterSpacing: '-0.02em',
+                    color: 'var(--ink)',
+                    margin: 0,
+                  }}
+                >
+                  Engineer your
+                  <span
+                    style={{
+                      display: 'block',
+                      fontStyle: 'italic',
+                      color: 'var(--acid)',
+                    }}
+                  >
+                    operational future.
+                  </span>
+                </h2>
+                {/* Desktop heading */}
+                <h2
+                  className="hidden md:block"
                   style={{
                     fontFamily: "'Space Grotesk', system-ui, sans-serif",
                     fontWeight: 300,
@@ -725,7 +764,7 @@ const App: React.FC = () => {
                     operational future.
                   </span>
                 </h2>
-                <p className="mt-6 text-[15px] text-[var(--ink-2)] leading-relaxed max-w-md font-light">
+                <p className="mt-6 text-[14px] md:text-[15px] text-[var(--ink-2)] leading-relaxed max-w-md font-light">
                   Book a free architecture discovery call. We'll map your operational needs, discuss
                   system strategy, and confirm if ARCTOS is the right fit — no sales pitch, just
                   expertise.
@@ -734,14 +773,14 @@ const App: React.FC = () => {
                   <button
                     type="button"
                     onClick={scrollToContact}
-                    className="inline-flex items-center gap-2 rounded-none bg-[var(--acid)] px-6 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#09090A] transition-opacity hover:opacity-85"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-none bg-[var(--acid)] px-6 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[#09090A] transition-opacity hover:opacity-85"
                   >
                     Start Your Infrastructure
                   </button>
                   <button
                     type="button"
                     onClick={() => scrollTo('systems')}
-                    className="inline-flex items-center rounded-none border border-[var(--border-2)] px-6 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--ink-2)] transition-colors hover:text-[var(--ink)]"
+                    className="w-full sm:w-auto inline-flex items-center justify-center rounded-none border border-[var(--border-2)] px-6 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--ink-2)] transition-colors hover:text-[var(--ink)]"
                   >
                     View Our Systems
                   </button>
@@ -769,10 +808,11 @@ const App: React.FC = () => {
       </div>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-[var(--border)] bg-[var(--bg)] py-16">
+      <footer className="border-t border-[var(--border)] bg-[var(--bg)] py-10 md:py-16">
         <div className="max-w-[1280px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-10">
-            <div className="flex flex-col gap-3">
+          {/* Mobile layout: logo+desc stacked, then nav row */}
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-10">
+            <div className="flex flex-col gap-3 w-full md:w-auto">
               <div className="flex items-center gap-3">
                 <img src={POLAR_BEAR_LOGO} alt="Arctos Launchpad" className="h-12 w-auto object-contain" />
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink)]">
@@ -785,7 +825,8 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex gap-12 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-2)]">
+            {/* Desktop nav groups */}
+            <div className="hidden md:flex gap-12 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-2)]">
               <div className="flex flex-col gap-3">
                 <span className="text-[var(--ink)] text-[10px] font-medium">Navigate</span>
                 <button onClick={() => scrollTo('systems')} className="text-left hover:text-[var(--ink)] transition-colors">Systems</button>
@@ -801,6 +842,101 @@ const App: React.FC = () => {
                 <span className="text-[var(--ink)] text-[10px] font-medium">Legal</span>
                 <a href="#" className="hover:text-[var(--ink)] transition-colors">Privacy</a>
                 <a href="#" className="hover:text-[var(--ink)] transition-colors">Terms</a>
+              </div>
+            </div>
+
+            {/* Mobile nav groups — single horizontal row, compact */}
+            <div className="md:hidden flex gap-6 w-full">
+              <div className="flex flex-col gap-2 flex-1">
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: 'var(--ink)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Navigate
+                </span>
+                <button
+                  onClick={() => scrollTo('systems')}
+                  className="text-left hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Systems
+                </button>
+                <button
+                  onClick={() => scrollTo('work')}
+                  className="text-left hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Work
+                </button>
+                <button
+                  onClick={scrollToContact}
+                  className="text-left hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Contact
+                </button>
+              </div>
+              <div className="flex flex-col gap-2 flex-1">
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: 'var(--ink)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Social
+                </span>
+                <a
+                  href="#"
+                  className="hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Instagram
+                </a>
+                <a
+                  href="#"
+                  className="hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  LinkedIn
+                </a>
+              </div>
+              <div className="flex flex-col gap-2 flex-1">
+                <span
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: 'var(--ink)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Legal
+                </span>
+                <a
+                  href="#"
+                  className="hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Privacy
+                </a>
+                <a
+                  href="#"
+                  className="hover:text-[var(--ink)] transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--ink-2)' }}
+                >
+                  Terms
+                </a>
               </div>
             </div>
           </div>
