@@ -83,14 +83,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-24 pb-12 sm:pt-28"
         style={{ zIndex: 10 }}
       >
-        {/* Eyebrow */}
+        {/* Eyebrow — desktop */}
         <motion.div
           {...a({
             initial: { opacity: 0 },
             animate: { opacity: 1 },
             transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
           })}
-          className="self-start mb-5"
+          className="self-start mb-5 hidden sm:flex"
         >
           <span
             style={{
@@ -108,6 +108,37 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           >
             <span style={{ color: 'var(--accent)', fontSize: '8px' }}>●</span>
             Enterprise Digital Infrastructure · Canada
+          </span>
+        </motion.div>
+
+        {/* Eyebrow — mobile: centered pill */}
+        <motion.div
+          {...a({
+            initial: { opacity: 0 },
+            animate: { opacity: 1 },
+            transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
+          })}
+          className="block sm:hidden mb-4"
+          style={{ display: 'flex', justifyContent: 'flex-start' }}
+        >
+          <span
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '7.5px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              color: 'var(--ink-2)',
+              border: '1px solid rgba(37,99,255,0.35)',
+              background: 'rgba(37,99,255,0.07)',
+              padding: '0.3rem 0.65rem',
+              borderRadius: '999px',
+            }}
+          >
+            <span style={{ color: 'var(--accent)', fontSize: '7px' }}>●</span>
+            Canada · Digital Infrastructure
           </span>
         </motion.div>
 
@@ -131,7 +162,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             ))}
           </span>
           {/* H1 — mobile */}
-          <span className="sm:hidden block" style={{ fontSize: 'clamp(3rem, 10vw, 4.5rem)' }}>
+          <span className="sm:hidden block" style={{ fontSize: 'clamp(2.75rem, 10vw, 3.5rem)' }}>
             {lines.map((line, i) => (
               <span key={line} className="block overflow-hidden">
                 <motion.span
@@ -150,13 +181,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           </span>
         </h1>
 
-        {/* Subtext */}
+        {/* Subtext — desktop */}
         <motion.p
           {...a({
             initial: { opacity: 0, y: 16 },
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
           })}
+          className="hidden sm:block"
           style={{
             marginTop: '1.25rem',
             fontFamily: "'Inter', system-ui, sans-serif",
@@ -171,14 +203,36 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           infrastructure for Canadian enterprises. You own everything we build — forever.
         </motion.p>
 
-        {/* CTAs */}
+        {/* Subtext — mobile */}
+        <motion.p
+          {...a({
+            initial: { opacity: 0, y: 16 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
+          })}
+          className="block sm:hidden"
+          style={{
+            marginTop: '0.875rem',
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontSize: '14px',
+            fontWeight: 400,
+            lineHeight: 1.55,
+            color: 'var(--ink-2)',
+            maxWidth: '22rem',
+          }}
+        >
+          Custom platforms, AI workflows, and digital infrastructure for Canadian enterprises. You own everything — forever.
+        </motion.p>
+
+        {/* CTAs — desktop */}
         <motion.div
           {...a({
             initial: { opacity: 0, y: 16 },
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
           })}
-          style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}
+          className="hidden sm:flex"
+          style={{ marginTop: '1.5rem', gap: '0.75rem', flexWrap: 'wrap' }}
         >
           <button
             type="button"
@@ -234,10 +288,78 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           </button>
         </motion.div>
 
+        {/* CTAs — mobile: stacked, full-width */}
+        <motion.div
+          {...a({
+            initial: { opacity: 0, y: 16 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
+          })}
+          className="block sm:hidden"
+          style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}
+        >
+          <button
+            type="button"
+            onClick={scrollToContact}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              background: 'var(--accent)',
+              color: '#fff',
+              width: '100%',
+              padding: '0 1.5rem',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '11px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'opacity 0.2s',
+              opacity: 1,
+              minHeight: '52px',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            Engineer Your Future
+            <ArrowRight style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+          </button>
+
+          <button
+            type="button"
+            onClick={onViewSystems}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              color: 'var(--ink)',
+              width: '100%',
+              padding: '0 1.5rem',
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '11px',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              border: '1px solid var(--border-2)',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s',
+              minHeight: '52px',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--ink)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+          >
+            View Systems
+          </button>
+        </motion.div>
+
       </div>
 
-      {/* Stats strip */}
-      <div className="relative max-w-[1360px] mx-auto w-full px-6 md:px-12 pb-12" style={{ zIndex: 10 }}>
+      {/* Stats strip — desktop */}
+      <div className="hidden sm:block relative max-w-[1360px] mx-auto w-full px-6 md:px-12 pb-12" style={{ zIndex: 10 }}>
         <motion.div
           {...a({
             initial: { opacity: 0, y: 12 },
@@ -265,6 +387,57 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
                   letterSpacing: '0.2em',
                   color: 'var(--ink-2)',
                   marginTop: '0.4rem',
+                }}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Stats strip — mobile: 3-across compact pill cards */}
+      <div className="block sm:hidden relative w-full px-6 pb-8" style={{ zIndex: 10 }}>
+        <motion.div
+          {...a({
+            initial: { opacity: 0, y: 12 },
+            animate: { opacity: 1, y: 0 },
+            transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.6 },
+          })}
+        >
+          <div style={{ height: '1px', background: 'var(--border)', marginBottom: '1rem' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+            {HERO_STATS.map(stat => (
+              <div
+                key={stat.label}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  padding: '0.625rem 0.5rem',
+                  background: 'rgba(37,99,255,0.06)',
+                  border: '1px solid rgba(37,99,255,0.18)',
+                  borderRadius: '8px',
+                }}
+              >
+                <div style={{
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 'clamp(1.4rem, 6vw, 1.75rem)',
+                  lineHeight: 1,
+                  color: 'var(--accent)',
+                }}>
+                  {stat.value}
+                </div>
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '7px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  color: 'var(--ink-2)',
+                  textAlign: 'center',
+                  lineHeight: 1.3,
                 }}>
                   {stat.label}
                 </div>
