@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useInView, useReducedMotion } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 
@@ -56,6 +56,7 @@ const AnimatedCount: React.FC = () => {
 
 const WhyCustomSection: React.FC = () => {
   const reduced = useReducedMotion() ?? false;
+  const [activeTab, setActiveTab] = useState<'trap' | 'fix'>('trap');
 
   const headerRef = useRef<HTMLDivElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: '-60px' });
@@ -72,6 +73,262 @@ const WhyCustomSection: React.FC = () => {
       style={{ background: 'var(--bg)' }}
     >
       <div className="max-w-[1360px] mx-auto px-6 md:px-12">
+
+        {/* ── MOBILE layout ── */}
+        <div className="block sm:hidden">
+          {/* Mobile section header */}
+          <div className="mb-8">
+            <p
+              className="uppercase tracking-[0.2em] mb-3"
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '9px',
+                color: 'var(--ink-2)',
+              }}
+            >
+              THE CASE FOR INFRASTRUCTURE
+            </p>
+            <h2
+              style={{
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                fontSize: 'clamp(2rem, 8vw, 2.75rem)',
+                fontWeight: 300,
+                lineHeight: 1.0,
+                color: 'var(--ink)',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Fragmented tools are costing you more than money.
+            </h2>
+          </div>
+
+          {/* Toggle tabs */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '0.5rem',
+              marginBottom: '1.25rem',
+              padding: '0.4rem',
+              background: 'var(--bg-1)',
+              borderRadius: 10,
+              border: '1px solid var(--border)',
+            }}
+          >
+            <button
+              onClick={() => setActiveTab('trap')}
+              style={{
+                flex: 1,
+                padding: '0.75rem',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontFamily: "'Inter'",
+                borderRadius: 8,
+                cursor: 'pointer',
+                border: activeTab === 'trap' ? 'none' : '1px solid var(--border-2)',
+                background: activeTab === 'trap' ? 'var(--accent)' : 'transparent',
+                color: activeTab === 'trap' ? '#fff' : 'var(--ink-2)',
+              }}
+            >
+              The Trap
+            </button>
+            <button
+              onClick={() => setActiveTab('fix')}
+              style={{
+                flex: 1,
+                padding: '0.75rem',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontFamily: "'Inter'",
+                borderRadius: 8,
+                cursor: 'pointer',
+                border: activeTab === 'fix' ? 'none' : '1px solid var(--border-2)',
+                background: activeTab === 'fix' ? 'var(--accent)' : 'transparent',
+                color: activeTab === 'fix' ? '#fff' : 'var(--ink-2)',
+              }}
+            >
+              The Fix
+            </button>
+          </div>
+
+          {/* Active panel */}
+          {activeTab === 'trap' ? (
+            <div
+              style={{
+                background: 'var(--bg-1)',
+                border: '1px solid var(--border-2)',
+                borderRadius: 12,
+                padding: '1.25rem',
+              }}
+            >
+              {/* Panel header */}
+              <div className="flex items-center justify-between mb-5">
+                <span
+                  className="uppercase tracking-[0.22em]"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  The Subscription Trap
+                </span>
+                <X size={14} strokeWidth={1.5} style={{ color: 'rgba(232,112,96,0.5)' }} />
+              </div>
+              {/* Pain points */}
+              <div>
+                {PAIN_POINTS.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex justify-between items-baseline py-3"
+                    style={{ borderBottom: '1px solid var(--border)' }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Inter', system-ui, sans-serif",
+                        fontSize: '14px',
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontSize: '13px',
+                        color: '#E87060',
+                      }}
+                    >
+                      {item.cost}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {/* Total */}
+              <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--border-2)' }}>
+                <p
+                  className="uppercase tracking-[0.18em] mb-2"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  Annual burden
+                </p>
+                <div
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontSize: 'clamp(2.5rem, 8vw, 3.5rem)',
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  <AnimatedCount />
+                </div>
+                <p
+                  className="mt-2"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    color: 'var(--ink-3)',
+                  }}
+                >
+                  × 3 years = $16,200+ with zero equity
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: 'var(--bg-1)',
+                border: '1px solid var(--border-2)',
+                borderRadius: 12,
+                padding: '1.25rem',
+              }}
+            >
+              {/* Panel header */}
+              <div className="flex items-center justify-between mb-5">
+                <span
+                  className="uppercase tracking-[0.22em]"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  Engineered Infrastructure
+                </span>
+                <Check size={14} strokeWidth={2} style={{ color: '#2563FF' }} />
+              </div>
+              {/* Benefits */}
+              <div>
+                {ARCTOS_WINS.map((item) => (
+                  <div
+                    key={item.statement}
+                    className="py-4"
+                    style={{ borderBottom: '1px solid var(--border)' }}
+                  >
+                    <p
+                      style={{
+                        fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                        fontSize: '1.125rem',
+                        fontWeight: 500,
+                        color: 'var(--ink)',
+                        lineHeight: 1.2,
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {item.statement}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'Inter', system-ui, sans-serif",
+                        fontSize: '12px',
+                        color: 'var(--ink-2)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {item.detail}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              {/* Investment callout */}
+              <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(37,99,255,0.12)' }}>
+                <p
+                  className="uppercase tracking-[0.18em] mb-2"
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '10px',
+                    color: 'var(--ink-2)',
+                  }}
+                >
+                  One-time investment
+                </p>
+                <div
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontSize: 'clamp(2.5rem, 8vw, 3.5rem)',
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                    color: '#2563FF',
+                  }}
+                >
+                  Yours.
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ── DESKTOP layout ── */}
+        <div className="hidden sm:block">
 
         {/* ── Section header ── */}
         <motion.div
@@ -325,6 +582,8 @@ const WhyCustomSection: React.FC = () => {
           </motion.div>
 
         </div>
+
+        </div>{/* end desktop wrapper */}
       </div>
     </section>
   );
