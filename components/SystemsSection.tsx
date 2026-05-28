@@ -66,6 +66,110 @@ const headerFade = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 
+// ─── ServiceCard (mobile only) ───────────────────────────────────────────────
+const ServiceCard: React.FC<{ service: Service; index: number; reduceMotion: boolean }> = ({
+  service,
+  index,
+  reduceMotion,
+}) => {
+  const [active, setActive] = useState(false);
+
+  return (
+    <motion.div
+      custom={index}
+      variants={reduceMotion ? undefined : fadeUp}
+      initial={reduceMotion ? undefined : 'hidden'}
+      whileInView={reduceMotion ? undefined : 'visible'}
+      viewport={{ once: true, margin: '-40px' }}
+      onTouchStart={() => setActive(true)}
+      onTouchEnd={() => setActive(false)}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        background: T.bg1,
+        border: `1px solid ${active ? T.accent : T.border2}`,
+        borderRadius: 12,
+        padding: '1.25rem',
+        marginBottom: '0.75rem',
+        transition: 'border-color 0.2s ease',
+      }}
+    >
+      {/* Ghost number */}
+      <div
+        aria-hidden
+        style={{
+          fontFamily: "'Space Grotesk', system-ui, sans-serif",
+          fontWeight: 700,
+          fontSize: '5rem',
+          lineHeight: 1,
+          color: T.ink,
+          opacity: 0.08,
+          position: 'absolute',
+          top: '0.5rem',
+          right: '0.75rem',
+          userSelect: 'none',
+          pointerEvents: 'none',
+        }}
+      >
+        {service.num}
+      </div>
+
+      {/* Title */}
+      <div
+        style={{
+          fontFamily: "'Space Grotesk', system-ui, sans-serif",
+          fontWeight: 700,
+          fontSize: '1.4rem',
+          color: T.ink,
+          lineHeight: 1.2,
+          letterSpacing: '-0.01em',
+          marginBottom: '0.5rem',
+          paddingRight: '3.5rem', // keep clear of ghost number
+        }}
+      >
+        {service.title}
+      </div>
+
+      {/* Descriptor */}
+      <div
+        style={{
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontSize: 13,
+          color: T.ink2,
+          lineHeight: 1.55,
+          fontWeight: 400,
+          marginBottom: '0.85rem',
+        }}
+      >
+        {service.descriptor}
+      </div>
+
+      {/* Tags */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+        {service.tags.map((tag) => (
+          <span
+            key={tag}
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 9,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              color: T.ink3,
+              border: `1px solid ${T.border2}`,
+              borderRadius: 4,
+              padding: '0.2rem 0.55rem',
+              whiteSpace: 'nowrap',
+              lineHeight: 1.6,
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </motion.div>
+  );
+};
+
 // ─── ServiceRow ──────────────────────────────────────────────────────────────
 const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: boolean }> = ({
   service,
@@ -75,130 +179,140 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
   const [hovered, setHovered] = useState(false);
 
   return (
-    <motion.div
-      custom={index}
-      variants={reduceMotion ? undefined : fadeUp}
-      initial={reduceMotion ? undefined : 'hidden'}
-      whileInView={reduceMotion ? undefined : 'visible'}
-      viewport={{ once: true, margin: '-60px' }}
-    >
-      {/* Top rule */}
-      <div style={{ height: 1, background: T.border }} />
+    <>
+      {/* ── Mobile card ── */}
+      <div className="block sm:hidden">
+        <ServiceCard service={service} index={index} reduceMotion={reduceMotion} />
+      </div>
 
-      {/* Row */}
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          position: 'relative',
-          backgroundColor: hovered ? T.bg1 : 'transparent',
-          transition: 'background-color 0.3s ease',
-          cursor: 'default',
-          paddingTop: '2rem',
-          paddingBottom: '2rem',
-          paddingLeft: '0',
-          paddingRight: '0',
-        }}
-      >
-        {/* Acid bottom border on hover */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 1,
-            backgroundColor: T.accent,
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-          }}
-        />
-
-        {/* Grid: number | content | tags */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'auto 1fr auto',
-            alignItems: 'center',
-            gap: '2rem',
-          }}
-          className="gap-x-8 md:gap-x-12"
+      {/* ── Desktop row ── */}
+      <div className="hidden sm:block">
+        <motion.div
+          custom={index}
+          variants={reduceMotion ? undefined : fadeUp}
+          initial={reduceMotion ? undefined : 'hidden'}
+          whileInView={reduceMotion ? undefined : 'visible'}
+          viewport={{ once: true, margin: '-60px' }}
         >
-          {/* Number */}
+          {/* Top rule */}
+          <div style={{ height: 1, background: T.border }} />
+
+          {/* Row */}
           <div
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
             style={{
-              fontFamily: "'Space Grotesk', system-ui, sans-serif",
-              fontWeight: 300,
-              fontSize: 'clamp(3.5rem, 6vw, 5rem)',
-              lineHeight: 1,
-              color: hovered ? T.accent : T.ink3,
-              transition: 'color 0.3s ease',
-              userSelect: 'none',
-              minWidth: '4.5rem',
+              position: 'relative',
+              backgroundColor: hovered ? T.bg1 : 'transparent',
+              transition: 'background-color 0.3s ease',
+              cursor: 'default',
+              paddingTop: '2rem',
+              paddingBottom: '2rem',
+              paddingLeft: '0',
+              paddingRight: '0',
             }}
           >
-            {service.num}
-          </div>
-
-          {/* Title + descriptor */}
-          <motion.div
-            animate={reduceMotion ? undefined : { x: hovered ? 8 : 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            style={{ minWidth: 0 }}
-          >
+            {/* Acid bottom border on hover */}
             <div
               style={{
-                fontFamily: "'Space Grotesk', system-ui, sans-serif",
-                fontWeight: 500,
-                fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)',
-                color: T.ink,
-                lineHeight: 1.15,
-                marginBottom: '0.4rem',
-                letterSpacing: '-0.01em',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+                backgroundColor: T.accent,
+                opacity: hovered ? 1 : 0,
+                transition: 'opacity 0.3s ease',
               }}
-            >
-              {service.title}
-            </div>
+            />
+
+            {/* Grid: number | content | tags */}
             <div
               style={{
-                fontFamily: "'Inter', system-ui, sans-serif",
-                fontSize: 13,
-                color: T.ink2,
-                lineHeight: 1.5,
-                fontWeight: 400,
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr auto',
+                alignItems: 'center',
+                gap: '2rem',
               }}
+              className="gap-x-8 md:gap-x-12"
             >
-              {service.descriptor}
-            </div>
-          </motion.div>
-
-          {/* Tags — hidden on mobile via inline media approach */}
-          <div
-            className="hidden md:flex"
-            style={{ flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', flexShrink: 0 }}
-          >
-            {service.tags.map((tag) => (
-              <span
-                key={tag}
+              {/* Number */}
+              <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 9,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.15em',
-                  color: T.ink3,
-                  border: `1px solid ${T.border2}`,
-                  padding: '0.2rem 0.55rem',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1.6,
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                  fontWeight: 300,
+                  fontSize: 'clamp(3.5rem, 6vw, 5rem)',
+                  lineHeight: 1,
+                  color: hovered ? T.accent : T.ink3,
+                  transition: 'color 0.3s ease',
+                  userSelect: 'none',
+                  minWidth: '4.5rem',
                 }}
               >
-                {tag}
-              </span>
-            ))}
+                {service.num}
+              </div>
+
+              {/* Title + descriptor */}
+              <motion.div
+                animate={reduceMotion ? undefined : { x: hovered ? 8 : 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                style={{ minWidth: 0 }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
+                    fontWeight: 500,
+                    fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)',
+                    color: T.ink,
+                    lineHeight: 1.15,
+                    marginBottom: '0.4rem',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {service.title}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "'Inter', system-ui, sans-serif",
+                    fontSize: 13,
+                    color: T.ink2,
+                    lineHeight: 1.5,
+                    fontWeight: 400,
+                  }}
+                >
+                  {service.descriptor}
+                </div>
+              </motion.div>
+
+              {/* Tags */}
+              <div
+                className="hidden md:flex"
+                style={{ flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem', flexShrink: 0 }}
+              >
+                {service.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontSize: 9,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.15em',
+                      color: T.ink3,
+                      border: `1px solid ${T.border2}`,
+                      padding: '0.2rem 0.55rem',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </>
   );
 };
 
@@ -254,6 +368,7 @@ const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> =
           onClick={scrollToContact}
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
+          className="systems-cta-btn"
           style={{
             fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: 13,
@@ -298,6 +413,7 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           margin: '0 auto',
           padding: 'clamp(5rem, 10vw, 10rem) clamp(1.25rem, 5vw, 3.5rem)',
         }}
+        className="mobile-systems-wrapper"
       >
         {/* ── Section header ── */}
         <motion.div
@@ -311,12 +427,12 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           <div
             style={{
               fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 10,
               textTransform: 'uppercase',
               letterSpacing: '0.2em',
               color: T.ink2,
               marginBottom: '1.5rem',
             }}
+            className="mobile-eyebrow"
           >
             01 / Capabilities
           </div>
@@ -325,13 +441,13 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           <h2
             style={{
               fontFamily: "'Space Grotesk', system-ui, sans-serif",
-              fontSize: 'clamp(3rem, 5vw, 5rem)',
               fontWeight: 500,
               color: T.ink,
               lineHeight: 1.05,
               letterSpacing: '-0.02em',
               margin: 0,
             }}
+            className="mobile-h2"
           >
             Built for the way
             <br />
