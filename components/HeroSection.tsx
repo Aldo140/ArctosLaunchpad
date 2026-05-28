@@ -18,7 +18,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
   return (
     <header
-      className="relative min-h-screen flex flex-col justify-between overflow-hidden"
+      className="relative h-svh flex flex-col justify-between overflow-hidden"
       style={{ background: 'var(--bg)' }}
     >
       {/* Mountain background — 7% opacity texture */}
