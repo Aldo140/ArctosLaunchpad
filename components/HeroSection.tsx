@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { HERO_STATS } from '../lib/siteContent';
 
+const BASE = import.meta.env.BASE_URL;
+
 interface HeroSectionProps {
   scrollToContact: () => void;
   onViewSystems: () => void;
@@ -27,7 +29,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'url(/bakcground-mountains.webp)',
+          backgroundImage: `url(${BASE}bakcground-mountains.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.07,
@@ -38,7 +40,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
       {/* Bear mascot — bold, bottom-right, mix-blend removes white bg */}
       <img
-        src="/website-landing.png"
+        src={`${BASE}website-landing.png`}
         alt=""
         aria-hidden
         className="hidden sm:block"
