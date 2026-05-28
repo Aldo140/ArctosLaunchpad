@@ -20,8 +20,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
   return (
     <header
-      className="relative h-svh flex flex-col justify-between overflow-hidden"
-      style={{ background: 'var(--bg)' }}
+      className="relative h-svh flex flex-col justify-between"
+      style={{ background: 'var(--bg)', overflow: 'visible', zIndex: 10 }}
     >
       {/* Mountain background — 7% opacity texture */}
       <div
@@ -47,8 +47,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         style={{
           position: 'absolute',
           right: 0,
-          bottom: 0,
-          height: '95%',
+          bottom: '-8%',
+          height: '130%',
           width: 'auto',
           zIndex: 1,
           pointerEvents: 'none',
