@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 
+const BASE = import.meta.env.BASE_URL;
+
 const PROOF_POINTS = [
   { value: '99', suffix: '/100', label: 'Avg Lighthouse score' },
   { value: '3–12', suffix: ' wks', label: 'Delivery timeline' },
@@ -22,7 +24,7 @@ const TrustSection: React.FC = () => {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'url(/social-post-1.png)',
+            backgroundImage: `url(${BASE}social-post-1.png)`,
             backgroundSize: 'cover',
             backgroundPosition: 'center 40%',
             zIndex: 0,

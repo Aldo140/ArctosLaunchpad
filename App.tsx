@@ -18,7 +18,8 @@ import TrustSection from './components/TrustSection';
 import { FAQ_ITEMS } from './lib/siteContent';
 import { Project } from './types';
 
-const POLAR_BEAR_LOGO = '/logo-no-text-2.png';
+const BASE = import.meta.env.BASE_URL;
+const POLAR_BEAR_LOGO = `${BASE}logo-no-text-2.png`;
 
 const projectHref = (p: Project): string => {
   if (p.href?.trim()) return p.href.trim();
@@ -35,8 +36,8 @@ const PROJECTS: Project[] = [
     href: 'https://aldo140.github.io/Starlings/',
     description:
       'Anonymous support map for youth impacted by family substance use. Real-time resource discovery, community notes, and vetted Canadian support services — built with React 19, Leaflet, and Google Apps Script moderation.',
-    image: '/starlings-landing-desktop.webp',
-    imageMobile: '/starlings-landing-mobile.webp',
+    image: `${BASE}starlings-landing-desktop.webp`,
+    imageMobile: `${BASE}starlings-landing-mobile.webp`,
     tags: ['React 19', 'Leaflet', 'Firebase'],
     featured: true,
   },
@@ -48,8 +49,8 @@ const PROJECTS: Project[] = [
     href: 'https://calgarywatch.ca/',
     description:
       'Canadian non-profit safety intelligence platform: community incident reports, 511 Alberta traffic, Environment Canada alerts, and crime choropleths. Firebase Firestore, react-leaflet, GitHub Actions ingest.',
-    image: '/calgarywatch-landing-desktop.webp',
-    imageMobile: '/calgarywatch-landing-mobile.webp',
+    image: `${BASE}calgarywatch-landing-desktop.webp`,
+    imageMobile: `${BASE}calgarywatch-landing-mobile.webp`,
     tags: ['Firebase', 'Leaflet', 'GitHub Actions'],
     featured: true,
   },
@@ -60,8 +61,8 @@ const PROJECTS: Project[] = [
     url: 'rioalto.ca',
     description:
       'Custom static site for a premium Calgary restaurant. 99/100 Lighthouse. Zero monthly platform fees — the client owns the build permanently.',
-    image: '/rioalto-landing-page-mobile.webp',
-    imageMobile: '/rioalto-photo-desk-mobile.webp',
+    image: `${BASE}rioalto-landing-page-mobile.webp`,
+    imageMobile: `${BASE}rioalto-photo-desk-mobile.webp`,
     mobileOnly: true,
     tags: ['Static', 'SEO', 'Performance'],
   },
@@ -72,8 +73,8 @@ const PROJECTS: Project[] = [
     url: 'mruhacks.ca',
     description:
       'Hackathon registration portal engineered for 500+ concurrent users with real-time capacity management and smooth onboarding flows.',
-    image: '/mruhacks-landing-desktop.webp',
-    imageMobile: '/mruhacks-landing-mobile.webp',
+    image: `${BASE}mruhacks-landing-desktop.webp`,
+    imageMobile: `${BASE}mruhacks-landing-mobile.webp`,
     tags: ['Events', 'Scale', 'React'],
   },
 ];
@@ -664,7 +665,7 @@ const App: React.FC = () => {
           className="border-t border-[var(--border)]"
           style={{
             position: 'relative',
-            backgroundImage: 'url(/header-for-socials.png)',
+            backgroundImage: `url(${BASE}header-for-socials.png)`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
