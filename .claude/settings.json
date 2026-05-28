@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git reset *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git branch *)",
+      "Bash(gh repo *)",
+      "Bash(git remote *)",
+      "Bash(gh api *)",
+      "Bash(xargs sed -i \"s/'DM Sans'/'Inter'/g; s/'Syne'/'Space Grotesk'/g\")"
+    ]
+  }
+}

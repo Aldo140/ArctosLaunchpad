@@ -55,7 +55,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '15px',
               fontWeight: 300,
               color: 'var(--ink-2)',
@@ -138,7 +138,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({
                     >
                       <p
                         style={{
-                          fontFamily: "'DM Sans', system-ui, sans-serif",
+                          fontFamily: "'Inter', system-ui, sans-serif",
                           fontSize: '14px',
                           fontWeight: 300,
                           color: 'var(--ink-2)',

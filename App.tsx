@@ -172,7 +172,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
         }}
       >
         <p style={{
-          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontFamily: "'Inter', system-ui, sans-serif",
           fontSize: '13px',
           lineHeight: 1.65,
           color: 'rgba(245,247,255,0.82)',
@@ -230,7 +230,7 @@ const ProjectWorkCard: React.FC<{ project: Project; className?: string }> = ({
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h3 style={{
-            fontFamily: "'Syne', system-ui, sans-serif",
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
             fontWeight: 600,
             fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
             color: 'var(--ink)',
@@ -291,7 +291,7 @@ const Marquee: React.FC = () => (
         <React.Fragment key={i}>
           <span
             style={{
-              fontFamily: "'Syne', system-ui, sans-serif",
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
               fontStyle: 'italic',
               fontWeight: 400,
               fontSize: 'clamp(2rem, 4vw, 3.5rem)',
@@ -705,7 +705,7 @@ const App: React.FC = () => {
                 <h2
                   id="contact-heading"
                   style={{
-                    fontFamily: "'Syne', system-ui, sans-serif",
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
                     fontWeight: 300,
                     fontSize: 'clamp(3.5rem,6vw,7rem)',
                     lineHeight: 0.95,

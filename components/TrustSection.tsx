@@ -75,7 +75,7 @@ const TrustSection: React.FC = () => {
           >
             <h2
               style={{
-                fontFamily: "'Syne', system-ui, sans-serif",
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
                 fontWeight: 800,
                 fontSize: 'clamp(3.5rem, 7vw, 8rem)',
                 lineHeight: 0.95,
@@ -112,7 +112,7 @@ const TrustSection: React.FC = () => {
               >
                 <span
                   style={{
-                    fontFamily: "'Syne', system-ui, sans-serif",
+                    fontFamily: "'Space Grotesk', system-ui, sans-serif",
                     fontWeight: 700,
                     fontSize: 'clamp(2.5rem, 5vw, 4rem)',
                     lineHeight: 1,
@@ -159,7 +159,7 @@ const TrustSection: React.FC = () => {
           >
             <p
               style={{
-                fontFamily: "'Syne', system-ui, sans-serif",
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
                 fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',

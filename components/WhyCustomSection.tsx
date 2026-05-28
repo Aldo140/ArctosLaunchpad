@@ -93,7 +93,7 @@ const WhyCustomSection: React.FC = () => {
           </p>
           <h2
             style={{
-              fontFamily: "'Syne', system-ui, sans-serif",
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
               fontSize: 'clamp(3rem, 5.5vw, 5.5rem)',
               fontWeight: 300,
               lineHeight: 0.92,
@@ -162,7 +162,7 @@ const WhyCustomSection: React.FC = () => {
                 >
                   <span
                     style={{
-                      fontFamily: "'DM Sans', system-ui, sans-serif",
+                      fontFamily: "'Inter', system-ui, sans-serif",
                       fontSize: '14px',
                       color: 'var(--ink)',
                     }}
@@ -199,7 +199,7 @@ const WhyCustomSection: React.FC = () => {
               </p>
               <div
                 style={{
-                  fontFamily: "'Syne', system-ui, sans-serif",
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
                   fontSize: 'clamp(3.5rem, 6vw, 4.5rem)',
                   fontWeight: 600,
                   lineHeight: 1,
@@ -269,7 +269,7 @@ const WhyCustomSection: React.FC = () => {
                 >
                   <p
                     style={{
-                      fontFamily: "'Syne', system-ui, sans-serif",
+                      fontFamily: "'Space Grotesk', system-ui, sans-serif",
                       fontSize: '1.25rem',
                       fontStyle: 'normal',
                       fontWeight: 500,
@@ -282,7 +282,7 @@ const WhyCustomSection: React.FC = () => {
                   </p>
                   <p
                     style={{
-                      fontFamily: "'DM Sans', system-ui, sans-serif",
+                      fontFamily: "'Inter', system-ui, sans-serif",
                       fontSize: '12px',
                       color: 'var(--ink-2)',
                       lineHeight: 1.5,
@@ -311,7 +311,7 @@ const WhyCustomSection: React.FC = () => {
               </p>
               <div
                 style={{
-                  fontFamily: "'Syne', system-ui, sans-serif",
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
                   fontSize: 'clamp(3.5rem, 6vw, 4.5rem)',
                   fontWeight: 600,
                   lineHeight: 1,

@@ -56,7 +56,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
       {/* Main content */}
       <div
-        className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-28 pb-16 sm:pt-32"
+        className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-24 pb-12 sm:pt-28"
         style={{ zIndex: 10 }}
       >
         {/* Eyebrow */}
@@ -66,7 +66,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1 },
             transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
           })}
-          className="self-start mb-10 sm:mb-12"
+          className="self-start mb-5"
         >
           <span
             style={{
@@ -88,8 +88,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         </motion.div>
 
         {/* H1 — desktop */}
-        <h1 style={{ fontFamily: "'Syne', system-ui, sans-serif", fontWeight: 800, lineHeight: 0.92, letterSpacing: '-0.03em', margin: 0 }}>
-          <span className="hidden sm:block" style={{ fontSize: 'clamp(4.5rem, 9vw, 10rem)' }}>
+        <h1 style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif", fontWeight: 800, lineHeight: 0.92, letterSpacing: '-0.03em', margin: 0 }}>
+          <span className="hidden sm:block" style={{ fontSize: 'clamp(3.25rem, 6.5vw, 7.5rem)' }}>
             {lines.map((line, i) => (
               <span key={line} className="block overflow-hidden">
                 <motion.span
@@ -134,10 +134,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
           })}
           style={{
-            marginTop: '2rem',
-            fontFamily: "'DM Sans', system-ui, sans-serif",
-            fontSize: '16px',
-            fontWeight: 300,
+            marginTop: '1.25rem',
+            fontFamily: "'Inter', system-ui, sans-serif",
+            fontSize: '15px',
+            fontWeight: 400,
             lineHeight: 1.65,
             color: 'var(--ink-2)',
             maxWidth: '26rem',
@@ -154,7 +154,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
           })}
-          style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}
+          style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}
         >
           <button
             type="button"
@@ -166,7 +166,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
               background: 'var(--accent)',
               color: '#fff',
               padding: '1rem 1.75rem',
-              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '11px',
               fontWeight: 500,
               textTransform: 'uppercase',
@@ -193,7 +193,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
               background: 'transparent',
               color: 'var(--ink)',
               padding: '1rem 1.75rem',
-              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '11px',
               fontWeight: 500,
               textTransform: 'uppercase',
@@ -225,7 +225,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             {HERO_STATS.map(stat => (
               <div key={stat.label}>
                 <div style={{
-                  fontFamily: "'Syne', system-ui, sans-serif",
+                  fontFamily: "'Space Grotesk', system-ui, sans-serif",
                   fontWeight: 700,
                   fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
                   lineHeight: 1,

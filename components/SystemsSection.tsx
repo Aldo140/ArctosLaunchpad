@@ -127,7 +127,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
           {/* Number */}
           <div
             style={{
-              fontFamily: "'Syne', system-ui, sans-serif",
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
               fontWeight: 300,
               fontSize: 'clamp(3.5rem, 6vw, 5rem)',
               lineHeight: 1,
@@ -148,7 +148,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
           >
             <div
               style={{
-                fontFamily: "'Syne', system-ui, sans-serif",
+                fontFamily: "'Space Grotesk', system-ui, sans-serif",
                 fontWeight: 500,
                 fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)',
                 color: T.ink,
@@ -161,7 +161,7 @@ const ServiceRow: React.FC<{ service: Service; index: number; reduceMotion: bool
             </div>
             <div
               style={{
-                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontFamily: "'Inter', system-ui, sans-serif",
                 fontSize: 13,
                 color: T.ink2,
                 lineHeight: 1.5,
@@ -239,7 +239,7 @@ const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> =
       >
         <div
           style={{
-            fontFamily: "'Syne', system-ui, sans-serif",
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
             fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 24,
@@ -255,7 +255,7 @@ const CTARow: React.FC<{ scrollToContact: () => void; reduceMotion: boolean }> =
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
           style={{
-            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: 13,
             fontWeight: 600,
             textTransform: 'uppercase',
@@ -324,7 +324,7 @@ const SystemsSection: React.FC<SystemsSectionProps> = ({ scrollToContact }) => {
           {/* Heading */}
           <h2
             style={{
-              fontFamily: "'Syne', system-ui, sans-serif",
+              fontFamily: "'Space Grotesk', system-ui, sans-serif",
               fontSize: 'clamp(3rem, 5vw, 5rem)',
               fontWeight: 500,
               color: T.ink,
