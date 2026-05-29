@@ -39,6 +39,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
       />
 
 
+      {/* Bear — mobile: absolute background, text sits on top */}
+      <img
+        src={`${BASE}website-landing.png`}
+        alt="" aria-hidden
+        className="block sm:hidden"
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          height: '72vh',
+          width: 'auto',
+          zIndex: 2,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          maskImage: 'linear-gradient(to bottom, black 42%, transparent 80%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 42%, transparent 80%)',
+        }}
+      />
+
       {/* Bear mascot — desktop */}
       <img
         src={`${BASE}website-landing.png`}
@@ -61,7 +81,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
 
       {/* Main content */}
       <div
-        className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-24 pb-12 sm:pt-28"
+        className="relative flex flex-col flex-1 max-w-[1360px] mx-auto w-full px-6 md:px-12 pt-16 pb-0 sm:pt-28 sm:pb-12"
         style={{ zIndex: 10 }}
       >
         {/* Eyebrow — desktop */}
@@ -99,7 +119,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1 },
             transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
           })}
-          className="block sm:hidden mb-4"
+          className="block sm:hidden mb-3"
           style={{ display: 'flex', justifyContent: 'flex-start' }}
         >
           <span
@@ -193,9 +213,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           })}
           className="block sm:hidden"
           style={{
-            marginTop: '0.875rem',
+            marginTop: '0.65rem',
             fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: '14px',
+            fontSize: '13.5px',
             fontWeight: 400,
             lineHeight: 1.55,
             color: 'var(--ink-2)',
@@ -277,7 +297,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
           })}
           className="block sm:hidden"
-          style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}
+          style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
         >
           <button
             type="button"
@@ -336,21 +356,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             View Systems
           </button>
 
-          {/* Bear — flows below View Systems on mobile */}
-          <img
-            src={`${BASE}website-landing.png`}
-            alt="" aria-hidden
-            style={{
-              display: 'block',
-              width: '100%',
-              height: 'auto',
-              marginTop: '1rem',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              maskImage: 'linear-gradient(to bottom, black 40%, transparent 82%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 82%)',
-            }}
-          />
         </motion.div>
 
       </div>
