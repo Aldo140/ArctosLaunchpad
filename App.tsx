@@ -671,27 +671,26 @@ const App: React.FC = () => {
 
       {/* ── Contact ── */}
       <div data-chapter="§ 08 / CONTACT">
-        <section
-          id="contact"
-          aria-labelledby="contact-heading"
-          className="border-t border-[var(--border)]"
-          style={{
-            position: 'relative',
+
+        {/* Full-width image banner — standalone visual, no text */}
+        <div style={{ position: 'relative', height: '50vh', overflow: 'hidden' }}>
+          <div aria-hidden style={{
+            position: 'absolute', inset: 0,
             backgroundImage: `url(${BASE}header-for-socials.png)`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-          }}
+          }} />
+          <div aria-hidden style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
+            background: 'linear-gradient(to bottom, transparent, var(--bg))',
+          }} />
+        </div>
+
+        <section
+          id="contact"
+          aria-labelledby="contact-heading"
+          style={{ position: 'relative', background: 'var(--bg)' }}
         >
-          {/* Dark gradient overlay */}
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(to bottom, rgba(8,10,15,0.55) 0%, rgba(8,10,15,0.75) 60%, rgba(8,10,15,0.95) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
 
           {/* 2-column grid — heading left, form right */}
           <div
