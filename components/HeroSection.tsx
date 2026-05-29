@@ -119,8 +119,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1 },
             transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 },
           })}
-          className="block sm:hidden mb-3"
-          style={{ display: 'flex', justifyContent: 'flex-start' }}
+          className="flex sm:hidden mb-3"
         >
           <span
             style={{
@@ -296,8 +295,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
             animate: { opacity: 1, y: 0 },
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
           })}
-          className="block sm:hidden"
-          style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+          className="flex sm:hidden flex-col"
+          style={{ marginTop: '1rem', gap: '0.5rem' }}
         >
           <button
             type="button"
