@@ -1,99 +1,65 @@
 <div align="center">
-  <img src="./public/baselayer-logo.png" alt="BaseLayer Logo" width="100" />
-  <h1>BaseLayer Studio</h1>
-  <p><strong>Engineered for absolute dominance. A studio proposition, not a ticket queue.</strong></p>
-</div>
-
-BaseLayer Studio is a premium web development and design agency specializing in bespoke architectures, platform hybrids, and data-intensive application systems. We replace brittle no-code stacks and ship highly-scrutinized tools with measurable speed, offline resilience, and seamless moderation.
-
----
-
-## 🛠️ Core Capabilities
-
-- **Bespoke Architecture**: Hand-coded React/Next.js architectures engineered for absolute performance, impenetrable security, and total ownership. 100/100 Core Web Vitals.
-- **Platform Hybrid**: Visually stunning, high-converting foundations on modern visual builders for teams needing rapid, daily content iteration.
-- **Application Systems**: Complex, data-intensive software—from high-availability booking engines to civic intelligence dashboards and robust API integrations.
-
----
-
-## 📂 The Arsenal (Selected Work)
-
-A showcase of live architectures, youth support cartography, civic safety infra, and flagship digital brands deployed in the wild.
-
-### Starlings Community
-Youth support platform emphasizing geospatial connectivity and curated resources. Responsive layouts built for accessibility across any device.
-
-<div align="center">
-  <img src="./WebProjects/Web%20Design/Starlings/Starlings-Landing-Page-Desktop.png" width="65%" alt="Starlings Desktop Landing">
-  <img src="./WebProjects/Web%20Design/Starlings/starlings-landing-mobile%20(1).png" width="30%" alt="Starlings Mobile Landing">
-</div>
-<br>
-<div align="center">
-  <img src="./WebProjects/Web%20Design/Starlings/About-Section-Desktop.png" width="65%" alt="Starlings Desktop About">
-  <img src="./WebProjects/Web%20Design/Starlings/About-Section-Priority-Mobile.png" width="30%" alt="Starlings Mobile About">
-</div>
-<br>
-<div align="center">
-  <img src="./WebProjects/Web%20Design/Starlings/Map-Section-Desktop.png" width="96%" alt="Starlings Desktop Map">
+  <img src="./public/logo-no-text-2.png" alt="ARCTOS LAUNCHPAD" width="80" />
+  <h1>ARCTOS LAUNCHPAD</h1>
+  <p><strong>Canadian Digital Infrastructure · Less chaos. Better systems.</strong></p>
+  <p>
+    <a href="https://aldo140.github.io/ArctosLaunchpad/">🌐 Live Site</a>
+    &nbsp;·&nbsp;
+    <strong>Branch:</strong> arctos-launchpad
+  </p>
 </div>
 
 ---
 
-### Calgary Watch
-Civic safety infrastructure and real-time geospatial incident reporting, optimized for map interactions and immediate alerts.
-
-<div align="center">
-  <img src="./WebProjects/Web%20Design/CalgaryWatch/Landing-Desktop.png" width="48%" alt="CalgaryWatch Landing">
-  <img src="./WebProjects/Web%20Design/CalgaryWatch/Map-Section.png" width="48%" alt="CalgaryWatch Map">
-</div>
+ARCTOS LAUNCHPAD engineers custom operational platforms, AI workflows, and digital infrastructure for Canadian enterprises. You own everything we build — forever. No subscriptions. No lock-in. Full source code on delivery.
 
 ---
 
-### PolarOps & Rio Alto
-High-end e-commerce and product interfaces, showcasing our deep branding and UI system capabilities.
+## Stack
 
-<div align="center">
-  <img src="./WebProjects/Web%20Design/PolarOps/Desktop-mockup.png" width="96%" alt="PolarOps Desktop Mockup">
-</div>
-<br>
-<div align="center">
-  <img src="./WebProjects/Web%20Design/PolarOps/Ecommerce-UI-Preview-Desktop.png" width="48%" alt="Ecommerce UI">
-  <img src="./WebProjects/Web%20Design/PolarOps/UI-Previews-medium%20Screen.png" width="48%" alt="UI Previews">
-</div>
+- **Framework**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS v4 + CSS custom properties
+- **Fonts**: Space Grotesk · Inter · IBM Plex Mono
+- **Animation**: Framer Motion + GSAP + Lenis smooth scroll
+- **Deployment**: GitHub Pages via GitHub Actions
+- **Base URL**: `/ArctosLaunchpad/` (configured per environment)
 
 ---
 
-### MRUHacks
-Hackathon event platform designed for massive engagement and conversion.
+## Capabilities
 
-<div align="center">
-  <img src="./WebProjects/Web%20Design/MRUHacks/Landing-Desktop.png" width="96%" alt="MRUHacks Landing">
-</div>
-
----
-
-## 💻 Technical Stack
-
-The BaseLayer Studio website itself is built utilizing our gold-standard stack:
-- **Core**: React 19, Vite
-- **Styling**: Vanilla CSS, Modern CSS Custom Properties, Tailwind CSS for utility alignments.
-- **Animations & Interaction**: Framer Motion, GSAP, Lenis (Smooth Scrolling).
-- **Aesthetic**: Intense glassmorphism, 3D perspective transformations (`preserve-3d`, `perspective-[2000px]`), and "digital intelligence" visual identity.
+| System | Description |
+|--------|-------------|
+| **Custom Operational Systems** | Hand-built React/Next.js infrastructure. Zero platform rent. Full source ownership. |
+| **Platform Hybrid** | Wix Studio / Webflow for teams needing daily content control without sacrificing craft. |
+| **Application Systems** | Dashboards, booking engines, AI pipelines, civic intelligence platforms, and APIs. |
 
 ---
 
-## 🚀 Local Development
+## Selected Work
+
+- **[Starlings Support Map](https://aldo140.github.io/Starlings/)** — Anonymous youth support map with real-time resource discovery. React 19, Leaflet, Firebase.
+- **[Calgary Watch](https://calgarywatch.ca/)** — Civic safety intelligence platform. Community incident reports, 511 Alberta, Environment Canada alerts.
+- **[Rio Alto](https://rioalto.ca/)** — Premium Calgary restaurant. 99/100 Lighthouse. Zero monthly fees.
+- **[MRU Hacks](https://mruhacks.ca/)** — Hackathon portal engineered for 500+ concurrent users.
+
+---
+
+## Local Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Start the local development server
-npm run dev
-
-# Build for production
-npm run build
+npm run dev        # localhost:3000
+npm run build      # production build
+npm run preview    # preview production build
 ```
 
 ---
-*Built for Canadian operators who need proof, not promises. Code is secondary. Strategy first.*
+
+## Deployment
+
+Pushes to `arctos-launchpad` trigger automatic deployment to GitHub Pages via `.github/workflows/deploy.yml`. The `GITHUB_PAGES=true` env var switches Vite's base to `/ArctosLaunchpad/`.
+
+---
+
+*Built in Canada. Owned by you. Permanently.*
