@@ -38,25 +38,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         }}
       />
 
-      {/* Bear — mobile: centered, anchored to bottom, fades down */}
-      <img
-        src={`${BASE}website-landing.png`}
-        alt="" aria-hidden
-        className="block sm:hidden"
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          height: '78vh',
-          width: 'auto',
-          zIndex: 3,
-          pointerEvents: 'none',
-          userSelect: 'none',
-          maskImage: 'linear-gradient(to bottom, black 45%, transparent 82%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, black 45%, transparent 82%)',
-        }}
-      />
 
       {/* Bear mascot — desktop */}
       <img
@@ -354,6 +335,22 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
           >
             View Systems
           </button>
+
+          {/* Bear — flows below View Systems on mobile */}
+          <img
+            src={`${BASE}website-landing.png`}
+            alt="" aria-hidden
+            style={{
+              display: 'block',
+              width: '100%',
+              height: 'auto',
+              marginTop: '1rem',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              maskImage: 'linear-gradient(to bottom, black 40%, transparent 82%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 82%)',
+            }}
+          />
         </motion.div>
 
       </div>
