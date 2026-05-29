@@ -67,7 +67,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToContact, onViewSystem
         style={{
           position: 'absolute',
           right: '-5vw',
-          top: '-25vh',
+          top: '-10vh',
           height: '160vh',
           width: 'auto',
           maskImage: 'linear-gradient(to bottom, black 30%, transparent 65%)',
