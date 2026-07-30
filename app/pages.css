@@ -1,0 +1,7058 @@
+/* =========================================================================
+   ARCTOS — interior pages
+   A single document vocabulary shared by services, work, industries, process,
+   studio, contact, and the policy pages. Pages compose these; they do not
+   invent new ones.
+   ========================================================================= */
+
+/* =========================================================================
+   MASTHEAD
+   ========================================================================= */
+
+.masthead {
+  padding-block: clamp(8rem, 16vh, 13rem) var(--section-y);
+}
+
+.masthead__inner {
+  display: grid;
+  gap: var(--s7);
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.crumbs li + li::before {
+  content: "/";
+  margin-right: 0.5rem;
+  color: var(--rule-strong);
+}
+
+.crumbs a:hover {
+  color: var(--accent);
+}
+
+.masthead__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s6);
+}
+
+.masthead__title {
+  max-width: 17ch;
+  margin-top: var(--s5);
+}
+
+.masthead__intro {
+  margin-top: var(--s5);
+}
+
+.masthead__folio {
+  white-space: nowrap;
+  padding-bottom: 0.4rem;
+}
+
+/* =========================================================================
+   DOC SECTIONS
+   ========================================================================= */
+
+.doc__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 44rem;
+  margin-bottom: var(--s7);
+}
+
+.doc__title {
+  max-width: 18ch;
+}
+
+.doc__problem {
+  max-width: 54ch;
+}
+
+/* Two-column document: heading rail on the left, content on the right. */
+.doc__split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.doc__split .doc__head {
+  margin-bottom: 0;
+  position: sticky;
+  top: 7rem;
+}
+
+.doc__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s6);
+}
+
+.doc__outcomes {
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+  display: grid;
+  gap: var(--s4);
+}
+
+.doc__aside {
+  max-width: 52rem;
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+}
+
+.doc__aside-title {
+  max-width: 16ch;
+}
+
+/* =========================================================================
+   LEDGER — a list of records with a number, a title, and a summary
+   ========================================================================= */
+
+.ledger {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.ledger__row {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.ledger__row a {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 2rem;
+  gap: var(--s5);
+  align-items: baseline;
+  padding: var(--s5) 0;
+  transition:
+    background var(--dur) var(--ease-out),
+    padding-left var(--dur) var(--ease-out);
+}
+
+.ledger__row a:hover {
+  background: color-mix(in oklab, var(--fg) 4%, transparent);
+  padding-left: var(--s4);
+}
+
+.ledger__n {
+  color: var(--accent);
+}
+
+.ledger__body {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ledger__title {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.ledger__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 62ch;
+}
+
+.ledger__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.ledger__row a:hover .ledger__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* =========================================================================
+   ARCHIVE — work index
+   ========================================================================= */
+
+.archive {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.archive__row {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.archive__link {
+  display: grid;
+  grid-template-columns: 3.5rem 12rem minmax(0, 1fr) auto 1.5rem;
+  gap: var(--s5);
+  align-items: center;
+  padding: var(--s5) 0;
+  transition: padding-left var(--dur) var(--ease-out);
+}
+
+.archive__link:hover {
+  padding-left: var(--s4);
+}
+
+.archive--compact .archive__link {
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto 1.5rem;
+}
+
+.archive__n {
+  color: var(--accent);
+}
+
+.archive__thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+}
+
+.archive__thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.archive__link:hover .archive__thumb img {
+  transform: scale(1.05);
+}
+
+.archive__text {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.archive__title {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.archive__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 56ch;
+}
+
+.archive__services {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.archive__status {
+  white-space: nowrap;
+}
+
+.archive__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.archive__link:hover .archive__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+.archive__note {
+  margin-top: var(--s7);
+  max-width: 52ch;
+  line-height: 1.7;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+/* =========================================================================
+   NUMBERED / STEPS / CHIPS
+   ========================================================================= */
+
+.numbered {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.numbered li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  align-items: baseline;
+}
+
+.numbered p {
+  color: var(--fg-dim);
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.steps li {
+  background: var(--bg);
+  padding: var(--s5);
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  font-size: var(--t-small);
+  font-weight: 500;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chips li {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  border: var(--hair) solid var(--rule);
+  padding: 0.35rem 0.6rem;
+}
+
+.chips--large li {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 0.55rem 0.85rem;
+  color: var(--fg);
+}
+
+/* =========================================================================
+   REGISTER
+   ========================================================================= */
+
+.register {
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.register__row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  align-items: baseline;
+}
+
+.register__row dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+/* =========================================================================
+   CASE FILE
+   ========================================================================= */
+
+.reel-figure {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+}
+
+.reel-figure .reel,
+.reel-figure img {
+  width: 100%;
+  height: auto;
+  border: var(--hair) solid var(--rule);
+  background: var(--bg-raised);
+}
+
+.case {
+  display: grid;
+  gap: var(--s8);
+}
+
+.case__story {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.case__panel {
+  background: var(--bg);
+  padding: var(--s6) var(--s5);
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+}
+
+.case__panel-title {
+  font-size: var(--t-subtitle);
+}
+
+.case__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--s6);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.proof__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 42rem;
+  margin-bottom: var(--s7);
+}
+
+.proof__gallery {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s5);
+}
+
+.proof__item {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+  grid-column: span 6;
+}
+
+.proof__item--portrait {
+  grid-column: span 2;
+}
+
+.proof__item--wide {
+  grid-column: span 4;
+}
+
+.proof__frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+}
+
+.proof__item--portrait .proof__frame {
+  aspect-ratio: 3 / 4;
+}
+
+.proof__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.proof__item figcaption {
+  font-size: var(--t-micro);
+  font-family: var(--font-mono);
+  line-height: 1.6;
+  color: var(--fg-faint);
+}
+
+/* =========================================================================
+   ROUTE (process)
+   ========================================================================= */
+
+.route {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.route__stop {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: var(--s6);
+}
+
+.route__marker {
+  display: grid;
+  justify-items: center;
+  gap: var(--s3);
+  grid-template-rows: auto 1fr;
+}
+
+.route__marker .t-folio {
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.route__line {
+  width: var(--hair);
+  height: 100%;
+  min-height: 3rem;
+  background: var(--rule);
+}
+
+.route__stop:last-child .route__line {
+  display: none;
+}
+
+.route__body {
+  display: grid;
+  gap: var(--s4);
+  padding-bottom: var(--s8);
+  max-width: 52rem;
+}
+
+.route__summary {
+  color: var(--fg);
+  max-width: 34ch;
+}
+
+.route__detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.route__detail li {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  border: var(--hair) solid var(--rule);
+  padding: 0.3rem 0.55rem;
+}
+
+.route__note {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* =========================================================================
+   FAQ
+   ========================================================================= */
+
+.faq {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.faq__item {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-block: var(--s5);
+  cursor: pointer;
+  list-style: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-stretch: 94%;
+  letter-spacing: -0.015em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary:hover {
+  color: var(--accent);
+}
+
+.faq__sign {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.faq__sign::before,
+.faq__sign::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: var(--hair);
+  background: currentColor;
+}
+
+.faq__sign::after {
+  transform: rotate(90deg);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.faq__item[open] .faq__sign::after {
+  transform: rotate(0deg);
+}
+
+.faq__item p {
+  padding-bottom: var(--s5);
+  color: var(--fg-dim);
+  max-width: 62ch;
+}
+
+/* =========================================================================
+   STUDIO
+   ========================================================================= */
+
+.plate {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+}
+
+.plate img {
+  width: 100%;
+  height: auto;
+}
+
+.manifesto {
+  display: grid;
+  gap: var(--s5);
+  max-width: 46rem;
+}
+
+.manifesto__line {
+  font-size: var(--t-subtitle);
+  line-height: 1.35;
+  color: var(--fg-dim);
+  max-width: 40ch;
+}
+
+.manifesto__punch {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-style: italic;
+  max-width: 14ch;
+  color: var(--fg);
+}
+
+/* =========================================================================
+   LOCAL BRIEF
+   ========================================================================= */
+
+.local__proof {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.local__proof > div:first-child {
+  display: grid;
+  gap: var(--s4);
+  justify-items: start;
+}
+
+.local__proof-media img {
+  width: 100%;
+  height: auto;
+  border: var(--hair) solid var(--rule);
+}
+
+/* =========================================================================
+   CONTACT
+   ========================================================================= */
+
+.intake {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.intake__memo {
+  display: grid;
+  gap: var(--s5);
+  position: sticky;
+  top: 7rem;
+}
+
+.intake__memo-title {
+  font-size: var(--t-subtitle);
+}
+
+.intake__note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.intake__sheet {
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+/* --- form --------------------------------------------------------------- */
+
+.project-form {
+  display: grid;
+  gap: var(--s6);
+  position: relative;
+}
+
+.project-form-intro {
+  display: grid;
+  gap: var(--s2);
+  padding-bottom: var(--s5);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.project-form-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.project-form-intro p:not(.project-form-kicker) {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.project-form-section {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s4);
+}
+
+.project-form-section legend {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  padding: 0;
+  margin-bottom: var(--s2);
+}
+
+.project-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+}
+
+.project-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: var(--t-small);
+  font-weight: 500;
+}
+
+.project-form-wide {
+  grid-column: 1 / -1;
+}
+
+.project-form input,
+.project-form select,
+.project-form textarea {
+  width: 100%;
+  background: var(--bg);
+  border: var(--hair) solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.85rem;
+  font-size: var(--t-small);
+  color: var(--fg);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.project-form input:hover,
+.project-form select:hover,
+.project-form textarea:hover {
+  border-color: var(--fg-dim);
+}
+
+.project-form textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.project-form-error {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: #ff9a9a;
+}
+
+.project-form-notice {
+  padding: var(--s4);
+  border: var(--hair) solid #ff9a9a;
+  color: #ff9a9a;
+  font-size: var(--t-small);
+}
+
+.project-form-trap {
+  position: absolute;
+  left: -9999px;
+}
+
+.project-form-submit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  align-items: center;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.project-form-submit button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s5);
+  padding: 0.95rem 1.4rem;
+  background: var(--fg);
+  color: var(--bg);
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: var(--t-small);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.project-form-submit button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--glacier);
+}
+
+.project-form-submit button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.project-form-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.project-form-success {
+  display: grid;
+  gap: var(--s4);
+  justify-items: start;
+  padding: var(--s6) 0;
+}
+
+.project-form-success-mark {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.project-form-secondary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* =========================================================================
+   POLICY / DOCUMENT PAGES
+   ========================================================================= */
+
+.document-page {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.document-page-header {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: clamp(8rem, 16vh, 13rem) var(--gutter) var(--section-y);
+  display: grid;
+  gap: var(--s4);
+}
+
+.document-page-header-meta {
+  display: flex;
+  gap: var(--s5);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.document-page-header h1 {
+  font-size: var(--t-display);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: var(--lh-snug);
+  letter-spacing: -0.028em;
+  max-width: 16ch;
+}
+
+.document-page-header > p {
+  max-width: var(--measure);
+  color: var(--fg-dim);
+  font-size: var(--t-lead);
+}
+
+.document-page-updated {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--fg-faint);
+}
+
+.document-page section,
+.document-page article {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--s7);
+}
+
+.document-page h2 {
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s4);
+  padding-top: var(--s6);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.document-page p,
+.document-page li {
+  max-width: var(--measure);
+  color: var(--fg-dim);
+}
+
+.document-page ul,
+.document-page ol {
+  display: grid;
+  gap: var(--s2);
+  padding-left: 1.1rem;
+  margin-block: var(--s4);
+}
+
+.document-page a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* =========================================================================
+   404
+   ========================================================================= */
+
+.notfound {
+  min-height: 70svh;
+  display: grid;
+  align-items: center;
+}
+
+.notfound__inner {
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+  max-width: 46rem;
+}
+
+.notfound__mark {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.notfound__title {
+  max-width: 14ch;
+}
+
+.notfound__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  margin-top: var(--s3);
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+@media (max-width: 1100px) {
+  .doc__split {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+  .doc__split .doc__head {
+    position: static;
+  }
+    .archive__link {
+    grid-template-columns: 3rem 9rem minmax(0, 1fr) 1.5rem;
+  }
+  .archive__status {
+    display: none;
+  }
+  .intake {
+    grid-template-columns: 1fr;
+  }
+  .intake__memo {
+    position: static;
+  }
+  .case__story {
+    grid-template-columns: 1fr;
+  }
+  .local__proof {
+    grid-template-columns: 1fr;
+  }
+  .proof__item--wide,
+  .proof__item--portrait {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 760px) {
+  .masthead__body {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: var(--s4);
+  }
+  .archive__link {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--s3) var(--s4);
+    align-items: start;
+  }
+  .archive__thumb {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    aspect-ratio: 16 / 9;
+  }
+  .archive__go {
+    display: none;
+  }
+  .ledger__row a {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--s3) var(--s4);
+  }
+  .ledger__go {
+    display: none;
+  }
+  .register__row {
+    grid-template-columns: 1fr;
+    gap: var(--s2);
+  }
+  .project-form-grid,
+  .doc__cols {
+    grid-template-columns: 1fr;
+  }
+  .proof__item--wide,
+  .proof__item--portrait {
+    grid-column: span 6;
+  }
+  .route__stop {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--s4);
+  }
+  }
+
+/* ===== SERVICES =====================================================
+   The services index and the nine service sheets.
+
+   Rule of the set: no two sections on a page share a composition. Each
+   stage owns a material, an accent, and a shape — a plate, a spread, a
+   console, a gauge — and each section of a service sheet is a different
+   instrument. The accent draws the structural line of the composition
+   (the scale, the card edge, the axis, the sign), never the body copy.
+
+   Marks used throughout: "+" reads as an outcome, "−" as a fault. The
+   diagnostic and the outcomes are the same grid run backwards.
+   =================================================================== */
+
+/* Sequenced entrances. Motion states the order of a list, once. */
+.svc-seq > * {
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svc-seq > * {
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   STAGE INDEX — the map of the whole offer, drawn as a measuring scale.
+   The four accent spans butt together into one continuous four-colour
+   rule: the offer, legible in a single line.
+   ------------------------------------------------------------------ */
+
+.svc-index {
+  display: grid;
+  gap: var(--s4);
+}
+
+.svc-index__track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-index__stop + .svc-index__stop {
+  border-left: var(--hair) solid var(--rule);
+}
+
+.svc-index__link {
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  height: 100%;
+  padding-bottom: var(--s5);
+}
+
+.svc-index__link > *:not(.svc-index__gauge) {
+  padding-inline: var(--s4);
+}
+
+.svc-index__stop:first-child .svc-index__link > *:not(.svc-index__gauge) {
+  padding-left: 0;
+}
+
+.svc-index__gauge {
+  position: relative;
+  display: block;
+  height: 1.15rem;
+  margin-bottom: var(--s3);
+}
+
+.svc-index__span {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+  transition: height var(--dur) var(--ease-out);
+}
+
+/* Ruler ticks hanging off the scale. */
+.svc-index__ticks {
+  position: absolute;
+  inset: 2px 0 auto 0;
+  height: 0.42rem;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--rule-strong) 0 1px,
+    transparent 1px 0.5rem
+  );
+}
+
+.svc-index__link:hover .svc-index__span,
+.svc-index__link:focus-visible .svc-index__span {
+  height: 5px;
+}
+
+.svc-index__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.svc-index__n {
+  color: var(--accent);
+}
+
+.svc-index__count {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.svc-index__name {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.svc-index__link:hover .svc-index__name {
+  color: var(--accent);
+}
+
+.svc-index__note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 26ch;
+}
+
+/* ---------------------------------------------------------------------
+   01 ATTRACT — plate. Outline numeral at plate scale, wide two-column
+   rows, outcomes as a footnote against the rule.
+   ------------------------------------------------------------------ */
+
+.svc-plate__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+  margin-bottom: var(--s8);
+}
+
+.svc-plate__numeral {
+  font-family: var(--font-ui);
+  font-size: clamp(5rem, 13vw, 12rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: 0.74;
+  letter-spacing: -0.045em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+}
+
+.svc-plate__copy {
+  display: grid;
+  gap: var(--s4);
+}
+
+.svc-plate__title {
+  max-width: 20ch;
+}
+
+.svc-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.svc-rows__row {
+  position: relative;
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+/* The accent draws itself along the row rather than tinting it. */
+.svc-rows__row::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-rows__row:hover::after,
+.svc-rows__row:focus-within::after {
+  transform: scaleX(1);
+}
+
+.svc-rows__link {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1.05fr) minmax(0, 0.95fr) 2rem;
+  gap: var(--s5);
+  align-items: baseline;
+  padding-block: var(--s6);
+}
+
+.svc-rows__n {
+  color: var(--accent);
+}
+
+.svc-rows__title {
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.024em;
+  line-height: 1.04;
+}
+
+.svc-rows__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.svc-rows__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.svc-rows__link:hover .svc-rows__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+.svc-plate__foot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s5) clamp(1.5rem, 4vw, 3.5rem);
+  align-items: baseline;
+  margin-top: var(--s7);
+}
+
+/* "+" is the outcome mark across the whole set. */
+.svc-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3) var(--s6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--t-small);
+}
+
+.svc-marks li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+}
+
+.svc-marks li::before {
+  content: "+";
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------
+   02 CONVERT — spread. A printed left-hand column that stays put while
+   the sheets pass it.
+   ------------------------------------------------------------------ */
+
+.svc-spread__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.svc-spread__aside {
+  position: sticky;
+  top: 7rem;
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-spread__title {
+  /* The paper voice at display size overwhelms a column this narrow; the
+     spread wants a headline it can stand beside, not under. */
+  font-size: var(--t-title);
+  line-height: 1.04;
+  max-width: 14ch;
+}
+
+.svc-spread__foot {
+  display: grid;
+  gap: var(--s4);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+/* Outcomes as a run-in line in the paper voice, split by accent solidus. */
+.svc-run {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--t-lead);
+  line-height: 1.4;
+}
+
+.svc-run li + li::before {
+  content: "/";
+  font-style: normal;
+  color: var(--accent);
+  margin-inline: 0.5rem;
+}
+
+.svc-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-cards__card {
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  height: 100%;
+  padding: clamp(1.35rem, 3vw, 2.25rem);
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+  border-left: 3px solid var(--accent);
+  transition: background var(--dur) var(--ease-out);
+}
+
+.svc-cards__card:hover {
+  background: color-mix(in oklab, var(--accent) 7%, var(--bg-raised));
+}
+
+.svc-cards__n {
+  color: var(--accent);
+}
+
+.svc-cards__title {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+
+.svc-cards__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 48ch;
+}
+
+.svc-cards__go,
+.svc-pair__go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.svc-cards__go span,
+.svc-pair__go span {
+  display: inline-block;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-cards__card:hover .svc-cards__go span,
+.svc-pair__block:hover .svc-pair__go span {
+  transform: translateX(0.3rem);
+}
+
+/* ---------------------------------------------------------------------
+   03 OPERATE — console. The heading is a cell in the same hairline grid
+   as the services, so the stage reads as one panel rather than a title
+   sitting above a list.
+   ------------------------------------------------------------------ */
+
+.svc-console__ticker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3) var(--s6);
+  list-style: none;
+  margin: 0 0 var(--s6);
+  padding-bottom: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.svc-console__ticker li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+}
+
+.svc-console__ticker li::before {
+  content: "+";
+  color: var(--accent);
+}
+
+.svc-console__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.svc-console__cell {
+  position: relative;
+  background: var(--bg);
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+}
+
+.svc-console__cell--head {
+  gap: var(--s4);
+}
+
+.svc-console__title {
+  font-size: var(--t-title);
+  max-width: 15ch;
+}
+
+.svc-console__cell--unit {
+  grid-template-rows: auto auto 1fr auto;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.svc-console__cell--unit::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-console__cell--unit:hover {
+  background: color-mix(in oklab, var(--accent) 8%, var(--bg));
+}
+
+.svc-console__cell--unit:hover::before,
+.svc-console__cell--unit:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.svc-console__n {
+  color: var(--accent);
+}
+
+.svc-console__name {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+}
+
+.svc-console__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.svc-console__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.svc-console__cell--unit:hover .svc-console__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* ---------------------------------------------------------------------
+   04 SCALE — gauge. The stage about measurement is composed as one: the
+   outcomes are read off an accent axis, the services sit beside it.
+   ------------------------------------------------------------------ */
+
+.svc-gauge__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(1.5rem, 5vw, 5rem);
+  align-items: end;
+  margin-bottom: var(--s8);
+  padding-bottom: var(--s5);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.svc-gauge__title {
+  max-width: 15ch;
+  margin-top: var(--s4);
+}
+
+.svc-gauge__problem {
+  justify-self: end;
+  text-align: right;
+  max-width: 34ch;
+}
+
+.svc-gauge__body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.svc-gauge__scale {
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-gauge__readings {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--s5);
+  border-left: 2px solid var(--accent);
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-gauge__readings li {
+  position: relative;
+  font-size: var(--t-lead);
+  line-height: 1.32;
+}
+
+.svc-gauge__readings li::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--s5) - 2px);
+  top: 0.62em;
+  width: var(--s4);
+  height: 2px;
+  background: var(--accent);
+}
+
+.svc-pair {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.svc-pair__block {
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  height: 100%;
+  padding-top: var(--s4);
+  border-top: 3px solid var(--accent);
+}
+
+.svc-pair__n {
+  color: var(--fg-faint);
+}
+
+.svc-pair__title {
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.026em;
+  line-height: 1.02;
+}
+
+.svc-pair__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+/* ---------------------------------------------------------------------
+   SERVICE SHEET — masthead readout
+   ------------------------------------------------------------------ */
+
+.svc-spec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5) clamp(1.5rem, 4vw, 3.5rem);
+  margin: 0;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-spec__item {
+  display: grid;
+  gap: var(--s2);
+}
+
+.svc-spec__item dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--fg);
+}
+
+/* ---------------------------------------------------------------------
+   DIAGNOSTIC / OUTCOMES — one grid, run in both directions.
+   Dark, right-hung, minus. Then light, left-hung, plus.
+   ------------------------------------------------------------------ */
+
+.svc-balance__inner {
+  display: grid;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.svc-balance__head {
+  display: grid;
+  gap: var(--s4);
+}
+
+.svc-balance__title {
+  max-width: 17ch;
+}
+
+.svc-balance__note {
+  margin-top: var(--s2);
+  padding-left: var(--s5);
+  border-left: 2px solid var(--accent);
+  max-width: 36ch;
+  color: var(--fg-dim);
+}
+
+.svc-balance__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-balance__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  font-size: var(--t-subtitle);
+  font-weight: 500;
+  font-stretch: 94%;
+  letter-spacing: -0.018em;
+  line-height: 1.18;
+}
+
+.svc-balance__list li:first-child {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-balance__sign {
+  position: relative;
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.svc-balance__sign::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 1px) 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.svc-balance--gain .svc-balance__sign::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 calc(50% - 1px);
+  width: 2px;
+  background: var(--accent);
+}
+
+@media (min-width: 861px) {
+  .svc-balance--fault .svc-balance__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+  .svc-balance--fault .svc-balance__head {
+    order: 2;
+    position: sticky;
+    top: 7rem;
+  }
+  .svc-balance--fault .svc-balance__list {
+    order: 1;
+    text-align: right;
+  }
+  .svc-balance--fault .svc-balance__list li {
+    flex-direction: row-reverse;
+  }
+  .svc-balance--gain .svc-balance__inner {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+  .svc-balance--gain .svc-balance__head {
+    position: sticky;
+    top: 7rem;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SCOPE — a ruled index with the count set as a plate
+   ------------------------------------------------------------------ */
+
+.svc-scope__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+  margin-bottom: var(--s7);
+  padding-bottom: var(--s5);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.svc-scope__count {
+  font-family: var(--font-ui);
+  font-size: clamp(4.5rem, 11vw, 9.5rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: 0.72;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+}
+
+.svc-scope__copy {
+  display: grid;
+  gap: var(--s4);
+  max-width: 46ch;
+}
+
+.svc-scope__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 3;
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.svc-scope__list li {
+  break-inside: avoid;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  padding-block: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.svc-scope__n {
+  flex: none;
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------
+   METHOD — a stair. Each step steps in; the sequence is the shape.
+   ------------------------------------------------------------------ */
+
+.svc-method__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 46rem;
+  margin-bottom: var(--s8);
+}
+
+.svc-stair {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-stair__step {
+  --stair: clamp(1rem, 3.4vw, 4rem);
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: baseline;
+  margin-left: calc(var(--i, 0) * var(--stair));
+  padding: var(--s5) 0 var(--s5) var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-stair__step:last-child {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.svc-stair__drop {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+.svc-stair__n {
+  color: var(--accent);
+}
+
+.svc-stair__label {
+  font-size: clamp(1.35rem, 0.95rem + 1.5vw, 2.4rem);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.024em;
+  line-height: 1.06;
+}
+
+/* ---------------------------------------------------------------------
+   EVIDENCE BAND
+   ------------------------------------------------------------------ */
+
+.svc-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s3) var(--s5);
+  align-items: baseline;
+  padding-bottom: var(--s4);
+  margin-bottom: var(--s6);
+  border-bottom: 2px solid var(--accent);
+}
+
+.svc-band__title {
+  grid-column: 1;
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+}
+
+.svc-band > .t-folio {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+}
+
+/* The archive is site vocabulary and stays itself here; it only gets the
+   air it needs to hold its own beside the stair and the balance lists. */
+.svc-evidence .archive__link {
+  padding-block: var(--s6);
+}
+
+/* ---------------------------------------------------------------------
+   QUESTIONS — a centred column of notes, set on paper
+   ------------------------------------------------------------------ */
+
+.svc-notes__inner {
+  max-width: 50rem;
+  margin-inline: auto;
+  display: grid;
+  gap: var(--s7);
+}
+
+.svc-notes__head {
+  display: grid;
+  gap: var(--s4);
+  justify-items: center;
+  text-align: center;
+}
+
+.svc-notes__title {
+  font-size: var(--t-title);
+}
+
+.svc-notes__list {
+  border-top: 2px solid var(--accent);
+}
+
+.svc-notes .faq__item summary {
+  align-items: baseline;
+  gap: var(--s4);
+}
+
+.svc-notes__q {
+  flex: none;
+  color: var(--accent);
+}
+
+.svc-notes__ask {
+  flex: 1 1 auto;
+}
+
+.svc-notes .faq__item p {
+  padding-left: calc(var(--s4) + 2.1rem);
+}
+
+/* ---------------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------------ */
+
+@media (max-width: 1100px) {
+  .svc-index__track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--s6);
+  }
+  .svc-index__stop:nth-child(3) {
+    border-left: 0;
+  }
+  .svc-index__stop:nth-child(3) .svc-index__link > *:not(.svc-index__gauge) {
+    padding-left: 0;
+  }
+  .svc-spread__inner,
+  .svc-gauge__body {
+    grid-template-columns: 1fr;
+  }
+  .svc-spread__aside {
+    position: static;
+  }
+  .svc-scope__list {
+    columns: 2;
+  }
+  .svc-rows__link {
+    grid-template-columns: 4rem minmax(0, 1fr) 1.5rem;
+    row-gap: var(--s3);
+  }
+  .svc-rows__summary {
+    grid-column: 2 / 3;
+  }
+  .svc-rows__go {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 860px) {
+  .svc-balance__list {
+    text-align: left;
+  }
+}
+
+@media (max-width: 760px) {
+  .svc-index__track {
+    grid-template-columns: 1fr;
+    row-gap: var(--s5);
+  }
+  .svc-index__stop + .svc-index__stop {
+    border-left: 0;
+  }
+  .svc-index__link > *:not(.svc-index__gauge) {
+    padding-inline: 0;
+  }
+  .svc-index__note {
+    max-width: none;
+  }
+  .svc-plate__head,
+  .svc-scope__head,
+  .svc-gauge__head,
+  .svc-plate__foot {
+    grid-template-columns: 1fr;
+  }
+  .svc-gauge__problem {
+    justify-self: start;
+    text-align: left;
+  }
+  /* Keep the hanging ticks inside the gutter on a phone. */
+  .svc-gauge__readings {
+    margin-left: var(--s5);
+  }
+  .svc-console__grid,
+  .svc-pair {
+    grid-template-columns: 1fr;
+  }
+  .svc-scope__list {
+    columns: 1;
+  }
+  .svc-rows__link {
+    grid-template-columns: 3rem minmax(0, 1fr) 1.25rem;
+    gap: var(--s3) var(--s4);
+    padding-block: var(--s5);
+  }
+  .svc-stair__step {
+    --stair: 0.5rem;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: var(--s4);
+    padding-left: var(--s4);
+  }
+  .svc-notes .faq__item p {
+    padding-left: 0;
+  }
+  .svc-notes__inner {
+    gap: var(--s6);
+  }
+}
+
+/* =========================================================================
+   ===== WORK =====
+   The archive index and the case file. Appended block — nothing above this
+   line is modified by it.
+
+   Two ideas carry the whole thing:
+
+   1. The projects are not the same size of thing, so the archive does not set
+      them in equal rows. Four plate tiers, assigned in reading order, move the
+      crop ratio, the plate scale and the Archivo width axis together. The two
+      projects with nothing to show are set as records instead of being given
+      an empty grey well.
+
+   2. On a case file, the register is data and the reasoning is narrative, so
+      they are built out of different materials: a hairline parts list on
+      instrument, then a numbered route on paper.
+   ========================================================================= */
+
+/* --- archive: derived status legend under the masthead ------------------- */
+
+.wk-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--s5) var(--s6);
+  margin: 0;
+}
+
+/* The rule sits on top of each cell rather than between columns, so a legend
+   that wraps to a second row still looks ruled instead of ragged. */
+.wk-legend__cell {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+  padding-top: var(--s3);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.wk-legend__count {
+  font-family: var(--font-ui);
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+.wk-legend__label {
+  margin: 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* --- archive: the plate grid --------------------------------------------- */
+
+.wk-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--s6);
+  row-gap: clamp(4rem, 8vw, 9rem);
+  align-items: start;
+}
+
+.wk-entry {
+  position: relative;
+  display: grid;
+  gap: var(--s5);
+  align-content: start;
+  grid-column: 1 / -1;
+  /* Tier defaults; each tier overrides what it needs to. */
+  --wk-title: clamp(1.7rem, 2.4vw, 2.4rem);
+  --wk-stretch: 92%;
+  --wk-ratio: 16 / 9;
+}
+
+.wk-entry--lead {
+  grid-column: 1 / -1;
+  --wk-title: clamp(2.6rem, 5.4vw, 5rem);
+  --wk-stretch: 86%;
+  --wk-ratio: 2 / 1;
+}
+
+.wk-entry--major {
+  grid-column: 1 / span 7;
+  --wk-title: clamp(2rem, 3.2vw, 3rem);
+  --wk-stretch: 89%;
+  --wk-ratio: 16 / 9;
+}
+
+/* The small one drops down the page so the pair reads as two beats, not a
+   two-up card row. */
+.wk-entry--minor {
+  grid-column: 9 / span 4;
+  padding-top: clamp(3rem, 8vw, 8rem);
+  --wk-title: clamp(1.5rem, 1.9vw, 1.9rem);
+  --wk-stretch: 96%;
+  /* Every capture in the archive is roughly 1.87:1, so a plate never goes
+     narrower than that. A tall crop of a website eats the interface sideways
+     and cuts the wordmark in half. Short plates, never narrow ones. */
+  --wk-ratio: 2 / 1;
+}
+
+.wk-entry--offset {
+  grid-column: 4 / span 9;
+  --wk-title: clamp(1.9rem, 3vw, 2.7rem);
+  --wk-stretch: 90%;
+  --wk-ratio: 21 / 9;
+}
+
+.wk-entry__slug {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.wk-entry__n {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.wk-entry__status {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.wk-entry__plate {
+  position: relative;
+  aspect-ratio: var(--wk-ratio);
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+}
+
+.wk-entry__plate > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.wk-entry:hover .wk-entry__plate > * {
+  transform: scale(1.02);
+}
+
+.wk-entry__body {
+  display: grid;
+  gap: var(--s4);
+}
+
+/* The lead record gets a masthead of its own: name on the left at full width
+   axis, the reading matter set beside it. */
+.wk-entry--lead .wk-entry__body {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  column-gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.wk-entry--lead .wk-entry__summary,
+.wk-entry--lead .wk-entry__services {
+  grid-column: 2;
+}
+
+.wk-entry--lead .wk-entry__title {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.wk-entry__title {
+  font-family: var(--font-ui);
+  font-size: var(--wk-title);
+  font-weight: 600;
+  font-stretch: var(--wk-stretch);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+/* One link per entry, stretched over the whole record. The focus ring still
+   lands on the title, so it stays visible and obvious. */
+.wk-entry__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.wk-entry__link {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.wk-entry:hover .wk-entry__link {
+  color: var(--accent);
+}
+
+.wk-entry__summary {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  max-width: 54ch;
+}
+
+.wk-entry--lead .wk-entry__summary,
+.wk-entry--offset .wk-entry__summary {
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  max-width: 46ch;
+}
+
+/* --- archive: the two projects with no public build ---------------------- */
+
+.wk-band {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.wk-band__note {
+  max-width: 44ch;
+  line-height: 1.7;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.wk-entry--record {
+  grid-column: span 6;
+  --wk-title: clamp(1.7rem, 2.4vw, 2.3rem);
+  --wk-stretch: 94%;
+}
+
+/* Nothing to photograph, so the index number is the plate. */
+.wk-entry--record .wk-entry__n {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-family: var(--font-ui);
+  font-stretch: 88%;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.wk-entry--record .wk-entry__slug {
+  align-items: end;
+}
+
+.wk-entry__record {
+  display: grid;
+  gap: var(--hair);
+  margin: 0;
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.wk-entry__record > div {
+  background: var(--bg);
+  padding: var(--s4);
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: baseline;
+}
+
+.wk-entry__record dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+/* Sequence, not decoration: the right-hand entry of a pair lands after the
+   left one. Silent under reduced motion, which base.css already enforces. */
+:root.js .wk-entry--minor.reveal,
+:root.js .wk-entry--record:nth-of-type(even).reveal {
+  transition-delay: 140ms;
+}
+
+/* =========================================================================
+   CASE FILE
+   ========================================================================= */
+
+/* --- the live build ------------------------------------------------------ */
+
+.wk-live {
+  margin: 0;
+  display: grid;
+  gap: var(--s4);
+}
+
+.wk-live__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.wk-live .reel,
+.wk-live img {
+  width: 100%;
+  height: auto;
+  border: var(--hair) solid var(--rule);
+  background: var(--bg-raised);
+}
+
+/* --- the register, set as a parts list ----------------------------------- */
+
+.wk-spec__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-bottom: var(--s4);
+}
+
+.wk-spec {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--hair);
+  margin: 0;
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.wk-spec__col {
+  background: var(--bg);
+  padding: var(--s5);
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+}
+
+.wk-spec__col dd {
+  margin: 0;
+}
+
+.wk-spec__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+}
+
+.wk-spec__flag {
+  color: var(--fg);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.wk-spec__flag::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.5rem;
+  background: var(--accent);
+}
+
+/* --- the reasoning, as a numbered route on paper ------------------------- */
+
+.wk-arc .route__body {
+  padding-bottom: var(--s7);
+  max-width: 46rem;
+}
+
+.wk-arc .route__stop:last-child .route__body {
+  padding-bottom: 0;
+}
+
+.wk-arc__title {
+  font-family: var(--font-ui);
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.12;
+  letter-spacing: -0.022em;
+  margin: 0;
+}
+
+.wk-arc__copy {
+  max-width: 54ch;
+}
+
+/* --- evidence: interface captures ---------------------------------------- */
+
+.wk-plates {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 5rem);
+}
+
+.wk-plate {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 17rem);
+  gap: var(--s6);
+  align-items: start;
+}
+
+.wk-plate__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule);
+}
+
+.wk-plate__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.wk-plate__caption {
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s3);
+  border-top: var(--hair) solid var(--rule-strong);
+  font-size: var(--t-small);
+  line-height: 1.55;
+  color: var(--fg-dim);
+}
+
+/* --- evidence: the photography strip ------------------------------------- */
+
+.wk-photos {
+  margin-top: clamp(3rem, 6vw, 6rem);
+  padding-top: var(--s6);
+  border-top: var(--hair) solid var(--rule);
+}
+
+/* Specimen scale, held. A project with one photograph must not turn that
+   photograph into a two-storey hero; the strip keeps its measure either way,
+   and its label rule keeps the same width as the frames under it. */
+.wk-photos .specimen {
+  max-width: 74rem;
+}
+
+.wk-photos:has(.specimen__item:only-child) .specimen {
+  max-width: 32rem;
+}
+
+/* A strip of one is not a strip. */
+.wk-photos .specimen__row:has(.specimen__item:only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* --- next case file ------------------------------------------------------ */
+
+.wk-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--s2) var(--s5);
+  min-width: min(24rem, 100%);
+  padding-top: var(--s3);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.wk-next__label {
+  grid-column: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.wk-next__title {
+  grid-column: 1;
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.wk-next__status {
+  grid-column: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.wk-next__go {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  align-self: center;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.wk-next:hover .wk-next__title {
+  color: var(--accent);
+}
+
+.wk-next:hover .wk-next__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* =========================================================================
+   WORK — responsive
+   Horizontal sequences become vertical; the tier offsets are dropped rather
+   than shrunk, because a 4-column plate at 400px is not a small plate, it is
+   an unreadable one.
+   ========================================================================= */
+
+@media (max-width: 1100px) {
+  .wk-entry--major,
+  .wk-entry--minor,
+  .wk-entry--offset {
+    grid-column: 1 / -1;
+  }
+  .wk-entry--minor {
+    padding-top: 0;
+    --wk-ratio: 16 / 9;
+    --wk-title: clamp(1.8rem, 3.4vw, 2.4rem);
+    --wk-stretch: 92%;
+  }
+  .wk-entry--lead {
+    --wk-ratio: 16 / 9;
+  }
+  .wk-entry--offset {
+    --wk-ratio: 16 / 9;
+  }
+  .wk-plate {
+    grid-template-columns: 1fr;
+    gap: var(--s4);
+  }
+  .wk-plate__caption {
+    max-width: 60ch;
+  }
+}
+
+@media (max-width: 900px) {
+  .wk-entry--record {
+    grid-column: 1 / -1;
+  }
+  .wk-entry__record > div {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
+  .wk-entry--lead .wk-entry__body {
+    grid-template-columns: 1fr;
+  }
+  .wk-entry--lead .wk-entry__title {
+    grid-row: auto;
+  }
+  .wk-entry--lead .wk-entry__summary,
+  .wk-entry--lead .wk-entry__services {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 620px) {
+  .wk-grid {
+    row-gap: clamp(3.5rem, 12vw, 5rem);
+  }
+  /* A phone-width plate stays wide. Cropping a site recording to 4/3 to fill
+     the column decapitates the interface it is meant to be showing. */
+  .wk-entry--lead,
+  .wk-entry--major,
+  .wk-entry--minor,
+  .wk-entry--offset {
+    --wk-ratio: 16 / 9;
+  }
+  .wk-entry__slug {
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .wk-entry__status {
+    text-align: left;
+  }
+  .wk-entry__record > div {
+    grid-template-columns: 1fr;
+    gap: var(--s2);
+  }
+  .wk-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4) var(--s5);
+  }
+  .wk-arc .route__body {
+    padding-bottom: var(--s6);
+  }
+  .wk-spec__col {
+    padding: var(--s4);
+  }
+}
+
+/* =========================================================================
+   ===== STUDIO + CONTACT + DOCS =====
+   Appended block. Everything below belongs to /studio, /contact, /privacy,
+   /accessibility and the 404. Nothing above this line is modified.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   INDEX STRIP — three facts under a masthead, set as a survey record.
+   Shared by the studio and contact mastheads.
+   ------------------------------------------------------------------------- */
+
+.index-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s5) var(--s6);
+  margin: 0;
+  max-width: 58rem;
+  border-top: var(--hair) solid var(--rule);
+  padding-top: var(--s5);
+}
+
+.index-strip__cell {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+.index-strip__cell dd {
+  margin: 0;
+}
+
+.index-strip__detail {
+  font-size: var(--t-small);
+  font-weight: 500;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+/* -------------------------------------------------------------------------
+   CHAPTER HEAD — a section opener with the folio held on the far side.
+   ------------------------------------------------------------------------- */
+
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s5) var(--s6);
+  margin-bottom: var(--s7);
+}
+
+.chapter-head > div {
+  display: grid;
+  gap: var(--s4);
+}
+
+.chapter-head__title {
+  max-width: 20ch;
+}
+
+.chapter-head__note {
+  padding-bottom: 0.4rem;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   STUDIO — the identity spread
+   ========================================================================= */
+
+.studio-spread__inner {
+  display: grid;
+  gap: var(--s7);
+  padding-block: var(--s5) var(--section-y);
+}
+
+/* The studio's only photograph, used once and used wide. It runs to the edge
+   of the page so the warm stone in the frame meets the paper ground without a
+   seam — the material transition is the image itself. */
+.studio-plate {
+  margin: 0;
+}
+
+.studio-plate__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2.5 / 1;
+  object-fit: cover;
+  object-position: 50% 46%;
+}
+
+.studio-plate__caption {
+  justify-self: start;
+}
+
+/* --- the space between ---------------------------------------------------
+   Two observations, ruled off as two fields, with a measured gap between
+   them. The sentence the studio exists for is set inside that gap, next to a
+   drafting dimension line. */
+
+.between {
+  display: grid;
+  gap: var(--s6);
+}
+
+.between__poles {
+  border-block: var(--hair) solid var(--rule-strong);
+}
+
+.between__pole {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--s4);
+  padding-block: var(--s5);
+  max-width: 50ch;
+  font-size: var(--t-subtitle);
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+.between__mark {
+  color: var(--accent);
+  padding-top: 0.5em;
+}
+
+.between__gap {
+  position: relative;
+  border-block: var(--hair) solid var(--rule-strong);
+  padding: clamp(2.75rem, 6.5vw, 5.5rem) 0 clamp(2.75rem, 6.5vw, 5.5rem) 3rem;
+}
+
+.between__dim {
+  position: absolute;
+  left: 1.4rem;
+  top: 0;
+  bottom: 0;
+  width: var(--hair);
+  background: var(--accent);
+}
+
+.between__dim::before,
+.between__dim::after {
+  content: "";
+  position: absolute;
+  left: -0.45rem;
+  width: 1rem;
+  height: var(--hair);
+  background: var(--accent);
+}
+
+.between__dim::before {
+  top: 0;
+}
+
+.between__dim::after {
+  bottom: 0;
+}
+
+.between__punch {
+  max-width: 15ch;
+  font-stretch: 88%;
+  color: var(--fg);
+}
+
+/* --- principles ---------------------------------------------------------- */
+
+.creed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.creed__item {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: start;
+  padding-block: var(--s5);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.creed__n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.45rem;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.creed__text {
+  display: grid;
+  gap: var(--s2);
+}
+
+.creed__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+}
+
+.creed__body {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 54ch;
+}
+
+/* =========================================================================
+   CONTACT — the intake sheet
+   ========================================================================= */
+
+/* The sheet reads as an instrument dropped onto the page; the accent edge is
+   the only chrome it gets. */
+.intake__sheet {
+  border-top: 2px solid var(--accent);
+}
+
+/* Error colour is derived from the convert chapter accent rather than a new
+   literal, so it stays inside the palette on both materials. */
+.form {
+  --danger: color-mix(in oklab, var(--convert-soft) 74%, var(--glacier));
+  display: grid;
+  gap: var(--s7);
+  position: relative;
+}
+
+[data-material="paper"] .form {
+  --danger: var(--convert);
+}
+
+.form__intro {
+  display: grid;
+  gap: var(--s3);
+  padding-bottom: var(--s5);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.form__intro-note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 48ch;
+}
+
+/* --- error summary ------------------------------------------------------- */
+
+.form__alert {
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s5);
+  border: var(--hair) solid var(--danger);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+}
+
+.form__alert-title {
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  color: var(--danger);
+}
+
+.form__alert-body {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.form__alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+  font-size: var(--t-small);
+}
+
+/* Enough vertical padding to clear the 24px minimum target without turning an
+   eight-item summary into a screenful. */
+.form__alert-list a {
+  display: inline-block;
+  padding-block: 0.35rem;
+  color: var(--danger);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.form__alert-list a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* --- the three steps ------------------------------------------------------
+   A spine runs down the left of the form so the sections read as a short
+   sequence rather than one long questionnaire. The numbered marker sits on
+   the sheet ground and masks the line behind it. */
+
+.form__step {
+  position: relative;
+  display: grid;
+  gap: var(--s5);
+  border: 0;
+  margin: 0;
+  padding: 0 0 0 3.25rem;
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.form__step::before {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  top: 0;
+  bottom: calc(-1 * var(--s7));
+  width: var(--hair);
+  background: var(--rule);
+}
+
+.form__step--last::before {
+  bottom: 0.6rem;
+}
+
+.form__legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  /* A rendered <legend> is not a grid item in every engine, so the space
+     below it is set here rather than left to the fieldset's gap. */
+  margin: 0 0 var(--s4);
+}
+
+.form__legend-n {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  background: var(--bg-raised);
+  border: var(--hair) solid var(--rule-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.form__legend-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  padding-top: 0.15rem;
+}
+
+.form__legend-note {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 44ch;
+}
+
+/* --- fields --------------------------------------------------------------- */
+
+.form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s5);
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+  min-width: 0;
+}
+
+/* Plain inline flow, not flex — the required mark has to be able to sit at the
+   end of a wrapped label rather than being pushed onto a line of its own. */
+.field__label {
+  display: block;
+  font-size: var(--t-small);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--fg);
+}
+
+.field__req {
+  color: var(--accent);
+}
+
+.field__optional {
+  display: inline;
+  margin-left: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--fg-dim);
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  min-height: 3rem;
+  background: var(--bg);
+  border: var(--hair) solid var(--rule);
+  border-bottom-color: var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 0.8rem 0.9rem;
+  font-size: var(--t-small);
+  color: var(--fg);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+
+.form textarea {
+  min-height: 7rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+  color: var(--fg-dim);
+  opacity: 1;
+}
+
+.form input:hover,
+.form select:hover,
+.form textarea:hover {
+  border-color: var(--rule-strong);
+  background: color-mix(in oklab, var(--fg) 3%, var(--bg));
+}
+
+.form input:focus-visible,
+.form select:focus-visible,
+.form textarea:focus-visible {
+  border-color: var(--accent);
+}
+
+.form [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field__select {
+  position: relative;
+  display: block;
+}
+
+.form select {
+  appearance: none;
+  padding-right: 2.6rem;
+  cursor: pointer;
+}
+
+.field__select::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: var(--hair) solid var(--fg-faint);
+  border-bottom: var(--hair) solid var(--fg-faint);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.field__error {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.55;
+  color: var(--danger);
+}
+
+.field__error-mark {
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--danger);
+}
+
+/* A reassurance set in the empty grid cell rather than a fourth field. */
+.form__aside {
+  align-self: end;
+  max-width: 34ch;
+  padding: 0.15rem 0 0.15rem var(--s4);
+  border-left: var(--hair) solid var(--rule);
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s5);
+  padding-top: var(--s6);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.form__send:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.form__submit-note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.7;
+  color: var(--fg-dim);
+  max-width: 34ch;
+}
+
+/* --- the received state --------------------------------------------------- */
+
+.receipt {
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+  padding-block: var(--s4) var(--s5);
+}
+
+.receipt__title {
+  max-width: 17ch;
+}
+
+.receipt__title:focus-visible {
+  outline-offset: 6px;
+}
+
+.receipt__register {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.receipt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s5);
+  margin-top: var(--s2);
+}
+
+.receipt__again {
+  padding: 0.6rem 0;
+  background: none;
+  border: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.receipt__again:hover {
+  color: var(--accent);
+}
+
+/* --- what happens after you send ------------------------------------------ */
+
+.handoff {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s6);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.handoff__step {
+  position: relative;
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  padding-top: var(--s5);
+}
+
+.handoff__step::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 2.5rem;
+  height: 2px;
+  background: var(--accent);
+}
+
+.handoff__n {
+  color: var(--fg-faint);
+}
+
+.handoff__title {
+  max-width: 22ch;
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.handoff__body {
+  max-width: 36ch;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.handoff__foot {
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================================
+   POLICY DOCUMENTS — /privacy, /accessibility
+   A cover on the instrument, the record itself set on paper.
+   ========================================================================= */
+
+.policy-cover__inner {
+  display: grid;
+  gap: var(--s7);
+}
+
+.policy-cover__title {
+  max-width: 15ch;
+  margin-top: var(--s5);
+}
+
+.policy-cover__intro {
+  margin-top: var(--s5);
+}
+
+.policy-cover__meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s5) var(--s6);
+  margin: 0;
+  max-width: 58rem;
+  border-top: var(--hair) solid var(--rule);
+  padding-top: var(--s5);
+}
+
+.policy-cover__meta > div {
+  display: grid;
+  gap: var(--s2);
+}
+
+.policy-cover__meta dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg);
+  letter-spacing: 0.02em;
+}
+
+.policy {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: clamp(2rem, 7vw, 7rem);
+  align-items: start;
+}
+
+.policy__contents {
+  position: sticky;
+  top: 7rem;
+  display: grid;
+  gap: var(--s4);
+}
+
+.policy__contents ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.policy__contents li {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.policy__contents a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: var(--s2);
+  padding-block: 0.7rem;
+  font-size: var(--t-small);
+  line-height: 1.4;
+  color: var(--fg-dim);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.policy__contents a:hover {
+  color: var(--accent);
+}
+
+.policy__contents a .t-folio {
+  color: var(--accent);
+}
+
+.policy__body {
+  display: grid;
+  gap: var(--s8);
+  max-width: 42rem;
+}
+
+/* The standfirst is the one place the paper voice speaks in a policy. */
+.policy__lead {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.95rem);
+  line-height: 1.36;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.policy__section {
+  display: grid;
+  gap: var(--s4);
+  scroll-margin-top: 6rem;
+}
+
+.policy__section-head {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--s4);
+  align-items: baseline;
+  padding-top: var(--s5);
+  margin-bottom: var(--s2);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.policy__n {
+  color: var(--accent);
+}
+
+.policy__h2 {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/* Body copy hangs off the number column, so the record reads as one measure. */
+.policy__section > :not(.policy__section-head) {
+  margin-left: calc(2.5rem + var(--s4));
+}
+
+.policy__section p {
+  max-width: 60ch;
+  line-height: 1.72;
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+.policy__note {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s5);
+  background: var(--bg-raised);
+  border-left: 2px solid var(--accent);
+}
+
+.policy__note .policy__note-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.policy__note p {
+  font-size: var(--t-small);
+  line-height: 1.65;
+}
+
+.policy__checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.policy__checklist li {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: var(--s3);
+  padding-block: 0.72rem;
+  border-bottom: var(--hair) solid var(--rule);
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.policy__checklist li::before {
+  content: "✓";
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.policy__action {
+  margin-top: var(--s3);
+}
+
+/* =========================================================================
+   404 — brief, and an index of the routes that do exist
+   ========================================================================= */
+
+.notfound__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s5) var(--s6);
+}
+
+.notfound__head > div {
+  display: grid;
+  gap: var(--s4);
+}
+
+.notfound__intro {
+  max-width: 44ch;
+}
+
+.notfound__index {
+  list-style: none;
+  margin: var(--s3) 0 0;
+  padding: 0;
+  width: 100%;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.notfound__index li {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.notfound__index a {
+  display: grid;
+  grid-template-columns: 2.5rem 7rem minmax(0, 1fr) 1.5rem;
+  gap: var(--s4);
+  align-items: baseline;
+  padding-block: var(--s4);
+  transition: padding-left var(--dur) var(--ease-out);
+}
+
+.notfound__index a:hover {
+  padding-left: var(--s3);
+}
+
+.notfound__n {
+  color: var(--accent);
+}
+
+.notfound__label {
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+}
+
+.notfound__note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.notfound__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.notfound__index a:hover .notfound__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* =========================================================================
+   RESPONSIVE — horizontal sequences become vertical, detail is dropped
+   ========================================================================= */
+
+@media (max-width: 1000px) {
+  .policy {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+  .policy__contents {
+    position: static;
+    max-width: 30rem;
+  }
+  .policy__body {
+    max-width: 44rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .handoff {
+    grid-template-columns: 1fr;
+    gap: var(--s5);
+    border-top: 0;
+  }
+  .handoff__step {
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+}
+
+@media (max-width: 760px) {
+  .index-strip,
+  .policy-cover__meta {
+    grid-template-columns: 1fr;
+    gap: var(--s4);
+  }
+
+  .studio-plate__img {
+    aspect-ratio: 4 / 3;
+    object-position: 50% 50%;
+  }
+
+  .between__pole {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--s3);
+    font-size: var(--t-lead);
+  }
+  .between__gap {
+    padding-left: 2rem;
+  }
+  .between__dim {
+    left: 0.85rem;
+  }
+
+  .creed__item {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .chapter-head__note {
+    padding-bottom: 0;
+  }
+
+  .form {
+    gap: var(--s6);
+  }
+  .form__grid {
+    grid-template-columns: 1fr;
+  }
+  .form__step {
+    padding-left: 2.6rem;
+  }
+  .form__step::before {
+    left: 0.75rem;
+    bottom: calc(-1 * var(--s6));
+  }
+  .form__legend-n {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+  .form__aside {
+    align-self: start;
+  }
+  .form__submit-note {
+    max-width: none;
+  }
+
+  .policy__section-head {
+    grid-template-columns: 1.9rem minmax(0, 1fr);
+    gap: var(--s3);
+  }
+  .policy__section > :not(.policy__section-head) {
+    margin-left: 0;
+  }
+
+  .notfound__index a {
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: var(--s2) var(--s3);
+    align-items: start;
+  }
+  .notfound__note {
+    grid-column: 2;
+  }
+  .notfound__go {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   ===== INDUSTRIES + PROCESS =====
+   Appended block. Compositions for /process (the traverse and its three legs)
+   and /industries (the coverage cross-reference, the display index, and the
+   per-context field page). Nothing above this line is modified.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   TRAVERSE — the printed route plan on /process
+   The whole route on one line before any of it is described. The line draws
+   left to right once and the stops land along it in order, which is the only
+   thing on the page that needs to be said with motion.
+   ------------------------------------------------------------------------- */
+
+.traverse {
+  position: relative;
+}
+
+.traverse__stops {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.traverse__stops::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--hair);
+  background: var(--rule-strong);
+  transform-origin: left;
+  transition: transform 1100ms var(--ease-out) 100ms;
+}
+
+.traverse__stop {
+  position: relative;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.traverse__stop > a {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+  padding: var(--s5) var(--s5) var(--s6) 0;
+  min-height: 7rem;
+}
+
+.traverse__node {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--fg-faint);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.traverse__stop:first-child .traverse__node {
+  background: var(--accent);
+}
+
+.traverse__stop > a:hover .traverse__node,
+.traverse__stop > a:focus-visible .traverse__node {
+  background: var(--accent);
+  transform: scale(1.7);
+}
+
+.traverse__name {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.028em;
+  line-height: 1.04;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.traverse__stop > a:hover .traverse__name {
+  color: var(--accent);
+}
+
+.traverse__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.55;
+  color: var(--fg-faint);
+  max-width: 17ch;
+}
+
+/* -------------------------------------------------------------------------
+   LEG — a section of the route. Rail on the left, stops on the right.
+   ------------------------------------------------------------------------- */
+
+.leg {
+  display: grid;
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5.5rem);
+  align-items: start;
+}
+
+.leg--wide {
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+}
+
+.leg__rail {
+  position: sticky;
+  top: 7rem;
+  display: grid;
+  gap: var(--s3);
+  justify-items: start;
+}
+
+.leg__index {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.leg__name {
+  font-family: var(--font-ui);
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.032em;
+  line-height: 1;
+}
+
+.leg__statement {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 22ch;
+}
+
+/* The route continuing into this leg. Drawn, not decorated. */
+.leg__spine {
+  display: block;
+  width: var(--hair);
+  height: clamp(4rem, 11vh, 9rem);
+  margin-top: var(--s4);
+  background: var(--rule-strong);
+  transform-origin: top;
+  transition: transform 900ms var(--ease-out) 200ms;
+}
+
+/* -------------------------------------------------------------------------
+   STOPS — three compositions, one per leg
+   ------------------------------------------------------------------------- */
+
+.stops {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stop {
+  position: relative;
+  scroll-margin-top: 7rem;
+}
+
+.stop__text {
+  display: grid;
+  gap: var(--s4);
+  max-width: 46rem;
+}
+
+.stop__summary {
+  color: var(--fg);
+  max-width: 34ch;
+}
+
+.stop__note {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* --- leg 01: a descending stair ----------------------------------------- */
+
+.stops--stair {
+  display: grid;
+  gap: var(--s9);
+}
+
+.stops--stair .stop {
+  display: grid;
+  grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: start;
+  padding-top: var(--s5);
+}
+
+.stops--stair .stop::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--hair);
+  background: var(--rule-strong);
+  transform-origin: left;
+  transition: transform 900ms var(--ease-out) 120ms;
+}
+
+.stops--stair .stop + .stop {
+  margin-left: clamp(0rem, 9vw, 9rem);
+}
+
+.stops--stair .stop__n {
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.05em;
+  line-height: 0.86;
+  color: var(--accent);
+}
+
+/* --- leg 02: a printed spread ------------------------------------------- */
+
+.stops--spread {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border-block: var(--hair) solid var(--rule);
+}
+
+.stops--spread .stop {
+  background: var(--bg);
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+  padding: var(--s6) clamp(1.25rem, 2.6vw, 2.5rem) var(--s7);
+}
+
+.stops--spread .stop:nth-child(even) {
+  padding-top: var(--s9);
+}
+
+.stop__plate {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 7vw, 6rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+  color: var(--fg-faint);
+}
+
+.stop__out {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s2);
+}
+
+.stop__reg {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.stop__reg li {
+  display: grid;
+  grid-template-columns: 0.9rem minmax(0, 1fr);
+  gap: var(--s3);
+  padding-block: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.stop__reg li::before {
+  content: "+";
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.9;
+  color: var(--accent);
+}
+
+/* --- leg 03: the console ------------------------------------------------ */
+
+.stops--console {
+  display: grid;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.stops--console .stop {
+  display: grid;
+  grid-template-columns:
+    5rem minmax(0, 1.05fr) minmax(0, 1fr)
+    minmax(0, 12rem);
+  gap: var(--s5);
+  align-items: start;
+  padding-block: var(--s6);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.stops--console .stop__n {
+  font-size: 1.55rem;
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--accent);
+}
+
+.stops--console .stop__text {
+  gap: var(--s3);
+}
+
+.stops--console .stop__title {
+  font-size: var(--t-subtitle);
+}
+
+.stops--console .stop__summary {
+  font-size: var(--t-body);
+  max-width: 30ch;
+}
+
+.stop__detail {
+  font-size: var(--t-small);
+}
+
+.stop__ticks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+.stop__ticks li {
+  display: grid;
+  grid-template-columns: 5px minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  line-height: 1.6;
+}
+
+.stop__ticks li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: var(--rule-strong);
+  transform: translateY(-0.15em);
+}
+
+/* --- the loop closes ----------------------------------------------------- */
+
+.loopback {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 5.5rem);
+  align-items: start;
+}
+
+.loopback__body {
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+}
+
+.loopback__line {
+  max-width: 30ch;
+  font-size: var(--t-subtitle);
+  color: var(--fg);
+}
+
+/* -------------------------------------------------------------------------
+   MATRIX — the coverage cross-reference on /industries
+   ------------------------------------------------------------------------- */
+
+.matrix {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s5);
+}
+
+.matrix__hint {
+  display: none;
+}
+
+.matrix__scroll {
+  /* Positioned so the visually-hidden cell text stays inside the scroller
+     instead of escaping to the initial containing block and widening the page. */
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.matrix__table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.matrix__corner {
+  text-align: left;
+  padding: 0 var(--s5) var(--s3) 0;
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.matrix__group {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding: 0 var(--s3) var(--s2) var(--s3);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* The row labels are the widest thing in the table; pin them so the marks are
+   not pushed to the far side of a 30rem gutter. */
+.matrix__corner,
+.matrix__context {
+  width: 16rem;
+}
+
+.matrix__code {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  text-align: center;
+  padding: var(--s4) var(--s2);
+  border-bottom: var(--hair) solid var(--rule-strong);
+  white-space: nowrap;
+}
+
+.matrix__code abbr {
+  text-decoration: none;
+  border: 0;
+  cursor: help;
+}
+
+.matrix__context {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg);
+  text-align: left;
+  font-size: var(--t-small);
+  font-weight: 500;
+  font-stretch: 94%;
+  white-space: nowrap;
+  padding: var(--s4) var(--s5) var(--s4) 0;
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.matrix__context a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s3);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.matrix__context a:hover {
+  color: var(--accent);
+}
+
+.matrix__cell {
+  position: relative;
+  text-align: center;
+  padding: var(--s4) var(--s2);
+  border-bottom: var(--hair) solid var(--rule);
+  border-left: var(--hair) solid var(--rule);
+}
+
+.matrix__mark {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+
+.matrix__table tbody tr:hover .matrix__cell,
+.matrix__table tbody tr:hover .matrix__context {
+  background: color-mix(in oklab, var(--fg) 5%, var(--bg));
+}
+
+.matrix__foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.matrix__tally {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 42ch;
+}
+
+.matrix__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s3) var(--s6);
+}
+
+.matrix__legend li {
+  display: grid;
+  grid-template-columns: 9px 4.25rem minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: baseline;
+  font-size: var(--t-small);
+}
+
+.matrix__legend li::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  background: var(--accent);
+  transform: rotate(45deg) translateY(-0.1em);
+}
+
+.matrix__legend-code {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+}
+
+/* -------------------------------------------------------------------------
+   CONTEXTS — the display index on /industries
+   ------------------------------------------------------------------------- */
+
+.contexts__legend {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 17rem) 1.75rem;
+  gap: var(--s5);
+  padding-bottom: var(--s3);
+}
+
+.contexts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.contexts__row {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.contexts__row > a {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 17rem) 1.75rem;
+  gap: var(--s5);
+  align-items: start;
+  padding: var(--s6) 0;
+  transition:
+    padding-left var(--dur) var(--ease-out),
+    background var(--dur) var(--ease-out);
+}
+
+.contexts__row > a:hover {
+  padding-left: var(--s4);
+  background: color-mix(in oklab, var(--fg) 4%, transparent);
+}
+
+.contexts__n {
+  padding-top: 0.55rem;
+  color: var(--accent);
+}
+
+.contexts__main {
+  display: grid;
+  gap: var(--s3);
+}
+
+.contexts__name {
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.034em;
+  line-height: 1.02;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.contexts__row > a:hover .contexts__name {
+  color: var(--accent);
+}
+
+.contexts__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 52ch;
+}
+
+.contexts__friction {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding-top: 0.7rem;
+}
+
+.contexts__friction span {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  line-height: 1.5;
+}
+
+.contexts__friction span::before {
+  content: "";
+  height: var(--hair);
+  margin-top: 0.55em;
+  background: var(--rule-strong);
+}
+
+.contexts__go {
+  justify-self: end;
+  padding-top: 0.5rem;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.contexts__row > a:hover .contexts__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* -------------------------------------------------------------------------
+   CONTEXT PAGE — intent, quadrant, stage plot, note, nav
+   ------------------------------------------------------------------------- */
+
+.context-open {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+.context-open__headline {
+  max-width: 20ch;
+  margin-top: var(--s5);
+}
+
+.context-open__friction {
+  display: grid;
+  gap: var(--s4);
+}
+
+.quadrant {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.quadrant__cell {
+  background: var(--bg);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  min-height: clamp(7rem, 13vw, 11rem);
+  display: grid;
+  gap: var(--s4);
+  align-content: space-between;
+}
+
+.quadrant__term {
+  font-size: clamp(1.2rem, 2.6vw, 2.15rem);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.028em;
+  line-height: 1.08;
+  max-width: 15ch;
+}
+
+.stageplot {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.stageplot__col {
+  background: var(--bg);
+  border-top: 2px solid var(--accent);
+  padding: var(--s5) var(--s5) var(--s6);
+  display: grid;
+  gap: var(--s5);
+  align-content: start;
+}
+
+.stageplot__col.is-empty {
+  border-top-color: var(--rule-strong);
+}
+
+.stageplot__head {
+  display: grid;
+  gap: var(--s2);
+}
+
+/* Chapter accents are saturated for hairlines, not for micro type — the soft
+   sample from the same collage carries the tint at readable contrast. */
+.stageplot__n {
+  color: var(--accent-soft, var(--accent));
+}
+
+.stageplot__col.is-empty .stageplot__n,
+.stageplot__col.is-empty .stageplot__name {
+  color: var(--fg-faint);
+}
+
+.stageplot__name {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.026em;
+  line-height: 1.04;
+}
+
+.stageplot__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  line-height: 1.55;
+  color: var(--fg-faint);
+}
+
+.stageplot__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s5);
+}
+
+.stageplot__item {
+  display: grid;
+  gap: var(--s2);
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.stageplot__item-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.018em;
+  line-height: 1.2;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.stageplot__item-summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.stageplot__item-go {
+  justify-self: start;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.stageplot__item:hover .stageplot__item-title,
+.stageplot__item:hover .stageplot__item-go {
+  color: var(--accent-soft, var(--accent));
+}
+
+.stageplot__item:hover .stageplot__item-go {
+  transform: translateX(0.3rem);
+}
+
+.stageplot__empty {
+  font-size: var(--t-small);
+  color: var(--fg-faint);
+  max-width: 22ch;
+}
+
+.context-note {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.context-note__head {
+  display: grid;
+  gap: var(--s4);
+}
+
+.context-note__title {
+  max-width: 15ch;
+}
+
+.context-note__body {
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+}
+
+.context-note__pull {
+  border-left: 2px solid var(--accent);
+  padding-left: var(--s5);
+  max-width: 48ch;
+  color: var(--fg);
+}
+
+.context-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: center;
+  margin-top: clamp(3rem, 8vw, 6rem);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.context-nav__side {
+  display: grid;
+  gap: var(--s2);
+  align-content: center;
+  min-height: 44px;
+}
+
+.context-nav__side--next {
+  justify-items: end;
+  text-align: right;
+}
+
+.context-nav__name {
+  font-size: var(--t-lead);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.022em;
+  line-height: 1.15;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.context-nav__side:hover .context-nav__name {
+  color: var(--accent);
+}
+
+.context-nav__index {
+  justify-self: center;
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  padding: var(--s3);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.context-nav__index:hover {
+  color: var(--accent);
+}
+
+/* -------------------------------------------------------------------------
+   MOTION — sequence only, and only when motion is wanted
+   The reveal observer in ChromeSync adds .is-in; everything below hangs off
+   that so the page is complete without JS and silent under reduced motion.
+   ------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The route line draws once, left to right. */
+  :root.js .traverse__stops::before {
+    transform: scaleX(0);
+  }
+
+  :root.js .traverse.is-in .traverse__stops::before {
+    transform: scaleX(1);
+  }
+
+  /* Stops land along it in route order. */
+  :root.js .traverse__stop {
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition:
+      opacity 520ms var(--ease-out),
+      transform 520ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 90ms + 260ms);
+  }
+
+  :root.js .traverse.is-in .traverse__stop {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The route continuing into each leg. */
+  :root.js .leg__spine {
+    transform: scaleY(0);
+  }
+
+  :root.js .leg__rail.is-in .leg__spine {
+    transform: scaleY(1);
+  }
+
+  /* Each stop is measured out before it is described. */
+  :root.js .stops--stair .stop::before {
+    transform: scaleX(0);
+  }
+
+  :root.js .stops--stair .stop.is-in::before {
+    transform: scaleX(1);
+  }
+
+  /* Sets enter in their own order: index rows, quadrant cells, stage columns. */
+  :root.js .contexts__row,
+  :root.js .quadrant__cell,
+  :root.js .stageplot__col {
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .leg,
+  .leg--wide,
+  .loopback {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+
+  .leg__rail {
+    position: static;
+  }
+
+  .leg__spine {
+    display: none;
+  }
+
+  .traverse__stops {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .traverse__stop > a {
+    padding-right: var(--s4);
+  }
+
+  .stops--console .stop {
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: var(--s4);
+  }
+
+  .stops--console .stop__detail,
+  .stops--console .stop__ticks {
+    grid-column: 2;
+  }
+
+  .contexts__legend,
+  .contexts__row > a {
+    grid-template-columns: 4rem minmax(0, 1fr) 1.75rem;
+  }
+
+  .contexts__legend > :nth-child(3) {
+    display: none;
+  }
+
+  .contexts__friction {
+    grid-column: 2 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem;
+    padding-top: var(--s2);
+  }
+
+  .stageplot {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .context-note {
+    grid-template-columns: 1fr;
+  }
+
+  .matrix__foot {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .matrix__hint {
+    display: block;
+  }
+}
+
+@media (max-width: 760px) {
+  .traverse__stops {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .traverse__stops::before {
+    display: none;
+  }
+
+  .traverse__stop > a {
+    min-height: 0;
+    padding-block: var(--s4) var(--s5);
+  }
+
+  .stops--stair {
+    gap: var(--s8);
+  }
+
+  .stops--stair .stop {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+  }
+
+  .stops--stair .stop + .stop {
+    margin-left: 0;
+  }
+
+  .stops--spread {
+    grid-template-columns: 1fr;
+  }
+
+  .stops--spread .stop:nth-child(even) {
+    padding-top: var(--s6);
+  }
+
+  .stops--console .stop {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  .matrix__table {
+    min-width: 40rem;
+  }
+
+  .matrix__corner,
+  .matrix__context {
+    width: 10rem;
+    white-space: normal;
+  }
+
+  .matrix__legend {
+    grid-template-columns: 1fr;
+  }
+
+  .quadrant,
+  .stageplot {
+    grid-template-columns: 1fr;
+  }
+
+  .quadrant__cell {
+    min-height: 0;
+  }
+
+  .contexts__legend {
+    display: none;
+  }
+
+  .contexts__row > a {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: var(--s3) var(--s4);
+    padding: var(--s5) 0;
+  }
+
+  .contexts__n {
+    padding-top: 0.35rem;
+  }
+
+  .contexts__go {
+    display: none;
+  }
+
+  .context-nav {
+    grid-template-columns: 1fr;
+    gap: var(--s5);
+  }
+
+  .context-nav__side--next {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .context-nav__index {
+    justify-self: start;
+    padding-left: 0;
+  }
+}
+
+/* The 404 index sits on the same left axis as every other page rather than
+   floating in the middle of the viewport. */
+.notfound__inner {
+  margin-inline: 0;
+  max-width: 52rem;
+}
+
+/* =========================================================================
+   ===== PLOTTED FIGURES =====
+   The hero's plotter language, reused as a per-page technical figure. One
+   vocabulary, four drawings; each encodes that page's actual argument.
+   ========================================================================= */
+
+.plot {
+  margin: 0;
+  display: grid;
+  width: 100%;
+  border: var(--hair) solid var(--rule);
+  background: color-mix(in oklab, var(--fg) 2.5%, transparent);
+}
+
+/* The field the drawing sits in. Inset from the sheet edge, with register
+   marks at the corners — the drawing has a ground instead of hanging. */
+.plot__sheet {
+  position: relative;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.plot__corner {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: var(--hair) solid var(--rule-strong);
+}
+
+.plot__corner--tl {
+  top: 8px;
+  left: 8px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.plot__corner--tr {
+  top: 8px;
+  right: 8px;
+  border-left: 0;
+  border-bottom: 0;
+}
+.plot__corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: 0;
+  border-top: 0;
+}
+.plot__corner--br {
+  bottom: 8px;
+  right: 8px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.plot__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  color: var(--fg);
+}
+
+/* --- title block -------------------------------------------------------- */
+
+.plot__block {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.plot__block-cell {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.6rem 0.85rem;
+  border-right: var(--hair) solid var(--rule);
+  min-width: 0;
+}
+
+.plot__block-cell:last-of-type {
+  border-right: 0;
+}
+
+.plot__block-key {
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.plot__block-val {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--fg);
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plot__block-cell--wide .plot__block-val {
+  color: var(--fg-dim);
+}
+
+/* Construction lines. Present from the start — a survey drawing shows its
+   setting-out, and it gives the drawn strokes something to arrive against. */
+.plot__guide {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 0.5;
+  stroke-dasharray: 2 2.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.plot__stroke {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.plot__node {
+  fill: var(--bg);
+  stroke: var(--fg-dim);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+}
+
+.plot__node.is-key {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.plot__label {
+  fill: var(--fg-faint);
+  font-family: var(--font-mono);
+  font-size: 3.4px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Per-figure sizing. Each drawing has its own natural proportion. */
+.plot--circuit {
+  max-width: 27rem;
+}
+
+/* Named stations need a little more room than bare folio numbers. */
+.plot--circuit .plot__label {
+  font-size: 4px;
+  letter-spacing: 0.08em;
+}
+
+.plot--traverse {
+  max-width: 32rem;
+}
+
+.plot--gap {
+  max-width: 36rem;
+}
+
+/* The right-hand label sits under its node so it does not collide with the
+   curve arriving from that side. */
+.plot--gap .plot__label:nth-of-type(2) {
+  transform: translateY(9px);
+}
+
+.plot--shapes {
+  max-width: 30rem;
+}
+
+@media (max-width: 760px) {
+  .plot__label {
+    font-size: 4.4px;
+  }
+  .plot--circuit,
+  .plot--traverse,
+  .plot--gap {
+    max-width: 100%;
+  }
+  /* Three title-block cells will not fit; the subject carries the meaning. */
+  .plot__block {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .plot__block-cell:last-of-type {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   INTERIOR PAGE RHYTHM
+   Services, Work, Process, and Studio share one structural masthead, but each
+   keeps its own page composition below it. The technical drawing is anchored
+   beside the opening argument; it no longer performs as a detached animation.
+   ========================================================================= */
+
+.interior-document .masthead {
+  padding-block: clamp(7rem, 11vh, 9rem) clamp(4.5rem, 7vw, 7rem);
+}
+
+.interior-document .masthead__inner {
+  grid-template-columns: minmax(0, 1.12fr) minmax(20rem, 0.72fr);
+  column-gap: clamp(2.5rem, 7vw, 7.5rem);
+  row-gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+
+.interior-document .crumbs {
+  grid-column: 1 / -1;
+}
+
+.interior-document .masthead__body {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s5);
+}
+
+.interior-document .masthead__title {
+  max-width: 15ch;
+  margin-top: var(--s4);
+}
+
+.interior-document .masthead__intro {
+  max-width: 61ch;
+  margin-top: var(--s5);
+}
+
+.interior-document .masthead__folio {
+  color: var(--accent);
+  padding: 0;
+}
+
+.interior-document .masthead__aside {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  padding-left: clamp(1.5rem, 3vw, 3rem);
+  border-left: var(--hair) solid var(--rule-strong);
+}
+
+.interior-document .masthead__aside .plot {
+  max-width: none;
+}
+
+.interior-document .masthead__footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.interior-document .masthead__footer .index-strip {
+  max-width: none;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.interior-document .masthead__inner:not(:has(.masthead__aside)) .masthead__body {
+  grid-column: 1 / -1;
+  max-width: 68rem;
+}
+
+.interior-document > .section:not(.masthead, .cta) {
+  padding-block: clamp(4.5rem, 7vw, 8rem);
+}
+
+/* The old per-element observer made interiors assemble as unrelated fragments,
+   so entrance motion was cancelled across every `.interior-document`. That was
+   the right call for the document-shaped routes — a case study, an industry
+   brief — which should arrive complete and be readable immediately.
+
+   It was the wrong call for the four narrative routes, where the motion is the
+   argument: a route that draws itself, a plate that wipes down over a reel. So
+   the cancellation is now opt-out. A page composed around its own sequence sets
+   `data-motion="staged"` and gets the three brand gestures back; everything
+   else keeps arriving finished. `ChromeSync` reads the same attribute to decide
+   whether to observe the page at all. */
+:root.js .interior-document:not([data-motion="staged"]) .reveal,
+:root.js .interior-document:not([data-motion="staged"]) .reveal.is-in,
+/* The shared closing call to action is not part of any page's composition, so
+   it keeps arriving finished on every interior route. Opting it in would make
+   a component four pages share depend on an observer for no design gain. */
+:root.js .interior-document .cta .reveal,
+:root.js .interior-document .cta .reveal.is-in {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Process used to hide the route's children behind a second animation layer.
+   Once the parent reveal was removed, that left the route looking like an
+   empty sheet until its individual trigger happened to fire. The route is a
+   navigation aid, so it is complete and usable from first paint. */
+:root.js .interior-document--process .traverse__stops::before,
+:root.js .interior-document--process .leg__spine,
+:root.js .interior-document--process .stops--stair .stop::before {
+  transform: none;
+  transition: none;
+}
+
+:root.js .interior-document--process .traverse__stop {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.interior-document .svc-cards__card {
+  border-left-width: var(--hair);
+  border-top: 3px solid var(--accent);
+}
+
+/* Services is a four-chapter atlas. The supplied collage canvases carry the
+   colour and material; a quiet central wash protects the reading field. */
+.interior-document--services .svc-chapter {
+  min-height: min(58rem, 100svh);
+  overflow: hidden;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+}
+
+.svc-chapter__art,
+.svc-chapter__veil {
+  position: absolute;
+  inset: 0;
+}
+
+.svc-chapter__art {
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.svc-chapter__veil {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgb(242 241 234 / 0.32), rgb(242 241 234 / 0.76) 34% 67%, rgb(242 241 234 / 0.28)),
+    linear-gradient(rgb(242 241 234 / 0.12), rgb(242 241 234 / 0.12));
+  pointer-events: none;
+}
+
+.interior-document--services .svc-chapter > .shell {
+  position: relative;
+  z-index: 2;
+}
+
+.interior-document--services .svc-console__cell,
+.interior-document--services .svc-cards__card {
+  background: color-mix(in oklab, var(--paper) 91%, transparent);
+}
+
+.interior-document--services .svc-console__grid {
+  box-shadow: 0 0 0 0.7rem color-mix(in oklab, var(--paper) 35%, transparent);
+}
+
+/* Work opens as a small exhibition wall made from the actual work. The three
+   plates share an edge and a horizon, so the stack reads as one composition. */
+.wk-hero-stack {
+  position: relative;
+  display: block !important;
+  min-height: clamp(25rem, 42vw, 37rem);
+  overflow: visible;
+}
+
+.wk-hero-stack__plate {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  border: var(--hair) solid var(--rule-strong);
+  background: var(--bg-raised);
+}
+
+.wk-hero-stack__plate img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.wk-hero-stack__plate--one {
+  inset: 1rem 8% auto 8%;
+  aspect-ratio: 16 / 10;
+}
+
+.wk-hero-stack__plate--two {
+  width: 63%;
+  aspect-ratio: 4 / 3;
+  left: 0;
+  bottom: 1rem;
+}
+
+.wk-hero-stack__plate--three {
+  width: 54%;
+  aspect-ratio: 4 / 3;
+  right: 0;
+  bottom: 0;
+}
+
+.wk-hero-stack__plate--two,
+.wk-hero-stack__plate--three {
+  box-shadow: 0 0 0 0.55rem var(--ink);
+}
+
+/* Studio trades the abstract plot for one physical scene. */
+.studio-hero-photo {
+  position: relative;
+  min-height: clamp(28rem, 42vw, 38rem);
+  margin: 0;
+  overflow: hidden;
+  border: var(--hair) solid var(--rule-strong);
+}
+
+.studio-hero-photo img {
+  object-fit: cover;
+  object-position: 42% center;
+}
+
+.interior-document--studio .studio-spread__inner {
+  padding-block: 0;
+}
+
+@media (max-width: 900px) {
+  .interior-document .masthead__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .interior-document .masthead__body,
+  .interior-document .masthead__aside,
+  .interior-document .masthead__footer {
+    grid-column: 1;
+  }
+
+  .interior-document .masthead__body {
+    grid-row: 2;
+  }
+
+  .interior-document .masthead__aside {
+    grid-row: 3;
+    padding: var(--s5) 0 0;
+    border-left: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .wk-hero-stack {
+    min-height: clamp(23rem, 70vw, 32rem);
+  }
+
+  .interior-document .masthead__footer {
+    grid-row: 4;
+  }
+}
+
+@media (max-width: 760px) {
+  .interior-document .masthead {
+    padding-block: 6.75rem 4.25rem;
+  }
+
+  .interior-document .masthead__title {
+    max-width: 18ch;
+  }
+
+  .interior-document .masthead__aside {
+    padding-top: var(--s4);
+  }
+
+  .wk-hero-stack {
+    min-height: 21rem;
+  }
+
+  .studio-hero-photo {
+    min-height: 24rem;
+  }
+
+  .interior-document--services .svc-chapter {
+    min-height: 0;
+  }
+
+  .svc-chapter__veil {
+    background: rgb(242 241 234 / 0.78);
+  }
+
+  .interior-document .svc-index__track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .interior-document .svc-index__stop + .svc-index__stop {
+    border-left: 0;
+  }
+
+  .interior-document .svc-index__stop:nth-child(even) {
+    border-left: var(--hair) solid var(--rule);
+  }
+
+  .interior-document .svc-index__link > *:not(.svc-index__gauge) {
+    padding-inline: var(--s3);
+  }
+}
+/* =========================================================================
+   THE FOUR NARRATIVE ROUTES — HELD SCENES
+   -------------------------------------------------------------------------
+   The signature device for Services, Work, Process, and Studio.
+
+   A scene is a full-viewport plate that HOLDS while the reader keeps scrolling,
+   and an instrument panel that RISES over it. The plate is the collage artwork
+   (or a recorded build); the panel is the detail. Paper is held, the screen
+   arrives over it — the two materials the brand is made of, staged as a
+   physical event rather than described in a caption.
+
+   Three things make this work where the previous attempt at collage interiors
+   failed badly enough that a later pass deleted all of it:
+
+   1. THE SCRIM IS PAPER, NOT GREY. Each collage is composed around a large
+      clear paper field. The scrim is a gradient of that same paper colour,
+      running from the type side, so where the field is already clear it is
+      invisible, and where a torn edge intrudes it reads as more paper rather
+      than as a wash over the artwork. Contrast is guaranteed at any crop.
+
+   2. EACH CANVAS IS FRAMED INDIVIDUALLY. The clear field sits in a different
+      place in all four collages, so each sets its own `object-position` to
+      bring that field under the type. One shared value put headlines on torn
+      edges, which is exactly what made the first version unreadable.
+
+   3. THE HOLD IS `position: sticky`, NOT A PINNED SCROLLTRIGGER. No DOM
+      wrapping, no scroll hijacking, no layout recalculation — and it degrades
+      to a plain stack of full-height sections when sticky is unavailable, on
+      short viewports, or under reduced motion.
+   ========================================================================= */
+
+/* The hold needs no magic numbers. The plate is `sticky` inside the scene, and
+   the panel is simply the next thing in flow — so the panel scrolling up over
+   the held plate *is* the default behaviour, and the scene is exactly as tall
+   as its own content. An earlier version paired a `padding-bottom` with a
+   negative `margin-top` to force the overlap and left a screen of dead space
+   trailing every scene whenever the panel was shorter than the offset. */
+.scene {
+  position: relative;
+}
+
+/* Only the BACKDROP is held. An earlier version made the whole plate sticky
+   with the title inside it, so the rising panel sliced the headline through
+   the middle of a word — a wipe that read as breakage, not as a transition.
+   With the artwork held and the title in normal flow above it, the title
+   leaves the way any type leaves, and the panel arrives to a clear plate. */
+.scene__hold {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+}
+
+.scene__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.scene__canvas img {
+  width: 100%;
+  height: 100%;
+  /* Per-canvas, set by the chapter. Brings that collage's clear field under
+     the type instead of trusting one value to suit four compositions. */
+  object-fit: cover;
+  object-position: var(--canvas-x, 50%) var(--canvas-y, 50%);
+}
+
+/* The paper scrim. Same colour as the artwork's own field, angled so it is
+   densest under the type and gone by the time it reaches the torn edges. */
+.scene__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    96deg,
+    var(--paper-warm) 0%,
+    color-mix(in oklab, var(--paper-warm) 92%, transparent) 34%,
+    color-mix(in oklab, var(--paper-warm) 55%, transparent) 56%,
+    transparent 82%
+  );
+}
+
+/* Sits inside the shell rather than replacing it. Given `.shell` directly it
+   overrode the shell's own max-width and, with `margin-inline: auto` still
+   applying, centred the title instead of setting it into the clear field. */
+/* Rides over the held backdrop and scrolls away normally. The negative margin
+   is the height of the backdrop it sits on, which is the one number this
+   construction genuinely needs. */
+.scene__shell {
+  position: relative;
+  z-index: 2;
+  margin-top: -100svh;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+}
+
+.scene__mark {
+  display: grid;
+  gap: var(--s5);
+  max-width: 22ch;
+}
+
+.scene__folio {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+/* The rule beside the folio draws as the scene arrives. */
+.scene__folio::after {
+  content: "";
+  flex: 1;
+  max-width: 8rem;
+  height: var(--hair);
+  background: currentColor;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.scene.is-in .scene__folio::after,
+:root:not(.js) .scene__folio::after {
+  transform: scaleX(1);
+}
+
+/* Mega scale is for a single word — a stage name, a project name. A sentence
+   at 14rem runs off the bottom of the viewport before it finishes, so scenes
+   whose title is a phrase step down a tier and stay inside the frame. */
+.scene__title--phrase {
+  font-size: var(--t-hero);
+  line-height: 0.92;
+  max-width: 15ch;
+}
+
+/* The one mega-scale line per scene. */
+.scene__title {
+  font-size: var(--t-mega);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.scene__title em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+/* The sentence under the mega word. Display scale, not body scale — at
+   --t-lead it looked like a caption apologising for the word above it. */
+.scene__lead {
+  max-width: 20ch;
+  font-size: clamp(1.35rem, 2.6vw, 2.35rem);
+  font-weight: 500;
+  font-stretch: 92%;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: color-mix(in oklab, var(--ink) 82%, transparent);
+}
+
+/* --- the panel that rises ------------------------------------------------
+   Sits after the held plate in normal flow, so scrolling carries it up over
+   the artwork. It brings its own material with it, which is the whole point:
+   the screen arriving over the page. */
+
+.scene__panel {
+  position: relative;
+  z-index: 3;
+  padding-block: clamp(3.5rem, 7vw, 6.5rem);
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: 0 -24px 60px color-mix(in oklab, var(--ink) 34%, transparent);
+}
+
+/* The panel's leading edge carries the chapter accent — the seam where the
+   two materials meet is the loudest line in the composition. */
+.scene__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* =========================================================================
+   SHARED OPENINGS
+   The four routes still open as siblings: an overline, one oversized line,
+   and a standfirst. Only the scenes below them diverge.
+   ========================================================================= */
+
+.route-open__overline {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.route-open__title {
+  margin-top: var(--s5);
+  font-size: var(--t-hero);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.88;
+  letter-spacing: -0.042em;
+  text-wrap: balance;
+}
+
+.route-open__title em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.route-open__intro {
+  margin-top: var(--s5);
+  max-width: 48ch;
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+/* The closing invitation takes the same two-column measure as the routes,
+   keyed to the motion attribute rather than to wrapper class names. */
+.interior-document[data-motion="staged"] .cta__inner {
+  grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+  column-gap: clamp(2rem, 7vw, 7rem);
+  text-align: left;
+  justify-items: start;
+}
+
+.interior-document[data-motion="staged"] .cta__title {
+  grid-column: 1;
+  max-width: 11ch;
+  font-size: var(--t-hero);
+  line-height: 0.9;
+}
+
+.interior-document[data-motion="staged"] .cta__body,
+.interior-document[data-motion="staged"] .cta__actions {
+  grid-column: 2;
+}
+
+.interior-document[data-motion="staged"] .cta__body {
+  align-self: end;
+  text-align: left;
+}
+
+.interior-document[data-motion="staged"] .cta__actions {
+  justify-content: flex-start;
+}
+
+/* -------------------------------------------------------------------------
+   SERVICES / FOUR HELD CANVASES
+
+   Each stage takes a full scene: its collage holds, its name is set into the
+   clear field at mega scale, and the service ledger rises over it as a dark
+   instrument panel. The gauge in the opening still measures the whole system
+   and still fills as you descend, so the reader always knows which of the four
+   canvases they are standing in.
+   ------------------------------------------------------------------------- */
+
+.services-open__inner {
+  display: grid;
+  gap: clamp(3rem, 6vw, 5rem);
+}
+
+.services-open__title {
+  max-width: 13ch;
+}
+
+/* --- the gauge ---------------------------------------------------------- */
+
+.stage-gauge {
+  display: grid;
+  gap: var(--s4);
+}
+
+.stage-gauge__scale {
+  display: grid;
+  grid-template-columns: var(--bands);
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.stage-gauge__band {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  gap: var(--s6);
+  min-height: clamp(7rem, 11vw, 9.5rem);
+  padding: var(--s4);
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--fg);
+  overflow: hidden;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.stage-gauge__band::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--rule-strong);
+}
+
+.stage-gauge__band::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--fill, 1));
+  transition: transform 380ms var(--ease-draw);
+}
+
+.stage-gauge__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.stage-gauge__name {
+  display: block;
+  font-size: var(--t-subtitle);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.stage-gauge__count {
+  display: block;
+  margin-top: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--fg-dim);
+}
+
+.stage-gauge__span {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stage-gauge__band:hover {
+    background: color-mix(in oklab, var(--accent) 14%, var(--bg));
+  }
+}
+
+/* --- per-canvas framing --------------------------------------------------
+   The clear paper field sits in a different place in each collage. These pull
+   the right part of each composition under the type. Tuned per asset. */
+
+.scene--attract .scene__canvas img {
+  --canvas-x: 58%;
+}
+.scene--convert .scene__canvas img {
+  --canvas-x: 42%;
+}
+.scene--operate .scene__canvas img {
+  --canvas-x: 54%;
+}
+.scene--scale .scene__canvas img {
+  --canvas-x: 38%;
+}
+
+/* --- the service ledger, on the risen panel ------------------------------ */
+
+/* Baseline-aligned, not bottom-aligned. `align-items: end` stretched the row
+   to the height of the problem statement and left the label stranded at the
+   foot of an empty column. */
+.chapter-panel__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s5);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.chapter-panel__head > p:first-child {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.chapter-panel__problem {
+  grid-column: 2;
+  max-width: 42ch;
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+}
+
+.atlas-services {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.atlas-services__item {
+  position: relative;
+}
+
+.atlas-services__item::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: var(--hair);
+  background: var(--rule-strong);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+  transition-delay: calc(var(--stagger) * var(--i, 0));
+}
+
+.reveal.is-in .atlas-services__item::after,
+:root:not(.js) .atlas-services__item::after {
+  transform: scaleX(1);
+}
+
+/* Rows are deliberately oversized. This is the offer, and at ledger scale it
+   read as a table of contents rather than as the thing being offered. */
+.atlas-services__link {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 0.9fr) minmax(0, 1.1fr) 2.5rem;
+  align-items: center;
+  gap: var(--s5);
+  padding-block: clamp(1.5rem, 3vw, 2.75rem);
+  text-decoration: none;
+  color: var(--fg);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.atlas-services__number {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--fg-dim);
+}
+
+.atlas-services__title {
+  font-size: clamp(1.6rem, 3vw, 2.9rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.atlas-services__summary {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+
+.atlas-services__arrow {
+  justify-self: end;
+  font-size: 1.4rem;
+  color: var(--accent);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+/* A wash of the chapter accent sweeps the row on hover — the loudest
+   interaction on the site, and it only exists where a row is a real link. */
+.atlas-services__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent) 26%, transparent),
+    transparent 72%
+  );
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .atlas-services__link:hover::before {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .atlas-services__link:hover .atlas-services__arrow {
+    transform: translate(6px, -6px);
+  }
+}
+
+.atlas-services__link:focus-visible::before {
+  clip-path: inset(0 0 0 0);
+}
+
+.atlas-chapter__outcomes {
+  display: grid;
+  gap: var(--s3);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.atlas-chapter__outcomes > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.atlas-chapter__bracket {
+  height: 12px;
+  border-inline: var(--hair) solid var(--accent);
+  border-bottom: var(--hair) solid var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .atlas-chapter__bracket,
+:root:not(.js) .atlas-chapter__bracket {
+  transform: scaleX(1);
+}
+
+.atlas-chapter__outcomes ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+/* -------------------------------------------------------------------------
+   WORK / THE BUILDS AT FULL VOLUME
+
+   The four recorded scrolls through the live sites are the strongest assets in
+   the project and the old page did not play one of them. Each project now gets
+   a full-viewport plate with its reel running, held while its register rises.
+   ------------------------------------------------------------------------- */
+
+.work-open__inner {
+  display: grid;
+  gap: var(--s8);
+}
+
+.work-open__title {
+  max-width: 13ch;
+}
+
+.work-sheet {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.work-sheet__frame {
+  position: relative;
+  margin: 0;
+  background: var(--bg-raised);
+}
+
+.work-sheet__plate {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.work-sheet__plate img {
+  object-fit: cover;
+  object-position: top left;
+}
+
+.work-sheet__frame figcaption {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s3) var(--s4) var(--s4);
+}
+
+.work-sheet__name {
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.work-sheet__kind {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+/* --- the held reel ------------------------------------------------------ */
+
+.scene--work .scene__hold {
+  background: var(--ink);
+}
+
+.scene--work .scene__canvas .reel,
+.scene--work .scene__canvas img,
+.scene--work .scene__canvas video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Ink, not paper: the plate underneath is a screen recording, so the scrim
+   that protects the title has to be the screen's own material. */
+/* Denser than the paper scenes, and it has to be. Under a collage the scrim
+   only competes with texture; under a recorded website it competes with that
+   site's own headline, which ghosted through behind the project title and read
+   as two headlines fighting. Opaque across the type column, gone by the time
+   it reaches the part of the build worth showing. */
+.scene--work .scene__scrim {
+  background: linear-gradient(
+    92deg,
+    var(--ink) 0%,
+    var(--ink) 45%,
+    color-mix(in oklab, var(--ink) 72%, transparent) 60%,
+    color-mix(in oklab, var(--ink) 24%, transparent) 76%,
+    transparent 92%
+  );
+}
+
+.scene--work .scene__title {
+  color: var(--glacier);
+}
+
+/* A project summary is a sentence, not a slogan. At the stage-name measure it
+   ran to six lines of display type; this keeps it clearly subordinate to the
+   title without dropping to caption scale. */
+.scene--work .scene__lead {
+  max-width: 40ch;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.42;
+  letter-spacing: -0.01em;
+  color: color-mix(in oklab, var(--glacier) 78%, transparent);
+}
+
+.work-scene__open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding: var(--s3) var(--s5);
+  border: var(--hair) solid color-mix(in oklab, var(--glacier) 42%, transparent);
+  color: var(--glacier);
+  text-decoration: none;
+  font-size: var(--t-small);
+  font-weight: 600;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.work-scene__open span {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .work-scene__open:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .work-scene__open:hover span {
+    transform: translate(3px, -3px);
+  }
+}
+
+.work-scene__open:active {
+  transform: scale(0.98);
+}
+
+/* The register rises over the reel. */
+.work-panel__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.work-panel__summary {
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  max-width: 34ch;
+}
+
+.work-panel__reg {
+  display: grid;
+  gap: var(--s3);
+  margin: 0;
+  padding-top: var(--s4);
+  border-top: 2px solid var(--accent);
+}
+
+.work-panel__reg dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-panel__reg dd {
+  margin: 0;
+  font-size: var(--t-small);
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+/* --- working builds ----------------------------------------------------- */
+
+.work-records__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.work-records__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.work-records__header h2 {
+  margin-top: var(--s4);
+  max-width: 16ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.work-record {
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: 2px solid var(--rule-strong);
+}
+
+.work-record__status {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-record h3 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.work-record > p {
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+  font-size: var(--t-small);
+}
+
+.work-record dl {
+  display: grid;
+  gap: var(--s2);
+  margin: var(--s2) 0 0;
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.work-record dl > div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: baseline;
+}
+
+.work-record dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-record dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  line-height: 1.45;
+}
+
+/* -------------------------------------------------------------------------
+   PROCESS / A ROUTE THAT DRAWS ITSELF
+
+   The route keeps its spine — it is the one device on the site that argues
+   its own sentence, and it works. What changes is scale: the stops are set at
+   display size, the numeral is held against the copy, and the whole route now
+   opens from a full-bleed collage scene rather than a flat masthead.
+   ------------------------------------------------------------------------- */
+
+.scene--process .scene__canvas img {
+  --canvas-x: 54%;
+}
+
+.process-legend {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s4);
+  list-style: none;
+  margin: 0;
+  padding-top: var(--s2);
+}
+
+.process-legend__stop a {
+  display: grid;
+  gap: var(--s2);
+  padding-top: var(--s4);
+  min-height: 44px;
+  border-top: 2px solid var(--rule-strong);
+  text-decoration: none;
+  color: var(--fg-dim);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.process-legend__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.process-legend__name {
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .process-legend__stop a:hover {
+    border-color: var(--accent);
+  }
+
+  .process-legend__stop a:hover .process-legend__name {
+    color: var(--accent);
+  }
+}
+
+.process-route__layout {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.24fr) minmax(0, 1fr);
+  column-gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.process-route__rail {
+  position: sticky;
+  top: clamp(6rem, 14vh, 9rem);
+  display: grid;
+  gap: var(--s5);
+}
+
+.process-route__rail > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.process-route__rail h2 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+.process-route__rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.process-route__rail li a {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding-block: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+  text-decoration: none;
+  font-size: var(--t-small);
+  color: color-mix(in oklab, var(--fg) calc(68% + 32% * var(--lit, 1)), var(--bg));
+  transition: color 240ms var(--ease-out);
+}
+
+.process-route__rail li a span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: color-mix(in oklab, var(--accent) calc(55% + 45% * var(--lit, 1)), var(--bg));
+  transition: color 240ms var(--ease-out);
+}
+
+.process-route__rail li[data-current] a {
+  font-weight: 600;
+}
+
+.process-route__steps {
+  position: relative;
+  display: grid;
+  gap: clamp(4rem, 8vw, 8rem);
+  padding-left: clamp(3rem, 6vw, 5.5rem);
+}
+
+.process-route__steps::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--hair);
+  background: var(--rule-strong);
+}
+
+.process-route__steps::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: top;
+  transform: scaleY(var(--run, 1));
+}
+
+/* The stop's copy is never dimmed. Progress rides on the spine and the station
+   tick — geometry, not content — so anyone landing mid-route can read it. */
+.process-stop {
+  position: relative;
+  display: grid;
+  gap: var(--s4);
+  scroll-margin-top: 7rem;
+}
+
+.process-stop::before {
+  content: "";
+  position: absolute;
+  top: 1.5rem;
+  left: calc(clamp(3rem, 6vw, 5.5rem) * -1);
+  width: clamp(1.75rem, 3vw, 2.75rem);
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--lit, 1));
+  transition: transform 420ms var(--ease-draw);
+}
+
+.process-stop__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+.process-stop__number {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--accent);
+}
+
+.process-stop__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.process-stop h3 {
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+.process-stop__summary {
+  max-width: 34ch;
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  line-height: 1.35;
+}
+
+.process-stop__detail {
+  max-width: 60ch;
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+}
+
+.process-stop__deliverables {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s2);
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.process-stop__deliverables > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.process-stop__deliverables ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--t-small);
+}
+
+.process-stop__deliverables li::before {
+  content: "+";
+  margin-right: var(--s2);
+  color: var(--accent);
+}
+
+.process-loop__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+}
+
+.process-loop__inner > p {
+  grid-column: 1;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.process-loop__inner h2 {
+  grid-column: 1;
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--t-title);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+}
+
+.process-loop__return {
+  grid-column: 2;
+  display: grid;
+  gap: var(--s3);
+  justify-items: end;
+  text-align: right;
+  min-height: 44px;
+  text-decoration: none;
+  color: var(--fg);
+  font-size: var(--t-small);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.process-loop__bracket {
+  width: clamp(6rem, 14vw, 12rem);
+  height: 14px;
+  border-inline: var(--hair) solid var(--accent);
+  border-top: var(--hair) solid var(--accent);
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .process-loop__bracket,
+:root:not(.js) .process-loop__bracket {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .process-loop__return:hover {
+    color: var(--accent);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   STUDIO / THE GAP, DIMENSIONED
+
+   The position is a measurement, so it is drawn as one: two witness lines, a
+   dimension span between them, and the studio annotated on the span. The
+   previous version set that sentence inside a saturated blue rectangle, which
+   made a spatial claim with no space in it.
+   ------------------------------------------------------------------------- */
+
+/* The photograph is almost exactly the viewport's aspect, so `object-position`
+   has nothing to crop with and the framed mountain print on the right of the
+   wall stayed in shot. Overwidening the image box pushes it out of frame and
+   lands the crop on the leaf shadows and the lettered card instead. */
+.scene--studio .scene__canvas img {
+  width: 148%;
+  max-width: none;
+  object-position: 0% 50%;
+}
+
+.studio-open__identity {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin: 0;
+  padding-top: 0;
+}
+
+.studio-open__identity > div {
+  padding-top: var(--s4);
+  border-top: 2px solid var(--rule-strong);
+}
+
+.studio-open__identity dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.studio-open__identity dd {
+  margin: var(--s2) 0 0;
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.studio-position__lead {
+  max-width: 42ch;
+  font-size: clamp(1.3rem, 2.4vw, 2.1rem);
+  font-weight: 500;
+  font-stretch: 92%;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.studio-gap {
+  margin-top: clamp(4rem, 8vw, 7rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s5);
+}
+
+.studio-gap__end {
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.45;
+}
+
+.studio-gap__end--right {
+  text-align: right;
+}
+
+.studio-gap__end span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.studio-gap__span {
+  display: grid;
+  justify-items: center;
+  gap: var(--s6);
+}
+
+.studio-gap__rule {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border-inline: 2px solid var(--accent);
+}
+
+.studio-gap__rule::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: center;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .studio-gap__rule::before,
+:root:not(.js) .studio-gap__rule::before {
+  transform: scaleX(1);
+}
+
+.studio-gap__measure {
+  max-width: 12ch;
+  text-align: center;
+  text-wrap: balance;
+  font-size: clamp(2.2rem, 5.5vw, 5rem);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+}
+
+.studio-gap__measure em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+/* --- the four disciplines, each carrying its own canvas ------------------ */
+
+.studio-system__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s6);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.studio-system__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.studio-system__header h2 {
+  grid-column: 2;
+  max-width: 18ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.studio-system__chapters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+/* A crop of each chapter's collage, so the four disciplines are visibly the
+   same four canvases the Services route is built from. */
+.studio-system__chapter {
+  position: relative;
+  display: grid;
+  align-content: end;
+  gap: var(--s2);
+  min-height: clamp(17rem, 26vw, 24rem);
+  padding: var(--s5);
+  overflow: hidden;
+  isolation: isolate;
+  text-decoration: none;
+  color: var(--ink);
+  border-top: 3px solid var(--accent);
+}
+
+.studio-system__chapter img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.studio-system__chapter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    0deg,
+    var(--paper-warm) 6%,
+    color-mix(in oklab, var(--paper-warm) 82%, transparent) 44%,
+    transparent 88%
+  );
+}
+
+.studio-system__chapter-number {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.studio-system__chapter-title {
+  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.studio-system__chapter-copy {
+  color: color-mix(in oklab, var(--ink) 76%, transparent);
+  font-size: var(--t-small);
+  line-height: 1.45;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .studio-system__chapter:hover img {
+    transform: scale(1.05);
+  }
+}
+
+/* --- principles --------------------------------------------------------- */
+
+.studio-principles__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s6);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.studio-principles__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.studio-principles__header h2 {
+  grid-column: 2;
+  max-width: 18ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.studio-principles__field {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem) clamp(2rem, 5vw, 4rem);
+}
+
+.studio-principle {
+  display: grid;
+  align-content: start;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.studio-principle > span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.studio-principle h3 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.studio-principle p {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}
+
+/* -------------------------------------------------------------------------
+   RESPONSIVE COLLAPSE
+
+   The held scene is a wide-screen device. On a phone a sticky full-viewport
+   plate with a panel rising over it eats the whole screen and fights the
+   browser's own address-bar behaviour, so below 900px the scene stops holding
+   and becomes what it always degrades to: a full-bleed plate followed by its
+   panel. Same content, same order, no stickiness.
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .process-route__layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .process-route__rail nav {
+    display: none;
+  }
+
+  .process-route__rail {
+    position: static;
+  }
+
+  .work-panel__grid,
+  .work-records__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .work-panel__summary,
+  .work-records__header {
+    grid-column: 1 / -1;
+  }
+
+  .studio-principles__field,
+  .studio-system__chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  /* The hold is released. */
+  .scene__hold {
+    position: static;
+    height: min(62svh, 26rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: 0;
+    min-height: 0;
+    padding-block: clamp(3rem, 8vw, 5rem);
+    background: var(--bg);
+  }
+
+  .scene__panel {
+    box-shadow: none;
+  }
+
+  /* With the plate no longer full-viewport the scrim has less room to fade,
+     so it covers more of the frame to keep the title legible. */
+  .scene__scrim {
+    background: linear-gradient(
+      170deg,
+      color-mix(in oklab, var(--paper-warm) 88%, transparent) 0%,
+      color-mix(in oklab, var(--paper-warm) 78%, transparent) 55%,
+      color-mix(in oklab, var(--paper-warm) 40%, transparent) 100%
+    );
+  }
+
+  .scene--work .scene__scrim {
+    background: linear-gradient(
+      170deg,
+      color-mix(in oklab, var(--ink) 86%, transparent) 0%,
+      color-mix(in oklab, var(--ink) 74%, transparent) 55%,
+      color-mix(in oklab, var(--ink) 40%, transparent) 100%
+    );
+  }
+
+  .scene__mark {
+    max-width: none;
+  }
+
+  .chapter-panel__head,
+  .studio-system__header,
+  .studio-principles__header,
+  .work-cases__intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chapter-panel__problem,
+  .studio-system__header h2,
+  .studio-principles__header h2 {
+    grid-column: 1;
+  }
+
+  .atlas-services__link {
+    grid-template-columns: 2.75rem minmax(0, 1fr) 1.75rem;
+    gap: var(--s3) var(--s4);
+    row-gap: var(--s2);
+    align-items: baseline;
+  }
+
+  .atlas-services__summary {
+    grid-column: 2 / -1;
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .studio-open__identity {
+    grid-auto-flow: row;
+    gap: var(--s4);
+  }
+
+  /* The dimension turns vertical: it still measures between two ends. */
+  .studio-gap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s6);
+  }
+
+  .studio-gap__end--right {
+    text-align: left;
+  }
+
+  .studio-gap__rule {
+    height: 2px;
+    border-inline: 0;
+    border-top: 2px solid var(--accent);
+  }
+
+  .studio-gap__rule::before {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .process-route__steps {
+    padding-left: clamp(1.75rem, 7vw, 2.75rem);
+  }
+
+  .process-stop::before {
+    left: calc(clamp(1.75rem, 7vw, 2.75rem) * -1);
+    width: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .process-legend {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: var(--s5);
+  }
+
+  .process-loop__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .process-loop__return {
+    grid-column: 1;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .process-loop__bracket {
+    transform-origin: left;
+  }
+
+  .work-panel__grid,
+  .work-records__grid,
+  .studio-principles__field,
+  .studio-system__chapters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .work-record dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s1);
+  }
+
+  .interior-document[data-motion="staged"] .cta__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interior-document[data-motion="staged"] .cta__title,
+  .interior-document[data-motion="staged"] .cta__body,
+  .interior-document[data-motion="staged"] .cta__actions {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .process-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stage-gauge__band {
+    min-height: 0;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-content: start;
+    gap: var(--s3);
+  }
+
+  .stage-gauge__n {
+    grid-row: 1 / span 2;
+  }
+
+  .atlas-services__link {
+    grid-template-columns: 2rem minmax(0, 1fr) 1.5rem;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   REDUCED MOTION
+
+   `base.css` flattens durations globally. What it cannot know is that these
+   routes drive geometry from custom properties that JavaScript would otherwise
+   leave part-way through a sequence, and that a held scene is itself motion.
+   The hold is released and everything reads as finished.
+   ------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .scene__hold {
+    position: static;
+    height: min(62svh, 26rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: 0;
+    min-height: 0;
+    padding-block: clamp(3rem, 8vw, 5rem);
+    background: var(--bg);
+  }
+
+  .process-route__steps::after,
+  .stage-gauge__band::after {
+    transform: scaleX(1) scaleY(1);
+  }
+
+  .process-stop,
+  .process-route__rail li a,
+  .process-route__rail li a span {
+    --lit: 1;
+  }
+
+  .process-stop::before,
+  .atlas-services__item::after,
+  .atlas-chapter__bracket,
+  .process-loop__bracket,
+  .scene__folio::after,
+  .studio-gap__rule::before {
+    transform: none;
+  }
+
+  .atlas-services__link::before {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .studio-system__chapter img {
+    transform: none;
+  }
+}

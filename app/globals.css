@@ -1,0 +1,15 @@
+/* =========================================================================
+   ARCTOS LAUNCHPAD
+   -------------------------------------------------------------------------
+   Load order matters: tokens define the vocabulary, base sets defaults and
+   primitives, chrome styles the persistent frame, then page compositions.
+   Nothing below tokens.css may hard-code a colour.
+   ========================================================================= */
+
+@import "tailwindcss";
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./chrome.css";
+@import "./home.css";
+@import "./pages.css";

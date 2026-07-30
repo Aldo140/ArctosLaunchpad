@@ -1,0 +1,476 @@
+/* =========================================================================
+   ARCTOS — base: reset, typography, primitives
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: var(--t-body);
+  line-height: var(--lh-copy);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Grain. One fixed layer for the whole document, not per-section, so it reads
+   as the surface of the page rather than an effect applied to boxes. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.032;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================================
+   TYPOGRAPHY
+   ========================================================================= */
+
+.t-hero {
+  font-family: var(--font-ui);
+  font-size: var(--t-hero);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-hero);
+  text-wrap: balance;
+}
+
+/* The editorial turn. One phrase per headline drops into the paper voice —
+   the two halves of the studio said in two typefaces on one line. */
+.t-hero em,
+.t-display em,
+.t-title em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+}
+
+.t-display {
+  font-family: var(--font-ui);
+  font-size: var(--t-display);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: var(--lh-snug);
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.t-title {
+  font-family: var(--font-ui);
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.1;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+/* Paper voice — chapter names, pull quotes, the studio page. */
+.t-paper {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.024em;
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+.t-quote {
+  font-family: var(--font-display);
+  font-size: var(--t-subtitle);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.012em;
+}
+
+.t-lead {
+  font-size: var(--t-lead);
+  line-height: 1.52;
+  color: var(--fg-dim);
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.t-body {
+  max-width: var(--measure);
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+/* Annotation voice. Folios, coordinates, specimen captions, eyebrows. */
+.t-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--fg-faint);
+}
+
+.t-folio {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   PRIMITIVES
+   ========================================================================= */
+
+.rule {
+  border: 0;
+  height: var(--hair);
+  background: var(--rule);
+  width: 100%;
+}
+
+/* Eyebrow with a leading tick — the survey mark, reused wherever a label
+   needs to sit against a rule. */
+.tick-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  line-height: 1;
+}
+
+.tick-label::before {
+  content: "";
+  width: 1.75rem;
+  height: var(--hair);
+  background: var(--accent);
+  flex: none;
+  transform-origin: left;
+}
+
+/* The tick draws itself in, the same gesture as the hero mark and the plotted
+   figures. Because a tick-label opens nearly every section, this becomes the
+   one entrance the whole site shares. */
+:root.js .tick-label::before {
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+:root.js .reveal.is-in .tick-label::before,
+:root.js .tick-label.is-in::before {
+  transform: scaleX(1);
+}
+
+.tick-label--plain::before {
+  display: none;
+}
+
+/* --- buttons ----------------------------------------------------------- */
+
+.btn {
+  --btn-fg: var(--bg);
+  --btn-bg: var(--fg);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s5);
+  padding: 0.95rem 1.4rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: 0.01em;
+  border: var(--hair) solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  --btn-bg: var(--accent);
+  --btn-fg: var(--glacier);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn__arrow {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.btn:hover .btn__arrow {
+  transform: translateX(0.28rem);
+}
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--fg);
+  border-color: var(--rule-strong);
+}
+
+.btn--ghost:hover {
+  --btn-bg: transparent;
+  --btn-fg: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn--small {
+  padding: 0.6rem 0.95rem;
+  gap: var(--s3);
+  font-size: var(--t-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+/* --- text link with a drawn underline ---------------------------------- */
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--fg);
+  font-weight: 500;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% var(--hair);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition:
+    background-size var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.link:hover {
+  color: var(--accent);
+  background-size: 100% var(--hair);
+}
+
+/* =========================================================================
+   ACCESSIBILITY
+   ========================================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--s4);
+  left: var(--s4);
+  z-index: 200;
+  padding: var(--s3) var(--s5);
+  background: var(--glacier);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  transform: translateY(-250%);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* =========================================================================
+   LAYOUT SHELL
+   ========================================================================= */
+
+.shell {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: var(--section-y);
+  position: relative;
+}
+
+/* Sections own their vertical rhythm; nothing else may set it. Keeps the
+   .section / .cta-style collisions the old sheet had from coming back. */
+.section--flush {
+  padding-block: 0;
+}
+
+.section--tight {
+  padding-block: calc(var(--section-y) * 0.6);
+}
+
+/* =========================================================================
+   MOTION
+   ========================================================================= */
+
+/* Entrance state is only applied when scripting is actually available. If the
+   observer can never run — JS disabled, a bundle that failed to load, a
+   crawler that does not execute scripts — the content must still be visible.
+   The `js` class is set by the bootstrap script before first paint.
+
+   SET, not slide. The element resolves where it already is. The movement in
+   the section comes from its rule drawing, not from the copy travelling. */
+:root.js .reveal {
+  opacity: 0;
+  transition: opacity var(--dur-set) var(--ease-set);
+}
+
+:root.js .reveal.is-in {
+  opacity: 1;
+}
+
+/* WIPE. A plate laid down — the only entrance allowed to move geometry, and
+   only for media, never for type. */
+:root.js [data-wipe] {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--dur-wipe) var(--ease-set);
+}
+
+:root.js .is-in[data-wipe],
+:root.js .is-in [data-wipe] {
+  clip-path: inset(0 0 0 0);
+}
+
+/* DRAW. Any hairline can announce itself by extending from its origin. */
+:root.js [data-draw] {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+:root.js .is-in[data-draw],
+:root.js .is-in [data-draw] {
+  transform: scaleX(1);
+}
+
+/* Sequences share one stagger step so nothing invents its own rhythm. */
+:root.js .seq > * {
+  transition-delay: calc(var(--stagger) * var(--i, 0));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Must match the `:root.js .reveal` specificity that sets the hidden state,
+     or the entrance never gets cancelled and the page stays blank below the
+     fold until the observer happens to fire. */
+  :root.js .reveal,
+  :root.js .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  :root.js .showcase__media,
+  :root.js .journey__bracket,
+  :root.js [data-wipe] {
+    clip-path: none;
+  }
+
+  :root.js [data-draw],
+  :root.js .tick-label::before,
+  :root.js .journey__bracket {
+    transform: none;
+  }
+}

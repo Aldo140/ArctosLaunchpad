@@ -1,0 +1,645 @@
+/* =========================================================================
+   ARCTOS — chrome: lockup, header, menu, survey rule, loader, footer
+   ========================================================================= */
+
+/* --- lockup ------------------------------------------------------------ */
+
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--fg);
+}
+
+.lockup__type {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12em;
+  line-height: 1;
+}
+
+.lockup__name {
+  font-family: var(--font-display);
+  font-size: 1.06rem;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.lockup__sub {
+  font-family: var(--font-mono);
+  font-size: 0.53rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  line-height: 1;
+  padding-left: 0.1em;
+}
+
+/* =========================================================================
+   HEADER
+   ========================================================================= */
+
+/* The chrome does not invert. It keeps one identity — light marks on a dark
+   bar — over every material on the site, so scrolling past four chapters does
+   not read as a strobe. Only --accent follows the page. */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  --fg: var(--glacier);
+  --fg-dim: color-mix(in oklab, var(--glacier) 68%, var(--ink));
+  --fg-faint: color-mix(in oklab, var(--glacier) 44%, var(--ink));
+  --rule: color-mix(in oklab, var(--glacier) 18%, transparent);
+  --rule-strong: color-mix(in oklab, var(--glacier) 34%, transparent);
+  color: var(--fg);
+  /* The bar is always on. The chrome carries light marks, so leaving it
+     transparent at scroll 0 put light text on cream on every page whose first
+     section is paper — Process, Studio, the policy pages. Over the dark
+     homepage hero this ink-on-ink bar is imperceptible, so it costs nothing
+     there and fixes the contrast everywhere else. */
+  background: color-mix(in oklab, var(--ink) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(150%);
+  transition:
+    background var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+  border-bottom: var(--hair) solid transparent;
+}
+
+/* Scrolled: the bar firms up and gains its rule. */
+.header.is-condensed {
+  background: color-mix(in oklab, var(--ink) 88%, transparent);
+  border-bottom-color: var(--rule);
+}
+
+.header__inner {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--s5) var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+  transition: padding var(--dur) var(--ease-out);
+}
+
+.header.is-condensed .header__inner {
+  padding-block: 0.85rem;
+}
+
+.header__brand {
+  display: inline-flex;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.header__brand:hover {
+  opacity: 0.72;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.2vw, 2.25rem);
+}
+
+.header__link {
+  position: relative;
+  font-size: var(--t-small);
+  font-weight: 500;
+  font-stretch: 96%;
+  color: var(--fg-dim);
+  padding-block: 0.35rem;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.header__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: var(--hair);
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.header__link:hover,
+.header__link.is-active {
+  color: var(--fg);
+}
+
+.header__link:hover::after,
+.header__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.header__cta {
+  margin-left: var(--s2);
+}
+
+.header__menu {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  background: none;
+  border: 0;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.header__menu-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 20px;
+}
+
+.header__menu-bars i {
+  height: var(--hair);
+  background: currentColor;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.header__menu:hover .header__menu-bars i:first-child {
+  transform: translateX(3px);
+}
+
+/* =========================================================================
+   FULL-SCREEN MENU
+   ========================================================================= */
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu__scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--ink) 78%, transparent);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.menu.is-open .menu__scrim {
+  opacity: 1;
+}
+
+.menu__panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(30rem, 100%);
+  background: color-mix(in oklab, var(--ink) 94%, transparent);
+  border-left: var(--hair) solid var(--rule);
+  padding: var(--s5) var(--gutter) var(--s7);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.menu.is-open .menu__panel {
+  transform: none;
+}
+
+.menu__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--s6);
+}
+
+.menu__close {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding: var(--s2);
+}
+
+.menu__close:hover {
+  color: var(--fg);
+}
+
+.menu__nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--s5);
+}
+
+.menu__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  align-items: baseline;
+  gap: var(--s4);
+  padding-block: clamp(0.9rem, 2.4vw, 1.35rem);
+}
+
+.menu__item-label {
+  font-size: clamp(1.9rem, 7vw, 2.6rem);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.menu__item-rule {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--hair);
+  background: var(--rule);
+}
+
+.menu__item:hover .menu__item-label {
+  color: var(--accent);
+  transform: translateX(0.4rem);
+}
+
+.menu__foot {
+  margin-top: auto;
+  padding-top: var(--s7);
+  display: grid;
+  gap: var(--s3);
+}
+
+.menu__foot-note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 26ch;
+}
+
+/* =========================================================================
+   SURVEY RULE — the signature
+   ========================================================================= */
+
+.staff {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--rail);
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  /* Same reasoning as the header: one identity, held. The rail sits on its own
+     ink ground so it never has to guess what is behind it. */
+  background: var(--ink);
+  --rule: color-mix(in oklab, var(--glacier) 16%, transparent);
+  --rule-strong: color-mix(in oklab, var(--glacier) 32%, transparent);
+  --fg-faint: color-mix(in oklab, var(--glacier) 42%, var(--ink));
+  border-right: var(--hair) solid var(--rule);
+  color: var(--glacier);
+}
+
+.staff__ticks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-block: 12vh;
+}
+
+.staff__tick {
+  width: 0.45rem;
+  height: var(--hair);
+  background: var(--rule);
+  margin-right: 0;
+}
+
+.staff__tick--major {
+  width: 1rem;
+  background: var(--rule-strong);
+}
+
+/* Travelling index — the only thing on the staff that moves. */
+.staff__index {
+  position: absolute;
+  right: 0;
+  width: 1.6rem;
+  height: 2px;
+  background: var(--accent);
+  transform: translateY(-50%);
+  transition:
+    background var(--dur) var(--ease-out),
+    top 90ms linear;
+}
+
+.staff__index::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.staff__station {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease-out);
+}
+
+.staff__reading {
+  position: absolute;
+  bottom: var(--s5);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-hair {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 55;
+  background: var(--rule);
+}
+
+.progress-hair span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 90ms linear;
+}
+
+/* =========================================================================
+   LOADER
+   ========================================================================= */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--glacier);
+}
+
+:root[data-intro="show"] .intro,
+:root[data-intro="done"] .intro {
+  display: flex;
+}
+
+:root[data-intro="show"] body,
+:root[data-intro="done"] body {
+  overflow: hidden;
+}
+
+:root[data-intro="done"] .intro {
+  transform: translateY(-100%);
+  transition: transform 500ms var(--ease-in-out);
+}
+
+.intro__stage {
+  --stagger: 70ms;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s5);
+}
+
+.intro__mark {
+  opacity: 0;
+  animation: intro-mark 620ms var(--ease-out) forwards;
+}
+
+.intro__word {
+  display: flex;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+
+.intro__letter {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  line-height: 1.1;
+  transform: translateY(110%);
+  animation: intro-rise 900ms cubic-bezier(0.86, 0, 0.07, 1) forwards;
+  animation-delay: calc(var(--stagger) * var(--i));
+  /* The texture reveal the brief asks for: the fill is a clipped gradient, so
+     the letters come up lit rather than flat. */
+  background: linear-gradient(
+    100deg,
+    var(--glacier) 0%,
+    color-mix(in oklab, var(--signal) 45%, var(--glacier)) 52%,
+    var(--glacier) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes intro-rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes intro-mark {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =========================================================================
+   FOOTER
+   ========================================================================= */
+
+.footer {
+  background: var(--bg);
+  color: var(--fg);
+  border-top: var(--hair) solid var(--rule);
+  padding-block: var(--s9) var(--s6);
+}
+
+.footer__statement {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.2vw, 2.5rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+  margin-bottom: var(--s8);
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  gap: var(--s7) var(--s5);
+  padding-bottom: var(--s8);
+}
+
+.footer__col h2 {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  margin-bottom: var(--s4);
+}
+
+.footer__col ul {
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer__col a {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.footer__col a:hover {
+  color: var(--accent);
+}
+
+.footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.footer__brand:hover {
+  opacity: 0.72;
+}
+
+/* The wordmark stacks under itself, matching the header lockup. Inline it
+   reads as one long word. */
+.footer__brand > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+  line-height: 1;
+}
+
+.footer__place {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 28ch;
+  margin-top: var(--s4);
+}
+
+.footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4) var(--s6);
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+/* =========================================================================
+   RESPONSIVE CHROME
+   ========================================================================= */
+
+@media (max-width: 1024px) {
+  .staff {
+    display: none;
+  }
+  .progress-hair {
+    display: block;
+  }
+}
+
+@media (max-width: 860px) {
+  .header__nav {
+    display: none;
+  }
+  .header__menu {
+    display: inline-flex;
+  }
+  .footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .menu__panel {
+    width: 100%;
+  }
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+  .footer__base {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    display: none !important;
+  }
+  :root[data-intro] body {
+    overflow: auto;
+  }
+}

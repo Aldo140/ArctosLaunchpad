@@ -1,76 +1,540 @@
+"use client";
+
+import Link from "next/link";
+import { FormEvent, useRef, useState } from "react";
+
+type FieldName =
+  | "name"
+  | "email"
+  | "company"
+  | "website"
+  | "projectType"
+  | "budget"
+  | "timeline"
+  | "challenge"
+  | "outcome"
+  | "message";
+
+type FieldErrors = Partial<Record<FieldName | "form", string>>;
+
+const projectTypes = [
+  "Website",
+  "SEO or AI search",
+  "Paid advertising",
+  "Branding",
+  "Lead-generation system",
+  "Business automation",
+  "Custom software",
+  "CRM or integration",
+  "Dashboard or reporting",
+  "Ongoing support",
+  "Not sure yet",
+] as const;
+
+const budgetRanges = [
+  "Under $10,000",
+  "$10,000 to $25,000",
+  "$25,000 to $50,000",
+  "$50,000 to $100,000",
+  "$100,000+",
+  "Not sure yet",
+] as const;
+
+const timelines = [
+  "As soon as practical",
+  "Within 1 to 3 months",
+  "Within 3 to 6 months",
+  "More than 6 months",
+  "No fixed date",
+] as const;
+
+/** Order used by the error summary so it matches the visual order of the form. */
+const fieldOrder: FieldName[] = [
+  "name",
+  "email",
+  "company",
+  "website",
+  "projectType",
+  "budget",
+  "timeline",
+  "challenge",
+  "outcome",
+  "message",
+];
+
+function valueOf(formData: FormData, name: FieldName) {
+  return String(formData.get(name) ?? "").trim();
+}
+
+function validate(formData: FormData): FieldErrors {
+  const errors: FieldErrors = {};
+  const name = valueOf(formData, "name");
+  const email = valueOf(formData, "email");
+  const company = valueOf(formData, "company");
+  const website = valueOf(formData, "website");
+  const projectType = valueOf(formData, "projectType");
+  const budget = valueOf(formData, "budget");
+  const timeline = valueOf(formData, "timeline");
+  const challenge = valueOf(formData, "challenge");
+  const outcome = valueOf(formData, "outcome");
+  const message = valueOf(formData, "message");
+
+  if (name.length < 2) errors.name = "Enter your name.";
+  if (!/^\S+@\S+\.\S+$/.test(email))
+    errors.email = "Enter a valid email address.";
+  if (company.length < 2)
+    errors.company = "Enter your company or organization.";
+  if (website) {
+    try {
+      const websiteUrl = new URL(website);
+      if (
+        !(["http:", "https:"] as const).includes(
+          websiteUrl.protocol as "http:" | "https:",
+        )
+      ) {
+        errors.website =
+          "Enter a complete http:// or https:// website address.";
+      }
+    } catch {
+      errors.website = "Enter a complete http:// or https:// website address.";
+    }
+  }
+  if (!projectTypes.includes(projectType as (typeof projectTypes)[number])) {
+    errors.projectType = "Choose a project type.";
+  }
+  if (!budgetRanges.includes(budget as (typeof budgetRanges)[number])) {
+    errors.budget = "Choose an estimated budget range.";
+  }
+  if (!timelines.includes(timeline as (typeof timelines)[number])) {
+    errors.timeline = "Choose a desired timeline.";
+  }
+  if (challenge.length < 20)
+    errors.challenge = "Tell us a little more about the current challenge.";
+  if (outcome.length < 20)
+    errors.outcome = "Tell us what a useful outcome would look like.";
+  if (message.length > 3000)
+    errors.message = "Keep additional context under 3,000 characters.";
+
+  return errors;
+}
+
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
-*/
+ * Per-field message. Announcement is handled once by the summary at the top of
+ * the form rather than by ten simultaneous live regions, which is quieter for
+ * screen-reader users; this stays wired to the input via aria-describedby.
+ */
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return (
+    <span className="field__error" id={id}>
+      <span className="field__error-mark" aria-hidden="true" />
+      {message}
+    </span>
+  );
+}
 
-import React, { useState } from 'react';
-import { Send, CheckCircle } from 'lucide-react';
+function Required() {
+  return (
+    <>
+      <span className="field__req" aria-hidden="true">
+        *
+      </span>
+      <span className="visually-hidden"> (required)</span>
+    </>
+  );
+}
 
-const ContactForm: React.FC = () => {
-  const [submitted, setSubmitted] = useState(false);
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    // Logic to send data would go here
-  };
+export function ContactForm() {
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+  const successHeading = useRef<HTMLHeadingElement>(null);
 
-  if (submitted) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const clientErrors = validate(formData);
+
+    if (Object.keys(clientErrors).length > 0) {
+      setErrors(clientErrors);
+      const firstInvalid = Object.keys(clientErrors)[0];
+      window.requestAnimationFrame(() => {
+        form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
+      });
+      return;
+    }
+
+    setErrors({});
+    setStatus("sending");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData.entries())),
+      });
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        fields?: FieldErrors;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        setErrors({
+          ...result?.fields,
+          form:
+            result?.error ??
+            "We could not send your enquiry. Please try again.",
+        });
+        setStatus("idle");
+        return;
+      }
+
+      form.reset();
+      setStatus("success");
+      window.requestAnimationFrame(() => successHeading.current?.focus());
+    } catch {
+      setErrors({
+        form: "We could not reach the server. Check your connection and try again.",
+      });
+      setStatus("idle");
+    }
+  }
+
+  if (status === "success") {
     return (
-      <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-2xl p-8 text-center backdrop-blur-sm">
-        <div className="flex justify-center mb-4">
-          <CheckCircle className="w-12 h-12 text-emerald-400" />
+      <section className="receipt" aria-live="polite">
+        <p className="tick-label">Enquiry received</p>
+        <h2 ref={successHeading} tabIndex={-1} className="t-title receipt__title">
+          Thank you. <em>We’ll take it from here.</em>
+        </h2>
+        <p className="t-body">
+          We’ll read through the details and reply with a useful next step.
+        </p>
+        <dl className="register receipt__register">
+          <div className="register__row">
+            <dt className="t-label">Reply</dt>
+            <dd>Within two business days</dd>
+          </div>
+          <div className="register__row">
+            <dt className="t-label">First step</dt>
+            <dd>A focused conversation</dd>
+          </div>
+        </dl>
+        <div className="receipt__actions">
+          <Link className="btn btn--ghost btn--small" href="/work">
+            See recent work
+          </Link>
+          <button
+            className="receipt__again"
+            type="button"
+            onClick={() => setStatus("idle")}
+          >
+            Send another enquiry
+          </button>
         </div>
-        <h3 className="text-2xl font-heading font-bold text-emerald-100 mb-2">Message Received</h3>
-        <p className="text-emerald-200/80">I'll get back to you shortly.</p>
-        <button 
-          onClick={() => setSubmitted(false)}
-          className="mt-6 text-sm font-bold text-emerald-400 hover:text-emerald-300 underline"
-        >
-          Send another message
-        </button>
-      </div>
+      </section>
     );
   }
 
-  // Architectural Input Styles
-  const inputClasses = "w-full px-0 py-3 bg-transparent border-b border-slate-700 focus:border-cyan-500 focus:outline-none transition-colors text-white placeholder-slate-600 text-lg font-light";
-  const labelClasses = "block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1";
+  const describedBy = (name: FieldName) => ({
+    "aria-invalid": errors[name] ? true : undefined,
+    "aria-describedby": errors[name] ? `${name}-error` : undefined,
+  });
+
+  const listed = fieldOrder.filter((f) => errors[f]);
+  const showAlert = Boolean(errors.form) || listed.length > 0;
 
   return (
-    <form onSubmit={handleSubmit} className="relative">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="group">
-          <label className={labelClasses}>Owner Name</label>
-          <input required type="text" className={inputClasses} placeholder="Jane Doe" />
-        </div>
-        <div className="group">
-          <label className={labelClasses}>Business Name</label>
-          <input required type="text" className={inputClasses} placeholder="Company Ltd." />
-        </div>
+    <form
+      className="form"
+      onSubmit={handleSubmit}
+      noValidate
+      aria-busy={status === "sending"}
+    >
+      <div className="form__intro">
+        <p className="tick-label">Confidential project intake</p>
+        <p className="form__intro-note">
+          Three short sections. Fields marked{" "}
+          <span className="field__req" aria-hidden="true">
+            *
+          </span>
+          <span className="visually-hidden">with an asterisk</span> are
+          required — everything else only helps.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="group">
-          <label className={labelClasses}>Email Address</label>
-          <input required type="email" className={inputClasses} placeholder="jane@example.com" />
+      {showAlert && (
+        <div className="form__alert" role="alert" tabIndex={-1}>
+          <p className="form__alert-title">
+            {errors.form
+              ? "Something interrupted the handoff."
+              : listed.length === 1
+                ? "One field needs attention."
+                : `${listed.length} fields need attention.`}
+          </p>
+          {errors.form && <p className="form__alert-body">{errors.form}</p>}
+          {listed.length > 0 && (
+            <ul className="form__alert-list">
+              {listed.map((f) => (
+                <li key={f}>
+                  <a href={`#${f}`}>{errors[f]}</a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className="group">
-          <label className={labelClasses}>Instagram (Optional)</label>
-          <input type="text" className={inputClasses} placeholder="@yourbusiness" />
+      )}
+
+      <fieldset className="form__step">
+        <legend className="form__legend">
+          <span className="form__legend-n" aria-hidden="true">
+            01
+          </span>
+          <span className="form__legend-title">The essentials</span>
+          <span className="form__legend-note">
+            Who you are, and where the reply should go.
+          </span>
+        </legend>
+
+        <div className="form__grid">
+          <div className="field">
+            <label className="field__label" htmlFor="name">
+              Name <Required />
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              maxLength={100}
+              required
+              {...describedBy("name")}
+            />
+            <FieldError id="name-error" message={errors.name} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="email">
+              Email <Required />
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={254}
+              required
+              {...describedBy("email")}
+            />
+            <FieldError id="email-error" message={errors.email} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="company">
+              Company or organization <Required />
+            </label>
+            <input
+              id="company"
+              name="company"
+              type="text"
+              autoComplete="organization"
+              maxLength={150}
+              required
+              {...describedBy("company")}
+            />
+            <FieldError id="company-error" message={errors.company} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="website">
+              Website <span className="field__optional">Optional</span>
+            </label>
+            <input
+              id="website"
+              name="website"
+              type="url"
+              inputMode="url"
+              autoComplete="url"
+              placeholder="https://"
+              maxLength={300}
+              {...describedBy("website")}
+            />
+            <FieldError id="website-error" message={errors.website} />
+          </div>
         </div>
-      </div>
-      
-      <div className="mb-12 group">
-        <label className={labelClasses}>How can I help?</label>
-        <textarea required rows={4} className={inputClasses + " resize-none"} placeholder="Tell me a bit about what you're looking for..."></textarea>
+      </fieldset>
+
+      <fieldset className="form__step">
+        <legend className="form__legend">
+          <span className="form__legend-n" aria-hidden="true">
+            02
+          </span>
+          <span className="form__legend-title">The shape of the work</span>
+          <span className="form__legend-note">
+            Rough answers are fine. None of this is binding.
+          </span>
+        </legend>
+
+        <div className="form__grid">
+          <div className="field">
+            <label className="field__label" htmlFor="projectType">
+              Project type <Required />
+            </label>
+            <span className="field__select">
+              <select
+                id="projectType"
+                name="projectType"
+                defaultValue=""
+                required
+                {...describedBy("projectType")}
+              >
+                <option value="" disabled>
+                  Select the closest fit
+                </option>
+                {projectTypes.map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
+              </select>
+            </span>
+            <FieldError id="projectType-error" message={errors.projectType} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="budget">
+              Estimated budget <Required />
+            </label>
+            <span className="field__select">
+              <select
+                id="budget"
+                name="budget"
+                defaultValue=""
+                required
+                {...describedBy("budget")}
+              >
+                <option value="" disabled>
+                  Select a range
+                </option>
+                {budgetRanges.map((range) => (
+                  <option key={range}>{range}</option>
+                ))}
+              </select>
+            </span>
+            <FieldError id="budget-error" message={errors.budget} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="timeline">
+              Desired timeline <Required />
+            </label>
+            <span className="field__select">
+              <select
+                id="timeline"
+                name="timeline"
+                defaultValue=""
+                required
+                {...describedBy("timeline")}
+              >
+                <option value="" disabled>
+                  Select a timeline
+                </option>
+                {timelines.map((timeline) => (
+                  <option key={timeline}>{timeline}</option>
+                ))}
+              </select>
+            </span>
+            <FieldError id="timeline-error" message={errors.timeline} />
+          </div>
+
+          <p className="form__aside">
+            Not sure yet is a real answer. Pick the closest option and we will
+            work the rest out together.
+          </p>
+        </div>
+      </fieldset>
+
+      <fieldset className="form__step form__step--last">
+        <legend className="form__legend">
+          <span className="form__legend-n" aria-hidden="true">
+            03
+          </span>
+          <span className="form__legend-title">What needs to change</span>
+          <span className="form__legend-note">
+            The part that matters most. A couple of sentences each is plenty.
+          </span>
+        </legend>
+
+        <div className="field">
+          <label className="field__label" htmlFor="challenge">
+            What is not working well today? <Required />
+          </label>
+          <textarea
+            id="challenge"
+            name="challenge"
+            rows={4}
+            maxLength={1500}
+            required
+            placeholder="Where does the friction show up for customers or your team?"
+            {...describedBy("challenge")}
+          />
+          <FieldError id="challenge-error" message={errors.challenge} />
+        </div>
+
+        <div className="field">
+          <label className="field__label" htmlFor="outcome">
+            What would a useful outcome look like? <Required />
+          </label>
+          <textarea
+            id="outcome"
+            name="outcome"
+            rows={4}
+            maxLength={1500}
+            required
+            placeholder="Describe the change you want to see after the work is done."
+            {...describedBy("outcome")}
+          />
+          <FieldError id="outcome-error" message={errors.outcome} />
+        </div>
+
+        <div className="field">
+          <label className="field__label" htmlFor="message">
+            Anything else we should know?{" "}
+            <span className="field__optional">Optional</span>
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={3}
+            maxLength={3000}
+            placeholder="Constraints, context, systems involved, or a question for us."
+            {...describedBy("message")}
+          />
+          <FieldError id="message-error" message={errors.message} />
+        </div>
+      </fieldset>
+
+      <div className="form__trap" aria-hidden="true">
+        <label>
+          Leave this field empty
+          <input name="address" type="text" tabIndex={-1} autoComplete="off" />
+        </label>
       </div>
 
-      <button type="submit" className="group w-full md:w-auto px-10 py-5 bg-white text-black font-bold text-sm uppercase tracking-widest hover:bg-cyan-400 transition-all flex items-center justify-center gap-3">
-        Send Message <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-      </button>
+      <div className="form__submit">
+        <button className="btn form__send" type="submit" disabled={status === "sending"}>
+          <span>
+            {status === "sending" ? "Sending enquiry" : "Send project enquiry"}
+          </span>
+          <span className="btn__arrow" aria-hidden="true">
+            →
+          </span>
+        </button>
+        <p className="form__submit-note">
+          We reply within two business days. Your information is only used to
+          respond to this enquiry.
+        </p>
+      </div>
     </form>
   );
-};
-
-export default ContactForm;
+}

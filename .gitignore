@@ -1,6 +1,5 @@
+.next
 node_modules
-dist
-.DS_Store
-.env
-.env.local
-*.log
+.backup-pre-redesign
+assets-source
+*.tsbuildinfo

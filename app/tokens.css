@@ -1,0 +1,163 @@
+/* =========================================================================
+   ARCTOS — design tokens
+   -------------------------------------------------------------------------
+   The site is built from two materials that never blend:
+
+     PAPER       the field guide. Warm, torn, printed. Chapter stages, studio.
+     INSTRUMENT  the screen. Black, precise, luminous. Work, systems, data.
+
+   Every surface declares one via [data-material]. Components read the neutral
+   aliases (--bg, --fg, --rule, --accent) and never name a literal colour, so a
+   section inverts by changing one attribute.
+   ========================================================================= */
+
+:root {
+  /* --- ground ---------------------------------------------------------- */
+  --ink: #081319; /* arctic black */
+  --ink-raised: #0d1c26; /* ink navy, raised surface */
+  --ink-hairline: #14262f;
+
+  --glacier: #f2f1ea; /* warm off-white, never pure */
+  --paper: #e7e2d7;
+  --paper-warm: #ede7d8; /* sampled from the collages */
+
+  /* --- interactive ----------------------------------------------------- */
+  --signal: #2f9bff;
+  --signal-deep: #1d4ed8;
+
+  /* --- chapter accents -------------------------------------------------
+     Sampled from the collage artwork itself so UI accents and the printed
+     canvases are the same colour, not an approximation of it. */
+  --attract: #1e63c8;
+  --attract-soft: #7ea6e0;
+  --convert: #9a3b52;
+  --convert-soft: #c98b92;
+  --operate: #c1541f;
+  --operate-soft: #dda07a;
+  --scale: #336a61;
+  --scale-soft: #8fb3a9;
+
+  /* --- type ------------------------------------------------------------ */
+  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-ui: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
+
+  /* Fluid scale. Ratio widens as the viewport does — headlines grow faster
+     than body copy, which is what makes the editorial sizes land. */
+  /* A tier above hero, for the held collage scenes on the narrative routes.
+     At this size the type is the composition rather than a label on it, so it
+     only ever appears once per scene, set into the artwork's clear field. */
+  --t-mega: clamp(3.4rem, 1rem + 12vw, 14rem);
+  --t-hero: clamp(2.9rem, 1.2rem + 7.4vw, 8.5rem);
+  --t-display: clamp(2.4rem, 1.3rem + 4.6vw, 5.75rem);
+  --t-title: clamp(1.85rem, 1.25rem + 2.5vw, 3.4rem);
+  --t-subtitle: clamp(1.35rem, 1.05rem + 1.2vw, 2rem);
+  --t-lead: clamp(1.08rem, 0.98rem + 0.5vw, 1.4rem);
+  --t-body: clamp(1rem, 0.96rem + 0.18vw, 1.09rem);
+  --t-small: 0.9rem;
+  --t-micro: 0.735rem;
+
+  --lh-tight: 0.92;
+  --lh-snug: 1.08;
+  --lh-copy: 1.62;
+
+  --track-hero: -0.035em;
+  --track-label: 0.15em;
+
+  /* --- space ------------------------------------------------------------
+     4px base. Section rhythm is fluid so chapters breathe on wide screens
+     without leaving mobile with 300px of dead air. */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4rem;
+  --s9: 6rem;
+  --s10: 8rem;
+  --section-y: clamp(5rem, 9vw, 11rem);
+
+  /* --- measure ---------------------------------------------------------- */
+  --measure: 62ch;
+  --measure-tight: 46ch;
+  --max: 1420px;
+  --rail: 4.5rem; /* survey rule gutter, desktop */
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+
+  /* --- motion -----------------------------------------------------------
+     The site has exactly three entrance gestures, all borrowed from how the
+     artwork is actually made rather than from a scroll library:
+
+       DRAW   a line extends from its origin — rules, ticks, plotted figures
+       WIPE   a plate is laid down — images, video, specimen frames
+       SET    type resolves in place, without sliding in from anywhere
+
+     Nothing translates on entry. A heading that slides up 20px is the generic
+     tell; a heading that simply resolves while its rule draws beneath it
+     belongs to a drawing board. Interaction feedback still moves — that is
+     response, not entrance. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-set: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --dur-fast: 180ms;
+  --dur: 320ms;
+  --dur-slow: 720ms;
+  --dur-draw: 1100ms;
+  --dur-wipe: 820ms;
+  --dur-set: 640ms;
+  /* One stagger step, shared by every sequence on the site. */
+  --stagger: 70ms;
+
+  --radius: 2px; /* the brand is drafted, not rounded */
+  --hair: 1px;
+}
+
+/* =========================================================================
+   MATERIALS
+   ========================================================================= */
+
+[data-material="instrument"] {
+  --bg: var(--ink);
+  --bg-raised: var(--ink-raised);
+  --fg: var(--glacier);
+  --fg-dim: color-mix(in oklab, var(--glacier) 62%, var(--ink));
+  --fg-faint: color-mix(in oklab, var(--glacier) 38%, var(--ink));
+  --rule: color-mix(in oklab, var(--glacier) 16%, transparent);
+  --rule-strong: color-mix(in oklab, var(--glacier) 34%, transparent);
+  --accent: var(--signal);
+  color-scheme: dark;
+}
+
+[data-material="paper"] {
+  --bg: var(--paper);
+  --bg-raised: var(--paper-warm);
+  --fg: var(--ink);
+  --fg-dim: color-mix(in oklab, var(--ink) 68%, var(--paper));
+  --fg-faint: color-mix(in oklab, var(--ink) 42%, var(--paper));
+  --rule: color-mix(in oklab, var(--ink) 18%, transparent);
+  --rule-strong: color-mix(in oklab, var(--ink) 38%, transparent);
+  --accent: var(--signal-deep);
+  color-scheme: light;
+}
+
+/* Chapter tint. Applied alongside a material, never instead of one. */
+[data-chapter="attract"] {
+  --accent: var(--attract);
+  --accent-soft: var(--attract-soft);
+}
+[data-chapter="convert"] {
+  --accent: var(--convert);
+  --accent-soft: var(--convert-soft);
+}
+[data-chapter="operate"] {
+  --accent: var(--operate);
+  --accent-soft: var(--operate-soft);
+}
+[data-chapter="scale"] {
+  --accent: var(--scale);
+  --accent-soft: var(--scale-soft);
+}
