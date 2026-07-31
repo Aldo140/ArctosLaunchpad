@@ -7,6 +7,7 @@ import { LoadingIntro, INTRO_BOOTSTRAP } from "@/components/LoadingIntro";
 import { ChromeSync } from "@/components/ChromeSync";
 import { ScrollRefresh } from "@/components/ScrollRefresh";
 import { SurveyRule } from "@/components/SurveyRule";
+import { InteriorMotion } from "@/components/InteriorMotion";
 import {
   SITE_NAME,
   SITE_URL,
@@ -102,7 +103,10 @@ export default function RootLayout({
         <SiteHeader />
         <ChromeSync />
         <ScrollRefresh />
-        <main id="main">{children}</main>
+        <main id="main">
+          <InteriorMotion />
+          {children}
+        </main>
         <SiteFooter />
         <script
           type="application/ld+json"

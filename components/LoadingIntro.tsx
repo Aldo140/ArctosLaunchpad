@@ -64,5 +64,5 @@ export function LoadingIntro() {
 export const INTRO_BOOTSTRAP = `(function(){var r=document.documentElement;r.classList.add('js');try{
 var skip=sessionStorage.getItem('arctos-intro')||matchMedia('(prefers-reduced-motion: reduce)').matches;
 r.dataset.intro=skip?'skip':'show';
-if(!skip)sessionStorage.setItem('arctos-intro','seen');
+if(!skip){sessionStorage.setItem('arctos-intro','seen');setTimeout(function(){if(r.dataset.intro==='show'||r.dataset.intro==='done')r.dataset.intro='skip';},2400);}
 }catch(e){r.dataset.intro='skip';}})();`;

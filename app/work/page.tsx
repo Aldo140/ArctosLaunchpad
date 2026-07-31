@@ -89,13 +89,14 @@ export default function WorkPage() {
 
           {/* The contact sheet: an index of what follows, at one size. */}
           <div className="work-sheet">
-            {visible.map((project) => (
+            {visible.map((project, index) => (
               <figure key={project.slug} className="work-sheet__frame">
                 <div className="work-sheet__plate">
                   <Image
                     src={posterFor(project)}
                     alt=""
                     fill
+                    priority={index < 2}
                     sizes="(max-width: 520px) 100vw, (max-width: 900px) 50vw, 24vw"
                   />
                 </div>

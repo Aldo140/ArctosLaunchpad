@@ -76,10 +76,8 @@ export default function HomePage() {
               The systems <em>behind</em> growing businesses.
             </h1>
             <p className="hero__lead t-lead">
-              We build conversion-focused websites, lead-generation campaigns,
-              custom software, and workflow automation — connecting how your
-              business attracts customers with how it operates behind the
-              scenes.
+              Websites, campaigns, software, and automation — connected around
+              how your business attracts customers and operates.
             </p>
             <div className="hero__actions">
               <Link className="btn" href="/contact">
@@ -108,6 +106,7 @@ export default function HomePage() {
 
       {/* ── Positioning ──────────────────────────────────────────────── */}
       <section
+        id="position"
         className="statement section"
         data-material="instrument"
         data-station="Position"
@@ -135,6 +134,7 @@ export default function HomePage() {
 
       {/* ── Lead-generation journey ──────────────────────────────────── */}
       <section
+        id="lead-system"
         className="journey section"
         data-material="instrument"
         data-station="Lead system"
@@ -163,6 +163,7 @@ export default function HomePage() {
 
       {/* ── Selected work ────────────────────────────────────────────── */}
       <section
+        id="featured-work"
         className="work section"
         data-material="instrument"
         data-station="Work"
@@ -205,6 +206,7 @@ export default function HomePage() {
 
       {/* ── Automation ───────────────────────────────────────────────── */}
       <section
+        id="automation"
         className="automation section"
         data-material="paper"
         data-chapter="operate"
@@ -247,6 +249,7 @@ export default function HomePage() {
 
       {/* ── Process ──────────────────────────────────────────────────── */}
       <section
+        id="home-process"
         className="process section"
         data-material="instrument"
         data-station="Process"
@@ -272,6 +275,7 @@ export default function HomePage() {
 
       {/* ── Industries ───────────────────────────────────────────────── */}
       <section
+        id="home-industries"
         className="industries section section--tight"
         data-material="instrument"
         data-station="Industries"
@@ -301,6 +305,7 @@ export default function HomePage() {
 
       {/* ── Why Arctos ───────────────────────────────────────────────── */}
       <section
+        id="why-arctos"
         className="why section"
         data-material="paper"
         data-chapter="scale"

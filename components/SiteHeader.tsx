@@ -20,22 +20,37 @@ export function SiteHeader() {
   const panel = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
 
-  const close = useCallback(() => setOpen(false), []);
-
-  // Navigating closes the menu. Adjusted during render rather than in an
-  // effect, so the menu is never painted open on the page you just arrived at.
-  const [lastPath, setLastPath] = useState(pathname);
-  if (lastPath !== pathname) {
-    setLastPath(pathname);
+  const close = useCallback((restoreFocus = true) => {
     setOpen(false);
-  }
+    if (restoreFocus) {
+      requestAnimationFrame(() => trigger.current?.focus());
+    }
+  }, []);
+
+  // A route can also change through browser history while the menu is open.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setOpen(false));
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
 
   // Modal behaviour: lock scroll, trap focus, close on Escape.
   useEffect(() => {
     if (!open) return;
     const { body } = document;
-    const prev = body.style.overflow;
+    const scrollY = window.scrollY;
+    const previousStyles = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+
+    // `overflow: hidden` alone still allows the page to drift behind a modal
+    // in iOS Safari. Fixing the body preserves the exact reading position.
     body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
 
     panel.current
       ?.querySelector<HTMLElement>('a, button, [tabindex]:not([tabindex="-1"])')
@@ -44,8 +59,7 @@ export function SiteHeader() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        setOpen(false);
-        trigger.current?.focus();
+        close();
         return;
       }
       if (e.key !== "Tab" || !panel.current) return;
@@ -69,12 +83,18 @@ export function SiteHeader() {
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      body.style.overflow = prev;
+      body.style.overflow = previousStyles.overflow;
+      body.style.position = previousStyles.position;
+      body.style.top = previousStyles.top;
+      body.style.width = previousStyles.width;
+      window.scrollTo(0, scrollY);
     };
-  }, [open]);
+  }, [close, open]);
 
   return (
-    <header className={`header${condensed ? " is-condensed" : ""}`}>
+    <header
+      className={`header${condensed ? " is-condensed" : ""}${open ? " is-menu-open" : ""}`}
+    >
       <div className="header__inner">
         <Link className="header__brand" href="/">
           <ArctosLockup size={30} />
@@ -107,6 +127,8 @@ export function SiteHeader() {
           onClick={() => setOpen(true)}
           aria-expanded={open}
           aria-controls="site-menu"
+          aria-haspopup="dialog"
+          aria-label="Open site menu"
         >
           <span className="header__menu-bars" aria-hidden="true">
             <i />
@@ -124,13 +146,23 @@ export function SiteHeader() {
         role="dialog"
         aria-modal="true"
         aria-label="Site menu"
-        hidden={!open}
+        aria-hidden={!open}
+        inert={!open}
       >
-        <div className="menu__scrim" onClick={close} aria-hidden="true" />
+        <div
+          className="menu__scrim"
+          onClick={() => close()}
+          aria-hidden="true"
+        />
         <div className="menu__panel" ref={panel} data-material="instrument">
           <div className="menu__head">
             <ArctosLockup size={28} />
-            <button type="button" className="menu__close" onClick={close}>
+            <button
+              type="button"
+              className="menu__close"
+              onClick={() => close()}
+              aria-label="Close site menu"
+            >
               Close
             </button>
           </div>
@@ -138,7 +170,13 @@ export function SiteHeader() {
           <nav className="menu__nav" aria-label="Site">
             {[...LINKS, ["Contact", "/contact"] as const].map(
               ([label, href], i) => (
-                <Link key={href} href={href} className="menu__item">
+                <Link
+                  key={href}
+                  href={href}
+                  className={`menu__item${pathname === href ? " is-active" : ""}`}
+                  aria-current={pathname === href ? "page" : undefined}
+                  onClick={() => close(false)}
+                >
                   <span className="t-folio">{String(i + 1).padStart(2, "0")}</span>
                   <span className="menu__item-label">{label}</span>
                   <span className="menu__item-rule" aria-hidden="true" />

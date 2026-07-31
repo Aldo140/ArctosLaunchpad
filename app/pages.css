@@ -7056,3 +7056,569 @@
     transform: none;
   }
 }
+
+/* =========================================================================
+   PHONE COMPOSITIONS
+   Wide indexes become swipeable folios; chapter artwork and type become one
+   cover; dense records become strongly ordered touch-first reading paths.
+   ========================================================================= */
+
+@media (max-width: 760px) {
+  .interior-document,
+  .interior-document * {
+    min-width: 0;
+  }
+
+  /* Scroll-linked image scale can extend a few optical pixels beyond its
+     frame. The mobile scenes are no longer sticky, so clipping at the scene
+     boundary is safe and prevents that transform from widening the page. */
+  .scene {
+    overflow: clip;
+  }
+
+  .interior-document > .section:not(.masthead, .cta),
+  .section.policy-cover,
+  .section.notfound {
+    padding-block: clamp(3.75rem, 15vw, 5.5rem);
+  }
+
+  .masthead,
+  .interior-document .masthead,
+  .services-open,
+  .work-open {
+    padding-top: max(6.25rem, calc(5.25rem + env(safe-area-inset-top)));
+    padding-bottom: clamp(3.5rem, 14vw, 5rem);
+  }
+
+  .masthead__inner,
+  .interior-document .masthead__inner,
+  .svc-balance__inner,
+  .svc-scope__head,
+  .svc-method__head,
+  .svc-notes__inner,
+  .svc-band,
+  .svc-spec,
+  .wk-spec,
+  .wk-spec__head,
+  .wk-live__head,
+  .context-open,
+  .stageplot,
+  .quadrant,
+  .context-nav,
+  .context-note,
+  .intake,
+  .policy,
+  .policy-cover__meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interior-document .masthead__body,
+  .interior-document .masthead__aside,
+  .interior-document .masthead__footer,
+  .interior-document .crumbs {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .interior-document .masthead__aside {
+    padding: var(--s5) 0 0;
+    border-left: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .crumbs ol {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+
+  .crumbs ol::-webkit-scrollbar {
+    display: none;
+  }
+
+  .masthead__title,
+  .interior-document .masthead__title,
+  .route-open__title,
+  .policy-cover__title,
+  .context-open__headline,
+  .notfound__title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+    font-size: clamp(2.65rem, 13.5vw, 4.35rem);
+    line-height: 0.94;
+    letter-spacing: -0.042em;
+  }
+
+  .masthead__intro,
+  .interior-document .masthead__intro,
+  .route-open__intro,
+  .policy-cover__intro {
+    max-width: 34rem;
+    font-size: clamp(1.05rem, 4.6vw, 1.25rem);
+    line-height: 1.48;
+  }
+
+  .services-open__inner,
+  .work-open__inner {
+    gap: clamp(2.25rem, 10vw, 3.75rem);
+  }
+
+  /* Artwork and argument share one compact cover without sticky scrolling. */
+  .scene__hold,
+  .scene--work .scene__hold {
+    position: static;
+    height: clamp(19rem, 48svh, 24rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: clamp(-24rem, -48svh, -19rem);
+    min-height: clamp(19rem, 48svh, 24rem);
+    padding-block: clamp(2.25rem, 9vw, 3.5rem);
+    align-content: end;
+    background: transparent;
+  }
+
+  .scene__mark {
+    max-width: 100%;
+    gap: var(--s4);
+    padding-right: clamp(0rem, 5vw, 1.25rem);
+  }
+
+  .scene__title,
+  .scene__title--phrase {
+    max-width: 100%;
+    font-size: clamp(3.15rem, 16vw, 5.25rem);
+    line-height: 0.88;
+    overflow-wrap: anywhere;
+  }
+
+  .scene__lead {
+    max-width: 26ch;
+    font-size: clamp(1.1rem, 5.2vw, 1.4rem);
+    line-height: 1.2;
+  }
+
+  .scene__panel {
+    padding-block: clamp(3rem, 12vw, 4.5rem);
+  }
+
+  .scene__scrim {
+    background: linear-gradient(168deg, color-mix(in oklab, var(--paper-warm) 38%, transparent), color-mix(in oklab, var(--paper-warm) 96%, transparent));
+  }
+
+  .scene--work .scene__scrim {
+    background: linear-gradient(168deg, color-mix(in oklab, var(--ink) 24%, transparent), color-mix(in oklab, var(--ink) 96%, transparent));
+  }
+
+  .scene--attract .scene__canvas img,
+  .scene--convert .scene__canvas img,
+  .scene--operate .scene__canvas img,
+  .scene--scale .scene__canvas img,
+  .scene--studio .scene__canvas img {
+    --canvas-x: 50%;
+  }
+
+  .scene--process .scene__canvas img {
+    --canvas-x: 43%;
+  }
+
+  .scene--studio .scene__canvas img {
+    width: 170%;
+    object-position: 7% 54%;
+  }
+
+  /* These indexes are spatial maps, so a swipeable folio preserves the idea
+     better than a tall stack before the page's actual content. */
+  .stage-gauge__scale,
+  .work-sheet,
+  .process-legend,
+  .studio-system__chapters {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: var(--s3);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+    padding-bottom: var(--s2);
+  }
+
+  /* The scale deliberately reaches the viewport edge from inside a padded
+     shell. Contain that visual bleed at the gauge, while the scale itself
+     remains independently swipeable. */
+  .stage-gauge {
+    overflow: clip;
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-auto-columns: minmax(15rem, 78vw);
+    border: 0;
+    background: transparent;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .stage-gauge__scale {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+
+  .process-legend {
+    grid-auto-columns: minmax(8.5rem, 43vw);
+  }
+
+  .studio-system__chapters {
+    grid-auto-columns: minmax(16rem, 82vw);
+    gap: var(--s4);
+  }
+
+  .stage-gauge__scale::-webkit-scrollbar,
+  .work-sheet::-webkit-scrollbar,
+  .process-legend::-webkit-scrollbar,
+  .studio-system__chapters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stage-gauge__band,
+  .work-sheet__frame,
+  .process-legend__stop,
+  .studio-system__chapter {
+    scroll-snap-align: start;
+  }
+
+  .stage-gauge__band {
+    min-height: 8.5rem;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-content: center;
+    gap: var(--s4);
+    border: var(--hair) solid var(--rule);
+  }
+
+  .stage-gauge__n {
+    grid-row: 1 / span 2;
+  }
+
+  .work-sheet__plate {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* The contact opener should expose the intake in the first scroll, rather
+     than spending a phone viewport reproducing the desktop title block. */
+  .masthead:not(.interior-document .masthead) {
+    padding-bottom: 3.25rem;
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__inner {
+    gap: clamp(1.5rem, 7vw, 2.5rem);
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__folio {
+    order: -1;
+    padding: 0;
+    color: var(--accent);
+  }
+
+  .atlas-services__link {
+    position: relative;
+    min-height: 88px;
+    grid-template-columns: 2rem minmax(0, 1fr) 1.5rem;
+    gap: var(--s2) var(--s3);
+    padding-block: var(--s5);
+  }
+
+  .atlas-services__title {
+    font-size: clamp(1.35rem, 7vw, 1.85rem);
+  }
+
+  .atlas-services__summary {
+    grid-column: 2 / 4;
+    font-size: 0.9rem;
+  }
+
+  .atlas-chapter__outcomes ul,
+  .process-stop__deliverables ul {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .atlas-chapter__outcomes li {
+    padding-bottom: var(--s3);
+    border-bottom: var(--hair) solid var(--rule);
+  }
+
+  .process-legend__stop a {
+    min-height: 68px;
+  }
+
+  .process-route__steps {
+    padding-left: 1.5rem;
+  }
+
+  .process-stop {
+    padding-bottom: clamp(3.75rem, 16vw, 5.5rem);
+  }
+
+  .process-stop__head,
+  .process-stop__detail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .process-stop__number {
+    font-size: clamp(3.75rem, 18vw, 6rem);
+    line-height: 0.85;
+  }
+
+  .process-stop h3 {
+    font-size: clamp(1.8rem, 8vw, 2.45rem);
+  }
+
+  .studio-system__chapter {
+    min-height: 21rem;
+  }
+
+  .studio-principles__field {
+    gap: 0;
+  }
+
+  .studio-principle {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s2) var(--s4);
+    min-height: 44px;
+    padding-block: var(--s5);
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .studio-principle > span {
+    grid-row: 1 / span 2;
+  }
+
+  .studio-principle p {
+    grid-column: 2;
+  }
+
+  .svc-balance__list {
+    text-align: left;
+  }
+
+  .svc-balance__list li,
+  .svc-scope__list li,
+  .svc-stair__step,
+  .stageplot__items {
+    min-height: 44px;
+  }
+
+  .svc-stair__step {
+    --stair: 0;
+    padding-inline: 0;
+  }
+
+  .svc-band__title,
+  .svc-balance__title,
+  .svc-method__title,
+  .svc-notes__title,
+  .wk-arc__title {
+    overflow-wrap: anywhere;
+    font-size: clamp(2.15rem, 10vw, 3.25rem);
+    line-height: 0.98;
+  }
+
+  .archive--compact .archive__link,
+  .archive__link,
+  .wk-next {
+    min-height: 72px;
+  }
+
+  .wk-spec__col {
+    padding: var(--s5) 0;
+    border-inline: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .wk-plate__frame,
+  .wk-live .reel,
+  .wk-live img {
+    aspect-ratio: 16 / 10;
+  }
+
+  .matrix__scroll {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .matrix__table {
+    min-width: 44rem;
+  }
+
+  .matrix__corner,
+  .matrix__context {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 9.5rem;
+    background: var(--paper-warm);
+    box-shadow: 1px 0 0 var(--rule-strong);
+  }
+
+  .contexts__legend {
+    display: none;
+  }
+
+  .contexts__row > a {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 1.5rem;
+    min-height: 96px;
+    gap: var(--s3);
+    padding-block: var(--s5);
+  }
+
+  .contexts__friction {
+    grid-column: 2 / 4;
+    font-size: 0.78rem;
+  }
+
+  .contexts__name {
+    font-size: clamp(1.25rem, 6vw, 1.65rem);
+  }
+
+  .context-nav__side,
+  .context-nav__index {
+    min-height: 56px;
+    padding-block: var(--s4);
+  }
+
+  .intake__memo {
+    padding-bottom: var(--s6);
+    border-bottom: var(--hair) solid var(--rule-strong);
+  }
+
+  .intake__sheet {
+    padding: clamp(1rem, 5vw, 1.5rem);
+    margin-inline: calc(-0.5 * var(--gutter));
+  }
+
+  .form input,
+  .form select,
+  .form textarea,
+  .form button,
+  .faq summary,
+  .policy__contents a,
+  .notfound__index a {
+    min-height: 44px;
+  }
+
+  .handoff__step {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s2) var(--s4);
+    padding-block: var(--s5);
+  }
+
+  .handoff__n {
+    grid-row: 1 / span 2;
+  }
+
+  .handoff__body,
+  .handoff__foot {
+    grid-column: 2;
+  }
+
+  .policy__contents {
+    display: grid;
+    position: static;
+    max-width: none;
+    padding: var(--s4) 0;
+    border-block: var(--hair) solid var(--rule-strong);
+  }
+
+  .policy__contents ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s2) var(--s4);
+  }
+
+  .policy__section-head {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .policy__section > :not(.policy__section-head) {
+    margin-left: 0;
+  }
+
+  .notfound {
+    min-height: 100svh;
+  }
+
+  .interior-document[data-motion="staged"] .cta__actions,
+  .cta__actions,
+  .notfound__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cta__actions .btn,
+  .notfound__actions .btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .work-records__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scene__folio {
+    justify-content: space-between;
+  }
+
+  .scene__folio::after {
+    display: none;
+  }
+
+  .svc-spec__item,
+  .register__row,
+  .index-strip__cell,
+  .wk-spec__list,
+  .policy__contents ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 360px) {
+  .route-open__title,
+  .masthead__title,
+  .interior-document .masthead__title,
+  .policy-cover__title,
+  .context-open__headline,
+  .notfound__title {
+    font-size: clamp(2.35rem, 13vw, 3.15rem);
+  }
+
+  .scene__title,
+  .scene__title--phrase {
+    font-size: clamp(3.1rem, 17vw, 4.75rem);
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-auto-columns: minmax(14rem, 88vw);
+  }
+}

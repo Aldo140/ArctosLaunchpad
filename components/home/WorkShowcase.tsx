@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import type { Project } from "@/lib/content";
-import { useReducedMotion } from "@/lib/useMedia";
+import { useMediaQuery, useReducedMotion } from "@/lib/useMedia";
 
 /**
  * Selected work.
@@ -151,11 +151,14 @@ function Reel({
 
 export function WorkShowcase({ projects }: { projects: Project[] }) {
   const reduced = useReducedMotion();
+  const compact = useMediaQuery("(max-width: 700px)");
 
   const entries = LAYOUTS.map((layout) => ({
     layout,
     project: projects.find((p) => p.slug === layout.slug),
-  })).filter((e): e is { layout: Layout; project: Project } => Boolean(e.project));
+  })).filter((e): e is { layout: Layout; project: Project } =>
+    Boolean(e.project),
+  );
 
   return (
     <div className="showcase">
@@ -171,7 +174,9 @@ export function WorkShowcase({ projects }: { projects: Project[] }) {
             </span>
             <span className="showcase__rule" aria-hidden="true" />
             <span className="t-folio showcase__kind">{layout.kind}</span>
-            <span className="t-folio showcase__status">{project.statusLabel}</span>
+            <span className="t-folio showcase__status">
+              {project.statusLabel}
+            </span>
           </header>
 
           <div className="showcase__media">
@@ -192,14 +197,17 @@ export function WorkShowcase({ projects }: { projects: Project[] }) {
                   src={project.reel?.src}
                   poster={project.reel?.poster ?? project.featuredImage}
                   title={project.title}
-                  reduced={reduced}
+                  reduced={reduced || compact}
                 />
               )}
             </Link>
           </div>
 
           {layout.plates?.length ? (
-            <ul className="showcase__plates" aria-label={`${project.title} detail`}>
+            <ul
+              className="showcase__plates"
+              aria-label={`${project.title} detail`}
+            >
               {layout.plates.map((plate) => (
                 <li key={plate.src}>
                   <Image
