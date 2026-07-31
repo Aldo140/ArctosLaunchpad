@@ -34,7 +34,7 @@ export function HomeMotion() {
     const mm = gsap.matchMedia();
 
     mm.add(
-      "(prefers-reduced-motion: no-preference)",
+      "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
       () => {
         const ledger = root.querySelector(".automation__ledger");
 
@@ -46,7 +46,6 @@ export function HomeMotion() {
             ledger.querySelectorAll(".automation__list--after li"),
           );
           const arrow = ledger.querySelector(".automation__arrow");
-          const vertical = window.matchMedia("(max-width: 700px)").matches;
 
           const tl = gsap.timeline({
             scrollTrigger: { trigger: ledger, start: "top 74%", once: true },
@@ -62,38 +61,22 @@ export function HomeMotion() {
             .from(
               arrow,
               {
-                scaleX: vertical ? 1 : 0,
-                scaleY: vertical ? 0 : 1,
-                transformOrigin: vertical ? "top" : "left",
+                scaleX: 0,
+                transformOrigin: "left",
                 duration: 0.5,
                 ease: "power2.inOut",
               },
               "-=0.35",
             )
-            .from(after, {
-              autoAlpha: 0,
-              duration: 0.5,
-              stagger: 0.07,
-            }, "-=0.2");
-        }
-
-        const mobileStops = select<HTMLElement>(".journey__stop");
-        if (
-          mobileStops.length &&
-          window.matchMedia("(max-width: 700px)").matches
-        ) {
-          gsap.from(mobileStops, {
-            x: -10,
-            autoAlpha: 0,
-            duration: 0.48,
-            stagger: 0.09,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: root.querySelector(".journey__track"),
-              start: "top 78%",
-              once: true,
-            },
-          });
+            .from(
+              after,
+              {
+                autoAlpha: 0,
+                duration: 0.5,
+                stagger: 0.07,
+              },
+              "-=0.2",
+            );
         }
 
         for (const image of select<HTMLElement>(

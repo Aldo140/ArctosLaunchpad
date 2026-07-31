@@ -2045,3 +2045,352 @@ main,
     font-size: 3rem;
   }
 }
+
+/* =========================================================================
+   MOBILE COMPOSITION REFINEMENT
+
+   The phone index is a concise field guide: one strong cover, a swipeable
+   chapter atlas, one dominant case study, and compact supporting records.
+   This block intentionally comes last so mobile is composed rather than
+   merely inheriting the desktop document.
+   ========================================================================= */
+
+@media (max-width: 700px) {
+  /* Cover: more mark, less agency-decoration text. */
+  .hero {
+    background:
+      radial-gradient(
+        ellipse at 92% 88%,
+        color-mix(in oklab, var(--attract) 22%, transparent),
+        transparent 46%
+      ),
+      var(--bg);
+  }
+
+  .hero__eyebrow {
+    margin-bottom: clamp(1.1rem, 3.5vh, 1.7rem);
+  }
+
+  .hero__title {
+    max-width: 13ch;
+    text-wrap: wrap;
+  }
+
+  .hero__lead {
+    max-width: 28ch;
+  }
+
+  .hero__disciplines {
+    display: none;
+  }
+
+  .hero__plot {
+    right: -4rem;
+    bottom: -1rem;
+    width: 18rem;
+    opacity: 0.23;
+  }
+
+  /* Four full-page stages become one tactile, art-directed atlas. The next
+     plate remains visible at the edge, so the horizontal affordance explains
+     itself without a scroll instruction. */
+  .chapters {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 1rem var(--gutter) 1.4rem;
+    background: var(--ink);
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+  }
+
+  .chapters::-webkit-scrollbar,
+  .why__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chapter {
+    flex: 0 0 min(86vw, 23rem);
+    min-height: 45rem;
+    padding-block: 0.9rem;
+    border: var(--hair) solid
+      color-mix(in oklab, var(--glacier) 22%, transparent);
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .chapter__inner {
+    min-height: 43rem;
+    gap: 1rem;
+    padding-inline: 0.9rem;
+  }
+
+  .chapter__canvas {
+    scale: 1;
+  }
+
+  .chapter[data-chapter="attract"] .chapter__canvas,
+  .chapter[data-chapter="convert"] .chapter__canvas,
+  .chapter[data-chapter="operate"] .chapter__canvas {
+    object-position: left center;
+  }
+
+  .chapter[data-chapter="scale"] .chapter__canvas {
+    object-position: right center;
+  }
+
+  .chapter__folio {
+    justify-self: start;
+    gap: 0.55rem;
+    padding: 0.45rem 0.6rem;
+    background: color-mix(in oklab, var(--paper-warm) 86%, transparent);
+  }
+
+  .chapter__folio-rule {
+    width: 1.5rem;
+  }
+
+  .chapter__body {
+    gap: 0.8rem;
+    padding: 1rem;
+    background: color-mix(in oklab, var(--paper-warm) 96%, transparent);
+    box-shadow: 0 1rem 2.5rem color-mix(in oklab, var(--ink) 16%, transparent);
+  }
+
+  .chapter__title {
+    font-size: clamp(3rem, 15vw, 4rem);
+  }
+
+  .chapter__lead {
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+
+  .chapter__problem {
+    font-size: 0.87rem;
+    line-height: 1.5;
+  }
+
+  .chapter__list li:nth-child(n + 5) {
+    display: none;
+  }
+
+  .chapter__more {
+    min-height: 2.75rem;
+  }
+
+  /* Mobile motion never withholds reading content. */
+  .journey__stop,
+  .process__step > *,
+  .industries__item > *,
+  .why__card > * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+
+  .journey__stop {
+    min-height: 3.55rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .journey__label {
+    font-size: 0.95rem;
+  }
+
+  .journey__spans {
+    margin-top: 1.25rem;
+  }
+
+  /* One lead case study carries the visual argument. The remaining three form
+     a compact roster with real imagery instead of repeating full-page rows. */
+  .showcase {
+    gap: 3rem;
+  }
+
+  .showcase__item:nth-child(n + 2) {
+    display: grid;
+    grid-template-columns: 7.25rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 0.85rem 1rem;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__head {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__kind {
+    display: none;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__status {
+    grid-column: 3;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__media {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 1 !important;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__plates,
+  .showcase__item:nth-child(n + 2) .showcase__summary,
+  .showcase__item:nth-child(n + 2) .showcase__services {
+    display: none;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__body {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    gap: 0.55rem;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__title {
+    font-size: clamp(1.35rem, 6.2vw, 1.75rem);
+    line-height: 1;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__go {
+    min-height: 2.75rem;
+    font-size: 0.86rem;
+  }
+
+  /* The homepage previews the before/after argument; the full automation page
+     owns the exhaustive list. */
+  .automation__ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .automation__arrow {
+    display: none;
+  }
+
+  .automation__list li {
+    min-height: 3.25rem;
+    padding-block: 0.65rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .automation__list li:nth-child(n + 5) {
+    display: none;
+  }
+
+  .automation__list--before li {
+    --strike-scale: 0 !important;
+    opacity: 0.72 !important;
+  }
+
+  .automation__list--after li {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .automation__more,
+  .process__more {
+    min-height: 2.75rem;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+
+  /* A compact six-part index is a better homepage preview than six long
+     paragraphs. The dedicated process route keeps the full explanation. */
+  .process__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: var(--hair) solid var(--rule);
+    border-left: var(--hair) solid var(--rule);
+  }
+
+  .process {
+    padding-bottom: 3rem;
+  }
+
+  .process__step {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    min-height: 7.25rem;
+    padding: 1rem;
+    border-right: var(--hair) solid var(--rule);
+    border-bottom: var(--hair) solid var(--rule);
+  }
+
+  .process__step-title {
+    font-size: 1.08rem;
+  }
+
+  .process__step-body {
+    display: none;
+  }
+
+  .industries__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .industries__item {
+    min-height: 4.5rem;
+    padding: 0.75rem 0.7rem 0.75rem 0;
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .industries__list li:nth-child(odd) .industries__item {
+    border-right: var(--hair) solid var(--rule);
+  }
+
+  .industries__list li:nth-child(even) .industries__item {
+    padding-left: 0.7rem;
+  }
+
+  /* Principles become a swipeable set of statements, not six identical boxes
+     stacked into another long landing-page wall. */
+  .why__grid {
+    display: flex;
+    gap: 0.75rem;
+    width: calc(100% + var(--gutter) * 2);
+    margin-left: calc(var(--gutter) * -1);
+    overflow-x: auto;
+    padding-inline: var(--gutter);
+    background: transparent;
+    border: 0;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .why__card {
+    flex: 0 0 min(78vw, 19rem);
+    min-height: 13rem;
+    border: var(--hair) solid var(--rule-strong);
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 350px) {
+  .hero__plot {
+    right: -4.5rem;
+    bottom: -0.5rem;
+  }
+
+  .chapter {
+    flex-basis: 88vw;
+    min-height: 43rem;
+  }
+
+  .chapter__inner {
+    min-height: 41rem;
+  }
+
+  .showcase__item:nth-child(n + 2) {
+    grid-template-columns: 6.25rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+}

@@ -24,11 +24,12 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
  * inline style left behind for the static case to fight with.
  */
 export function ChapterMotion() {
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+    mm.add(
+      "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
+      () => {
         for (const stage of gsap.utils.toArray<HTMLElement>(".chapter")) {
           const canvas = stage.querySelector<HTMLElement>(".chapter__canvas");
           const title = stage.querySelector<HTMLElement>(".chapter__title");
@@ -59,9 +60,10 @@ export function ChapterMotion() {
             });
           }
         }
-      });
+      },
+    );
 
-      return () => mm.revert();
+    return () => mm.revert();
   });
 
   // Renders nothing: this component exists only to own the timelines.

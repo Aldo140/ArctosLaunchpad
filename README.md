@@ -25,9 +25,24 @@ Copy `.env.example` to `.env.local`.
 | Variable                     | Required | Purpose                                                        |
 | ---------------------------- | -------- | -------------------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL`       | no       | Canonical origin for metadata, sitemap, and OG images. Defaults to `https://arctoslaunchpad.com`. |
+| `NEXT_PUBLIC_CONTACT_ENDPOINT` | no     | Public HTTPS endpoint used by static deployments for the project intake form. |
 | `CONTACT_WEBHOOK_URL`        | no       | Where `/api/contact` forwards enquiries. **Without it, in production the route rejects the submission rather than silently discarding it.** In development it logs to the server console instead. |
 
 No secrets are read on the client. `.env.local` is gitignored.
+
+---
+
+## GitHub Pages
+
+The `arctos-launchpad` branch deploys through
+`.github/workflows/deploy.yml`. The workflow builds a static export in `out/`,
+adds the `/ArctosLaunchpad` repository base path, and publishes the artifact to
+GitHub Pages.
+
+The static project intake needs a public form endpoint. Set the repository
+variable `NEXT_PUBLIC_CONTACT_ENDPOINT` before enabling submissions on the
+Pages deployment. The server-side `CONTACT_WEBHOOK_URL` route remains available
+for conventional Next.js hosting.
 
 ---
 

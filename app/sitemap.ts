@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { industries, projects, services } from "@/lib/content";
 
+export const dynamic = "force-static";
+
 const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://arctoslaunchpad.com"
 ).replace(/\/$/, "");

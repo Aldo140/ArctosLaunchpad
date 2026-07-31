@@ -244,6 +244,14 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
+
+          <Link
+            className="link automation__more"
+            href="/calgary-business-automation"
+          >
+            Explore business automation
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </section>
 
@@ -270,6 +278,10 @@ export default function HomePage() {
               </li>
             ))}
           </ol>
+          <Link className="link process__more" href="/process">
+            See the complete process
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </section>
 

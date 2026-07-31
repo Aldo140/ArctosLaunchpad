@@ -167,12 +167,26 @@ export function ContactForm() {
     setErrors({});
     setStatus("sending");
 
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(formData.entries())),
+    if (
+      process.env.NEXT_PUBLIC_STATIC_EXPORT === "true" &&
+      !process.env.NEXT_PUBLIC_CONTACT_ENDPOINT
+    ) {
+      setErrors({
+        form: "The project intake is not connected on this preview deployment yet. Please use the production Arctos Launchpad contact page.",
       });
+      setStatus("idle");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ?? "/api/contact",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(formData.entries())),
+        },
+      );
       const result = (await response.json().catch(() => null)) as {
         ok?: boolean;
         error?: string;
@@ -205,7 +219,11 @@ export function ContactForm() {
     return (
       <section className="receipt" aria-live="polite">
         <p className="tick-label">Enquiry received</p>
-        <h2 ref={successHeading} tabIndex={-1} className="t-title receipt__title">
+        <h2
+          ref={successHeading}
+          tabIndex={-1}
+          className="t-title receipt__title"
+        >
           Thank you. <em>We’ll take it from here.</em>
         </h2>
         <p className="t-body">
@@ -259,8 +277,8 @@ export function ContactForm() {
           <span className="field__req" aria-hidden="true">
             *
           </span>
-          <span className="visually-hidden">with an asterisk</span> are
-          required — everything else only helps.
+          <span className="visually-hidden">with an asterisk</span> are required
+          — everything else only helps.
         </p>
       </div>
 
@@ -522,7 +540,11 @@ export function ContactForm() {
       </div>
 
       <div className="form__submit">
-        <button className="btn form__send" type="submit" disabled={status === "sending"}>
+        <button
+          className="btn form__send"
+          type="submit"
+          disabled={status === "sending"}
+        >
           <span>
             {status === "sending" ? "Sending enquiry" : "Send project enquiry"}
           </span>
