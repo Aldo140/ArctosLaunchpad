@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CTASection } from "@/components/Shared";
 import { ProjectReel } from "@/components/ProjectReel";
+import { SceneMotion } from "@/components/pages/SceneMotion";
 import { projects, type Project } from "@/lib/content";
 import {
   absoluteUrl,
@@ -45,6 +46,9 @@ const privateRecords = ordered.filter(
 const posterFor = (project: Project) =>
   project.reel?.poster ?? project.featuredImage ?? "";
 
+/** Cycled across the work scenes so each build gets its own accent. */
+const TONES = ["attract", "convert", "operate", "scale"] as const;
+
 const schema = graph(
   webPageSchema({
     type: "CollectionPage",
@@ -70,6 +74,7 @@ const schema = graph(
 export default function WorkPage() {
   return (
     <div className="interior-document" data-motion="staged">
+      <SceneMotion />
       <section
         className="section work-open reveal"
         data-material="paper"
@@ -116,44 +121,62 @@ export default function WorkPage() {
           runs full-bleed and keeps running while the register rises over it —
           the four .webm captures are the strongest evidence in the project and
           the previous build showed poster frames instead. */}
-      {visible.map((project) => (
+      {visible.map((project, index) => (
         <section
           key={project.slug}
           id={project.slug}
           className="scene scene--work reveal"
           data-material="instrument"
+          /* Each build gets its own colour temperature, so four scenes in a row
+             read as four projects rather than one long dark band. */
+          data-chapter={TONES[index % TONES.length]}
           data-station={project.title}
         >
           <div className="scene__hold">
-            <div className="scene__canvas">
-              {project.reel ? (
-                <ProjectReel
-                  src={project.reel.src}
-                  poster={project.reel.poster}
-                  title={project.title}
-                />
-              ) : (
-                <Image
-                  src={posterFor(project)}
-                  alt={`${project.title} homepage and interface`}
-                  fill
-                  sizes="100vw"
-                />
-              )}
-            </div>
-            <div className="scene__scrim" aria-hidden="true" />
-          </div>
+            <div className="workbench__field" aria-hidden="true" />
 
-          <div className="shell scene__shell">
-            <div className="scene__mark">
-              <p className="scene__folio">
-                <span>{project.statusLabel}</span>
-              </p>
-              <h2 className="scene__title">{project.title}</h2>
-              <p className="scene__lead">{project.summary}</p>
-              <Link className="work-scene__open" href={project.route}>
-                Open case file <span aria-hidden="true">↗</span>
-              </Link>
+            <div className="shell workbench">
+              <div className="scene__mark">
+                <p className="scene__folio">
+                  <span>{project.statusLabel}</span>
+                </p>
+                <h2 className="scene__title">{project.title}</h2>
+                <p className="scene__lead">{project.summary}</p>
+                <Link className="work-scene__open" href={project.route}>
+                  Open case file <span aria-hidden="true">↗</span>
+                </Link>
+              </div>
+
+              {/* The build, running on a drawn machine. Deliberately a
+                  technical outline rather than window chrome with traffic
+                  lights — the site's imagery rules rule out faking a browser
+                  around a real screenshot, and a plotted monitor keeps the
+                  drafting vocabulary the rest of the page is built from. */}
+              <figure className="workstation">
+                <div className="workstation__bezel">
+                  <div className="workstation__screen">
+                    {project.reel ? (
+                      <ProjectReel
+                        src={project.reel.src}
+                        poster={project.reel.poster}
+                        title={project.title}
+                      />
+                    ) : (
+                      <Image
+                        src={posterFor(project)}
+                        alt={`${project.title} homepage and interface`}
+                        fill
+                        sizes="(max-width: 1000px) 92vw, 46vw"
+                      />
+                    )}
+                  </div>
+                </div>
+                <span className="workstation__neck" aria-hidden="true" />
+                <span className="workstation__base" aria-hidden="true" />
+                <figcaption className="workstation__cap">
+                  Recorded from the live build
+                </figcaption>
+              </figure>
             </div>
           </div>
 

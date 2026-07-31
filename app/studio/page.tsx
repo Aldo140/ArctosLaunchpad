@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CTASection } from "@/components/Shared";
+import { SceneMotion } from "@/components/pages/SceneMotion";
 import { growthStages, whyArctos } from "@/lib/content";
 import {
   breadcrumbSchema,
@@ -38,6 +39,7 @@ const schema = graph(
 export default function StudioPage() {
   return (
     <div className="interior-document" data-motion="staged">
+      <SceneMotion />
       {/* The workspace itself, held full-bleed. Cropped left onto the leaf
           shadows and the lettered card — centred, the frame pulled in the
           mountain print on the right wall, and a mountain used as decoration
@@ -65,9 +67,15 @@ export default function StudioPage() {
             <p className="scene__folio">
               <span>A Calgary digital growth and technology studio</span>
             </p>
-            <h1 className="scene__title scene__title--phrase">
-              Close the gap <em>between</em> growing and running.
+            {/* Three words at mega scale. The full sentence ran to five lines
+                and filled the viewport before it finished; the rest of it is
+                the standfirst, where it reads properly. */}
+            <h1 className="scene__title">
+              Close the <em>gap.</em>
             </h1>
+            <p className="scene__lead">
+              Between how a business grows and how it actually runs.
+            </p>
           </div>
         </div>
 
@@ -136,28 +144,26 @@ export default function StudioPage() {
             <h2>Four disciplines become one growth system.</h2>
           </div>
 
-          <div className="studio-system__chapters">
+          {/* One unbroken band, divided by hairlines rather than gaps, under a
+              single rule that runs the whole width through all four accents.
+              Four separate cards said "four things"; the section's claim is
+              that they are one. The collage crops that used to sit behind each
+              card were pulled from the artwork's clear paper field, so they
+              rendered as four blank beige rectangles carrying nothing. */}
+          <div className="disciplines">
+            <span className="disciplines__rule" aria-hidden="true" />
             {growthStages.map((stage) => (
               <Link
                 key={stage.id}
-                className="studio-system__chapter"
+                className="disciplines__cell"
                 href={`/services#${stage.id}`}
                 data-chapter={stage.id}
               >
-                <Image
-                  src={`/assets/chapters/${stage.id}.webp`}
-                  alt=""
-                  fill
-                  sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 24vw"
-                />
-                <span className="studio-system__chapter-number">
-                  {stage.index}
-                </span>
-                <span className="studio-system__chapter-title">
-                  {stage.title}
-                </span>
-                <span className="studio-system__chapter-copy">
-                  {stage.statement}
+                <span className="disciplines__n">{stage.index}</span>
+                <span className="disciplines__name">{stage.title}</span>
+                <span className="disciplines__copy">{stage.statement}</span>
+                <span className="disciplines__go" aria-hidden="true">
+                  See the services ↗
                 </span>
               </Link>
             ))}

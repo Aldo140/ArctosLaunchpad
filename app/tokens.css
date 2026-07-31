@@ -25,6 +25,14 @@
   --signal: #2f9bff;
   --signal-deep: #1d4ed8;
 
+  /* The readable partner to --accent. The chapter accents are sampled from the
+     artwork and must not be altered, but on instrument they land at 2.8-4.1:1,
+     which fails AA for the small mono numerals and eyebrows that use them. The
+     soft variants clear 6.8-8.4:1, so small accent TEXT uses --accent-soft
+     while rules, fills, and marks keep the sampled colour. Defaults to the
+     interactive blue for anything outside a chapter subtree. */
+  --accent-soft: var(--signal);
+
   /* --- chapter accents -------------------------------------------------
      Sampled from the collage artwork itself so UI accents and the printed
      canvases are the same colour, not an approximation of it. */
@@ -160,4 +168,15 @@
 [data-chapter="scale"] {
   --accent: var(--scale);
   --accent-soft: var(--scale-soft);
+}
+
+/* The soft variants are light — built to lift off ink. On paper they measure
+   1.7-2.1:1 and simply vanish, so there `--accent-soft` falls back to the
+   sampled accent itself, which is the darker of the two on that ground.
+
+   Declared AFTER the chapter blocks deliberately: a section carries both
+   attributes, both selectors have the same specificity, and source order is
+   the only thing that decides. */
+[data-material="paper"] {
+  --accent-soft: var(--accent);
 }

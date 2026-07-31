@@ -27,13 +27,16 @@
   line-height: 1;
 }
 
+/* "Launchpad" is the second half of the studio's name, not decoration, and at
+   0.53rem it was sitting at 2.83:1. Nudged up in both size and value — still
+   clearly subordinate to the wordmark, now actually readable. */
 .lockup__sub {
   font-family: var(--font-mono);
-  font-size: 0.53rem;
+  font-size: 0.58rem;
   font-weight: 500;
-  letter-spacing: 0.34em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   line-height: 1;
   padding-left: 0.1em;
 }
@@ -420,7 +423,7 @@
   font-weight: 500;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   white-space: nowrap;
   transition: color var(--dur) var(--ease-out);
 }
@@ -433,7 +436,7 @@
   font-family: var(--font-mono);
   font-size: var(--t-micro);
   font-weight: 500;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   font-variant-numeric: tabular-nums;
 }
 
@@ -605,13 +608,14 @@
   padding-bottom: var(--s8);
 }
 
+/* These name the footer's three link groups — navigation, not decoration. */
 .footer__col h2 {
   font-family: var(--font-mono);
   font-size: var(--t-micro);
   font-weight: 500;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   margin-bottom: var(--s4);
 }
 

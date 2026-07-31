@@ -99,9 +99,11 @@ export function HomeMotion() {
           );
         }
 
-        for (const row of select<HTMLElement>(
-          ".process__step, .industries__item, .why__card",
-        )) {
+        // `.process__step` and `.industries__item` no longer exist — the
+        // process rows became a drawn track and the industries list became a
+        // field of names, both of which carry their own entrance. Left as-is
+        // these selectors matched nothing and the why cards lost theirs too.
+        for (const row of select<HTMLElement>(".why__card")) {
           const contents = Array.from(row.children);
           if (!contents.length) continue;
           gsap.from(contents, {

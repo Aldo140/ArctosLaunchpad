@@ -56,7 +56,14 @@ Everything else uses the neutral aliases, which resolve per material:
 Chapter accents were **sampled from the collage artwork itself**, so UI accent
 and printed canvas are the same colour. Do not "improve" them.
 
-Aim for ~75–80% neutral. Accent is for one thing at a time.
+`--fg-faint` resolves to about **2.8:1 on instrument**. That is correct for what
+it is — folios and marks that could be deleted without losing meaning. Anything
+a reader needs uses `--fg-dim` (~6:1), however small and quiet it is.
+
+Documents (case studies, industry briefs, legal) stay ~75–80% neutral. **The
+four narrative routes do not** — on a held scene the artwork is full-bleed and
+the accent runs the seam, the folio, and the gauge. Restraint on those pages
+read as timidity, which is why they were rebuilt.
 
 ---
 
@@ -144,6 +151,24 @@ orchestrated, meaningful moments. Use CSS for everything simple.
 The hero's plotter-draw of the Arctos mark is the reference for tone —
 purposeful, technical, once.
 
+**Held scenes.** The narrative routes hold a full-bleed plate with
+`position: sticky` while the instrument panel rises over it in normal flow.
+Sticky, never a pinned ScrollTrigger: no DOM wrapping, no scroll hijacking, and
+it degrades to a plain stack below 900px and under reduced motion. Two rules
+learned the hard way:
+
+- The mark is a **sibling** of `.scene__hold`, never a child — inside it, the
+  negative margin that lifts it over the plate is clipped by `overflow: hidden`.
+- Mega scale (`--t-mega`) is for **one word**. A sentence at 14rem runs off the
+  bottom of the viewport; those use `.scene__title--phrase`.
+
+**Never let content depend on a tween to become visible.** `gsap.from({autoAlpha: 0})`
+hides its target the moment it is built, and a trigger that dies mid-flight
+strands it there — measured at `opacity: 0.85`, in production, on every scene
+after the first when scrolling quickly. Anything whose only job is to end up
+visible fades with a **CSS transition**, which cannot stop short of its end
+value. GSAP is for sequencing, not for revealing.
+
 ---
 
 ## 7. Imagery — hard rules
@@ -152,6 +177,18 @@ purposeful, technical, once.
 stock cartoon illustration, AI landscapes, aurora, mountains-as-decoration,
 fake browser chrome around real screenshots, text baked into a raster, glowing
 flowcharts, glassmorphism, neon gradients, 3D blobs.
+
+**The chapter collages are the interior system, not homepage-only.** They lead
+the Services scenes, open Process, and label the Studio disciplines. An earlier
+pass banned them from interiors after setting grey copy over torn edges; the
+artwork was never the problem, the placement was. Three rules make them work:
+
+1. Type goes **into the clear paper field**, never over the torn edges.
+2. The scrim under the type is **the artwork's own paper colour** (ink on the
+   Work scenes), so it reads as more paper rather than as a wash over the art.
+3. Each canvas sets its **own** `object-position` — the clear field sits
+   somewhere different in all four, and one shared value puts a headline on a
+   torn edge.
 
 The mark already contains a bear, abstracted. That is the only bear.
 

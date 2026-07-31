@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArctosDiagram } from "@/components/home/ArctosDiagram";
-import { ChapterStages } from "@/components/home/ChapterStages";
+import { GrowthSystem } from "@/components/home/GrowthSystem";
 import { HomeMotion } from "@/components/home/HomeMotion";
 import { JourneyDiagram } from "@/components/home/JourneyDiagram";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
@@ -101,8 +101,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── The four stages, as printed chapters ─────────────────────── */}
-      <ChapterStages />
+      {/* ── The four stages, as one system ───────────────────────────── */}
+      <GrowthSystem />
 
       {/* ── Positioning ──────────────────────────────────────────────── */}
       <section
@@ -116,17 +116,40 @@ export default function HomePage() {
           <h2 className="statement__title t-display reveal">
             More leads should not mean <em>more administrative work.</em>
           </h2>
-          <div className="statement__cols reveal">
-            <p className="t-body">
-              A campaign can create demand. A website can capture it. Growth
-              gets difficult when the systems behind the business cannot keep
-              up.
+          {/* The claim is a mismatch between two curves, so it is drawn as
+              one: demand climbing, and the manual work that usually climbs
+              with it held flat. No numbers — the shape is the argument, and
+              inventing figures to label it is not on the table. */}
+          <div className="crossover reveal" aria-hidden="true">
+            <svg viewBox="0 0 600 150" preserveAspectRatio="none" role="presentation">
+              <path className="crossover__grid" d="M0 37.5H600M0 75H600M0 112.5H600" />
+              <path
+                className="crossover__demand"
+                d="M0 132 C 150 128, 300 96, 420 58 S 540 18, 600 12"
+              />
+              <path className="crossover__admin" d="M0 132 C 200 126, 400 122, 600 118" />
+            </svg>
+            <p className="crossover__key">
+              <span className="crossover__key-demand">Demand</span>
+              <span className="crossover__key-admin">Work behind it</span>
             </p>
-            <p className="t-body">
-              Most agencies stop at the form submission. Most software companies
-              never see how customers found you. Arctos connects both sides —
-              marketing, customer experience, software, automation, and
-              reporting, built as one system.
+          </div>
+          {/* The second column says Arctos connects both sides. The bracket
+              spans both columns and draws across as the section arrives, so
+              the connection is made rather than only claimed. */}
+          <div className="statement__cols reveal">
+            <span className="statement__tie" aria-hidden="true" />
+            <p className="statement__col">
+              <span className="statement__mark">Demand</span>A campaign can
+              create demand. A website can capture it. Growth gets difficult
+              when the systems behind the business cannot keep up.
+            </p>
+            <p className="statement__col">
+              <span className="statement__mark">Operations</span>Most agencies
+              stop at the form submission. Most software companies never see how
+              customers found you. Arctos connects both sides — marketing,
+              customer experience, software, automation, and reporting, built as
+              one system.
             </p>
           </div>
         </div>
@@ -225,6 +248,19 @@ export default function HomePage() {
             </p>
           </div>
 
+          {/* The bear at the console. The lit switch is the operate accent this
+              section already carries, so the figure and the section are the
+              same colour by construction rather than by coincidence. */}
+          <figure className="automation__figure reveal">
+            <Image
+              src="/assets/figures/bear-console.webp"
+              alt="The Arctos bear at a control panel, switching one process from manual to automatic."
+              width={1200}
+              height={1200}
+              sizes="(max-width: 900px) 80vw, 34vw"
+            />
+          </figure>
+
           <div className="automation__ledger reveal">
             <div className="automation__side">
               <h3 className="t-label">Recognizable today</h3>
@@ -267,14 +303,23 @@ export default function HomePage() {
             <p className="tick-label">How Arctos works</p>
             <h2 className="process__title t-display">Six steps, in order.</h2>
           </div>
-          <ol className="process__steps">
+          {/* The section claims order, so the order is drawn. One line runs the
+              width of the shell and each stop hangs a tick from it, the same
+              gesture the interior route uses vertically. Six identical table
+              rows made a sequence look like a menu. */}
+          <ol className="track reveal">
             {processSteps.map((step, i) => (
-              <li key={step.title} className="process__step reveal">
-                <span className="t-folio">
+              <li
+                key={step.title}
+                className="track__stop"
+                style={{ "--i": i } as React.CSSProperties}
+              >
+                <span className="track__tick" aria-hidden="true" />
+                <span className="track__n t-folio">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="process__step-title">{step.title}</h3>
-                <p className="process__step-body">{step.body}</p>
+                <h3 className="track__title">{step.title}</h3>
+                <p className="track__body">{step.body}</p>
               </li>
             ))}
           </ol>
@@ -299,15 +344,17 @@ export default function HomePage() {
               Systems shaped around the needs of your industry.
             </h2>
           </div>
-          <ul className="industries__list reveal seq">
+          {/* Set as one field of names rather than ten identical rows with ten
+              identical arrows. At this scale the section reads as the breadth
+              it is describing in a single glance, which the list never did. */}
+          <ul className="ind-field reveal">
             {industries.map((industry) => (
-              <li key={industry.slug}>
+              <li key={industry.slug} className="ind-field__row">
                 <Link
                   href={`/industries/${industry.slug}`}
-                  className="industries__item"
+                  className="ind-field__item"
                 >
-                  <span>{industry.title}</span>
-                  <span aria-hidden="true">→</span>
+                  {industry.title}
                 </Link>
               </li>
             ))}

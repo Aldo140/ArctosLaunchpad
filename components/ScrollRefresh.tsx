@@ -28,6 +28,22 @@ export function ScrollRefresh() {
       if (!cancelled) ScrollTrigger.refresh();
     };
 
+    // A new route starts at its top. ScrollTrigger remembers the scroll
+    // position of the page it measured, and `refresh()` restores it — so
+    // following a nav link from halfway down a long route landed you halfway
+    // down the next one. Clearing that memory and jumping to the top *before*
+    // the refresh fixes it at the cause; without the clear, the refresh below
+    // simply puts the old offset back.
+    //
+    // An in-page anchor is the one case where the position is deliberate, so
+    // a hash is left alone.
+    if (!window.location.hash) {
+      ScrollTrigger.clearScrollMemory();
+      // `instant` matters: the site sets `scroll-behavior: smooth`, and an
+      // animated jump here reads as the page sliding rather than arriving.
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+
     // After the new route has painted.
     const raf = requestAnimationFrame(() => requestAnimationFrame(refresh));
 

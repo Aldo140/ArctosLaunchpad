@@ -249,7 +249,11 @@ main,
 
 .chapter__folio .t-folio {
   font-size: 1rem;
-  color: var(--accent);
+  /* The sampled accents sit at 3.6-5.2:1 on the collage's paper field, and
+     operate fails AA outright at this size. Mixed 80/20 with ink every chapter
+     clears 4.9:1 while staying unmistakably its own colour — the artwork keeps
+     the pure sampled value, only this numeral is darkened to stay readable. */
+  color: color-mix(in oklab, var(--accent) 80%, var(--ink));
   font-weight: 600;
 }
 
@@ -450,11 +454,13 @@ main,
 }
 
 .journey__n {
-  color: var(--accent);
+  color: var(--accent-soft);
 }
 
 .journey__stop[data-handover] .journey__n {
-  color: var(--operate);
+  /* Soft variant: the sampled operate orange is 4.08:1 on ink, just under AA
+     for an 11.76px numeral. The handover still reads as the orange moment. */
+  color: var(--operate-soft);
 }
 
 .journey__label {
@@ -481,7 +487,8 @@ main,
 
 .journey__span--agency {
   grid-column: 1 / span 3;
-  color: var(--fg-faint);
+  /* This label names the limit of the comparison — it has to be readable. */
+  color: var(--fg-dim);
 }
 
 .journey__span--arctos {
@@ -644,7 +651,7 @@ main,
   font-size: var(--t-micro);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   border: var(--hair) solid var(--rule);
   padding: 0.25rem 0.5rem;
 }
@@ -1209,7 +1216,7 @@ main,
 .showcase__n {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-soft);
 }
 
 .showcase__rule {
@@ -1228,7 +1235,7 @@ main,
   margin-left: auto;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
 }
 
 .showcase__media {
@@ -1342,7 +1349,7 @@ main,
   font-size: var(--t-micro);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--fg-faint);
+  color: var(--fg-dim);
   border: var(--hair) solid var(--rule);
   padding: 0.25rem 0.5rem;
 }
@@ -2392,5 +2399,709 @@ main,
   .showcase__item:nth-child(n + 2) {
     grid-template-columns: 6.25rem minmax(0, 1fr);
     gap: 0.75rem;
+  }
+}
+
+/* =========================================================================
+   MOBILE — INDEX PAGE CORRECTIONS
+   Appended last, and matching the specificity of the rules above, because
+   these override earlier mobile blocks on purpose.
+   ========================================================================= */
+
+@media (max-width: 700px) {
+  /* --- selected work -----------------------------------------------------
+     Items 2-4 were a compact list with a 7.25rem square thumbnail. The list
+     itself is a good call for a teaser, but a 116px square crop of a full
+     website screenshot is not a picture of anything — at that size you get a
+     blurry fragment of a hero image and no sense of the build, which is the
+     one thing this section exists to show.
+
+     Each item now gets a full-width plate at the same ratio as the lead, so
+     the four reads as four projects rather than one project and three
+     footnotes. It costs roughly 600px of page, on the section that is doing
+     the selling. */
+  .showcase__item:nth-child(n + 2) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 1rem;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__media {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 16 / 10 !important;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__body {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: start;
+    gap: 0.7rem;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__title {
+    font-size: clamp(1.6rem, 7.5vw, 2.1rem);
+    line-height: 1.02;
+  }
+
+  /* The summary earns its place back now that the plate is legible; the
+     service chips and extra plates stay out, they are the case study's job. */
+  .showcase__item:nth-child(n + 2) .showcase__summary {
+    display: block;
+    max-width: 34ch;
+  }
+
+  /* Bringing the kind back put it in the same grid cell as the status. The
+     head is a flex row by design; restore that for these items so the two
+     labels sit on a line and wrap as a pair. */
+  .showcase__item:nth-child(n + 2) .showcase__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__kind {
+    display: inline;
+  }
+
+  .showcase__item:nth-child(n + 2) .showcase__status {
+    margin-left: auto;
+  }
+
+  /* --- the coverage comparison -------------------------------------------
+     This is the homepage's central claim: an agency covers the first three of
+     seven stops, Arctos covers all seven. Collapsing the spans to one column
+     rendered both brackets at the full width, so the graphic said the two are
+     equivalent — the exact opposite of the argument, and the sort of thing a
+     reader believes without reading the labels.
+
+     The labels stay full width and readable; the BRACKETS keep the ratio. */
+  .journey__spans {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.15rem;
+  }
+
+  .journey__span--agency,
+  .journey__span--arctos {
+    grid-column: 1;
+  }
+
+  .journey__span--agency .journey__bracket {
+    width: calc(100% * 3 / 7);
+  }
+
+  .journey__span--arctos .journey__bracket {
+    width: 100%;
+  }
+
+  /* These plates are recordings of websites, and a website reads from its top
+     left. Cropping from the centre sliced the sites' own headlines mid-word
+     ("...city that / ...ks out"), which makes a real build look like a broken
+     one. */
+  .showcase__media img,
+  .showcase__video {
+    object-position: top left;
+  }
+}
+
+/* =========================================================================
+   ELEVATED SECTIONS
+   Three homepage sections carried their argument entirely in body copy set in
+   identical rows. Each now gets one device drawn from what it is actually
+   saying, using gestures the site already owns.
+
+   Appended last and at matching specificity so these supersede the earlier
+   definitions rather than sitting alongside them.
+   ========================================================================= */
+
+/* --- POSITION / the tie ---------------------------------------------------
+   "Arctos connects both sides." A bracket spans both columns and closes on
+   each of them, drawn as the section arrives. */
+
+.statement__cols {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4.5rem);
+  max-width: 68rem;
+  padding-top: var(--s7);
+  border-top: 0;
+}
+
+.statement__tie {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 14px;
+  border-inline: var(--hair) solid var(--accent);
+  border-top: var(--hair) solid var(--accent);
+  transform-origin: center;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .statement__tie,
+:root:not(.js) .statement__tie {
+  transform: scaleX(1);
+}
+
+.statement__col {
+  font-size: var(--t-body);
+  line-height: var(--lh-copy);
+  color: var(--fg-dim);
+}
+
+/* The label sits on the same first line as the copy, so the two columns read
+   as two named halves of one argument instead of two loose paragraphs. */
+.statement__mark {
+  display: block;
+  margin-bottom: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.statement__title {
+  max-width: 16ch;
+}
+
+/* --- PROCESS / a drawn track ----------------------------------------------
+   Six stops on one line. The line draws left to right and each tick drops from
+   it in turn, so the order the heading claims is the order you watch happen. */
+
+/* `ol.track`, not `.track`: base.css resets `ol[class] { padding: 0 }` at
+   specificity (0,1,1), which outranks a lone class and silently flattened the
+   padding the rail depends on — the ticks ended up above the line instead of
+   hanging from it. */
+ol.track {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: var(--s6) 0 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* The rail the stops hang from, and the accent that runs it. */
+ol.track::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--hair);
+  background: var(--rule);
+}
+
+ol.track::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1400ms var(--ease-draw);
+}
+
+.reveal.is-in.track::after,
+:root:not(.js) ol.track::after {
+  transform: scaleX(1);
+}
+
+.track__stop {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--s2);
+}
+
+.track__tick {
+  position: absolute;
+  top: calc(var(--s6) * -1);
+  left: 0;
+  width: 2px;
+  height: var(--s6);
+  background: var(--accent);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform var(--dur) var(--ease-draw);
+  /* Each tick waits for the rail to reach it. */
+  transition-delay: calc(160ms + var(--i, 0) * 190ms);
+}
+
+.reveal.is-in .track__tick,
+:root:not(.js) .track__tick {
+  transform: scaleY(1);
+}
+
+.track__n {
+  color: var(--accent);
+}
+
+.track__title {
+  font-size: clamp(1.15rem, 1.7vw, 1.6rem);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.track__body {
+  color: var(--fg-dim);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+/* The stops are unequal in height, so the link needs its own clearance rather
+   than inheriting whichever column happens to be longest. */
+.process__more {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* --- INDUSTRIES / a field of names ----------------------------------------
+   Ten rows with ten arrows told you there were ten of something. Set as one
+   wrapped field at display scale, the section shows its own breadth. */
+
+ul.ind-field {
+  list-style: none;
+  margin: 0;
+  padding: var(--s6) 0 0;
+  border-top: var(--hair) solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: clamp(1rem, 2.2vw, 2rem);
+  row-gap: clamp(0.35rem, 1vw, 0.75rem);
+}
+
+.ind-field__row {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1rem, 2.2vw, 2rem);
+}
+
+/* A hairline slash between names, never after the last one. */
+.ind-field__row:not(:last-child)::after {
+  content: "/";
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--rule-strong);
+}
+
+.ind-field__item {
+  display: inline-block;
+  font-size: clamp(1.4rem, 2.9vw, 2.6rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  color: var(--fg-dim);
+  text-decoration: none;
+  /* The rule grows from the left on hover — the same underline the rest of the
+     site uses for links, at this scale. */
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-size var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ind-field__item:hover {
+    color: var(--fg);
+    background-size: 100% 2px;
+  }
+}
+
+.ind-field__item:focus-visible {
+  color: var(--fg);
+  background-size: 100% 2px;
+}
+
+/* =========================================================================
+   THE SYSTEM — one ascent
+   The figure carries the claim; the list is its legend. Replaced three
+   attempts to say "these four climb" with layout alone, which layout cannot do.
+   ========================================================================= */
+
+.ascent__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+/* The illustration's own ground is within a shade of --ink, so it needs no
+   frame, no border and no plate — it sits directly on the section. */
+.ascent__figure {
+  margin: 0;
+}
+
+.ascent__figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+:root.js .ascent__figure {
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+
+:root.js .ascent__figure.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.ascent__body {
+  display: grid;
+  align-content: center;
+  gap: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.ascent__head {
+  display: grid;
+  justify-items: start;
+  gap: var(--s4);
+}
+
+.ascent__title {
+  max-width: 16ch;
+  font-size: clamp(2rem, 3.6vw, 3.4rem);
+  line-height: 1.02;
+}
+
+ol.ascent__stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.ascent__stages li a {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 8rem) minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--s4);
+  padding-block: clamp(0.9rem, 1.6vw, 1.25rem);
+  border-bottom: var(--hair) solid var(--rule);
+  text-decoration: none;
+  color: var(--fg);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+/* Each row carries the station colour it corresponds to on the figure. */
+.ascent__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent-soft);
+}
+
+.ascent__name {
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: 620;
+  font-stretch: 90%;
+  letter-spacing: -0.02em;
+}
+
+.ascent__copy {
+  font-size: var(--t-small);
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ascent__stages li a:hover {
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+  }
+}
+
+.ascent__stages li a:focus-visible {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+}
+
+@media (max-width: 900px) {
+  .ascent__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ascent__figure {
+    max-width: 30rem;
+    justify-self: center;
+  }
+
+  .ascent__stages li a {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    row-gap: var(--s1);
+  }
+
+  .ascent__copy {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root.js .ascent__figure,
+  :root.js .ascent__figure.is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =========================================================================
+   POSITION — the crossover
+   ========================================================================= */
+
+.crossover {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+  gap: var(--s4);
+  max-width: 44rem;
+}
+
+.crossover svg {
+  width: 100%;
+  height: clamp(7rem, 12vw, 10rem);
+  overflow: visible;
+}
+
+.crossover__grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.crossover__demand,
+.crossover__admin {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  transition: stroke-dashoffset var(--dur-draw) var(--ease-draw);
+}
+
+.crossover__demand {
+  stroke: var(--accent);
+}
+
+.crossover__admin {
+  stroke: var(--fg-faint);
+  transition-delay: 220ms;
+}
+
+.reveal.is-in .crossover__demand,
+.reveal.is-in .crossover__admin,
+:root:not(.js) .crossover__demand,
+:root:not(.js) .crossover__admin {
+  stroke-dashoffset: 0;
+}
+
+.crossover__key {
+  display: flex;
+  gap: var(--s6);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.crossover__key span {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.crossover__key span::before {
+  content: "";
+  width: 1.5rem;
+  height: 2px;
+  background: currentColor;
+}
+
+.crossover__key-demand {
+  color: var(--accent);
+}
+
+.crossover__key-admin {
+  color: var(--fg-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crossover__demand,
+  .crossover__admin {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* =========================================================================
+   THE INSTRUMENT — the mark, operable
+   The hero diagram is the one thing on this site nobody else could have: the
+   brand mark doubling as the system diagram. It was a static illustration with
+   a faint hover; it is now something a visitor operates.
+   ========================================================================= */
+
+.diagram {
+  position: relative;
+}
+
+/* --- the route and its signal -------------------------------------------- */
+
+.diagram__route-line,
+.diagram__route-live,
+.diagram__route-signal {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The route as drawn on the survey sheet: always present, quiet. */
+.diagram__route-line {
+  stroke: var(--rule-strong);
+  stroke-width: 1.25;
+  stroke-dasharray: 0.005 0.013;
+}
+
+/* Covered ground, in the accent of whichever station is taken. */
+.diagram__route-live {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  transition: stroke-dasharray 420ms var(--ease-out);
+}
+
+/* The signal itself — a short bright dash travelling the route. */
+.diagram__route-signal {
+  stroke: var(--accent);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 70%, transparent));
+  transition: stroke-dashoffset 420ms var(--ease-out);
+}
+
+/* Idle patrol is driven frame by frame, so it must not also be eased or the
+   two fight and the signal stutters. */
+.diagram:not([data-chapter]) .diagram__route-live,
+.diagram:not([data-chapter]) .diagram__route-signal {
+  transition: none;
+}
+
+/* --- stations ------------------------------------------------------------ */
+
+.diagram__controls {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.diagram__controls li {
+  position: absolute;
+  /* The SVG is a 1:1 viewBox, so station coordinates map straight to percent. */
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+}
+
+.diagram__control {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.diagram__control:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- readout -------------------------------------------------------------
+   A fixed block. Sized for the longest stage statement so the hero never
+   reflows as the reader moves between stations. */
+
+.diagram__readout {
+  display: grid;
+  align-content: start;
+  gap: var(--s2);
+  min-height: 8.5rem;
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 2px solid var(--accent);
+  transition: border-color var(--dur) var(--ease-out);
+}
+
+.diagram__readout-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+}
+
+.diagram__readout-n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.diagram__readout-name {
+  font-size: var(--t-subtitle);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.diagram__readout-copy {
+  max-width: 38ch;
+  font-size: var(--t-small);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+.diagram__readout-go {
+  justify-self: start;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-soft);
+  text-decoration: none;
+  padding-block: var(--s2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .diagram__readout-go:hover {
+    color: var(--fg);
+  }
+}
+
+/* The old legend is replaced by the readout — the four names now live on the
+   plot itself, where they mean something. */
+.diagram__legend {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No patrol. The route is shown complete and the stations still operate. */
+  .diagram__route-live {
+    stroke-dasharray: 1 0 !important;
+  }
+
+  .diagram__route-signal {
+    display: none;
   }
 }

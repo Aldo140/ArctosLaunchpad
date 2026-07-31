@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { CTASection } from "@/components/Shared";
 import { ProcessRoute } from "@/components/pages/ProcessRoute";
+import { SceneMotion } from "@/components/pages/SceneMotion";
 import { processDetails } from "@/lib/content";
 import {
   breadcrumbSchema,
@@ -54,6 +55,7 @@ const notes = [
 export default function ProcessPage() {
   return (
     <div className="interior-document" data-motion="staged">
+      <SceneMotion />
       {/* The route opens on the Operate canvas — the stage this page's work
           actually lives in — held full-bleed with the six stops laid across
           the bottom of the panel that rises over it. */}

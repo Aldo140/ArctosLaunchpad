@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CTASection } from "@/components/Shared";
+import { SceneMotion } from "@/components/pages/SceneMotion";
 import { StageGauge } from "@/components/pages/StageGauge";
 import { growthStages, services } from "@/lib/content";
 import type { GrowthStage } from "@/lib/content";
@@ -70,6 +71,7 @@ const stageIds = growthStages.map((stage) => stage.id);
 export default function ServicesPage() {
   return (
     <div className="interior-document" data-motion="staged">
+      <SceneMotion />
       <section
         className="section services-open reveal"
         data-material="instrument"
