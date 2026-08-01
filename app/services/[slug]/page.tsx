@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CTASection, PageHeader } from "@/components/Shared";
@@ -23,6 +24,25 @@ type Props = { params: Promise<{ slug: string }> };
 
 const seq = (i: number) => ({ "--i": i }) as CSSProperties;
 const pad = (n: number) => String(n).padStart(2, "0");
+
+const stageFigures = {
+  attract: {
+    src: "/assets/illustrations/branching-growth.webp",
+    alt: "A bear tending a branching system of connected growth channels.",
+  },
+  convert: {
+    src: "/assets/illustrations/interface-assembly.webp",
+    alt: "A bear assembling the parts of a digital interface.",
+  },
+  operate: {
+    src: "/assets/illustrations/connected-automation.webp",
+    alt: "A bear connecting gears into one automated operating system.",
+  },
+  scale: {
+    src: "/assets/illustrations/growth-curve.webp",
+    alt: "A bear tracing measured progress along a growth curve.",
+  },
+} as const;
 
 export function generateStaticParams() {
   return services.map(({ slug }) => ({ slug }));
@@ -67,6 +87,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const related = projects.filter((p) => service.relatedWork.includes(p.slug));
   const stage = service.group;
   const stageName = `${stage.charAt(0).toUpperCase()}${stage.slice(1)}`;
+  const stageFigure = stageFigures[stage];
 
   /* Service, the FAQs that are actually rendered below, and the crumb trail
      exactly as `PageHeader` prints it. Nothing asserted that is not on-screen. */
@@ -172,6 +193,18 @@ export default async function ServiceDetailPage({ params }: Props) {
                 works.
               </p>
             </div>
+            <figure className="svc-scope__figure reveal">
+              <Image
+                src={stageFigure.src}
+                alt={stageFigure.alt}
+                width={1254}
+                height={1254}
+                sizes="(max-width: 760px) 100vw, 28vw"
+              />
+              <figcaption className="t-folio">
+                {stageName} / working plate
+              </figcaption>
+            </figure>
           </div>
 
           <ol className="svc-scope__list svc-seq">

@@ -732,6 +732,27 @@
   color: var(--fg-dim);
 }
 
+.intake__figure {
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+  border-block: var(--hair) solid var(--rule-strong);
+}
+
+.intake__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.intake__figure figcaption {
+  padding-top: var(--s3);
+  color: var(--fg-dim);
+}
+
 .intake__sheet {
   background: var(--bg-raised);
   border: var(--hair) solid var(--rule);
@@ -1833,7 +1854,7 @@
 
 .svc-scope__head {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 0.62fr);
   gap: clamp(1.5rem, 4vw, 3.5rem);
   align-items: start;
   margin-bottom: var(--s7);
@@ -1856,6 +1877,28 @@
   display: grid;
   gap: var(--s4);
   max-width: 46ch;
+}
+
+.svc-scope__figure {
+  align-self: stretch;
+  min-width: 0;
+  margin: calc(-1 * var(--s5)) 0 0;
+  overflow: hidden;
+  background: var(--ink);
+  border-left: var(--hair) solid var(--rule-strong);
+}
+
+.svc-scope__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.svc-scope__figure figcaption {
+  padding: var(--s3) var(--s3) 0;
+  color: color-mix(in oklab, var(--glacier) 62%, var(--ink));
 }
 
 .svc-scope__list {
@@ -4375,7 +4418,9 @@
 
 .context-open {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.62fr);
   gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
 }
 
 .context-open__headline {
@@ -4384,8 +4429,29 @@
 }
 
 .context-open__friction {
+  grid-column: 1 / -1;
   display: grid;
   gap: var(--s4);
+}
+
+.context-open__figure {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.context-open__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.context-open__figure figcaption {
+  padding: var(--s3) var(--s3) 0;
+  color: color-mix(in oklab, var(--glacier) 62%, var(--ink));
 }
 
 .quadrant {
@@ -6434,7 +6500,7 @@
 
 .process-loop__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 20rem) auto;
   align-items: end;
   gap: var(--s5) clamp(2rem, 6vw, 6rem);
 }
@@ -6460,7 +6526,7 @@
 }
 
 .process-loop__return {
-  grid-column: 2;
+  grid-column: 3;
   display: grid;
   gap: var(--s3);
   justify-items: end;
@@ -6471,6 +6537,24 @@
   font-size: var(--t-small);
   font-weight: 600;
   white-space: nowrap;
+}
+
+.process-loop__figure {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.process-loop__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
 }
 
 .process-loop__bracket {
@@ -7045,6 +7129,12 @@
 
   .process-loop__inner {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .process-loop__figure {
+    grid-column: 1;
+    grid-row: auto;
+    max-width: 24rem;
   }
 
   .process-loop__return {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CTASection, PageHeader } from "@/components/Shared";
@@ -14,6 +15,25 @@ const STAGES: { id: Stage; label: string; note: string }[] = [
   { id: "operate", label: "Operate", note: "Running the work afterwards" },
   { id: "scale", label: "Scale", note: "Seeing what is actually happening" },
 ];
+
+const stageFigures = {
+  attract: {
+    src: "/assets/illustrations/branching-growth.webp",
+    alt: "A bear tending a branching system of connected growth channels.",
+  },
+  convert: {
+    src: "/assets/illustrations/route-compass.webp",
+    alt: "A bear using a compass to choose a route through connected paths.",
+  },
+  operate: {
+    src: "/assets/illustrations/modular-blocks.webp",
+    alt: "A bear assembling modular blocks into a connected operating system.",
+  },
+  scale: {
+    src: "/assets/illustrations/growth-curve.webp",
+    alt: "A bear tracing measured progress along a growth curve.",
+  },
+} as const;
 
 /**
  * The signature turn: the closing clause of the industry's own headline drops
@@ -108,6 +128,20 @@ export default async function IndustryPage({ params }: Props) {
               <em>{headlineTurn}</em>
             </h2>
           </div>
+
+          <figure className="context-open__figure reveal">
+            <Image
+              src={stageFigures[focus.id].src}
+              alt={stageFigures[focus.id].alt}
+              width={1254}
+              height={1254}
+              sizes="(max-width: 760px) 100vw, 36vw"
+            />
+            <figcaption className="t-folio">
+              Context {String(position + 1).padStart(2, "0")} / usual center of
+              gravity: {focus.label}
+            </figcaption>
+          </figure>
 
           <div className="context-open__friction">
             <p className="t-label reveal">

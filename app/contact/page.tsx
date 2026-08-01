@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ContactForm } from "@/components/ContactForm";
 import { PageHeader } from "@/components/Shared";
@@ -110,6 +111,18 @@ export default function ContactPage() {
               Tell us what is happening now and what you want to change. We will
               help identify the right shape of work.
             </p>
+            <figure className="intake__figure">
+              <Image
+                src="/assets/figures/bear-console.webp"
+                alt="A bear working through a control panel of connected settings."
+                width={1200}
+                height={1200}
+                sizes="(max-width: 760px) 100vw, 32vw"
+              />
+              <figcaption className="t-folio">
+                Begin with the controls that are not working
+              </figcaption>
+            </figure>
             <dl className="register">
               <div className="register__row">
                 <dt className="t-label">Good briefs</dt>

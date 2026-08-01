@@ -172,6 +172,15 @@ export default function ProcessPage() {
         <div className="shell process-loop__inner">
           <p>After launch</p>
           <h2>Real behaviour becomes the next round of discovery.</h2>
+          <figure className="process-loop__figure">
+            <Image
+              src="/assets/figures/bear-ascent.webp"
+              alt="A bear moving upward along a measured path toward a star."
+              width={1200}
+              height={1200}
+              sizes="(max-width: 760px) 100vw, 24vw"
+            />
+          </figure>
           <a className="process-loop__return" href="#discover">
             <span className="process-loop__bracket" aria-hidden="true" />
             Return to Discover <span aria-hidden="true">↑</span>
