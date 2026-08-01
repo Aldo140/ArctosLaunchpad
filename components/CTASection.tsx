@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArctosMark } from "./brand/ArctosMark";
 
 export function CTASection({
@@ -9,7 +10,19 @@ export function CTASection({
   body?: string;
 }) {
   return (
-    <section className="cta section" data-material="instrument" data-station="Start">
+    <section
+      className="cta section"
+      data-material="instrument"
+      data-station="Start"
+    >
+      <Image
+        className="cta__art"
+        src="/assets/illustrations/launch-star.webp"
+        alt=""
+        fill
+        sizes="100vw"
+        aria-hidden="true"
+      />
       {/* The mark at plate scale, sunk into the ground rather than sitting on
           it — a watermark, so the type stays the loudest thing here.
           Deliberately the simplified variant: at this size the bear head inside

@@ -56,6 +56,19 @@ const SPECIMENS = [
   },
 ] as const;
 
+/**
+ * Named clients, taken from the project records. Kept as a list of real
+ * engagements on purpose: a client wall is the easiest place on a site to
+ * quietly inflate, and every name here has a case file behind it.
+ */
+const CLIENTS = [
+  "Calgary Watch",
+  "Starlings",
+  "Rio Alto",
+  "True North Kromes",
+  "Fresh Prep",
+] as const;
+
 export default function HomePage() {
   return (
     <>
@@ -67,6 +80,15 @@ export default function HomePage() {
         data-material="instrument"
         data-station="Cover"
       >
+        <Image
+          className="hero__terrain"
+          src="/assets/illustrations/contour-field.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          aria-hidden="true"
+        />
         <div className="shell hero__inner">
           <div className="hero__copy">
             <p className="tick-label hero__eyebrow">
@@ -121,13 +143,23 @@ export default function HomePage() {
               with it held flat. No numbers — the shape is the argument, and
               inventing figures to label it is not on the table. */}
           <div className="crossover reveal" aria-hidden="true">
-            <svg viewBox="0 0 600 150" preserveAspectRatio="none" role="presentation">
-              <path className="crossover__grid" d="M0 37.5H600M0 75H600M0 112.5H600" />
+            <svg
+              viewBox="0 0 600 150"
+              preserveAspectRatio="none"
+              role="presentation"
+            >
+              <path
+                className="crossover__grid"
+                d="M0 37.5H600M0 75H600M0 112.5H600"
+              />
               <path
                 className="crossover__demand"
                 d="M0 132 C 150 128, 300 96, 420 58 S 540 18, 600 12"
               />
-              <path className="crossover__admin" d="M0 132 C 200 126, 400 122, 600 118" />
+              <path
+                className="crossover__admin"
+                d="M0 132 C 200 126, 400 122, 600 118"
+              />
             </svg>
             <p className="crossover__key">
               <span className="crossover__key-demand">Demand</span>
@@ -173,6 +205,15 @@ export default function HomePage() {
               and reporting so opportunities do not disappear into inboxes and
               spreadsheets.
             </p>
+            <figure className="journey__figure field-figure" data-wipe>
+              <Image
+                src="/assets/illustrations/route-mapping.webp"
+                alt="The Arctos bear inspecting a connected customer route before deciding where to build."
+                width={1254}
+                height={1254}
+                sizes="(max-width: 900px) 54vw, 18vw"
+              />
+            </figure>
           </div>
 
           <JourneyDiagram />
@@ -197,6 +238,20 @@ export default function HomePage() {
             <h2 className="work__title t-display">
               Different problems deserve <em>different systems.</em>
             </h2>
+            <p className="work__lead t-lead">
+              A civic safety platform, a community support map, a restaurant,
+              and a dental laboratory. None of them wanted the same website, so
+              none of them got one.
+            </p>
+
+            {/* The clients, named. Every one of these is a real engagement in
+                lib/content.ts — the register is generated from that list
+                rather than typed, so it cannot drift from the case files. */}
+            <ul className="work__clients">
+              {CLIENTS.map((client) => (
+                <li key={client}>{client}</li>
+              ))}
+            </ul>
           </div>
 
           <WorkShowcase projects={projects} />
@@ -248,15 +303,12 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* The bear at the console. The lit switch is the operate accent this
-              section already carries, so the figure and the section are the
-              same colour by construction rather than by coincidence. */}
-          <figure className="automation__figure reveal">
+          <figure className="automation__figure field-figure reveal" data-wipe>
             <Image
-              src="/assets/figures/bear-console.webp"
-              alt="The Arctos bear at a control panel, switching one process from manual to automatic."
-              width={1200}
-              height={1200}
+              src="/assets/illustrations/connected-automation.webp"
+              alt="The Arctos bear connecting two gears into one automated operating system."
+              width={1254}
+              height={1254}
               sizes="(max-width: 900px) 80vw, 34vw"
             />
           </figure>
@@ -299,9 +351,20 @@ export default function HomePage() {
         data-station="Process"
       >
         <div className="shell">
-          <div className="process__head reveal">
-            <p className="tick-label">How Arctos works</p>
-            <h2 className="process__title t-display">Six steps, in order.</h2>
+          <div className="process__head">
+            <div className="process__copy reveal">
+              <p className="tick-label">How Arctos works</p>
+              <h2 className="process__title t-display">Six steps, in order.</h2>
+            </div>
+            <figure className="process__figure field-figure reveal" data-wipe>
+              <Image
+                src="/assets/illustrations/interface-assembly.webp"
+                alt="The Arctos bear assembling an interface from measured modules."
+                width={1254}
+                height={1254}
+                sizes="(max-width: 900px) 64vw, 28vw"
+              />
+            </figure>
           </div>
           {/* The section claims order, so the order is drawn. One line runs the
               width of the shell and each stop hangs a tick from it, the same
@@ -337,28 +400,39 @@ export default function HomePage() {
         data-material="instrument"
         data-station="Industries"
       >
-        <div className="shell">
-          <div className="industries__head reveal">
-            <p className="tick-label">Industries</p>
-            <h2 className="industries__title t-title">
-              Systems shaped around the needs of your industry.
-            </h2>
+        <div className="shell industries__inner">
+          <div className="industries__body">
+            <div className="industries__head reveal">
+              <p className="tick-label">Industries</p>
+              <h2 className="industries__title t-title">
+                Systems shaped around the needs of your industry.
+              </h2>
+            </div>
+            {/* Set as one field of names rather than ten identical rows with ten
+                identical arrows. At this scale the section reads as the breadth
+                it is describing in a single glance, which the list never did. */}
+            <ul className="ind-field reveal">
+              {industries.map((industry) => (
+                <li key={industry.slug} className="ind-field__row">
+                  <Link
+                    href={`/industries/${industry.slug}`}
+                    className="ind-field__item"
+                  >
+                    {industry.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          {/* Set as one field of names rather than ten identical rows with ten
-              identical arrows. At this scale the section reads as the breadth
-              it is describing in a single glance, which the list never did. */}
-          <ul className="ind-field reveal">
-            {industries.map((industry) => (
-              <li key={industry.slug} className="ind-field__row">
-                <Link
-                  href={`/industries/${industry.slug}`}
-                  className="ind-field__item"
-                >
-                  {industry.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <figure className="industries__figure field-figure reveal" data-wipe>
+            <Image
+              src="/assets/illustrations/branching-growth.webp"
+              alt="The Arctos bear tending a branching system with four distinct outcomes."
+              width={1254}
+              height={1254}
+              sizes="(max-width: 900px) 70vw, 34vw"
+            />
+          </figure>
         </div>
       </section>
 
@@ -389,18 +463,38 @@ export default function HomePage() {
             ))}
           </div>
 
-          <figure className="why__plate reveal">
-            <Image
-              src="/assets/studio/arctos-wall-materials.webp"
-              alt="Studio material study: concrete, paper, fabric, and plant shadow with a pinned note reading Systems, Clarity, Growth"
-              width={1400}
-              height={933}
-              sizes="(max-width: 900px) 100vw, 70vw"
-            />
-            <figcaption className="t-folio">
-              Studio material study — Calgary, Alberta
-            </figcaption>
-          </figure>
+          <div className="why__plates reveal">
+            <figure className="field-figure" data-wipe>
+              <Image
+                src="/assets/illustrations/connected-partnership.webp"
+                alt="Two Arctos bears carrying one shared beam in step."
+                width={1254}
+                height={1254}
+                sizes="(max-width: 700px) 76vw, 28vw"
+              />
+              <figcaption>One accountable partner</figcaption>
+            </figure>
+            <figure className="field-figure" data-wipe>
+              <Image
+                src="/assets/illustrations/modular-blocks.webp"
+                alt="The Arctos bear connecting modular blocks into one system."
+                width={1254}
+                height={1254}
+                sizes="(max-width: 700px) 76vw, 28vw"
+              />
+              <figcaption>Built to connect</figcaption>
+            </figure>
+            <figure className="field-figure" data-wipe>
+              <Image
+                src="/assets/illustrations/route-compass.webp"
+                alt="The Arctos bear using a compass to choose among connected routes."
+                width={1254}
+                height={1254}
+                sizes="(max-width: 700px) 76vw, 28vw"
+              />
+              <figcaption>Direction before production</figcaption>
+            </figure>
+          </div>
         </div>
       </section>
 

@@ -383,16 +383,50 @@ main,
    once, and the brackets underneath make the coverage argument.
    ========================================================================= */
 
+/* Headline left, standfirst right. Capped at a 46rem single column the head
+   filled about a third of the shell and left the whole right-hand side of the
+   section empty above the plot — the widest piece of dead space on the page. */
 .journey__head {
   display: grid;
-  gap: var(--s5);
-  margin-bottom: var(--s9);
-  max-width: 46rem;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: end;
+  column-gap: clamp(2rem, 5vw, 5rem);
+  row-gap: var(--s5);
+  margin-bottom: var(--s8);
+}
+
+.journey__head .tick-label {
+  grid-column: 1 / -1;
+}
+
+.journey__title {
+  grid-column: 1;
+  max-width: 14ch;
+  margin: 0;
+}
+
+.journey__head > .t-lead {
+  grid-column: 2;
+  max-width: 46ch;
+  margin: 0;
+  padding-bottom: var(--s2);
+  color: var(--fg-dim);
+}
+
+@media (max-width: 900px) {
+  .journey__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journey__title,
+  .journey__head > .t-lead {
+    grid-column: 1;
+  }
 }
 
 .journey {
   position: relative;
-  padding-top: 7.5rem;
+  padding-top: clamp(7.5rem, 13vw, 12rem);
 }
 
 /* The SVG is the connective tissue only; the stations are real HTML above it. */
@@ -400,14 +434,14 @@ main,
   position: absolute;
   inset: 0 0 auto 0;
   width: 100%;
-  height: 7.5rem;
+  height: clamp(7.5rem, 13vw, 12rem);
   overflow: visible;
 }
 
 .journey__route {
   fill: none;
   stroke: url(#journey-run);
-  stroke-width: 2;
+  stroke-width: 2.5;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
@@ -2985,7 +3019,9 @@ ol.ascent__stages {
 .diagram__route-signal {
   stroke: var(--accent);
   stroke-width: 3;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 70%, transparent));
+  filter: drop-shadow(
+    0 0 6px color-mix(in oklab, var(--accent) 70%, transparent)
+  );
   transition: stroke-dashoffset 420ms var(--ease-out);
 }
 
@@ -3185,7 +3221,9 @@ ol.ascent__stages {
     ),
     url("/assets/figures/starfield.webp");
   background-size: auto, cover;
-  background-position: center, center right;
+  background-position:
+    center,
+    center right;
   background-repeat: no-repeat, no-repeat;
 }
 
@@ -3193,4 +3231,476 @@ ol.ascent__stages {
    wins — it has depth, and the watermark was only greying the middle. */
 .cta__watermark {
   display: none;
+}
+
+/* =========================================================================
+   SELECTED WORK — head and client register
+   ========================================================================= */
+
+/* Same correction as the journey head: capped to a single narrow column, the
+   headline filled a third of the shell and left the rest of the row empty. */
+.work__head {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: end;
+  column-gap: clamp(2rem, 5vw, 5rem);
+  row-gap: var(--s5);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.work__head .tick-label {
+  grid-column: 1 / -1;
+}
+
+.work__title {
+  grid-column: 1;
+  max-width: 15ch;
+  margin: 0;
+}
+
+.work__lead {
+  grid-column: 2;
+  max-width: 44ch;
+  margin: 0;
+  padding-bottom: var(--s2);
+  color: var(--fg-dim);
+}
+
+/* The named clients. A plain measured register rather than a logo wall: these
+   are real engagements and the case files are directly below, so the names
+   only have to be legible, not decorated. */
+ul.work__clients {
+  grid-column: 1 / -1;
+  list-style: none;
+  margin: var(--s3) 0 0;
+  padding: var(--s5) 0 0;
+  border-top: var(--hair) solid var(--rule-strong);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s3) clamp(1.25rem, 3vw, 2.75rem);
+}
+
+.work__clients li {
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.015em;
+  color: var(--fg-dim);
+}
+
+/* A hairline between names, never trailing the last. */
+.work__clients li:not(:last-child)::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 0.85em;
+  margin-left: clamp(1.25rem, 3vw, 2.75rem);
+  vertical-align: -0.1em;
+  background: var(--rule-strong);
+}
+
+@media (max-width: 900px) {
+  .work__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .work__title,
+  .work__lead {
+    grid-column: 1;
+  }
+}
+
+/* =========================================================================
+   POSITION — headline and figure share the row
+   Third instance of the same fault: a display headline capped to a narrow
+   column, with the right of the section left empty and the figure floating
+   small underneath it. The curves are the argument, so they sit beside the
+   claim at a size worth reading.
+   ========================================================================= */
+
+.statement__inner {
+  display: grid;
+  /* Weighted to the headline: at an even split it broke to five lines. The
+     curves still read at the width that leaves. */
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  align-items: center;
+  column-gap: clamp(2rem, 4vw, 4rem);
+  row-gap: clamp(2rem, 4vw, 3rem);
+}
+
+.statement__inner > .tick-label {
+  grid-column: 1 / -1;
+}
+
+.statement__title {
+  grid-column: 1;
+  max-width: 17ch;
+  margin: 0;
+}
+
+.crossover {
+  grid-column: 2;
+  margin: 0;
+  max-width: none;
+  align-self: center;
+}
+
+.crossover svg {
+  height: clamp(9rem, 16vw, 14rem);
+}
+
+.statement__cols {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .statement__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .statement__title,
+  .crossover {
+    grid-column: 1;
+  }
+}
+
+/* =========================================================================
+   SUPPLIED FIELD-GUIDE ARTWORK
+   The new illustrations share one near-ink ground, so they are treated as
+   unframed explanatory plates. Their dark field dissolves into the page while
+   the paper bear and measured marks remain legible.
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero__terrain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.48;
+  filter: saturate(0.72) contrast(1.06);
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+}
+
+.field-figure {
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.field-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transform-origin: center;
+}
+
+/* The route header carries three kinds of information: the claim, its plain
+   language explanation, and the visual model. Each receives a distinct track
+   instead of making the image float over text. */
+.journey__head {
+  grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.6fr) minmax(
+      10rem,
+      0.35fr
+    );
+  align-items: center;
+}
+
+.journey__head > .t-lead {
+  grid-column: 2;
+}
+
+.journey__figure {
+  grid-column: 3;
+  width: 100%;
+  max-width: 16rem;
+  justify-self: end;
+}
+
+.process__head {
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.42fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+.process__copy {
+  display: grid;
+  gap: var(--s4);
+}
+
+.process__figure {
+  width: min(100%, 20rem);
+  justify-self: end;
+}
+
+.industries__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+
+.industries__body {
+  min-width: 0;
+}
+
+.industries__figure {
+  width: 100%;
+  max-width: 31rem;
+  justify-self: end;
+}
+
+.why__plates {
+  margin-top: clamp(3rem, 7vw, 6rem);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.why__plates figure {
+  min-width: 0;
+}
+
+.why__plates figcaption {
+  padding: var(--s4) var(--s5);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The launch plate replaces the generic star field. The gradient protects the
+   conversion copy while leaving the rocket and north star visible at right. */
+.cta {
+  background: var(--ink);
+  text-align: left;
+  isolation: isolate;
+}
+
+.cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    var(--ink) 34%,
+    color-mix(in oklab, var(--ink) 84%, transparent) 58%,
+    transparent 100%
+  );
+}
+
+.cta__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right center;
+  pointer-events: none;
+}
+
+.cta__inner {
+  z-index: 2;
+  justify-items: start;
+}
+
+.cta__body {
+  max-width: 46ch;
+}
+
+.cta__actions {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1100px) {
+  .journey__head {
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.65fr);
+  }
+
+  .journey__title {
+    grid-column: 1;
+  }
+
+  .journey__head > .t-lead {
+    grid-column: 1;
+  }
+
+  .journey__figure {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    max-width: 20rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .journey__head,
+  .process__head,
+  .industries__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journey__title,
+  .journey__head > .t-lead,
+  .journey__figure {
+    grid-column: 1;
+  }
+
+  .journey__figure {
+    grid-row: auto;
+    width: min(64vw, 19rem);
+    justify-self: end;
+  }
+
+  .process__figure,
+  .industries__figure {
+    width: min(76vw, 25rem);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero__terrain {
+    object-position: 62% center;
+    opacity: 0.34;
+  }
+
+  .journey__figure {
+    width: min(72vw, 17rem);
+    justify-self: center;
+  }
+
+  .process__figure {
+    width: min(70vw, 18rem);
+  }
+
+  ol.track {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0 0 0 1.5rem;
+  }
+
+  ol.track::before,
+  ol.track::after {
+    inset: 0 auto 0 0;
+    width: var(--hair);
+    height: 100%;
+  }
+
+  ol.track::after {
+    width: 2px;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  .reveal.is-in.track::after,
+  :root:not(.js) ol.track::after {
+    transform: scaleY(1);
+  }
+
+  .track__stop {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s1) var(--s3);
+    padding: 0 0 var(--s6) var(--s4);
+  }
+
+  .track__tick {
+    top: 0.55rem;
+    left: -1.5rem;
+    width: 1.5rem;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .reveal.is-in .track__tick,
+  :root:not(.js) .track__tick {
+    transform: scaleX(1);
+  }
+
+  .track__n {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .track__title {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .track__body {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: 34ch;
+  }
+
+  .industries__figure {
+    width: min(78vw, 20rem);
+  }
+
+  .why__plates {
+    display: flex;
+    width: calc(100% + var(--gutter));
+    overflow-x: auto;
+    gap: var(--s3);
+    padding-right: var(--gutter);
+    border: 0;
+    background: transparent;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .why__plates::-webkit-scrollbar {
+    display: none;
+  }
+
+  .why__plates figure {
+    flex: 0 0 min(76vw, 18rem);
+    scroll-snap-align: start;
+  }
+
+  .cta::after {
+    background: linear-gradient(
+      90deg,
+      var(--ink) 0%,
+      color-mix(in oklab, var(--ink) 92%, transparent) 72%,
+      color-mix(in oklab, var(--ink) 56%, transparent) 100%
+    );
+  }
+
+  .cta__art {
+    opacity: 0.58;
+    object-position: 76% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__terrain,
+  .field-figure img,
+  .cta__art {
+    transform: none !important;
+  }
 }

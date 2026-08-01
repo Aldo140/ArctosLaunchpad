@@ -99,6 +99,47 @@ export function HomeMotion() {
           );
         }
 
+        // The supplied field-guide plates drift within their wipe masks. The
+        // movement is deliberately slight: it gives the raster artwork depth
+        // without turning explanatory figures into a scrolling effect demo.
+        for (const image of select<HTMLElement>(".field-figure img")) {
+          gsap.fromTo(
+            image,
+            { yPercent: -2, scale: 1.025 },
+            {
+              yPercent: 2,
+              scale: 1.025,
+              ease: "none",
+              scrollTrigger: {
+                trigger: image.closest(".field-figure"),
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 0.7,
+              },
+            },
+          );
+        }
+
+        const terrain = root.querySelector<HTMLElement>(".hero__terrain");
+        const hero = root.querySelector<HTMLElement>(".hero");
+        if (terrain && hero) {
+          gsap.fromTo(
+            terrain,
+            { yPercent: -1, scale: 1.035 },
+            {
+              yPercent: 2,
+              scale: 1.075,
+              ease: "none",
+              scrollTrigger: {
+                trigger: hero,
+                start: "top top",
+                end: "bottom top",
+                scrub: 0.8,
+              },
+            },
+          );
+        }
+
         // `.process__step` and `.industries__item` no longer exist — the
         // process rows became a drawn track and the industries list became a
         // field of names, both of which carry their own entrance. Left as-is
@@ -116,11 +157,11 @@ export function HomeMotion() {
           });
         }
 
-        const watermark = root.querySelector<HTMLElement>(".cta__watermark");
+        const ctaArt = root.querySelector<HTMLElement>(".cta__art");
         const cta = root.querySelector<HTMLElement>(".cta");
-        if (watermark && cta) {
+        if (ctaArt && cta) {
           gsap.fromTo(
-            watermark,
+            ctaArt,
             { rotation: -2, scale: 0.94 },
             {
               rotation: 2,

@@ -30,10 +30,10 @@ export function GrowthSystem() {
       <div className="shell ascent__inner">
         <figure className="ascent__figure reveal">
           <Image
-            src="/assets/figures/bear-ascent.webp"
-            alt="The Arctos bear climbing a rising route through four coloured stations toward the north star."
-            width={1200}
-            height={1200}
+            src="/assets/illustrations/growth-curve.webp"
+            alt="The Arctos bear tracing a rising curve through the four stages of growth."
+            width={1254}
+            height={1254}
             sizes="(max-width: 900px) 92vw, 46vw"
           />
         </figure>
