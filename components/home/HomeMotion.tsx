@@ -133,6 +133,7 @@ export function HomeMotion() {
     mm.add(
       "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
       () => {
+        let surveyCleanup: (() => void) | undefined;
         const ledger = root.querySelector(".automation__ledger");
 
         if (ledger) {
@@ -237,6 +238,48 @@ export function HomeMotion() {
           );
         }
 
+        const survey = root.querySelector<HTMLElement>(".hero__survey");
+        if (survey && hero && window.matchMedia("(pointer: fine)").matches) {
+          const idle = gsap.fromTo(
+            survey,
+            { "--scan-x": "18%" },
+            {
+              "--scan-x": "82%",
+              duration: 8,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+            },
+          );
+
+          const onPointerMove = (event: PointerEvent) => {
+            if (event.pointerType === "touch") return;
+            const bounds = hero.getBoundingClientRect();
+            const progress = gsap.utils.clamp(
+              0.08,
+              0.92,
+              (event.clientX - bounds.left) / bounds.width,
+            );
+            idle.pause();
+            gsap.to(survey, {
+              "--scan-x": `${progress * 100}%`,
+              duration: 0.7,
+              ease: "power3.out",
+              overwrite: true,
+            });
+          };
+
+          const onPointerLeave = () => idle.restart();
+
+          hero.addEventListener("pointermove", onPointerMove);
+          hero.addEventListener("pointerleave", onPointerLeave);
+          surveyCleanup = () => {
+            idle.kill();
+            hero.removeEventListener("pointermove", onPointerMove);
+            hero.removeEventListener("pointerleave", onPointerLeave);
+          };
+        }
+
         // `.process__step` and `.industries__item` no longer exist — the
         // process rows became a drawn track and the industries list became a
         // field of names, both of which carry their own entrance. Left as-is
@@ -273,6 +316,8 @@ export function HomeMotion() {
             },
           );
         }
+
+        return () => surveyCleanup?.();
       },
     );
 

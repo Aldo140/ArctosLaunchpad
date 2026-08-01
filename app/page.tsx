@@ -89,6 +89,9 @@ export default function HomePage() {
           sizes="100vw"
           aria-hidden="true"
         />
+        <div className="hero__survey" aria-hidden="true">
+          <span className="hero__survey-line" />
+        </div>
         <div className="shell hero__inner">
           <div className="hero__copy">
             <p className="tick-label hero__eyebrow">

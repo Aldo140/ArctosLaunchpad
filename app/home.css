@@ -3555,6 +3555,81 @@ ul.work__clients {
   pointer-events: none;
 }
 
+/* A live survey pass over the actual contour artwork. The narrow reveal uses
+   the same source plate at a brighter exposure, so it feels like an instrument
+   reading the terrain rather than an unrelated effect laid over the hero. */
+.hero__survey {
+  --scan-x: 72%;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__survey::before {
+  content: "";
+  position: absolute;
+  inset: -2%;
+  background-image: url("/assets/illustrations/contour-field.webp");
+  background-position: center;
+  background-size: cover;
+  opacity: 0.78;
+  filter: saturate(0.82) contrast(1.14) brightness(1.24);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--scan-x) - 13%),
+    rgb(0 0 0 / 0.2) calc(var(--scan-x) - 8%),
+    #000 calc(var(--scan-x) - 2%),
+    #000 calc(var(--scan-x) + 2%),
+    rgb(0 0 0 / 0.2) calc(var(--scan-x) + 8%),
+    transparent calc(var(--scan-x) + 13%),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--scan-x) - 13%),
+    rgb(0 0 0 / 0.2) calc(var(--scan-x) - 8%),
+    #000 calc(var(--scan-x) - 2%),
+    #000 calc(var(--scan-x) + 2%),
+    rgb(0 0 0 / 0.2) calc(var(--scan-x) + 8%),
+    transparent calc(var(--scan-x) + 13%),
+    transparent 100%
+  );
+}
+
+.hero__survey-line {
+  position: absolute;
+  top: 12%;
+  bottom: 8%;
+  left: var(--scan-x);
+  width: 1px;
+  background: color-mix(in oklab, var(--signal) 52%, transparent);
+  box-shadow: 0 0 1.25rem color-mix(in oklab, var(--signal) 20%, transparent);
+  opacity: 0.5;
+  transform: translateX(-0.5px);
+}
+
+.hero__survey-line::before,
+.hero__survey-line::after {
+  content: "";
+  position: absolute;
+  left: -0.28rem;
+  width: 0.56rem;
+  height: 1px;
+  background: var(--signal);
+}
+
+.hero__survey-line::before {
+  top: 0;
+}
+
+.hero__survey-line::after {
+  bottom: 0;
+}
+
 .hero__inner {
   position: relative;
   z-index: 1;
@@ -3747,6 +3822,10 @@ ul.work__clients {
 }
 
 @media (max-width: 700px) {
+  .hero__survey {
+    display: none;
+  }
+
   .hero__terrain {
     object-position: 62% center;
     opacity: 0.34;
@@ -3861,10 +3940,20 @@ ul.work__clients {
   }
 }
 
+@media (pointer: coarse) {
+  .hero__survey {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero__terrain,
   .field-figure img,
   .cta__art {
     transform: none !important;
+  }
+
+  .hero__survey {
+    display: none;
   }
 }
