@@ -71,6 +71,45 @@ main,
   max-width: 34rem;
 }
 
+/* Desktop heroes must fit the reader's screen, not just their width. Laptop
+   viewports are often wide and short, so both the display type and plotted
+   mark are capped by available height. This preserves the two-part cover and
+   leaves a small glimpse of the next chapter below it. */
+@media (min-width: 901px) {
+  .hero {
+    min-height: min(94svh, 64rem);
+    padding-block: clamp(6rem, 11vh, 8rem) clamp(2.5rem, 5vh, 4rem);
+  }
+
+  .hero__inner {
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+
+  .hero__eyebrow,
+  .hero__title {
+    margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
+  }
+
+  .hero__title {
+    font-size: clamp(4.25rem, min(7.4vw, 11.2vh), 8.5rem);
+  }
+
+  .hero__lead,
+  .hero__actions {
+    margin-bottom: clamp(1.25rem, 3vh, 2rem);
+  }
+
+  .hero__plot {
+    max-width: min(34rem, 54svh);
+  }
+
+  .diagram__readout {
+    min-height: clamp(6rem, 12vh, 8.5rem);
+    margin-top: clamp(0.75rem, 2vh, 1.5rem);
+    padding-top: clamp(0.75rem, 1.8vh, 1.25rem);
+  }
+}
+
 .diagram {
   position: relative;
 }
@@ -1107,14 +1146,6 @@ main,
    ========================================================================= */
 
 @media (max-width: 1100px) {
-  .hero__inner {
-    grid-template-columns: 1fr;
-    gap: var(--s8);
-  }
-  .hero__plot {
-    justify-self: start;
-    max-width: 26rem;
-  }
   .journey {
     padding-top: 0;
   }
@@ -1149,6 +1180,16 @@ main,
 }
 
 @media (max-width: 900px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    gap: var(--s8);
+  }
+
+  .hero__plot {
+    justify-self: start;
+    max-width: 26rem;
+  }
+
   .feature {
     grid-template-columns: 1fr;
     gap: var(--s5);
