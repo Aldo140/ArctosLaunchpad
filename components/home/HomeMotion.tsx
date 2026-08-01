@@ -33,6 +33,103 @@ export function HomeMotion() {
     const select = gsap.utils.selector(root);
     const mm = gsap.matchMedia();
 
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const statement = root.querySelector<HTMLElement>(".statement");
+      if (!statement) return;
+
+      const demand = statement.querySelector<HTMLElement>(".statement__demand");
+      const operatorLabel = statement.querySelector<HTMLElement>(
+        ".statement__operator span",
+      );
+      const operatorMark = statement.querySelector<HTMLElement>(
+        ".statement__operator strong",
+      );
+      const admin = statement.querySelector<HTMLElement>(".statement__admin");
+      const outcomes = gsap.utils.toArray<HTMLElement>(
+        statement.querySelectorAll(".statement__outcomes p"),
+      );
+      const demandPath =
+        statement.querySelector<SVGPathElement>(".crossover__demand");
+      const signal =
+        statement.querySelector<SVGCircleElement>(".crossover__signal");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: statement,
+          start: "top 72%",
+          once: true,
+        },
+      });
+
+      tl.from(demand, {
+        autoAlpha: 0,
+        y: 14,
+        duration: 0.62,
+        ease: "power3.out",
+      })
+        .from(
+          operatorLabel,
+          { autoAlpha: 0, duration: 0.32, ease: "power2.out" },
+          "-=0.2",
+        )
+        .from(
+          operatorMark,
+          {
+            autoAlpha: 0,
+            scale: 0.86,
+            rotation: -4,
+            duration: 0.48,
+            ease: "power3.out",
+          },
+          "-=0.14",
+        )
+        .from(
+          admin,
+          {
+            autoAlpha: 0,
+            y: 18,
+            duration: 0.68,
+            ease: "power3.out",
+          },
+          "-=0.24",
+        )
+        .from(
+          outcomes,
+          {
+            autoAlpha: 0,
+            x: 10,
+            duration: 0.42,
+            stagger: 0.09,
+            ease: "power2.out",
+          },
+          "-=0.08",
+        );
+
+      if (demandPath && signal) {
+        const travel = { progress: 0 };
+        const pathLength = demandPath.getTotalLength();
+
+        tl.set(signal, { autoAlpha: 1 }, 0.8)
+          .to(
+            travel,
+            {
+              progress: 1,
+              duration: 1.35,
+              ease: "power1.inOut",
+              onUpdate: () => {
+                const point = demandPath.getPointAtLength(
+                  travel.progress * pathLength,
+                );
+                signal.setAttribute("cx", point.x.toFixed(2));
+                signal.setAttribute("cy", point.y.toFixed(2));
+              },
+            },
+            0.8,
+          )
+          .to(signal, { autoAlpha: 0, duration: 0.22 }, ">-0.08");
+      }
+    });
+
     mm.add(
       "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
       () => {

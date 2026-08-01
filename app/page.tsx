@@ -162,6 +162,7 @@ export default function HomePage() {
                   className="crossover__admin"
                   d="M0 132 C 200 126, 400 122, 600 118"
                 />
+                <circle className="crossover__signal" cx="0" cy="132" r="4.5" />
               </svg>
               <p className="crossover__key">
                 <span className="crossover__key-demand">Demand</span>

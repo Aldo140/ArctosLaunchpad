@@ -2936,6 +2936,14 @@ ol.ascent__stages {
   transition-delay: 220ms;
 }
 
+.crossover__signal {
+  fill: var(--bg);
+  stroke: var(--signal);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+}
+
 .reveal.is-in .crossover__demand,
 .reveal.is-in .crossover__admin,
 :root:not(.js) .crossover__demand,
@@ -3460,6 +3468,12 @@ ul.work__clients {
 
   .statement__outcomes p {
     padding: var(--s5) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crossover__signal {
+    display: none;
   }
 }
 
