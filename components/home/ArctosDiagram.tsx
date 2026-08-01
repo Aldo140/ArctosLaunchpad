@@ -4,11 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useReducedMotion } from "@/lib/useMedia";
 import { growthStages } from "@/lib/content";
-import {
-  ARCTOS_BEAR_PATH,
-  ARCTOS_FRAME_PATH,
-  ARCTOS_STAR_PATH,
-} from "../brand/ArctosMark";
+import { ARCTOS_BEAR_PATH, ARCTOS_FRAME_PATH } from "../brand/ArctosMark";
 
 /**
  * The hero thesis: the mark is the instrument, and you can operate it.
@@ -50,6 +46,16 @@ const STATIONS = [
  */
 const ROUTE =
   "M11 90.5 C 13.5 88.8, 15.5 87.8, 17.5 87.5 S 31 79.5, 38 76 S 52 71.5, 60 70 S 75 74, 82 80 S 86.5 84.5, 88.5 86.5";
+
+/**
+ * The small brand lockup keeps the traced master star, whose handmade detail
+ * disappears at its normal size. The hero plots it at nearly ten times that
+ * scale, where one hook in the source outline becomes conspicuous. This clean
+ * four-point construction holds the same centre and bounds without changing
+ * the diagram's draw class or animation timing.
+ */
+const HERO_STAR_PATH =
+  "M56.85 3.95 L58.2 10.2 L64.65 11.58 L58.2 12.95 L56.85 19.2 L55.5 12.95 L49.05 11.58 L55.5 10.2 Z";
 
 type StageId = (typeof STATIONS)[number]["id"];
 
@@ -156,7 +162,7 @@ export function ArctosDiagram() {
             className="diagram__path diagram__path--bear"
           />
           <path
-            d={ARCTOS_STAR_PATH}
+            d={HERO_STAR_PATH}
             className="diagram__path diagram__path--star"
           />
         </g>
