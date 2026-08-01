@@ -3313,56 +3313,153 @@ ul.work__clients {
 }
 
 /* =========================================================================
-   POSITION — headline and figure share the row
-   Third instance of the same fault: a display headline capped to a narrow
-   column, with the right of the section left empty and the figure floating
-   small underneath it. The curves are the argument, so they sit beside the
-   claim at a size worth reading.
+   POSITION - a visual equation
+   The claim is not a headline beside a chart. It is the relationship itself:
+   opportunity rises while the administrative load stays controlled.
    ========================================================================= */
 
 .statement__inner {
   display: grid;
-  /* Weighted to the headline: at an even split it broke to five lines. The
-     curves still read at the width that leaves. */
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
-  align-items: center;
-  column-gap: clamp(2rem, 4vw, 4rem);
-  row-gap: clamp(2rem, 4vw, 3rem);
-}
-
-.statement__inner > .tick-label {
-  grid-column: 1 / -1;
+  gap: clamp(2rem, 4vw, 3.5rem);
 }
 
 .statement__title {
-  grid-column: 1;
-  max-width: 17ch;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) clamp(7rem, 12vw, 10rem) minmax(
+      0,
+      1.15fr
+    );
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 3rem);
+  max-width: none;
   margin: 0;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  border-top: var(--hair) solid var(--rule-strong);
+  border-bottom: var(--hair) solid var(--rule-strong);
 }
 
-.crossover {
-  grid-column: 2;
+.statement__demand,
+.statement__admin {
+  display: block;
+  font-size: clamp(2.8rem, 5.5vw, 5.6rem);
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.statement__demand {
+  color: var(--fg);
+}
+
+.statement__admin {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: var(--fg-dim);
+}
+
+.statement__operator {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  color: var(--signal);
+  text-align: center;
+}
+
+.statement__operator span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.statement__operator strong {
+  font-family: var(--font-ui);
+  font-size: clamp(3.5rem, 6vw, 6rem);
+  font-weight: 350;
+  line-height: 0.7;
+}
+
+.statement__proof {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+  align-items: stretch;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+
+.statement__proof .crossover {
   margin: 0;
   max-width: none;
   align-self: center;
 }
 
-.crossover svg {
-  height: clamp(9rem, 16vw, 14rem);
+.statement__proof .crossover svg {
+  height: clamp(10rem, 15vw, 13rem);
 }
 
-.statement__cols {
-  grid-column: 1 / -1;
+.statement__outcomes {
+  display: grid;
+  align-content: center;
+  border-left: var(--hair) solid var(--rule-strong);
+}
+
+.statement__outcomes p {
+  padding: var(--s5) 0 var(--s5) clamp(1.25rem, 3vw, 2.5rem);
+  color: var(--fg-dim);
+  font-size: var(--t-lead);
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+
+.statement__outcomes p + p {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.statement__outcomes .statement__mark {
+  display: block;
+  margin-bottom: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--signal);
 }
 
 @media (max-width: 900px) {
-  .statement__inner {
+  .statement__title {
     grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--s4);
   }
 
-  .statement__title,
-  .crossover {
-    grid-column: 1;
+  .statement__operator {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .statement__operator strong {
+    justify-self: end;
+  }
+
+  .statement__proof {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s6);
+  }
+
+  .statement__outcomes {
+    border-top: var(--hair) solid var(--rule-strong);
+    border-left: 0;
+  }
+
+  .statement__outcomes p {
+    padding: var(--s5) 0;
   }
 }
 

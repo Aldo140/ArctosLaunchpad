@@ -136,53 +136,49 @@ export default function HomePage() {
         <div className="shell statement__inner">
           <p className="tick-label reveal">The gap we close</p>
           <h2 className="statement__title t-display reveal">
-            More leads should not mean <em>more administrative work.</em>
+            <span className="statement__demand">More leads</span>
+            <span className="statement__operator">
+              <span>should not mean</span>
+              <strong aria-hidden="true">&ne;</strong>
+            </span>
+            <span className="statement__admin">more administrative work.</span>
           </h2>
-          {/* The claim is a mismatch between two curves, so it is drawn as
-              one: demand climbing, and the manual work that usually climbs
-              with it held flat. No numbers — the shape is the argument, and
-              inventing figures to label it is not on the table. */}
-          <div className="crossover reveal" aria-hidden="true">
-            <svg
-              viewBox="0 0 600 150"
-              preserveAspectRatio="none"
-              role="presentation"
-            >
-              <path
-                className="crossover__grid"
-                d="M0 37.5H600M0 75H600M0 112.5H600"
-              />
-              <path
-                className="crossover__demand"
-                d="M0 132 C 150 128, 300 96, 420 58 S 540 18, 600 12"
-              />
-              <path
-                className="crossover__admin"
-                d="M0 132 C 200 126, 400 122, 600 118"
-              />
-            </svg>
-            <p className="crossover__key">
-              <span className="crossover__key-demand">Demand</span>
-              <span className="crossover__key-admin">Work behind it</span>
-            </p>
-          </div>
-          {/* The second column says Arctos connects both sides. The bracket
-              spans both columns and draws across as the section arrives, so
-              the connection is made rather than only claimed. */}
-          <div className="statement__cols reveal">
-            <span className="statement__tie" aria-hidden="true" />
-            <p className="statement__col">
-              <span className="statement__mark">Demand</span>A campaign can
-              create demand. A website can capture it. Growth gets difficult
-              when the systems behind the business cannot keep up.
-            </p>
-            <p className="statement__col">
-              <span className="statement__mark">Operations</span>Most agencies
-              stop at the form submission. Most software companies never see how
-              customers found you. Arctos connects both sides — marketing,
-              customer experience, software, automation, and reporting, built as
-              one system.
-            </p>
+          <div className="statement__proof reveal">
+            <div className="crossover" aria-hidden="true">
+              <svg
+                viewBox="0 0 600 150"
+                preserveAspectRatio="none"
+                role="presentation"
+              >
+                <path
+                  className="crossover__grid"
+                  d="M0 37.5H600M0 75H600M0 112.5H600"
+                />
+                <path
+                  className="crossover__demand"
+                  d="M0 132 C 150 128, 300 96, 420 58 S 540 18, 600 12"
+                />
+                <path
+                  className="crossover__admin"
+                  d="M0 132 C 200 126, 400 122, 600 118"
+                />
+              </svg>
+              <p className="crossover__key">
+                <span className="crossover__key-demand">Demand</span>
+                <span className="crossover__key-admin">Work behind it</span>
+              </p>
+            </div>
+            <div className="statement__outcomes">
+              <p>
+                <span className="statement__mark">Demand</span>
+                Campaigns and websites create more opportunity.
+              </p>
+              <p>
+                <span className="statement__mark">Operations</span>
+                Connected systems keep the work behind it from climbing at the
+                same rate.
+              </p>
+            </div>
           </div>
         </div>
       </section>
