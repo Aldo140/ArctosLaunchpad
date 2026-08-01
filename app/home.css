@@ -468,6 +468,20 @@ main,
   padding-top: clamp(7.5rem, 13vw, 12rem);
 }
 
+.journey::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/illustrations/route-compass.webp");
+  background-repeat: no-repeat;
+  background-position: top 2rem right 2rem;
+  background-size: clamp(16rem, 28vw, 30rem);
+  opacity: 0.08;
+  filter: saturate(0.7) brightness(1.05);
+}
+
 /* The SVG is the connective tissue only; the stations are real HTML above it. */
 .journey__svg {
   position: absolute;
@@ -828,6 +842,24 @@ main,
    AUTOMATION
    ========================================================================= */
 
+.automation {
+  position: relative;
+}
+
+.automation::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/illustrations/growth-curve.webp");
+  background-repeat: no-repeat;
+  background-position: bottom 1rem right 2rem;
+  background-size: clamp(20rem, 30vw, 34rem);
+  opacity: 0.06;
+  filter: saturate(0.5) brightness(1.05);
+}
+
 .automation__head {
   display: grid;
   gap: var(--s5);
@@ -946,6 +978,24 @@ main,
    PROCESS
    ========================================================================= */
 
+.process {
+  position: relative;
+}
+
+.process::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/illustrations/modular-blocks.webp");
+  background-repeat: no-repeat;
+  background-position: bottom 1rem left 2rem;
+  background-size: clamp(18rem, 26vw, 32rem);
+  opacity: 0.08;
+  filter: saturate(0.6) brightness(1.08);
+}
+
 .process__head {
   display: grid;
   gap: var(--s4);
@@ -1028,6 +1078,24 @@ main,
 /* =========================================================================
    WHY
    ========================================================================= */
+
+.why {
+  position: relative;
+}
+
+.why::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/illustrations/connected-partnership.webp");
+  background-repeat: no-repeat;
+  background-position: center right;
+  background-size: clamp(24rem, 35vw, 40rem);
+  opacity: 0.05;
+  filter: saturate(0.6) brightness(1.05);
+}
 
 .why__head {
   display: grid;
@@ -3990,6 +4058,13 @@ ul.work__clients {
   color: var(--operate);
   font-size: clamp(4px, 0.5vw, 7px);
   pointer-events: none;
+  transform-style: preserve-3d;
+  perspective: 900px;
+}
+
+.pattern-press__sheet,
+.pattern-press__roll {
+  transform-style: preserve-3d;
 }
 
 .pattern-press__sheet,

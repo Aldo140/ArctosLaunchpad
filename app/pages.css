@@ -10,7 +10,36 @@
    ========================================================================= */
 
 .masthead {
+  position: relative;
   padding-block: clamp(8rem, 16vh, 13rem) var(--section-y);
+}
+
+.masthead::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size: clamp(18rem, 28vw, 32rem);
+  opacity: 0.05;
+}
+
+.masthead[data-chapter="attract"]::before {
+  background-image: url("/assets/illustrations/branching-growth.webp");
+}
+
+.masthead[data-chapter="convert"]::before {
+  background-image: url("/assets/illustrations/interface-assembly.webp");
+}
+
+.masthead[data-chapter="operate"]::before {
+  background-image: url("/assets/illustrations/connected-automation.webp");
+}
+
+.masthead[data-chapter="scale"]::before {
+  background-image: url("/assets/illustrations/growth-curve.webp");
 }
 
 .masthead__inner {
@@ -2984,6 +3013,11 @@
   display: grid;
   gap: clamp(2.5rem, 5vw, 4.5rem);
   position: relative;
+  background: color-mix(in oklab, var(--paper) 96%, var(--bg));
+  border: 1px solid var(--rule-strong);
+  border-radius: calc(var(--radius) * 1.25);
+  padding: clamp(2rem, 3vw, 2.5rem);
+  box-shadow: 0 2.5rem 5rem color-mix(in oklab, var(--ink) 8%, transparent);
 }
 
 [data-material="paper"] .form {
@@ -2994,6 +3028,7 @@
   display: grid;
   gap: var(--s3);
   padding-bottom: var(--s6);
+  border-bottom: 1px solid var(--rule);
 }
 
 .form__intro-head,
@@ -3018,17 +3053,19 @@
 .form__progress {
   position: relative;
   width: 100%;
-  height: 3px;
+  height: 4px;
   overflow: hidden;
-  background: var(--rule);
+  background: color-mix(in oklab, var(--rule) 65%, transparent);
+  border-radius: 999px;
 }
 
 .form__progress span {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--completion);
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), color-mix(in oklab, var(--accent) 65%, transparent));
   transition: width 420ms var(--ease-out);
+  border-radius: 999px;
 }
 
 .form__intro-note {
@@ -3196,7 +3233,8 @@
 .field__label {
   display: block;
   font-size: var(--t-small);
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   line-height: 1.4;
   color: var(--fg);
 }
@@ -3221,11 +3259,11 @@
 .form textarea {
   width: 100%;
   min-height: 3rem;
-  background: var(--bg);
-  border: var(--hair) solid var(--rule);
-  border-bottom-color: var(--rule-strong);
+  background: color-mix(in oklab, var(--paper) 98%, var(--bg));
+  border: 1px solid var(--rule-strong);
+  border-bottom-color: var(--rule);
   border-radius: var(--radius);
-  padding: 0.8rem 0.9rem;
+  padding: 0.95rem 1rem;
   font-size: var(--t-small);
   color: var(--fg);
   transition:
@@ -3256,7 +3294,7 @@
 .form select:focus-visible,
 .form textarea:focus-visible {
   border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 5%, var(--bg));
+  background: color-mix(in oklab, var(--accent) 5%, var(--paper));
   box-shadow: inset 2px 0 0 var(--accent);
 }
 

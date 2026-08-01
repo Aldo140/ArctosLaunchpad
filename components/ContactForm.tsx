@@ -321,12 +321,8 @@ export function ContactForm() {
           />
         </div>
         <p className="form__intro-note">
-          Three short sections. Fields marked{" "}
-          <span className="field__req" aria-hidden="true">
-            *
-          </span>
-          <span className="visually-hidden">with an asterisk</span> are required
-          — everything else only helps.
+          Three short sections. Required fields are marked with an asterisk —
+          everything else helps us reply with sharper clarity.
         </p>
       </div>
 

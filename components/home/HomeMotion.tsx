@@ -144,17 +144,58 @@ export function HomeMotion() {
             ledger.querySelectorAll(".automation__list--after li"),
           );
           const arrow = ledger.querySelector(".automation__arrow");
+          const press = root.querySelector<HTMLElement>(".pattern-press");
+          const sheets = press
+            ? gsap.utils.toArray<HTMLElement>(press.querySelectorAll(".pattern-press__sheet"))
+            : [];
+          const rolls = press
+            ? gsap.utils.toArray<HTMLElement>(press.querySelectorAll(".pattern-press__roll"))
+            : [];
 
           const tl = gsap.timeline({
             scrollTrigger: { trigger: ledger, start: "top 74%", once: true },
           });
 
-          tl.to(before, {
-            "--strike-scale": 1,
-            duration: 0.42,
-            stagger: 0.07,
-            ease: "power2.inOut",
+          tl.from(press, {
+            autoAlpha: 0,
+            y: 18,
+            rotationX: 8,
+            transformOrigin: "center center",
+            duration: 0.8,
+            ease: "power3.out",
           })
+            .from(
+              sheets,
+              {
+                yPercent: -15,
+                autoAlpha: 0,
+                duration: 0.7,
+                stagger: 0.08,
+                ease: "power3.out",
+              },
+              "-=0.6",
+            )
+            .from(
+              rolls,
+              {
+                rotation: -14,
+                autoAlpha: 0,
+                duration: 0.5,
+                stagger: 0.08,
+                ease: "power3.out",
+              },
+              "-=0.55",
+            )
+            .to(
+              before,
+              {
+                "--strike-scale": 1,
+                duration: 0.42,
+                stagger: 0.07,
+                ease: "power2.inOut",
+              },
+              "-=0.2",
+            )
             .to(before, { opacity: 0.4, duration: 0.45 }, "-=0.25")
             .from(
               arrow,
@@ -170,11 +211,32 @@ export function HomeMotion() {
               after,
               {
                 autoAlpha: 0,
+                y: 18,
                 duration: 0.5,
                 stagger: 0.07,
+                ease: "power3.out",
               },
               "-=0.2",
             );
+        }
+
+        const track = root.querySelector<HTMLElement>(".track");
+        if (track) {
+          const stops = gsap.utils.toArray<HTMLElement>(
+            track.querySelectorAll(".track__stop"),
+          );
+          gsap.fromTo(
+            stops,
+            { autoAlpha: 0, y: 18 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: "power3.out",
+              scrollTrigger: { trigger: track, start: "top 82%", once: true },
+            },
+          );
         }
 
         for (const image of select<HTMLElement>(
