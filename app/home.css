@@ -4256,6 +4256,230 @@ ul.work__clients {
   }
 }
 
+.responsive-build__selection {
+  position: absolute;
+  top: 42%;
+  left: 46%;
+  z-index: 4;
+  width: 3.2em;
+  height: 1.9em;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  animation: responsive-selection 8s var(--ease-in-out) infinite;
+}
+
+.responsive-build__cursor {
+  position: absolute;
+  top: 72%;
+  left: 78%;
+  z-index: 5;
+  width: 1.25em;
+  height: 1.6em;
+  background: var(--glacier);
+  clip-path: polygon(0 0, 100% 72%, 58% 76%, 40% 100%);
+  filter: drop-shadow(1px 2px 0 var(--ink));
+  transform-origin: top left;
+  animation: responsive-cursor 8s var(--ease-in-out) infinite;
+}
+
+@keyframes responsive-cursor {
+  0%,
+  14%,
+  100% {
+    opacity: 0;
+    transform: translate(2em, 1em) scale(1);
+  }
+  22%,
+  54% {
+    opacity: 1;
+    transform: translate(-4.5em, -3.25em) scale(1);
+  }
+  58% {
+    opacity: 1;
+    transform: translate(-4.5em, -3.25em) scale(0.88);
+  }
+  64%,
+  82% {
+    opacity: 1;
+    transform: translate(-2.2em, -1.4em) scale(1);
+  }
+  92% {
+    opacity: 0;
+    transform: translate(-6em, -4em) scale(1);
+  }
+}
+
+@keyframes responsive-selection {
+  0%,
+  25%,
+  100% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  32%,
+  58% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  68%,
+  90% {
+    opacity: 0.45;
+    transform: translate(-1.15em, -0.7em) scale(0.62);
+  }
+}
+
+/* --- position / sketched signal echo ----------------------------------- */
+
+.statement__operator strong {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+}
+
+.statement__operator strong::before,
+.statement__operator strong::after {
+  content: "≠";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: transparent;
+  pointer-events: none;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--signal) 58%, transparent);
+}
+
+.statement__operator strong::before {
+  opacity: 0.42;
+  animation: signal-sketch-one 1.8s steps(2, end) infinite alternate;
+}
+
+.statement__operator strong::after {
+  opacity: 0.26;
+  animation: signal-sketch-two 2.1s steps(2, end) infinite alternate;
+}
+
+@keyframes signal-sketch-one {
+  from {
+    transform: translate(1px, -1px) rotate(-1deg);
+  }
+  to {
+    transform: translate(2px, 1px) rotate(-0.3deg);
+  }
+}
+
+@keyframes signal-sketch-two {
+  from {
+    transform: translate(-1px, 1px) rotate(0.7deg);
+  }
+  to {
+    transform: translate(-2px, -1px) rotate(1.2deg);
+  }
+}
+
+/* --- why / octave field and overlapping evidence plates ---------------- */
+
+.why {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.why > .shell {
+  position: relative;
+  z-index: 1;
+}
+
+.octave-field {
+  position: absolute;
+  inset: 7% -8% auto;
+  z-index: 0;
+  width: 116%;
+  height: 76%;
+  color: color-mix(in oklab, var(--scale) 56%, var(--ink));
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.octave-field__layer {
+  fill: currentColor;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.octave-field__layer--one {
+  animation: octave-drift-one 18s ease-in-out infinite alternate;
+}
+
+.octave-field__layer--two {
+  opacity: 0.7;
+  animation: octave-drift-two 24s ease-in-out infinite alternate;
+}
+
+.why__card {
+  background: color-mix(in oklab, var(--paper) 82%, transparent);
+  backdrop-filter: blur(7px);
+  transition:
+    background var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .why__card:hover {
+    background: color-mix(in oklab, var(--paper) 94%, transparent);
+    transform: translateY(-3px);
+  }
+}
+
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+  .why__plates {
+    gap: 0;
+    padding-inline: clamp(1.5rem, 4vw, 4rem);
+    border: 0;
+    background: transparent;
+  }
+
+  .why__plates figure {
+    position: relative;
+    opacity: 0.9;
+    box-shadow: 0 1.5rem 3.5rem color-mix(in oklab, var(--ink) 18%, transparent);
+    transition:
+      opacity var(--dur) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
+  }
+
+  .why__plates figure:nth-child(1) {
+    z-index: 1;
+    transform: translateX(1.5rem) rotate(-2.2deg) translateY(0.5rem);
+  }
+
+  .why__plates figure:nth-child(2) {
+    z-index: 3;
+    transform: scale(1.025) translateY(-0.35rem);
+  }
+
+  .why__plates figure:nth-child(3) {
+    z-index: 2;
+    transform: translateX(-1.5rem) rotate(2.2deg) translateY(0.5rem);
+  }
+
+  .why__plates:hover figure {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes octave-drift-one {
+  to {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1.04);
+  }
+}
+
+@keyframes octave-drift-two {
+  to {
+    transform: translate3d(-2%, 2%, 0) scale(1.06);
+  }
+}
+
 /* --- selected work / real screens in device-specific frames ------------ */
 
 .showcase__browserbar {
@@ -4437,6 +4661,11 @@ ul.work__clients {
   .responsive-build__frame,
   .responsive-build__screen,
   .responsive-build__stand,
+  .responsive-build__selection,
+  .responsive-build__cursor,
+  .statement__operator strong::before,
+  .statement__operator strong::after,
+  .octave-field__layer,
   .cta__stars,
   .cta__meteor {
     animation: none !important;

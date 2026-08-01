@@ -6,6 +6,7 @@ import { HomeMotion } from "@/components/home/HomeMotion";
 import { JourneyDiagram } from "@/components/home/JourneyDiagram";
 import {
   AutomationPress,
+  OctaveField,
   ResponsiveBuild,
 } from "@/components/home/PatternInstruments";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
@@ -458,6 +459,7 @@ export default function HomePage() {
         data-chapter="scale"
         data-station="Why Arctos"
       >
+        <OctaveField />
         <div className="shell">
           <div className="why__head reveal">
             <p className="tick-label">Why Arctos</p>
