@@ -3950,6 +3950,476 @@ ul.work__clients {
   }
 }
 
+/* =========================================================================
+   SUPPLIED PATTERNS, TRANSLATED INTO THE ARCTOS SYSTEM
+
+   The source references are useful as motion studies, not as a second visual
+   language. Their geometry is retained where it explains the work; colours,
+   material, timing, and framing use the existing site tokens. Adapted from the
+   supplied Uiverse work by preet_7613, Nawsome, mobinkakei, arthur_6104, and
+   kiranmayee-abbireddy.
+   ========================================================================= */
+
+/* --- automation / continuous print feed -------------------------------- */
+
+.automation__figure {
+  position: relative;
+  overflow: hidden;
+}
+
+.pattern-press {
+  position: absolute;
+  right: 4%;
+  bottom: 4%;
+  width: 42%;
+  aspect-ratio: 1.18;
+  overflow: hidden;
+  border: var(--hair) solid color-mix(in oklab, var(--operate) 72%, var(--rule));
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 12px,
+      color-mix(in oklab, var(--glacier) 7%, transparent) 12px 13px
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--ink) 88%, var(--operate)),
+      var(--ink)
+    );
+  box-shadow: 0 1rem 2.5rem color-mix(in oklab, var(--ink) 36%, transparent);
+  color: var(--operate);
+  font-size: clamp(4px, 0.5vw, 7px);
+  pointer-events: none;
+}
+
+.pattern-press__sheet,
+.pattern-press__sheet::before,
+.pattern-press__roll {
+  position: absolute;
+}
+
+.pattern-press__sheet,
+.pattern-press__roll {
+  top: 50%;
+  left: 50%;
+}
+
+.pattern-press__sheet {
+  width: 4em;
+  height: 6em;
+  overflow: hidden;
+  background: var(--paper);
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg);
+}
+
+.pattern-press__sheet::before {
+  content: "";
+  top: -6em;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 6em);
+  background:
+    linear-gradient(transparent 86%, currentColor 86% 89%, transparent 89%)
+      0.45em 0 / 3.1em 1.4em,
+    repeating-linear-gradient(
+        var(--paper) 0 0.4em,
+        color-mix(in oklab, var(--ink) 18%, var(--paper)) 0.4em 0.55em,
+        var(--paper) 0.55em 1.4em
+      )
+      0 0 / 4em 1.4em;
+  background-repeat: repeat-y;
+  animation: pattern-print 780ms linear infinite;
+}
+
+.pattern-press__sheet--feed {
+  height: 42em;
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-17.4em, 9.4em) rotateX(-90deg);
+}
+
+.pattern-press__sheet--upper {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-2.5em, -2.5em);
+}
+
+.pattern-press__sheet--middle {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-0.5em, -0.7em) rotateX(-75deg);
+}
+
+.pattern-press__sheet--fold-one,
+.pattern-press__sheet--fold-two,
+.pattern-press__sheet--fold-three {
+  height: 0.4em;
+}
+
+.pattern-press__sheet--fold-one {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(1.7em, -1.85em) rotateX(-15deg);
+}
+
+.pattern-press__sheet--fold-two {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(1.7em, -1.5em) rotateX(15deg);
+}
+
+.pattern-press__sheet--fold-three {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(1.6em, -1.05em) rotateX(45deg);
+}
+
+.pattern-press__sheet--lower {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-0.5em, 1.95em) rotateX(75deg);
+}
+
+.pattern-press__sheet--out {
+  height: 29em;
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-2.5em, 19.25em);
+}
+
+.pattern-press__roll {
+  width: 8em;
+  height: 2em;
+  border: var(--hair) solid color-mix(in oklab, var(--glacier) 20%, transparent);
+  border-radius: 0.5em / 1em;
+  background:
+    radial-gradient(1em 2em at 0.5em 50%, var(--ink) 49%, transparent 50%),
+    color-mix(in oklab, var(--ink) 68%, var(--operate));
+}
+
+.pattern-press__roll--in {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-3em, -4.5em) skewX(-22.5deg);
+}
+
+.pattern-press__roll--upper {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-2em, -0.5em) skewX(-22.5deg);
+}
+
+.pattern-press__roll--middle {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(1em, -1em) skewX(-22.5deg);
+}
+
+.pattern-press__roll--out {
+  transform: translate(-50%, -50%) rotateX(-45deg) rotateZ(-45deg)
+    translate(-2em, 4.45em) skewX(-22.5deg);
+}
+
+@keyframes pattern-print {
+  to {
+    transform: translateY(1.4em);
+  }
+}
+
+/* --- process / desktop-to-mobile build --------------------------------- */
+
+.process__figure {
+  position: relative;
+}
+
+.responsive-build {
+  position: absolute;
+  right: 2%;
+  bottom: 3%;
+  width: 46%;
+  aspect-ratio: 1.25;
+  overflow: hidden;
+  border: var(--hair) solid color-mix(in oklab, var(--convert) 70%, var(--rule));
+  background:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px),
+    color-mix(in oklab, var(--ink) 92%, var(--convert));
+  background-size: 1.25rem 1.25rem;
+  font-size: clamp(0.58rem, 0.75vw, 0.72rem);
+  pointer-events: none;
+}
+
+.responsive-build__frame,
+.responsive-build__screen,
+.responsive-build__stand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.responsive-build__frame {
+  z-index: 1;
+  width: 10em;
+  height: 6.25em;
+  margin: -3.125em 0 0 -5em;
+  border: 1px solid var(--glacier);
+  background: color-mix(in oklab, var(--convert) 24%, var(--ink));
+  animation: responsive-frame 8s var(--ease-in-out) infinite;
+}
+
+.responsive-build__screen {
+  z-index: 2;
+  width: 9.25em;
+  height: 5.5em;
+  margin: -2.75em 0 0 -4.625em;
+  background:
+    linear-gradient(90deg, var(--convert) 28%, transparent 28%) 0.65rem 0.65rem /
+      4rem 0.35rem no-repeat,
+    linear-gradient(var(--glacier), var(--glacier)) 0.65rem 1.5rem / 55% 1.8rem
+      no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--glacier) 15%, transparent) 0 1px,
+      transparent 1px 12px
+    ),
+    var(--ink);
+  animation: responsive-screen 8s var(--ease-in-out) infinite;
+}
+
+.responsive-build__stand {
+  z-index: 3;
+  width: 2.5em;
+  height: 1.2em;
+  margin: 3.125em 0 0 -1.25em;
+  background: var(--accent);
+  animation: responsive-stand 8s var(--ease-in-out) infinite;
+}
+
+.responsive-build__label {
+  position: absolute;
+  right: var(--s2);
+  bottom: var(--s2);
+  z-index: 4;
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+@keyframes responsive-frame {
+  0%,
+  100% {
+    width: 10em;
+    height: 6.25em;
+    margin: -3.125em 0 0 -5em;
+  }
+  33% {
+    width: 5em;
+    height: 7.5em;
+    margin: -3.75em 0 0 -2.5em;
+  }
+  66% {
+    width: 2.6em;
+    height: 5em;
+    margin: -2.5em 0 0 -1.3em;
+  }
+}
+
+@keyframes responsive-screen {
+  0%,
+  100% {
+    width: 9.25em;
+    height: 5.5em;
+    margin: -2.75em 0 0 -4.625em;
+  }
+  33% {
+    width: 4.4em;
+    height: 6em;
+    margin: -3em 0 0 -2.2em;
+  }
+  66% {
+    width: 2em;
+    height: 3.75em;
+    margin: -1.875em 0 0 -1em;
+  }
+}
+
+@keyframes responsive-stand {
+  0%,
+  100% {
+    width: 2.5em;
+    height: 1.2em;
+    margin: 3.125em 0 0 -1.25em;
+  }
+  33% {
+    width: 0.55em;
+    height: 0.55em;
+    margin: 3.05em 0 0 -0.275em;
+    border-radius: 50%;
+  }
+  66% {
+    width: 1em;
+    height: 0.2em;
+    margin: -2.3em 0 0 -0.5em;
+    border-radius: 1rem;
+  }
+}
+
+/* --- selected work / real screens in device-specific frames ------------ */
+
+.showcase__browserbar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-inline: var(--s4);
+  border-bottom: var(--hair) solid var(--rule-strong);
+  background: var(--ink);
+}
+
+.showcase__browserlights {
+  width: 2.4rem;
+  height: 0.45rem;
+  background:
+    radial-gradient(circle at 0.225rem, center, var(--attract) 0 0.2rem, transparent 0.22rem),
+    radial-gradient(circle at 1.2rem, center, var(--operate) 0 0.2rem, transparent 0.22rem),
+    radial-gradient(circle at 2.175rem, center, var(--scale) 0 0.2rem, transparent 0.22rem);
+}
+
+.showcase__address {
+  flex: 1;
+  padding-bottom: 0.15rem;
+  border-bottom: var(--hair) solid var(--rule-strong);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+}
+
+.showcase__item--banner .showcase__media-link {
+  inset: 2.5rem 0 0;
+}
+
+.showcase__item--portrait .showcase__media {
+  border-color: var(--rule-strong);
+  background:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px),
+    color-mix(in oklab, var(--scale) 8%, var(--bg-raised));
+  background-size: 2rem 2rem;
+}
+
+.showcase__item--portrait .showcase__media-link {
+  inset: 6% auto;
+  left: 50%;
+  width: auto;
+  height: 88%;
+  aspect-ratio: 38 / 63;
+  overflow: hidden;
+  border: 4px solid var(--fg);
+  border-radius: 1.25rem;
+  background: var(--paper);
+  box-shadow:
+    0.35rem 0.45rem 0 var(--scale),
+    0 1.5rem 3rem color-mix(in oklab, var(--ink) 38%, transparent);
+  transform: translateX(-50%);
+}
+
+.showcase__item--portrait .showcase__media-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  width: 38%;
+  height: 0.45rem;
+  border-radius: 0 0 0.4rem 0.4rem;
+  background: var(--fg);
+  transform: translateX(-50%);
+}
+
+/* --- conversion / a restrained live sky above the launch plate --------- */
+
+.cta__sky,
+.cta__stars,
+.cta__meteor {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cta__sky {
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.cta__stars {
+  inset: 0;
+  background-repeat: repeat;
+}
+
+.cta__stars--near {
+  opacity: 0.32;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, var(--glacier), transparent),
+    radial-gradient(1px 1px at 52% 64%, var(--glacier), transparent),
+    radial-gradient(1.5px 1.5px at 84% 28%, var(--accent), transparent);
+  background-size: 17rem 17rem;
+  animation: arctos-twinkle 5s ease-in-out infinite;
+}
+
+.cta__stars--far {
+  opacity: 0.2;
+  background-image:
+    radial-gradient(1px 1px at 28% 42%, var(--glacier), transparent),
+    radial-gradient(1px 1px at 72% 76%, var(--glacier), transparent);
+  background-size: 23rem 23rem;
+  animation: arctos-twinkle 8s ease-in-out 1.5s infinite reverse;
+}
+
+.cta__meteor {
+  top: 22%;
+  right: -5rem;
+  width: 5rem;
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--glacier));
+  transform: rotate(-32deg);
+  animation: arctos-meteor 13s linear 3s infinite;
+}
+
+@keyframes arctos-twinkle {
+  50% {
+    opacity: 0.08;
+  }
+}
+
+@keyframes arctos-meteor {
+  0%,
+  72% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  74% {
+    opacity: 0.7;
+  }
+  82%,
+  100% {
+    opacity: 0;
+    translate: -70vw 42vw;
+  }
+}
+
+@media (max-width: 700px) {
+  .pattern-press,
+  .responsive-build {
+    width: 40%;
+  }
+
+  .showcase__browserbar {
+    height: 2.1rem;
+    padding-inline: var(--s3);
+  }
+
+  .showcase__item--banner .showcase__media-link {
+    top: 2.1rem;
+  }
+}
+
 @media (pointer: coarse) {
   .hero__survey {
     display: none;
@@ -3961,6 +4431,15 @@ ul.work__clients {
   .field-figure img,
   .cta__art {
     transform: none !important;
+  }
+
+  .pattern-press__sheet::before,
+  .responsive-build__frame,
+  .responsive-build__screen,
+  .responsive-build__stand,
+  .cta__stars,
+  .cta__meteor {
+    animation: none !important;
   }
 
   .hero__survey {

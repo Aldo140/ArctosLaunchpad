@@ -4,6 +4,10 @@ import { ArctosDiagram } from "@/components/home/ArctosDiagram";
 import { GrowthSystem } from "@/components/home/GrowthSystem";
 import { HomeMotion } from "@/components/home/HomeMotion";
 import { JourneyDiagram } from "@/components/home/JourneyDiagram";
+import {
+  AutomationPress,
+  ResponsiveBuild,
+} from "@/components/home/PatternInstruments";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
 import { SpecimenStrip } from "@/components/SpecimenStrip";
 import { CTASection } from "@/components/CTASection";
@@ -311,6 +315,7 @@ export default function HomePage() {
               height={1254}
               sizes="(max-width: 900px) 80vw, 34vw"
             />
+            <AutomationPress />
           </figure>
 
           <div className="automation__ledger reveal">
@@ -364,6 +369,7 @@ export default function HomePage() {
                 height={1254}
                 sizes="(max-width: 900px) 64vw, 28vw"
               />
+              <ResponsiveBuild />
             </figure>
           </div>
           {/* The section claims order, so the order is drawn. One line runs the

@@ -23,6 +23,11 @@ export function CTASection({
         sizes="100vw"
         aria-hidden="true"
       />
+      <div className="cta__sky" aria-hidden="true">
+        <span className="cta__stars cta__stars--near" />
+        <span className="cta__stars cta__stars--far" />
+        <span className="cta__meteor" />
+      </div>
       {/* The mark at plate scale, sunk into the ground rather than sitting on
           it — a watermark, so the type stays the loudest thing here.
           Deliberately the simplified variant: at this size the bear head inside

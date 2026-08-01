@@ -49,8 +49,8 @@ const LAYOUTS: Layout[] = [
     chapter: "scale",
     kind: "Human-scale care platform",
     still: {
-      src: "/assets/work/starlings-phone-in-hand.webp",
-      alt: "A person holding a phone showing the Starlings Support Map homepage on a studio desk",
+      src: "/assets/work/starlings-mobile.webp",
+      alt: "The Starlings Support Map homepage on a mobile screen",
     },
     plates: [
       {
@@ -180,6 +180,12 @@ export function WorkShowcase({ projects }: { projects: Project[] }) {
           </header>
 
           <div className="showcase__media">
+            {layout.shape === "banner" ? (
+              <div className="showcase__browserbar" aria-hidden="true">
+                <span className="showcase__browserlights" />
+                <span className="showcase__address">calgarywatch.ca</span>
+              </div>
+            ) : null}
             <Link
               href={project.route}
               className="showcase__media-link"
