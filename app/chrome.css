@@ -603,7 +603,7 @@
 
 .footer__grid {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.35fr repeat(4, minmax(0, 1fr));
   gap: var(--s7) var(--s5);
   padding-bottom: var(--s8);
 }
@@ -684,6 +684,9 @@
   }
   .progress-hair {
     display: block;
+  }
+  .footer__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

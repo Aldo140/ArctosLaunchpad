@@ -423,6 +423,14 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
+            <div className="industries__actions reveal">
+              <Link className="btn btn--ghost" href="/industries">
+                Explore all industries
+                <span className="btn__arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            </div>
           </div>
           <figure className="industries__figure field-figure reveal" data-wipe>
             <Image
@@ -494,6 +502,15 @@ export default function HomePage() {
               />
               <figcaption>Direction before production</figcaption>
             </figure>
+          </div>
+
+          <div className="why__actions reveal">
+            <Link className="btn btn--ghost" href="/studio">
+              Meet the studio
+              <span className="btn__arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
           </div>
         </div>
       </section>

@@ -3703,6 +3703,16 @@ ul.work__clients {
   justify-self: end;
 }
 
+.industries__actions,
+.why__actions {
+  display: flex;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.why__actions {
+  justify-content: flex-end;
+}
+
 .why__plates {
   margin-top: clamp(3rem, 7vw, 6rem);
   display: grid;

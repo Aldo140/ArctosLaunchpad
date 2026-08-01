@@ -9,6 +9,7 @@ import { ArctosLockup } from "./brand/ArctosLockup";
 const LINKS = [
   ["Services", "/services"],
   ["Work", "/work"],
+  ["Industries", "/industries"],
   ["Process", "/process"],
   ["Studio", "/studio"],
 ] as const;
@@ -177,7 +178,9 @@ export function SiteHeader() {
                   aria-current={pathname === href ? "page" : undefined}
                   onClick={() => close(false)}
                 >
-                  <span className="t-folio">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="t-folio">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   <span className="menu__item-label">{label}</span>
                   <span className="menu__item-rule" aria-hidden="true" />
                 </Link>

@@ -4,6 +4,7 @@ import { ArctosMark } from "./brand/ArctosMark";
 const NAV = [
   ["Services", "/services"],
   ["Work", "/work"],
+  ["Industries", "/industries"],
   ["Process", "/process"],
   ["Studio", "/studio"],
   ["Contact", "/contact"],
@@ -22,9 +23,19 @@ const LEGAL = [
   ["Accessibility", "/accessibility"],
 ] as const;
 
+const LOCAL = [
+  ["Calgary web design", "/calgary-web-design"],
+  ["Calgary automation", "/calgary-business-automation"],
+  ["Calgary custom software", "/calgary-custom-software"],
+] as const;
+
 export function SiteFooter() {
   return (
-    <footer className="footer" data-material="instrument" data-station="Colophon">
+    <footer
+      className="footer"
+      data-material="instrument"
+      data-station="Colophon"
+    >
       <div className="shell">
         <p className="footer__statement">
           Marketing that creates demand. Websites that convert it.{" "}
@@ -60,6 +71,17 @@ export function SiteFooter() {
             <h2>Capability</h2>
             <ul>
               {CAPABILITY.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href}>{label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="footer__col">
+            <h2>Calgary</h2>
+            <ul>
+              {LOCAL.map(([label, href]) => (
                 <li key={href}>
                   <Link href={href}>{label}</Link>
                 </li>
