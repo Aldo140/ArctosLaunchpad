@@ -48,6 +48,8 @@ const timelines = [
   "No fixed date",
 ] as const;
 
+const requiredFieldCount = 8;
+
 /** Order used by the error summary so it matches the visual order of the form. */
 const fieldOrder: FieldName[] = [
   "name",
@@ -118,6 +120,27 @@ function validate(formData: FormData): FieldErrors {
   return errors;
 }
 
+function completedRequiredFields(form: HTMLFormElement) {
+  const formData = new FormData(form);
+
+  return [
+    valueOf(formData, "name").length >= 2,
+    /^\S+@\S+\.\S+$/.test(valueOf(formData, "email")),
+    valueOf(formData, "company").length >= 2,
+    projectTypes.includes(
+      valueOf(formData, "projectType") as (typeof projectTypes)[number],
+    ),
+    budgetRanges.includes(
+      valueOf(formData, "budget") as (typeof budgetRanges)[number],
+    ),
+    timelines.includes(
+      valueOf(formData, "timeline") as (typeof timelines)[number],
+    ),
+    valueOf(formData, "challenge").length >= 20,
+    valueOf(formData, "outcome").length >= 20,
+  ].filter(Boolean).length;
+}
+
 /**
  * Per-field message. Announcement is handled once by the summary at the top of
  * the form rather than by ten simultaneous live regions, which is quieter for
@@ -147,6 +170,7 @@ function Required() {
 export function ContactForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+  const [completed, setCompleted] = useState(0);
   const successHeading = useRef<HTMLHeadingElement>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -267,11 +291,35 @@ export function ContactForm() {
     <form
       className="form"
       onSubmit={handleSubmit}
+      onInput={(event) =>
+        setCompleted(completedRequiredFields(event.currentTarget))
+      }
       noValidate
       aria-busy={status === "sending"}
     >
       <div className="form__intro">
-        <p className="tick-label">Confidential project intake</p>
+        <div className="form__intro-head">
+          <p className="tick-label">Confidential project intake</p>
+          <p className="form__progress-value" aria-hidden="true">
+            {String(completed).padStart(2, "0")} / 08
+          </p>
+        </div>
+        <div
+          className="form__progress"
+          role="progressbar"
+          aria-label="Required fields completed"
+          aria-valuemin={0}
+          aria-valuemax={requiredFieldCount}
+          aria-valuenow={completed}
+        >
+          <span
+            style={
+              {
+                "--completion": `${(completed / requiredFieldCount) * 100}%`,
+              } as React.CSSProperties
+            }
+          />
+        </div>
         <p className="form__intro-note">
           Three short sections. Fields marked{" "}
           <span className="field__req" aria-hidden="true">
@@ -492,6 +540,7 @@ export function ContactForm() {
             name="challenge"
             rows={4}
             maxLength={1500}
+            minLength={20}
             required
             placeholder="Where does the friction show up for customers or your team?"
             {...describedBy("challenge")}
@@ -508,6 +557,7 @@ export function ContactForm() {
             name="outcome"
             rows={4}
             maxLength={1500}
+            minLength={20}
             required
             placeholder="Describe the change you want to see after the work is done."
             {...describedBy("outcome")}
