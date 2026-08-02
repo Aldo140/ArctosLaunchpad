@@ -8,7 +8,8 @@
     "postbuild": "node scripts/prepare-github-pages.mjs",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:textures": "node scripts/build-textures.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

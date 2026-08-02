@@ -1,0 +1,438 @@
+/* =========================================================================
+   ARCTOS — interior page rhythm and the shared route openings
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   INTERIOR PAGE RHYTHM
+   Services, Work, Process, and Studio share one structural masthead, but each
+   keeps its own page composition below it. The technical drawing is anchored
+   beside the opening argument; it no longer performs as a detached animation.
+   ========================================================================= */
+
+.interior-document .masthead {
+  padding-block: clamp(7rem, 11vh, 9rem) clamp(4.5rem, 7vw, 7rem);
+}
+
+.interior-document .masthead__inner {
+  grid-template-columns: minmax(0, 1.12fr) minmax(20rem, 0.72fr);
+  column-gap: clamp(2.5rem, 7vw, 7.5rem);
+  row-gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+
+.interior-document .crumbs {
+  grid-column: 1 / -1;
+}
+
+.interior-document .masthead__body {
+  grid-column: 1;
+  grid-row: 2;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s5);
+}
+
+.interior-document .masthead__title {
+  max-width: 15ch;
+  margin-top: var(--s4);
+}
+
+.interior-document .masthead__intro {
+  max-width: 61ch;
+  margin-top: var(--s5);
+}
+
+.interior-document .masthead__folio {
+  color: var(--accent);
+  padding: 0;
+}
+
+.interior-document .masthead__aside {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  padding-left: clamp(1.5rem, 3vw, 3rem);
+  border-left: var(--hair) solid var(--rule-strong);
+}
+
+.interior-document .masthead__aside .plot {
+  max-width: none;
+}
+
+.interior-document .masthead__footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.interior-document .masthead__footer .index-strip {
+  max-width: none;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.interior-document .masthead__inner:not(:has(.masthead__aside)) .masthead__body {
+  grid-column: 1 / -1;
+  max-width: 68rem;
+}
+
+.interior-document > .section:not(.masthead, .cta) {
+  padding-block: clamp(4.5rem, 7vw, 8rem);
+}
+
+/* The old per-element observer made interiors assemble as unrelated fragments,
+   so entrance motion was cancelled across every `.interior-document`. That was
+   the right call for the document-shaped routes — a case study, an industry
+   brief — which should arrive complete and be readable immediately.
+
+   It was the wrong call for the four narrative routes, where the motion is the
+   argument: a route that draws itself, a plate that wipes down over a reel. So
+   the cancellation is now opt-out. A page composed around its own sequence sets
+   `data-motion="staged"` and gets the three brand gestures back; everything
+   else keeps arriving finished. `ChromeSync` reads the same attribute to decide
+   whether to observe the page at all. */
+:root.js .interior-document:not([data-motion="staged"]) .reveal,
+:root.js .interior-document:not([data-motion="staged"]) .reveal.is-in,
+/* The shared closing call to action is not part of any page's composition, so
+   it keeps arriving finished on every interior route. Opting it in would make
+   a component four pages share depend on an observer for no design gain. */
+:root.js .interior-document .cta .reveal,
+:root.js .interior-document .cta .reveal.is-in {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (max-width: 900px) {
+  .interior-document .masthead__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .interior-document .masthead__body,
+  .interior-document .masthead__aside,
+  .interior-document .masthead__footer {
+    grid-column: 1;
+  }
+
+  .interior-document .masthead__body {
+    grid-row: 2;
+  }
+
+  .interior-document .masthead__aside {
+    grid-row: 3;
+    padding: var(--s5) 0 0;
+    border-left: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .interior-document .masthead__footer {
+    grid-row: 4;
+  }
+}
+
+@media (max-width: 760px) {
+  .interior-document .masthead {
+    padding-block: 6.75rem 4.25rem;
+  }
+
+  .interior-document .masthead__title {
+    max-width: 18ch;
+  }
+
+  .interior-document .masthead__aside {
+    padding-top: var(--s4);
+  }
+}
+/* =========================================================================
+   THE FOUR NARRATIVE ROUTES — HELD SCENES
+   -------------------------------------------------------------------------
+   The signature device for Services, Work, Process, and Studio.
+
+   A scene is a full-viewport plate that HOLDS while the reader keeps scrolling,
+   and an instrument panel that RISES over it. The plate is the collage artwork
+   (or a recorded build); the panel is the detail. Paper is held, the screen
+   arrives over it — the two materials the brand is made of, staged as a
+   physical event rather than described in a caption.
+
+   Three things make this work where the previous attempt at collage interiors
+   failed badly enough that a later pass deleted all of it:
+
+   1. THE SCRIM IS PAPER, NOT GREY. Each collage is composed around a large
+      clear paper field. The scrim is a gradient of that same paper colour,
+      running from the type side, so where the field is already clear it is
+      invisible, and where a torn edge intrudes it reads as more paper rather
+      than as a wash over the artwork. Contrast is guaranteed at any crop.
+
+   2. EACH CANVAS IS FRAMED INDIVIDUALLY. The clear field sits in a different
+      place in all four collages, so each sets its own `object-position` to
+      bring that field under the type. One shared value put headlines on torn
+      edges, which is exactly what made the first version unreadable.
+
+   3. THE HOLD IS `position: sticky`, NOT A PINNED SCROLLTRIGGER. No DOM
+      wrapping, no scroll hijacking, no layout recalculation — and it degrades
+      to a plain stack of full-height sections when sticky is unavailable, on
+      short viewports, or under reduced motion.
+   ========================================================================= */
+
+/* The hold needs no magic numbers. The plate is `sticky` inside the scene, and
+   the panel is simply the next thing in flow — so the panel scrolling up over
+   the held plate *is* the default behaviour, and the scene is exactly as tall
+   as its own content. An earlier version paired a `padding-bottom` with a
+   negative `margin-top` to force the overlap and left a screen of dead space
+   trailing every scene whenever the panel was shorter than the offset. */
+.scene {
+  position: relative;
+  /* The scene carries no `.section` class, so nothing was painting a ground
+     under it — the collage was the only thing standing between ink type and
+     whatever the body happened to be. If that image fails to decode, the
+     headline lands on a dark page and disappears. The material's own ground,
+     declared explicitly. */
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Only the BACKDROP is held. An earlier version made the whole plate sticky
+   with the title inside it, so the rising panel sliced the headline through
+   the middle of a word — a wipe that read as breakage, not as a transition.
+   With the artwork held and the title in normal flow above it, the title
+   leaves the way any type leaves, and the panel arrives to a clear plate. */
+.scene__hold {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+}
+
+.scene__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.scene__canvas img {
+  width: 100%;
+  height: 100%;
+  /* Per-canvas, set by the chapter. Brings that collage's clear field under
+     the type instead of trusting one value to suit four compositions. */
+  object-fit: cover;
+  object-position: var(--canvas-x, 50%) var(--canvas-y, 50%);
+}
+
+/* The paper scrim. Same colour as the artwork's own field, angled so it is
+   densest under the type and gone by the time it reaches the torn edges. */
+.scene__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    96deg,
+    var(--paper-warm) 0%,
+    color-mix(in oklab, var(--paper-warm) 92%, transparent) 34%,
+    color-mix(in oklab, var(--paper-warm) 55%, transparent) 56%,
+    transparent 82%
+  );
+}
+
+/* Sits inside the shell rather than replacing it. Given `.shell` directly it
+   overrode the shell's own max-width and, with `margin-inline: auto` still
+   applying, centred the title instead of setting it into the clear field. */
+/* Rides over the held backdrop and scrolls away normally. The negative margin
+   is the height of the backdrop it sits on, which is the one number this
+   construction genuinely needs. */
+.scene__shell {
+  position: relative;
+  z-index: 2;
+  margin-top: -100svh;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+}
+
+.scene__mark {
+  display: grid;
+  gap: var(--s5);
+  max-width: 22ch;
+}
+
+.scene__folio {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent-soft);
+}
+
+/* The rule beside the folio draws as the scene arrives. */
+/* On paper the folio inherits the sampled accent (--accent-soft falls back to
+   it there) and attract lands at 4.43:1 — a hair under AA for 11.76px. Mixed
+   toward ink like the other paper numerals. */
+.scene[data-material="paper"] .scene__folio {
+  color: color-mix(in oklab, var(--accent) 80%, var(--ink));
+}
+
+.scene__folio::after {
+  content: "";
+  flex: 1;
+  max-width: 8rem;
+  height: var(--hair);
+  background: currentColor;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.scene.is-in .scene__folio::after,
+:root:not(.js) .scene__folio::after {
+  transform: scaleX(1);
+}
+
+/* The one mega-scale line per scene. */
+.scene__title {
+  font-size: var(--t-mega);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.scene__title em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+/* Mega scale is for a single word — a stage name, a project name. A sentence
+   at 14rem runs off the bottom of the viewport before it finishes, so scenes
+   whose title is a phrase step down a tier. Declared AFTER `.scene__title`
+   deliberately: both are single-class selectors, so source order is the only
+   thing deciding which font-size survives. */
+.scene__title--phrase {
+  font-size: var(--t-hero);
+  line-height: 0.92;
+  max-width: 15ch;
+}
+
+/* The sentence under the mega word. Display scale, not body scale — at
+   --t-lead it looked like a caption apologising for the word above it. */
+.scene__lead {
+  max-width: 20ch;
+  font-size: clamp(1.35rem, 2.6vw, 2.35rem);
+  font-weight: 500;
+  font-stretch: 92%;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: color-mix(in oklab, var(--ink) 82%, transparent);
+}
+
+/* --- the panel that rises ------------------------------------------------
+   Sits after the held plate in normal flow, so scrolling carries it up over
+   the artwork. It brings its own material with it, which is the whole point:
+   the screen arriving over the page. */
+
+.scene__panel {
+  position: relative;
+  z-index: 3;
+  padding-block: clamp(3.5rem, 7vw, 6.5rem);
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: 0 -24px 60px color-mix(in oklab, var(--ink) 34%, transparent);
+}
+
+/* The panel's leading edge carries the chapter accent — the seam where the
+   two materials meet is the loudest line in the composition. */
+.scene__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+/* =========================================================================
+   SHARED OPENINGS
+   The four routes still open as siblings: an overline, one oversized line,
+   and a standfirst. Only the scenes below them diverge.
+   ========================================================================= */
+
+.route-open__overline {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.route-open__title {
+  margin-top: var(--s5);
+  font-size: var(--t-hero);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.88;
+  letter-spacing: -0.042em;
+  text-wrap: balance;
+}
+
+.route-open__title em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.route-open__intro {
+  margin-top: var(--s5);
+  max-width: 48ch;
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+/* The closing invitation takes the same two-column measure as the routes,
+   keyed to the motion attribute rather than to wrapper class names. */
+.interior-document[data-motion="staged"] .cta__inner {
+  grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+  column-gap: clamp(2rem, 7vw, 7rem);
+  text-align: left;
+  justify-items: start;
+}
+
+.interior-document[data-motion="staged"] .cta__title {
+  grid-column: 1;
+  max-width: 11ch;
+  font-size: var(--t-hero);
+  line-height: 0.9;
+}
+
+.interior-document[data-motion="staged"] .cta__body,
+.interior-document[data-motion="staged"] .cta__actions {
+  grid-column: 2;
+}
+
+.interior-document[data-motion="staged"] .cta__body {
+  align-self: end;
+  text-align: left;
+}
+
+.interior-document[data-motion="staged"] .cta__actions {
+  justify-content: flex-start;
+}

@@ -21,6 +21,13 @@
   --paper: #e7e2d7;
   --paper-warm: #ede7d8; /* sampled from the collages */
 
+  /* The ground baked into every field-guide illustration, sampled from the
+     files themselves. The artwork is opaque and square, so a plate laid on
+     --ink showed a faint seam and a plate laid on --paper was a foreign block.
+     Matching the ground exactly and framing the result turns both into one
+     deliberate object instead of a pasted rectangle. */
+  --plate-ground: #02131b;
+
   /* --- interactive ----------------------------------------------------- */
   --signal: #2f9bff;
   --signal-deep: #1d4ed8;

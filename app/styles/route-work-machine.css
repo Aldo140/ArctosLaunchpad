@@ -1,0 +1,379 @@
+/* =========================================================================
+   ARCTOS — work: the build on a drawn machine
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   WORK / THE BUILD ON A DRAWN MACHINE
+   -------------------------------------------------------------------------
+   The reel used to run full-bleed behind the title. It made every scene the
+   same washed-out dark band, the recording fought the type for the same
+   pixels, and a scrim heavy enough to keep the headline legible also hid the
+   build you were supposed to be looking at.
+
+   The reel now runs inside a plotted monitor on the right, and the copy has
+   the left to itself. The machine is drawn the way everything else on this
+   site is drawn — hairlines, corner ticks, a stand — rather than mocked up as
+   browser chrome, which the imagery rules rule out and which would have dated
+   the page the moment the OS changed.
+   ========================================================================= */
+
+.scene--work .scene__hold {
+  display: grid;
+  align-content: center;
+  background: var(--ink);
+}
+
+/* The ground. A drafting grid plus one accent glow keyed to the scene's tone,
+   so the four builds read as four rooms instead of one long dark corridor. */
+.workbench__field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      ellipse 70% 60% at 78% 42%,
+      color-mix(in oklab, var(--accent) 22%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(var(--rule) var(--hair), transparent var(--hair)),
+    linear-gradient(90deg, var(--rule) var(--hair), transparent var(--hair));
+  background-size:
+    100% 100%,
+    100% 5.5rem,
+    5.5rem 100%;
+  opacity: 0.9;
+}
+
+.workbench {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* Weighted to the copy: the title is the loudest thing in the scene and it
+     needs the room. The machine stays large enough to read the build in. */
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: clamp(2rem, 3.5vw, 3.5rem);
+}
+
+/* The mark owns a real column now, so it should not also be clamped to a
+   headline measure — at 20ch the summary broke into seven short lines. The
+   title and the lead set their own measures below. */
+.scene--work .scene__mark {
+  max-width: none;
+}
+
+.scene--work .scene__title {
+  max-width: 12ch;
+}
+
+/* --- the machine --------------------------------------------------------- */
+
+.workstation {
+  position: relative;
+  margin: 0;
+  display: grid;
+  justify-items: center;
+}
+
+.workstation__bezel {
+  position: relative;
+  width: 100%;
+  padding: clamp(0.5rem, 0.9vw, 0.85rem);
+  background: var(--ink-raised);
+  border: var(--hair) solid var(--rule-strong);
+  border-radius: 3px;
+  box-shadow: 0 30px 70px color-mix(in oklab, var(--ink) 70%, transparent);
+}
+
+/* Corner ticks — the same registration marks the collages carry. */
+.workstation__bezel::before,
+.workstation__bezel::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: var(--hair) solid var(--accent);
+  pointer-events: none;
+}
+
+.workstation__bezel::before {
+  top: -5px;
+  left: -5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.workstation__bezel::after {
+  right: -5px;
+  bottom: -5px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.workstation__screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: 1px;
+}
+
+.workstation__screen img,
+.workstation__screen video,
+.workstation__screen .reel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* WIPE: the screen comes on. */
+:root.js .workstation__screen {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--dur-wipe) var(--ease-set) 120ms;
+}
+
+:root.js .reveal.is-in .workstation__screen {
+  clip-path: inset(0 0 0 0);
+}
+
+.workstation__neck {
+  width: clamp(3.5rem, 6vw, 5.5rem);
+  height: clamp(1rem, 1.8vw, 1.6rem);
+  border-inline: var(--hair) solid var(--rule-strong);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--glacier) 6%, transparent),
+    transparent
+  );
+}
+
+.workstation__base {
+  width: clamp(9rem, 16vw, 14rem);
+  height: var(--hair);
+  background: var(--rule-strong);
+  box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 26%, transparent);
+}
+
+.workstation__cap {
+  margin-top: var(--s4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--fg-dim);
+}
+
+@media (max-width: 1000px) {
+  .workbench {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 3rem);
+  }
+
+  .scene--work .scene__mark {
+    max-width: none;
+  }
+
+  /* Released from the hold on small screens, the scene is a stacked banner and
+     the machine no longer needs to hold half a viewport. */
+  .scene--work .scene__hold {
+    height: auto;
+    padding-block: clamp(3rem, 9vw, 5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root.js .workstation__screen {
+    clip-path: none;
+  }
+}
+
+/* The work title shares its row with the machine now, so it cannot use the
+   full-width mega scale — at 14rem "Starlings" is wider than its whole column
+   and ran straight into the bezel. Sized to the column it actually has. */
+/* Display scale, the way the earlier build had it. The ceiling is set by the
+   longest single WORD, not the longest title — "Starlings" cannot wrap, so if
+   it overflows it runs straight into the bezel. The copy column is widened
+   below to buy the headroom this size needs. */
+.scene--work .scene__title {
+  font-size: clamp(3rem, 9.5vw, 9rem);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+}
+
+/* The stand was drawn in hairlines and disappeared against the grid; the
+   machine needs to read as an object standing on something. */
+.workstation__neck {
+  border-inline-width: 2px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--glacier) 10%, transparent),
+    transparent
+  );
+}
+
+.workstation__base {
+  height: 2px;
+  background: var(--rule-strong);
+}
+
+/* A little more of the scene's tone in the ground. */
+.workbench__field {
+  background-image:
+    radial-gradient(
+      ellipse 72% 62% at 76% 44%,
+      color-mix(in oklab, var(--accent) 34%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(var(--rule) var(--hair), transparent var(--hair)),
+    linear-gradient(90deg, var(--rule) var(--hair), transparent var(--hair));
+  background-size:
+    100% 100%,
+    100% 5.5rem,
+    5.5rem 100%;
+}
+
+/* =========================================================================
+   STUDIO — SECTION HEADERS AND THE DISCIPLINES BAND
+   ========================================================================= */
+
+/* The eyebrow used to sit in its own column, bottom-aligned against a headline
+   in the next one. On a three-line headline that stranded it in the middle of
+   an empty half and squeezed the title into a narrow measure. Eyebrow above
+   title, one left-aligned block, and the headline gets room to sit on two
+   lines. */
+.studio-system__header,
+.studio-principles__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: var(--s4);
+  padding-bottom: var(--s6);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.studio-system__header h2,
+.studio-principles__header h2 {
+  grid-column: 1;
+  max-width: 26ch;
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* --- the band ------------------------------------------------------------
+   Hairline dividers instead of gaps: the four cells are one object. */
+
+.disciplines {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule-strong);
+  border: var(--hair) solid var(--rule-strong);
+}
+
+/* One rule across the whole band, running through all four accents — the
+   sentence "four disciplines become one growth system" as a single line. */
+.disciplines__rule {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    var(--attract) 0%,
+    var(--attract) 22%,
+    var(--convert) 38%,
+    var(--operate) 62%,
+    var(--scale) 82%,
+    var(--scale) 100%
+  );
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .disciplines__rule,
+:root:not(.js) .disciplines__rule {
+  transform: scaleX(1);
+}
+
+.disciplines__cell {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--s3);
+  padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1.25rem, 2vw, 2rem);
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--fg);
+  transition: background var(--dur) var(--ease-out);
+}
+
+.disciplines__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  /* Not --accent-soft here. `data-chapter` sits on this cell while
+     `data-material` sits on the section above it, so the paper fallback that
+     normally rescues --accent-soft never applies and the pastel landed at
+     1.9:1 on paper. Mixed toward ink instead: 4.9-6.7:1 for all four, hue
+     intact. */
+  color: color-mix(in oklab, var(--accent) 80%, var(--ink));
+}
+
+.disciplines__name {
+  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.disciplines__copy {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+
+.disciplines__go {
+  margin-top: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .disciplines__cell:hover {
+    background: color-mix(in oklab, var(--accent) 12%, var(--bg));
+  }
+
+  .disciplines__cell:hover .disciplines__go {
+    color: var(--accent);
+  }
+}
+
+@media (max-width: 1000px) {
+  .disciplines {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .disciplines {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -66,7 +66,7 @@ export default function ContactPage() {
   };
 
   return (
-    <>
+    <div className="intake-page">
       {/* Paper opening: the conversation starts warm, then the intake sheet
           below is the instrument you actually fill in. */}
       <PageHeader
@@ -189,6 +189,6 @@ export default function ContactPage() {
           __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
         }}
       />
-    </>
+    </div>
   );
 }

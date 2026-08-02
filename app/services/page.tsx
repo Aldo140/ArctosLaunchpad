@@ -6,6 +6,12 @@ import { SceneMotion } from "@/components/pages/SceneMotion";
 import { StageGauge } from "@/components/pages/StageGauge";
 import { growthStages, services } from "@/lib/content";
 import type { GrowthStage } from "@/lib/content";
+/* Static imports so Next reads the real dimensions at build time and generates
+   a blur placeholder per file — same handling the homepage plates get. */
+import routeMapping from "@/public/assets/illustrations/route-mapping.webp";
+import interfaceAssembly from "@/public/assets/illustrations/interface-assembly.webp";
+import connectedAutomation from "@/public/assets/illustrations/connected-automation.webp";
+import growthCurve from "@/public/assets/illustrations/growth-curve.webp";
 import {
   absoluteUrl,
   breadcrumbSchema,
@@ -54,6 +60,47 @@ const stageLine: Record<GrowthStage, string> = {
   scale: "Know what is working, and improve it.",
 };
 
+/**
+ * One field-guide plate per stage.
+ *
+ * Chosen by what each drawing actually depicts, not by what is unused: the
+ * stage names are abstract, and the plate is the only thing on the panel that
+ * shows the work rather than naming it.
+ *
+ *   attract  — a single node picked out of a constellation. The stage is
+ *              "reach the RIGHT people"; the drawing is selection, not volume.
+ *   convert  — the interface being assembled panel by panel. This stage is
+ *              literally website strategy, landing pages, and UX/UI.
+ *   operate  — two gears meshed into one drive. This stage is workflow
+ *              automation, CRM, and integration; the drawing is that sentence.
+ *   scale    — a rising line plotted point by point against an axis. This
+ *              stage is measurement and continuous improvement.
+ *
+ * The same four plates carry the same four ideas on the homepage. That is the
+ * point — a reader arriving here from the homepage should recognise them.
+ */
+const stagePlate: Record<
+  GrowthStage,
+  { src: typeof routeMapping; alt: string }
+> = {
+  attract: {
+    src: routeMapping,
+    alt: "The Arctos bear picking one lit node out of a constellation of connected points.",
+  },
+  convert: {
+    src: interfaceAssembly,
+    alt: "The Arctos bear assembling an interface panel by panel.",
+  },
+  operate: {
+    src: connectedAutomation,
+    alt: "The Arctos bear meshing two gears into one automated drive.",
+  },
+  scale: {
+    src: growthCurve,
+    alt: "The Arctos bear plotting a rising curve point by point against an axis.",
+  },
+};
+
 const byStage = (id: GrowthStage) =>
   services.filter((service) => service.group === id);
 
@@ -78,7 +125,7 @@ export default function ServicesPage() {
         data-station="Services"
       >
         <div className="shell services-open__inner">
-          <div>
+          <div className="services-open__lede">
             <p className="route-open__overline">Connected capabilities</p>
             <h1 className="route-open__title services-open__title">
               One partner across the whole growth system.
@@ -105,6 +152,14 @@ export default function ServicesPage() {
                   <span className="stage-gauge__n">{stage.index}</span>
                   <span>
                     <span className="stage-gauge__name">{stage.title}</span>
+                    {/* The count alone said how many but never what. Naming the
+                        services is what makes the gauge a summary of the offer
+                        rather than a set of four labelled doors. */}
+                    <span className="stage-gauge__summary">
+                      {byStage(stage.id)
+                        .map((service) => service.title)
+                        .join(" · ")}
+                    </span>
                     <span className="stage-gauge__count">
                       {byStage(stage.id).length} services
                     </span>
@@ -168,6 +223,17 @@ export default function ServicesPage() {
               <div className="chapter-panel__head">
                 <p>{stage.title} — what it covers</p>
                 <p className="chapter-panel__problem">{stage.problem}</p>
+                <figure
+                  className="field-figure chapter-panel__plate"
+                  data-wipe
+                >
+                  <Image
+                    src={stagePlate[stage.id].src}
+                    alt={stagePlate[stage.id].alt}
+                    placeholder="blur"
+                    sizes="(max-width: 900px) 40vw, 15vw"
+                  />
+                </figure>
               </div>
 
               <ol className="atlas-services">

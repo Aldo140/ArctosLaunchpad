@@ -29,11 +29,18 @@ export const ui = Archivo({
   axes: ["wdth"],
 });
 
+/* Plex Mono is the one family here that is not variable, so every weight in
+   this array is another file preloaded on first paint. Measured across
+   thirteen routes, 400 and 500 carry 825 elements between them and 600 carries
+   seven — and no rule in the stylesheets actually pairs the mono family with
+   600, so those seven inherit it from a parent rather than ask for it. It is
+   dropped: they now render at 500, which at folio and caption sizes is not a
+   difference anyone can see, and the site preloads one file fewer. */
 export const mono = IBM_Plex_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-plex-mono",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
 });
 
 export const fontClass = `${display.variable} ${ui.variable} ${mono.variable}`;

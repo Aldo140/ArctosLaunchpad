@@ -4,14 +4,32 @@ import { ArctosDiagram } from "@/components/home/ArctosDiagram";
 import { GrowthSystem } from "@/components/home/GrowthSystem";
 import { HomeMotion } from "@/components/home/HomeMotion";
 import { JourneyDiagram } from "@/components/home/JourneyDiagram";
-import {
-  AutomationPress,
-  OctaveField,
-  ResponsiveBuild,
-} from "@/components/home/PatternInstruments";
+import { OctaveField } from "@/components/home/PatternInstruments";
+/* Static imports, not string paths. Next reads the real dimensions at build
+   time and generates a blur placeholder for each file, so the plate shows the
+   artwork's own colour while the full image decodes instead of holding an empty
+   box. It also removes the chance of width/height drifting from the asset.
+
+   None of these carry `loading="eager"`. They used to — paired, contradictorily,
+   with `fetchPriority="low"`, which told the browser to fetch all seven
+   immediately and then not to hurry about it. Every one of them is below the
+   fold, so that was ~420KB of illustration downloaded before first paint for
+   artwork the reader had not scrolled to. The eager flag was presumably a guard
+   against the `data-wipe` clip-path deadlock, but that was fixed at the source
+   in base.css by clipping the plate's contents rather than the plate itself —
+   and `clip-path` never affected the layout box lazy loading measures anyway.
+   The blur placeholder covers the arrival. */
+import contourField from "@/public/assets/illustrations/contour-field.webp";
+import routeMapping from "@/public/assets/illustrations/route-mapping.webp";
+import connectedAutomation from "@/public/assets/illustrations/connected-automation.webp";
+import interfaceAssembly from "@/public/assets/illustrations/interface-assembly.webp";
+import branchingGrowth from "@/public/assets/illustrations/branching-growth.webp";
+import connectedPartnership from "@/public/assets/illustrations/connected-partnership.webp";
+import modularBlocks from "@/public/assets/illustrations/modular-blocks.webp";
+import routeCompass from "@/public/assets/illustrations/route-compass.webp";
 import { WorkShowcase } from "@/components/home/WorkShowcase";
-import { SpecimenStrip } from "@/components/SpecimenStrip";
-import { CTASection } from "@/components/CTASection";
+import { SpecimenStrip } from "@/components/figures/SpecimenStrip";
+import { CTASection } from "@/components/Shared";
 import {
   automationOutcomes,
   automationProblems,
@@ -87,10 +105,11 @@ export default function HomePage() {
       >
         <Image
           className="hero__terrain"
-          src="/assets/illustrations/contour-field.webp"
+          src={contourField}
           alt=""
           fill
           priority
+          placeholder="blur"
           sizes="100vw"
           aria-hidden="true"
         />
@@ -196,6 +215,7 @@ export default function HomePage() {
       <section
         id="lead-system"
         className="journey section"
+        data-plate
         data-material="instrument"
         data-station="Lead system"
       >
@@ -210,12 +230,11 @@ export default function HomePage() {
               and reporting so opportunities do not disappear into inboxes and
               spreadsheets.
             </p>
-            <figure className="journey__figure field-figure" data-wipe>
+            <figure className="journey__figure field-figure reveal" data-wipe>
               <Image
-                src="/assets/illustrations/route-mapping.webp"
+                src={routeMapping}
+                placeholder="blur"
                 alt="The Arctos bear inspecting a connected customer route before deciding where to build."
-                width={1254}
-                height={1254}
                 sizes="(max-width: 900px) 54vw, 18vw"
               />
             </figure>
@@ -291,6 +310,7 @@ export default function HomePage() {
       <section
         id="automation"
         className="automation section"
+        data-plate
         data-material="paper"
         data-chapter="operate"
         data-station="Automation"
@@ -310,13 +330,11 @@ export default function HomePage() {
 
           <figure className="automation__figure field-figure reveal" data-wipe>
             <Image
-              src="/assets/illustrations/connected-automation.webp"
+              src={connectedAutomation}
+              placeholder="blur"
               alt="The Arctos bear connecting two gears into one automated operating system."
-              width={1254}
-              height={1254}
               sizes="(max-width: 900px) 80vw, 34vw"
             />
-            <AutomationPress />
           </figure>
 
           <div className="automation__ledger reveal">
@@ -353,6 +371,7 @@ export default function HomePage() {
       <section
         id="home-process"
         className="process section"
+        data-plate
         data-material="instrument"
         data-station="Process"
       >
@@ -364,13 +383,11 @@ export default function HomePage() {
             </div>
             <figure className="process__figure field-figure reveal" data-wipe>
               <Image
-                src="/assets/illustrations/interface-assembly.webp"
+                src={interfaceAssembly}
+                placeholder="blur"
                 alt="The Arctos bear assembling an interface from measured modules."
-                width={1254}
-                height={1254}
                 sizes="(max-width: 900px) 64vw, 28vw"
               />
-              <ResponsiveBuild />
             </figure>
           </div>
           {/* The section claims order, so the order is drawn. One line runs the
@@ -441,10 +458,9 @@ export default function HomePage() {
           </div>
           <figure className="industries__figure field-figure reveal" data-wipe>
             <Image
-              src="/assets/illustrations/branching-growth.webp"
+              src={branchingGrowth}
+              placeholder="blur"
               alt="The Arctos bear tending a branching system with four distinct outcomes."
-              width={1254}
-              height={1254}
               sizes="(max-width: 900px) 70vw, 34vw"
             />
           </figure>
@@ -455,6 +471,7 @@ export default function HomePage() {
       <section
         id="why-arctos"
         className="why section"
+        data-plate
         data-material="paper"
         data-chapter="scale"
         data-station="Why Arctos"
@@ -482,30 +499,27 @@ export default function HomePage() {
           <div className="why__plates reveal">
             <figure className="field-figure" data-wipe>
               <Image
-                src="/assets/illustrations/connected-partnership.webp"
+                src={connectedPartnership}
+                placeholder="blur"
                 alt="Two Arctos bears carrying one shared beam in step."
-                width={1254}
-                height={1254}
                 sizes="(max-width: 700px) 76vw, 28vw"
               />
               <figcaption>One accountable partner</figcaption>
             </figure>
             <figure className="field-figure" data-wipe>
               <Image
-                src="/assets/illustrations/modular-blocks.webp"
+                src={modularBlocks}
+                placeholder="blur"
                 alt="The Arctos bear connecting modular blocks into one system."
-                width={1254}
-                height={1254}
                 sizes="(max-width: 700px) 76vw, 28vw"
               />
               <figcaption>Built to connect</figcaption>
             </figure>
             <figure className="field-figure" data-wipe>
               <Image
-                src="/assets/illustrations/route-compass.webp"
+                src={routeCompass}
+                placeholder="blur"
                 alt="The Arctos bear using a compass to choose among connected routes."
-                width={1254}
-                height={1254}
                 sizes="(max-width: 700px) 76vw, 28vw"
               />
               <figcaption>Direction before production</figcaption>

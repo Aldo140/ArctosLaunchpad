@@ -573,9 +573,15 @@
   }
 }
 
+/* Releases the intro's scroll lock. It must restore the base.css pairing rather
+   than `auto`: `auto` turns <body> into a scroll container, and once it is one,
+   every `position: sticky` in the document resolves against it instead of the
+   viewport and silently stops sticking. `clip`/`visible` is the one pairing
+   that keeps horizontal overflow contained without creating a scrollport. */
 @keyframes intro-scroll-failsafe {
   to {
-    overflow: auto;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 }
 
@@ -716,16 +722,39 @@
     width: 100%;
     border-left: 0;
   }
+
+  /* One column turned sixteen 44px links into roughly four phone screens of
+     footer. Two columns halve that without shrinking a single tap target: the
+     lists are short and their labels are short, so they pair cleanly. The
+     brand block keeps the full width because its sentence needs the measure. */
   .footer__grid {
-    grid-template-columns: 1fr;
-    gap: var(--s6);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s6) var(--s5);
+    padding-bottom: var(--s7);
+  }
+  .footer__col:first-child {
+    grid-column: 1 / -1;
+  }
+  .footer__col h2 {
+    margin-bottom: var(--s2);
+  }
+  .footer__col ul {
+    gap: 0;
+  }
+  /* Hairlines between rows keep the denser list scannable. */
+  .footer__col li + li {
+    border-top: var(--hair) solid var(--rule);
+  }
+  .footer__statement {
+    margin-bottom: var(--s6);
   }
   .footer__base {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--s2);
   }
   .footer a {
-    display: inline-flex;
+    display: flex;
     min-height: 2.75rem;
     align-items: center;
   }
@@ -751,7 +780,8 @@
     display: none !important;
   }
   :root[data-intro] body {
-    overflow: auto;
+    overflow-x: clip;
+    overflow-y: visible;
   }
   .menu,
   .menu__scrim,

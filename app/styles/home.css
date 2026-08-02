@@ -177,10 +177,6 @@ main,
   cursor: default;
 }
 
-.diagram__hit {
-  fill: transparent;
-}
-
 .diagram__node {
   fill: var(--bg);
   stroke: var(--accent);
@@ -212,40 +208,6 @@ main,
   transform: scale(1);
 }
 
-.diagram__legend {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--s3);
-  margin-top: var(--s6);
-  padding: 0;
-  list-style: none;
-  border-top: var(--hair) solid var(--rule);
-  padding-top: var(--s4);
-}
-
-.diagram__legend li {
-  display: grid;
-  gap: 0.35rem;
-  padding-left: var(--s3);
-  border-left: 2px solid var(--rule);
-  transition: border-color var(--dur-fast) var(--ease-out);
-}
-
-.diagram__legend li.is-active {
-  border-left-color: var(--accent);
-}
-
-.diagram__legend-label {
-  font-size: var(--t-small);
-  font-weight: 600;
-  font-stretch: 92%;
-  transition: color var(--dur-fast) var(--ease-out);
-}
-
-.diagram__legend li.is-active .diagram__legend-label {
-  color: var(--accent);
-}
-
 /* =========================================================================
    CHAPTER STAGES
    ========================================================================= */
@@ -265,135 +227,6 @@ main,
   overflow: hidden;
 }
 
-.chapter__canvas {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  object-fit: cover;
-  object-position: center;
-}
-
-.chapter__inner {
-  width: 100%;
-  display: grid;
-  gap: var(--s6);
-}
-
-.chapter__folio {
-  display: flex;
-  align-items: center;
-  gap: var(--s4);
-  margin-left: clamp(0rem, 7vw, 7rem);
-}
-
-.chapter__folio .t-folio {
-  font-size: 1rem;
-  /* The sampled accents sit at 3.6-5.2:1 on the collage's paper field, and
-     operate fails AA outright at this size. Mixed 80/20 with ink every chapter
-     clears 4.9:1 while staying unmistakably its own colour — the artwork keeps
-     the pure sampled value, only this numeral is darkened to stay readable. */
-  color: color-mix(in oklab, var(--accent) 80%, var(--ink));
-  font-weight: 600;
-}
-
-.chapter__folio-rule {
-  flex: 1;
-  max-width: 8rem;
-  height: var(--hair);
-  background: var(--rule-strong);
-}
-
-/* The artwork's clear paper field sits centre-right, so the text column is
-   inset from the left edge where the torn collage lives. A very slight paper
-   wash sits under the type: the collages carry grain and printed marks, and
-   body copy alone does not reliably clear 4.5:1 against them. */
-.chapter__body {
-  max-width: 44rem;
-  display: grid;
-  gap: var(--s5);
-  margin-left: clamp(0rem, 7vw, 7rem);
-  padding: clamp(1.25rem, 3vw, 2.25rem) clamp(1.25rem, 3vw, 2.5rem);
-  background: color-mix(in oklab, var(--paper-warm) 82%, transparent);
-  backdrop-filter: blur(2px);
-  border-left: 2px solid var(--accent);
-}
-
-.chapter__body .chapter__problem,
-.chapter__body .chapter__list li {
-  color: color-mix(in oklab, var(--ink) 82%, var(--paper));
-}
-
-/* The mask is what makes the title read as rising out of the paper rather
-   than sliding over it. The clip lives on the wrapper so the tween can move
-   the span freely inside it. */
-.chapter__title-mask {
-  overflow: hidden;
-  padding-bottom: 0.06em;
-  margin: 0;
-}
-
-.chapter__title {
-  display: block;
-  font-size: clamp(3.5rem, 11vw, 8rem);
-  line-height: 0.88;
-  color: var(--accent);
-}
-
-/* The canvas is parallaxed, so it needs headroom at both ends or the drift
-   exposes the section ground. */
-.chapter__canvas {
-  scale: 1.12;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chapter__canvas {
-    scale: 1;
-  }
-}
-
-.chapter__lead {
-  font-size: var(--t-subtitle);
-  font-weight: 500;
-  line-height: 1.3;
-  max-width: 24ch;
-  letter-spacing: -0.015em;
-}
-
-.chapter__problem {
-  max-width: 52ch;
-  color: var(--fg-dim);
-}
-
-.chapter__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 0;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-width: 46rem;
-}
-
-.chapter__list li {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fg-dim);
-  padding-right: 0.7rem;
-  margin-right: 0.7rem;
-  border-right: var(--hair) solid var(--rule-strong);
-  line-height: 1.9;
-}
-
-.chapter__list li:last-child {
-  border-right: 0;
-}
-
-.chapter__more {
-  justify-self: start;
-}
-
 /* =========================================================================
    STATEMENT
    ========================================================================= */
@@ -405,15 +238,6 @@ main,
 
 .statement__title {
   max-width: 18ch;
-}
-
-.statement__cols {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s6);
-  max-width: 62rem;
-  padding-top: var(--s5);
-  border-top: var(--hair) solid var(--rule);
 }
 
 /* =========================================================================
@@ -465,19 +289,14 @@ main,
 
 .journey {
   position: relative;
+  isolation: isolate;
   padding-top: clamp(7.5rem, 13vw, 12rem);
 }
 
 .journey::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("/assets/illustrations/route-compass.webp");
-  background-repeat: no-repeat;
-  background-position: top 2rem right 2rem;
-  background-size: clamp(16rem, 28vw, 30rem);
+  --plate: url("/assets/textures/route-compass.webp");
+  --plate-size: clamp(16rem, 28vw, 30rem);
+  --plate-pos: top 2rem right 2rem;
   opacity: 0.08;
   filter: saturate(0.7) brightness(1.05);
 }
@@ -645,11 +464,6 @@ main,
   margin-bottom: var(--s9);
 }
 
-.work__list {
-  display: grid;
-  gap: clamp(4rem, 9vw, 8rem);
-}
-
 .feature {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
@@ -663,84 +477,6 @@ main,
 
 .feature[data-flip] > * {
   direction: ltr;
-}
-
-.feature__media {
-  position: relative;
-  aspect-ratio: 16 / 10;
-  background: var(--bg-raised);
-  border: var(--hair) solid var(--rule);
-  overflow: hidden;
-}
-
-.feature__media-link {
-  position: absolute;
-  inset: 0;
-  display: block;
-}
-
-.feature__media img,
-.feature__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  transition: transform var(--dur-slow) var(--ease-out);
-}
-
-.feature__media:hover img,
-.feature__media:hover .feature__video {
-  transform: scale(1.02);
-}
-
-.feature__index {
-  position: absolute;
-  top: var(--s4);
-  left: var(--s4);
-  z-index: 2;
-  padding: 0.25rem 0.5rem;
-  background: color-mix(in oklab, var(--ink) 72%, transparent);
-  color: var(--glacier);
-  backdrop-filter: blur(6px);
-}
-
-.feature__body {
-  display: grid;
-  gap: var(--s4);
-  align-content: center;
-}
-
-.feature__title a {
-  background-image: linear-gradient(var(--accent), var(--accent));
-  background-size: 0% var(--hair);
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  transition: background-size var(--dur) var(--ease-out);
-}
-
-.feature__title a:hover {
-  background-size: 100% var(--hair);
-}
-
-.feature__services {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.5rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.feature__services li {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--fg-dim);
-  border: var(--hair) solid var(--rule);
-  padding: 0.25rem 0.5rem;
 }
 
 .work__more {
@@ -844,18 +580,13 @@ main,
 
 .automation {
   position: relative;
+  isolation: isolate;
 }
 
 .automation::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("/assets/illustrations/growth-curve.webp");
-  background-repeat: no-repeat;
-  background-position: bottom 1rem right 2rem;
-  background-size: clamp(20rem, 30vw, 34rem);
+  --plate: url("/assets/textures/growth-curve.webp");
+  --plate-size: clamp(20rem, 30vw, 34rem);
+  --plate-pos: bottom 1rem right 2rem;
   opacity: 0.06;
   filter: saturate(0.5) brightness(1.05);
 }
@@ -980,18 +711,13 @@ main,
 
 .process {
   position: relative;
+  isolation: isolate;
 }
 
 .process::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("/assets/illustrations/modular-blocks.webp");
-  background-repeat: no-repeat;
-  background-position: bottom 1rem left 2rem;
-  background-size: clamp(18rem, 26vw, 32rem);
+  --plate: url("/assets/textures/modular-blocks.webp");
+  --plate-size: clamp(18rem, 26vw, 32rem);
+  --plate-pos: bottom 1rem left 2rem;
   opacity: 0.08;
   filter: saturate(0.6) brightness(1.08);
 }
@@ -1000,13 +726,6 @@ main,
   display: grid;
   gap: var(--s4);
   margin-bottom: var(--s8);
-}
-
-.process__steps {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border-top: var(--hair) solid var(--rule);
 }
 
 .process__step {
@@ -1023,19 +742,6 @@ main,
   background: color-mix(in oklab, var(--fg) 4%, transparent);
 }
 
-.process__step-title {
-  font-size: var(--t-subtitle);
-  font-weight: 600;
-  font-stretch: 90%;
-  letter-spacing: -0.02em;
-}
-
-.process__step-body {
-  color: var(--fg-dim);
-  font-size: var(--t-small);
-  max-width: 58ch;
-}
-
 /* =========================================================================
    INDUSTRIES
    ========================================================================= */
@@ -1045,15 +751,6 @@ main,
   gap: var(--s4);
   margin-bottom: var(--s6);
   max-width: 34rem;
-}
-
-.industries__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-  border-top: var(--hair) solid var(--rule);
 }
 
 .industries__item {
@@ -1084,15 +781,9 @@ main,
 }
 
 .why::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("/assets/illustrations/connected-partnership.webp");
-  background-repeat: no-repeat;
-  background-position: center right;
-  background-size: clamp(24rem, 35vw, 40rem);
+  --plate: url("/assets/textures/connected-partnership.webp");
+  --plate-size: clamp(24rem, 35vw, 40rem);
+  --plate-pos: center right;
   opacity: 0.05;
   filter: saturate(0.6) brightness(1.05);
 }
@@ -1150,17 +841,6 @@ main,
 .why__card-body {
   font-size: var(--t-small);
   color: var(--fg-dim);
-}
-
-.why__plate {
-  margin: var(--s9) 0 0;
-  display: grid;
-  gap: var(--s3);
-}
-
-.why__plate img {
-  width: 100%;
-  height: auto;
 }
 
 /* =========================================================================
@@ -1268,13 +948,6 @@ main,
   .process__step {
     grid-template-columns: 3rem 1fr;
   }
-  .process__step-body {
-    grid-column: 2;
-  }
-  .statement__cols {
-    grid-template-columns: 1fr;
-    gap: var(--s5);
-  }
 }
 
 @media (max-width: 700px) {
@@ -1295,10 +968,6 @@ main,
     bottom: 0;
     transform: translateX(-50%) rotate(135deg);
   }
-  .diagram__legend {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s4) var(--s3);
-  }
   .journey__track,
   .journey__spans {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1309,9 +978,6 @@ main,
   }
   .specimen__row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .chapter__title {
-    font-size: clamp(3rem, 16vw, 5rem);
   }
 }
 
@@ -1719,69 +1385,78 @@ main,
     min-height: calc(100svh - 7.75rem);
   }
 
+  /* The plotted mark is a desktop instrument. At this width it could only ever
+     be a ghost bleeding off the right edge, and its readout — "The customer
+     path" and its caption — ran off the screen with it. Removed rather than
+     shrunk: the cover is now carried by the type, which is what actually reads
+     on a phone. `display: none` also stops the diagram's signal loop, so the
+     work is not merely hidden. */
+  .hero__plot {
+    display: none;
+  }
+
+  /* One column, filling the viewport: label at the top, the claim as the
+     centrepiece, and the disciplines pinned to the bottom edge so the cover has
+     a floor instead of trailing off. */
   .hero__copy {
     position: relative;
     z-index: 2;
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - 7.75rem);
   }
 
+  /* The measure has to allow for the tick rule that sits inside the label, or
+     four words break onto four lines. */
   .hero__eyebrow {
-    max-width: 28ch;
+    max-width: none;
     margin-bottom: clamp(1.25rem, 5vh, 2.25rem);
-    line-height: 1.35;
+    line-height: 1.45;
   }
 
   .hero__title {
-    max-width: 12ch;
-    margin-bottom: 1.3rem;
-    font-size: clamp(2.85rem, 13.2vw, 4rem);
+    max-width: 14ch;
+    margin-bottom: 1.5rem;
+    font-size: clamp(3rem, 14.5vw, 4.6rem);
     line-height: 0.9;
     text-wrap: balance;
   }
 
   .hero__lead {
-    max-width: 30ch;
-    margin-bottom: 1.35rem;
-    font-size: clamp(1rem, 4.4vw, 1.12rem);
-    line-height: 1.5;
+    max-width: 34ch;
+    margin-bottom: clamp(1.75rem, 5vh, 2.5rem);
+    font-size: clamp(1.02rem, 4.4vw, 1.14rem);
+    line-height: 1.55;
   }
 
+  /* Stacked and full width. Side by side, the two labels forced 0.76rem type
+     into 3rem boxes; at this size a phone button should be easy to hit without
+     aiming. */
   .hero__actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    max-width: 26rem;
-    margin-bottom: 1.15rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+    max-width: none;
+    margin-bottom: clamp(1.5rem, 4vh, 2.25rem);
   }
 
   .hero__actions .btn {
-    min-height: 3rem;
+    min-height: 3.25rem;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 0.75rem 0.85rem;
-    font-size: clamp(0.76rem, 3.2vw, 0.88rem);
+    padding: 0.85rem 1.1rem;
+    font-size: 0.92rem;
   }
 
+  /* Brought back on mobile. With the diagram gone there is room for it, and it
+     is the only place on the cover that names what the studio actually does. */
   .hero__disciplines {
-    max-width: 31ch;
-    padding-top: 0.8rem;
+    display: block;
+    margin-top: auto;
+    padding-top: 0.9rem;
     border-top: var(--hair) solid var(--rule);
-    line-height: 1.75;
-  }
-
-  .hero__plot {
-    position: absolute;
-    right: -4.5rem;
-    bottom: -1.75rem;
-    z-index: 1;
-    width: 18rem;
-    opacity: 0.14;
-    pointer-events: none;
-  }
-
-  .hero .diagram__legend {
-    display: none;
+    line-height: 1.7;
+    letter-spacing: 0.12em;
   }
 
   /* --- four growth chapters ------------------------------------------ */
@@ -1792,77 +1467,6 @@ main,
     padding-block: 4.75rem 1.25rem;
   }
 
-  .chapter__canvas {
-    scale: 1.03;
-  }
-
-  .chapter__inner {
-    min-height: calc(100svh - 6rem);
-    align-content: space-between;
-    gap: 1.5rem;
-  }
-
-  .chapter__folio,
-  .chapter__body {
-    margin-left: 0;
-  }
-
-  .chapter__folio {
-    gap: 0.75rem;
-  }
-
-  .chapter__folio-rule {
-    max-width: 3.5rem;
-  }
-
-  .chapter__body {
-    width: 100%;
-    max-width: none;
-    gap: 1rem;
-    padding: 1.15rem;
-    background: color-mix(in oklab, var(--paper-warm) 92%, transparent);
-    backdrop-filter: none;
-    border-left: 0;
-    border-top: 2px solid var(--accent);
-    box-shadow: 0 1.2rem 3rem color-mix(in oklab, var(--ink) 13%, transparent);
-  }
-
-  .chapter__title {
-    font-size: clamp(3.2rem, 17vw, 4.8rem);
-  }
-
-  .chapter__lead {
-    max-width: 26ch;
-    font-size: clamp(1.08rem, 4.7vw, 1.25rem);
-  }
-
-  .chapter__problem {
-    font-size: 0.94rem;
-    line-height: 1.55;
-  }
-
-  .chapter__list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    max-width: none;
-    border-top: var(--hair) solid var(--rule-strong);
-  }
-
-  .chapter__list li {
-    margin: 0;
-    padding: 0.46rem 0.45rem 0.46rem 0;
-    border-right: 0;
-    border-bottom: var(--hair) solid var(--rule);
-    line-height: 1.35;
-  }
-
-  .chapter__list li:nth-child(even) {
-    padding-left: 0.65rem;
-    border-left: var(--hair) solid var(--rule);
-  }
-
-  .chapter__more,
   .showcase__go {
     min-height: 2.75rem;
     align-items: center;
@@ -1884,10 +1488,6 @@ main,
   .process__title {
     font-size: clamp(2.45rem, 11.5vw, 3.35rem);
     line-height: 0.98;
-  }
-
-  .statement__cols {
-    padding-top: 1.25rem;
   }
 
   .journey__head,
@@ -2103,19 +1703,6 @@ main,
     padding-block: 1.25rem;
   }
 
-  .process__step-title {
-    font-size: 1.2rem;
-  }
-
-  .process__step-body {
-    grid-column: 2;
-    line-height: 1.55;
-  }
-
-  .industries__list {
-    grid-template-columns: 1fr;
-  }
-
   .industries__item {
     min-height: 3.5rem;
     padding-block: 0.9rem;
@@ -2129,15 +1716,6 @@ main,
 
   .why__card {
     padding: 1.35rem 1.15rem;
-  }
-
-  .why__plate {
-    width: calc(100% + var(--gutter) * 2);
-    margin: 3.5rem 0 0 calc(var(--gutter) * -1);
-  }
-
-  .why__plate figcaption {
-    padding-inline: var(--gutter);
   }
 
   .cta {
@@ -2159,40 +1737,8 @@ main,
 }
 
 @media (max-width: 350px) {
-  .hero__eyebrow {
-    margin-bottom: 1.15rem;
-  }
-
-  .hero__title {
-    font-size: 2.8rem;
-  }
-
-  .hero__actions {
-    grid-template-columns: 1fr;
-  }
-
-  .hero__disciplines {
-    display: none;
-  }
-
-  .hero__plot {
-    right: -5.5rem;
-  }
-
   .chapter {
     min-height: auto;
-  }
-
-  .chapter__inner {
-    min-height: 42rem;
-  }
-
-  .chapter__body {
-    padding: 1rem;
-  }
-
-  .chapter__title {
-    font-size: 3rem;
   }
 }
 
@@ -2215,30 +1761,6 @@ main,
         transparent 46%
       ),
       var(--bg);
-  }
-
-  .hero__eyebrow {
-    margin-bottom: clamp(1.1rem, 3.5vh, 1.7rem);
-  }
-
-  .hero__title {
-    max-width: 13ch;
-    text-wrap: wrap;
-  }
-
-  .hero__lead {
-    max-width: 28ch;
-  }
-
-  .hero__disciplines {
-    display: none;
-  }
-
-  .hero__plot {
-    right: -4rem;
-    bottom: -1rem;
-    width: 18rem;
-    opacity: 0.23;
   }
 
   /* Four full-page stages become one tactile, art-directed atlas. The next
@@ -2269,66 +1791,6 @@ main,
       color-mix(in oklab, var(--glacier) 22%, transparent);
     scroll-snap-align: center;
     scroll-snap-stop: always;
-  }
-
-  .chapter__inner {
-    min-height: 43rem;
-    gap: 1rem;
-    padding-inline: 0.9rem;
-  }
-
-  .chapter__canvas {
-    scale: 1;
-  }
-
-  .chapter[data-chapter="attract"] .chapter__canvas,
-  .chapter[data-chapter="convert"] .chapter__canvas,
-  .chapter[data-chapter="operate"] .chapter__canvas {
-    object-position: left center;
-  }
-
-  .chapter[data-chapter="scale"] .chapter__canvas {
-    object-position: right center;
-  }
-
-  .chapter__folio {
-    justify-self: start;
-    gap: 0.55rem;
-    padding: 0.45rem 0.6rem;
-    background: color-mix(in oklab, var(--paper-warm) 86%, transparent);
-  }
-
-  .chapter__folio-rule {
-    width: 1.5rem;
-  }
-
-  .chapter__body {
-    gap: 0.8rem;
-    padding: 1rem;
-    background: color-mix(in oklab, var(--paper-warm) 96%, transparent);
-    box-shadow: 0 1rem 2.5rem color-mix(in oklab, var(--ink) 16%, transparent);
-  }
-
-  .chapter__title {
-    font-size: clamp(3rem, 15vw, 4rem);
-  }
-
-  .chapter__lead {
-    font-size: 1.05rem;
-    line-height: 1.3;
-  }
-
-  .chapter__problem {
-    font-size: 0.87rem;
-    line-height: 1.5;
-  }
-
-  .chapter__list li:nth-child(n + 5) {
-    display: none;
-  }
-
-  .chapter__more {
-    min-height: 2.75rem;
   }
 
   /* Mobile motion never withholds reading content. */
@@ -2450,15 +1912,6 @@ main,
     align-items: center;
   }
 
-  /* A compact six-part index is a better homepage preview than six long
-     paragraphs. The dedicated process route keeps the full explanation. */
-  .process__steps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border-top: var(--hair) solid var(--rule);
-    border-left: var(--hair) solid var(--rule);
-  }
-
   .process {
     padding-bottom: 3rem;
   }
@@ -2473,31 +1926,11 @@ main,
     border-bottom: var(--hair) solid var(--rule);
   }
 
-  .process__step-title {
-    font-size: 1.08rem;
-  }
-
-  .process__step-body {
-    display: none;
-  }
-
-  .industries__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .industries__item {
     min-height: 4.5rem;
     padding: 0.75rem 0.7rem 0.75rem 0;
     font-size: 0.88rem;
     line-height: 1.25;
-  }
-
-  .industries__list li:nth-child(odd) .industries__item {
-    border-right: var(--hair) solid var(--rule);
-  }
-
-  .industries__list li:nth-child(even) .industries__item {
-    padding-left: 0.7rem;
   }
 
   /* Principles become a swipeable set of statements, not six identical boxes
@@ -2525,18 +1958,9 @@ main,
 }
 
 @media (max-width: 350px) {
-  .hero__plot {
-    right: -4.5rem;
-    bottom: -0.5rem;
-  }
-
   .chapter {
     flex-basis: 88vw;
     min-height: 43rem;
-  }
-
-  .chapter__inner {
-    min-height: 41rem;
   }
 
   .showcase__item:nth-child(n + 2) {
@@ -2660,41 +2084,6 @@ main,
    definitions rather than sitting alongside them.
    ========================================================================= */
 
-/* --- POSITION / the tie ---------------------------------------------------
-   "Arctos connects both sides." A bracket spans both columns and closes on
-   each of them, drawn as the section arrives. */
-
-.statement__cols {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(2rem, 5vw, 4.5rem);
-  max-width: 68rem;
-  padding-top: var(--s7);
-  border-top: 0;
-}
-
-.statement__tie {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 14px;
-  border-inline: var(--hair) solid var(--accent);
-  border-top: var(--hair) solid var(--accent);
-  transform-origin: center;
-  transform: scaleX(0);
-  transition: transform var(--dur-draw) var(--ease-draw);
-}
-
-.reveal.is-in .statement__tie,
-:root:not(.js) .statement__tie {
-  transform: scaleX(1);
-}
-
-.statement__col {
-  font-size: var(--t-body);
-  line-height: var(--lh-copy);
-  color: var(--fg-dim);
-}
 
 /* The label sits on the same first line as the copy, so the two columns read
    as two named halves of one argument instead of two loose paragraphs. */
@@ -3242,12 +2631,6 @@ ol.ascent__stages {
   }
 }
 
-/* The old legend is replaced by the readout — the four names now live on the
-   plot itself, where they mean something. */
-.diagram__legend {
-  display: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   /* No patrol. The route is shown complete and the stations still operate. */
   .diagram__route-live {
@@ -3336,7 +2719,7 @@ ol.ascent__stages {
       color-mix(in oklab, var(--ink) 82%, transparent) 38%,
       transparent 72%
     ),
-    url("/assets/figures/starfield.webp");
+    url("/assets/textures/starfield.webp");
   background-size: auto, cover;
   background-position:
     center,
@@ -3623,11 +3006,56 @@ ul.work__clients {
   pointer-events: none;
 }
 
-/* A live survey pass over the actual contour artwork. The narrow reveal uses
-   the same source plate at a brighter exposure, so it feels like an instrument
-   reading the terrain rather than an unrelated effect laid over the hero. */
+/* A live survey pass over the actual contour artwork.
+   -------------------------------------------------------------------------
+   The band is a LENS, not a spotlight. It shows the same contour plate as the
+   terrain behind it, displaced and scaled a little, so every contour line
+   breaks sideways where the band crosses it and closes up again once it has
+   passed. That refraction is the whole effect: exposure alone only ever gave a
+   moving highlight, and the bending is what makes the pass read as an
+   instrument taking a reading off real ground.
+
+   Geometry is stated once as custom properties because three layers have to
+   agree on it — the refracted plate, the colour wash, and the rule itself.
+   Only `--scan-x` is animated; everything else is fixed. */
 .hero__survey {
   --scan-x: 72%;
+
+  /* Half-widths of the pass, measured out from the rule. */
+  --band: 14%; /* where it has faded to nothing */
+  --band-soft: 8.5%; /* the shoulder */
+  --band-core: 2.4%; /* full strength either side of the rule */
+
+  /* How far the lens throws the terrain, per half. The step you actually see
+     at the rule is twice this, because the two halves throw it opposite ways. */
+  --warp: 1.5rem;
+
+  /* Two half-windows that butt against the rule. The hard stop AT --scan-x is
+     the whole trick: the two halves show the same terrain shifted opposite
+     ways, so every contour line crossing the pass takes a visible step exactly
+     where the rule is. The rule stops being a highlight drawn over the
+     background and becomes the edge doing the bending. */
+  --pass-lead: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--scan-x) - var(--band)),
+    rgb(0 0 0 / 0.18) calc(var(--scan-x) - var(--band-soft)),
+    #000 calc(var(--scan-x) - var(--band-core)),
+    #000 var(--scan-x),
+    transparent var(--scan-x),
+    transparent 100%
+  );
+  --pass-trail: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent var(--scan-x),
+    #000 var(--scan-x),
+    #000 calc(var(--scan-x) + var(--band-core)),
+    rgb(0 0 0 / 0.18) calc(var(--scan-x) + var(--band-soft)),
+    transparent calc(var(--scan-x) + var(--band)),
+    transparent 100%
+  );
+
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -3635,37 +3063,41 @@ ul.work__clients {
   pointer-events: none;
 }
 
-.hero__survey::before {
+/* The two refracted halves.
+   -------------------------------------------------------------------------
+   The displacement is on `background-position`, NOT on `transform`. A transform
+   carries the element's own mask along with it, so the window and the terrain
+   inside it move together and nothing is displaced relative to anything — it
+   just slides the whole band sideways. Moving the background inside a window
+   that stays put is what actually refracts.
+
+   `background-size` is deliberately oversized rather than `cover`: at cover
+   this plate has no horizontal slack at all on a wide hero, so shifting the
+   position would drag a bare edge into frame. */
+.hero__survey::before,
+.hero__survey::after {
   content: "";
   position: absolute;
   inset: -2%;
-  background-image: url("/assets/illustrations/contour-field.webp");
-  background-position: center;
-  background-size: cover;
-  opacity: 0.78;
-  filter: saturate(0.82) contrast(1.14) brightness(1.24);
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    transparent calc(var(--scan-x) - 13%),
-    rgb(0 0 0 / 0.2) calc(var(--scan-x) - 8%),
-    #000 calc(var(--scan-x) - 2%),
-    #000 calc(var(--scan-x) + 2%),
-    rgb(0 0 0 / 0.2) calc(var(--scan-x) + 8%),
-    transparent calc(var(--scan-x) + 13%),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    transparent calc(var(--scan-x) - 13%),
-    rgb(0 0 0 / 0.2) calc(var(--scan-x) - 8%),
-    #000 calc(var(--scan-x) - 2%),
-    #000 calc(var(--scan-x) + 2%),
-    rgb(0 0 0 / 0.2) calc(var(--scan-x) + 8%),
-    transparent calc(var(--scan-x) + 13%),
-    transparent 100%
-  );
+  background-image: url("/assets/textures/contour-field.webp");
+  background-size: 116% auto;
+  opacity: 0.88;
+  /* Enough lift that the pass is visibly a brighter column, not so much that
+     the contour lines bloom — the bloom is what buried the displacement when
+     this carried a colour wash, and the displacement is the whole effect. */
+  filter: saturate(0.82) contrast(1.22) brightness(1.38);
+}
+
+.hero__survey::before {
+  background-position: calc(50% - var(--warp)) center;
+  -webkit-mask-image: var(--pass-lead);
+  mask-image: var(--pass-lead);
+}
+
+.hero__survey::after {
+  background-position: calc(50% + var(--warp)) center;
+  -webkit-mask-image: var(--pass-trail);
+  mask-image: var(--pass-trail);
 }
 
 .hero__survey-line {
@@ -3703,10 +3135,27 @@ ul.work__clients {
   z-index: 1;
 }
 
+/* A mounted plate, not a loose image. The artwork is an opaque square with its
+   own dark ground, so it is treated as a physical specimen card: ground matched
+   so no seam shows, hairline frame so the edge is intentional, and a drop
+   shadow on paper so it reads as laid onto the sheet rather than cut out of it.
+   The same object works on both materials, which is the point. */
 .field-figure {
   margin: 0;
   overflow: hidden;
-  background: var(--ink);
+  border-radius: var(--radius);
+}
+
+/* An edge is only drawn where one is needed. On paper the plate is a dark
+   object on a cream sheet, and there the frame and shadow are what make it read
+   as mounted rather than punched out — so the instrument feather is cancelled
+   and the square edge comes back deliberately. */
+[data-material="paper"] .field-figure {
+  background: var(--plate-ground);
+  border: var(--hair) solid color-mix(in oklab, var(--ink) 55%, transparent);
+  box-shadow: 0 1.25rem 3rem color-mix(in oklab, var(--ink) 22%, transparent);
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .field-figure img {
@@ -3714,6 +3163,36 @@ ul.work__clients {
   height: auto;
   display: block;
   transform-origin: center;
+}
+
+/* The instrument seam.
+   The note above used to claim the plate ground and the section ground were
+   "the same dark". Sampled from the files, they are not: the artwork grounds
+   run #02111a–#05141d and `--ink` is #081319, so an opaque square laid on an
+   instrument section showed as a visibly darker box with four hard corners —
+   the illustrations reading as floating grey plates.
+
+   The ground is baked into the raster, so no background colour can fix it;
+   only dissolving the artwork's own edge can. These compositions are circular
+   inside their square, so a `closest-side` falloff takes the straight edges and
+   corners — which are pure ground and nothing else — and leaves the drawing
+   untouched.
+
+   Stated unscoped and cancelled on paper below, NOT scoped to
+   `[data-material="instrument"]`: <body> carries that attribute, so an
+   instrument-scoped selector matches every plate on the page including the ones
+   sitting on cream, and it feathered the mounted paper plates into blurred
+   circles. Material has to be read from the nearest surface, and the only
+   selector that does that reliably here is the paper override. */
+.field-figure,
+.ascent__figure {
+  --plate-edge: radial-gradient(
+    closest-side circle at center,
+    #000 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: var(--plate-edge);
+  mask-image: var(--plate-edge);
 }
 
 /* The route header carries three kinds of information: the claim, its plain
@@ -3782,22 +3261,25 @@ ul.work__clients {
 }
 
 .why__plates {
-  margin-top: clamp(3rem, 7vw, 6rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--hair);
-  background: var(--rule);
-  border: var(--hair) solid var(--rule);
+  gap: clamp(1rem, 2.5vw, 2rem);
 }
 
 .why__plates figure {
   min-width: 0;
 }
 
+/* The label belongs to the plate, so it is printed on the plate's own ground.
+   A cream caption strip under a dark card made each figure two materials at
+   once, and once the plates are staggered those cream strips overlapped their
+   neighbours and clipped each other's text. */
 .why__plates figcaption {
   padding: var(--s4) var(--s5);
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--plate-ground);
+  border-top: var(--hair) solid color-mix(in oklab, var(--glacier) 16%, transparent);
+  color: color-mix(in oklab, var(--glacier) 78%, var(--plate-ground));
   font-family: var(--font-mono);
   font-size: var(--t-micro);
   font-weight: 500;
@@ -4505,40 +3987,30 @@ ul.work__clients {
   }
 }
 
+/* Laid-out-on-a-desk stagger. The rotation is the whole effect; the inward
+   translateX that used to come with it pulled the plates into each other and
+   the scaled middle plate covered its neighbours' labels. Rotation alone reads
+   the same and cannot clip anything, because the gap absorbs the sweep. */
 @media (min-width: 901px) and (hover: hover) and (pointer: fine) {
-  .why__plates {
-    gap: 0;
-    padding-inline: clamp(1.5rem, 4vw, 4rem);
-    border: 0;
-    background: transparent;
-  }
-
   .why__plates figure {
     position: relative;
-    opacity: 0.9;
-    box-shadow: 0 1.5rem 3.5rem color-mix(in oklab, var(--ink) 18%, transparent);
-    transition:
-      opacity var(--dur) var(--ease-out),
-      transform var(--dur-slow) var(--ease-out);
+    transition: transform var(--dur-slow) var(--ease-out);
   }
 
   .why__plates figure:nth-child(1) {
-    z-index: 1;
-    transform: translateX(1.5rem) rotate(-2.2deg) translateY(0.5rem);
+    transform: rotate(-1.6deg) translateY(0.4rem);
   }
 
   .why__plates figure:nth-child(2) {
-    z-index: 3;
-    transform: scale(1.025) translateY(-0.35rem);
+    transform: translateY(-0.3rem);
   }
 
   .why__plates figure:nth-child(3) {
-    z-index: 2;
-    transform: translateX(-1.5rem) rotate(2.2deg) translateY(0.5rem);
+    transform: rotate(1.6deg) translateY(0.4rem);
   }
 
+  /* Squared up on approach — the set resolves into an ordered row. */
   .why__plates:hover figure {
-    opacity: 1;
     transform: none;
   }
 }

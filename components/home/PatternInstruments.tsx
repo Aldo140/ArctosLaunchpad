@@ -2,6 +2,11 @@
  * Small kinetic instruments adapted from the supplied Uiverse references.
  * Their geometry is decorative; the surrounding heading and illustration
  * carry the meaning when motion is unavailable.
+ *
+ * AutomationPress and ResponsiveBuild are kept here but are no longer mounted
+ * on the homepage illustration plates: sitting inside the plate they covered
+ * the artwork's subject and their labels were clipped by the plate edge. They
+ * need a container of their own before they go back on the page.
  */
 
 export function AutomationPress() {

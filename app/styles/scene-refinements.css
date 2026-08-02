@@ -1,0 +1,979 @@
+/* =========================================================================
+   ARCTOS — scene refinements, responsive collapse, reduced motion, phone compositions
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   SCENE REFINEMENTS
+   Placed before the responsive blocks on purpose: these are unconditional
+   rules, and a later unconditional rule would out-rank the media queries
+   below it at equal specificity.
+   ========================================================================= */
+
+/* The header is fixed, so a scene mark centred in the full viewport puts its
+   folio underneath the bar. Reserve the bar's height at the top and balance it
+   at the foot so the block stays optically centred. */
+.scene__shell {
+  padding-top: clamp(5rem, 9vh, 7rem);
+  padding-bottom: clamp(2rem, 5vh, 4rem);
+}
+
+/* The seam where the screen meets the page. The accent hairline alone marked
+   the edge; this makes the panel look lit from that edge, so the two materials
+   read as one object meeting rather than two blocks stacked. */
+.scene__panel::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(6rem, 14vh, 11rem);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--accent) 16%, transparent),
+    transparent
+  );
+}
+
+.scene__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The mega title is clipped by `SceneMotion` on entry. Declaring the finished
+   state here means the type is fully visible with no JavaScript — the mask is
+   something motion adds, never something the layout depends on. */
+.scene__title {
+  clip-path: inset(0 0 -12% 0);
+}
+
+/* The copy under the title follows it in, on a CSS transition rather than a
+   tween. GSAP owned this briefly and a fast scroll through four scenes left it
+   stranded mid-fade; a transition cannot stop short of its end value. Gated on
+   `:root.js` so it is simply visible without scripting. */
+:root.js .scene__lead,
+:root.js .work-scene__open {
+  opacity: 0;
+  transition: opacity var(--dur-set) var(--ease-set) 260ms;
+}
+
+:root.js .scene.is-in .scene__lead,
+:root.js .scene.is-in .work-scene__open {
+  opacity: 1;
+}
+
+:root.js .work-scene__open {
+  transition-delay: 380ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root.js .scene__lead,
+  :root.js .work-scene__open {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/* A held plate that fills the viewport gives the reader no hint that it ends.
+   A single hairline at the foot of the scene, in the chapter's accent, marks
+   how far the artwork runs. */
+.scene__hold::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: var(--hair);
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+/* -------------------------------------------------------------------------
+   RESPONSIVE COLLAPSE
+
+   The held scene is a wide-screen device. On a phone a sticky full-viewport
+   plate with a panel rising over it eats the whole screen and fights the
+   browser's own address-bar behaviour, so below 900px the scene stops holding
+   and becomes what it always degrades to: a full-bleed plate followed by its
+   panel. Same content, same order, no stickiness.
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .process-route__layout {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .process-route__rail nav {
+    display: none;
+  }
+
+  .process-route__rail {
+    position: static;
+  }
+
+  .work-panel__grid,
+  .work-records__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .work-panel__summary,
+  .work-records__header {
+    grid-column: 1 / -1;
+  }
+
+  .studio-principles__field,
+  .studio-system__chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  /* The hold is released. */
+  .scene__hold {
+    position: static;
+    height: min(62svh, 26rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: 0;
+    min-height: 0;
+    padding-block: clamp(3rem, 8vw, 5rem);
+    background: var(--bg);
+  }
+
+  .scene__panel {
+    box-shadow: none;
+  }
+
+  /* With the plate no longer full-viewport the scrim has less room to fade,
+     so it covers more of the frame to keep the title legible. */
+  .scene__scrim {
+    background: linear-gradient(
+      170deg,
+      color-mix(in oklab, var(--paper-warm) 88%, transparent) 0%,
+      color-mix(in oklab, var(--paper-warm) 78%, transparent) 55%,
+      color-mix(in oklab, var(--paper-warm) 40%, transparent) 100%
+    );
+  }
+
+  .scene--work .scene__scrim {
+    background: linear-gradient(
+      170deg,
+      color-mix(in oklab, var(--ink) 86%, transparent) 0%,
+      color-mix(in oklab, var(--ink) 74%, transparent) 55%,
+      color-mix(in oklab, var(--ink) 40%, transparent) 100%
+    );
+  }
+
+  .scene__mark {
+    max-width: none;
+  }
+
+  .chapter-panel__head,
+  .studio-system__header,
+  .studio-principles__header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chapter-panel__problem,
+  .studio-system__header h2,
+  .studio-principles__header h2 {
+    grid-column: 1;
+  }
+
+  /* Stacked, the plate must not become the panel's opening statement. Held to
+     a reference size and set to the right, it stays a margin figure beside the
+     problem rather than a banner above the service list. */
+  .chapter-panel__plate {
+    grid-column: 1;
+    width: 40vw;
+    max-width: 11rem;
+    margin-top: calc(var(--s2) * -1);
+  }
+
+  .atlas-services__link {
+    grid-template-columns: 2.75rem minmax(0, 1fr) 1.75rem;
+    gap: var(--s3) var(--s4);
+    row-gap: var(--s2);
+    align-items: baseline;
+  }
+
+  .atlas-services__summary {
+    grid-column: 2 / -1;
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .studio-open__identity {
+    grid-auto-flow: row;
+    gap: var(--s4);
+  }
+
+  /* The dimension turns vertical: it still measures between two ends. */
+  .studio-gap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s6);
+  }
+
+  .studio-gap__end--right {
+    text-align: left;
+  }
+
+  .studio-gap__rule {
+    height: 2px;
+    border-inline: 0;
+    border-top: 2px solid var(--accent);
+  }
+
+  .studio-gap__rule::before {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .process-route__steps {
+    padding-left: clamp(1.75rem, 7vw, 2.75rem);
+  }
+
+  .process-stop::before {
+    left: calc(clamp(1.75rem, 7vw, 2.75rem) * -1);
+    width: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .process-legend {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: var(--s5);
+  }
+
+  .process-loop__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .process-loop__figure {
+    grid-column: 1;
+    grid-row: auto;
+    max-width: 24rem;
+  }
+
+  .process-loop__return {
+    grid-column: 1;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .process-loop__bracket {
+    transform-origin: left;
+  }
+
+  .work-panel__grid,
+  .work-records__grid,
+  .studio-principles__field,
+  .studio-system__chapters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .work-record dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s1);
+  }
+
+  .interior-document[data-motion="staged"] .cta__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interior-document[data-motion="staged"] .cta__title,
+  .interior-document[data-motion="staged"] .cta__body,
+  .interior-document[data-motion="staged"] .cta__actions {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .process-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stage-gauge__band {
+    min-height: 0;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-content: start;
+    gap: var(--s3);
+  }
+
+  .stage-gauge__n {
+    grid-row: 1 / span 2;
+  }
+
+  .atlas-services__link {
+    grid-template-columns: 2rem minmax(0, 1fr) 1.5rem;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   REDUCED MOTION
+
+   `base.css` flattens durations globally. What it cannot know is that these
+   routes drive geometry from custom properties that JavaScript would otherwise
+   leave part-way through a sequence, and that a held scene is itself motion.
+   The hold is released and everything reads as finished.
+   ------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .scene__hold {
+    position: static;
+    height: min(62svh, 26rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: 0;
+    min-height: 0;
+    padding-block: clamp(3rem, 8vw, 5rem);
+    background: var(--bg);
+  }
+
+  .process-route__steps::after,
+  .stage-gauge__band::after {
+    transform: scaleX(1) scaleY(1);
+  }
+
+  .process-stop,
+  .process-route__rail li a,
+  .process-route__rail li a span {
+    --lit: 1;
+  }
+
+  .process-stop::before,
+  .atlas-services__item::after,
+  .atlas-chapter__bracket,
+  .process-loop__bracket,
+  .scene__folio::after,
+  .studio-gap__rule::before {
+    transform: none;
+  }
+
+  .atlas-services__link::before {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .studio-system__chapter img {
+    transform: none;
+  }
+}
+
+/* =========================================================================
+   PHONE COMPOSITIONS
+   Wide indexes become swipeable folios; chapter artwork and type become one
+   cover; dense records become strongly ordered touch-first reading paths.
+   ========================================================================= */
+
+@media (max-width: 760px) {
+  .interior-document,
+  .interior-document * {
+    min-width: 0;
+  }
+
+  /* Scroll-linked image scale can extend a few optical pixels beyond its
+     frame. The mobile scenes are no longer sticky, so clipping at the scene
+     boundary is safe and prevents that transform from widening the page. */
+  .scene {
+    overflow: clip;
+  }
+
+  .interior-document > .section:not(.masthead, .cta),
+  .section.policy-cover,
+  .section.notfound {
+    padding-block: clamp(3.75rem, 15vw, 5.5rem);
+  }
+
+  .masthead,
+  .interior-document .masthead,
+  .services-open,
+  .work-open {
+    padding-top: max(6.25rem, calc(5.25rem + env(safe-area-inset-top)));
+    padding-bottom: clamp(3.5rem, 14vw, 5rem);
+  }
+
+  .masthead__inner,
+  .interior-document .masthead__inner,
+  .svc-balance__inner,
+  .svc-scope__head,
+  .svc-method__head,
+  .svc-notes__inner,
+  .svc-band,
+  .svc-spec,
+  .wk-spec,
+  .wk-spec__head,
+  .wk-live__head,
+  .context-open,
+  .stageplot,
+  .quadrant,
+  .context-nav,
+  .context-note,
+  .intake,
+  .policy,
+  .policy-cover__meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .interior-document .masthead__body,
+  .interior-document .masthead__aside,
+  .interior-document .masthead__footer,
+  .interior-document .crumbs {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .interior-document .masthead__aside {
+    padding: var(--s5) 0 0;
+    border-left: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .crumbs ol {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+
+  .crumbs ol::-webkit-scrollbar {
+    display: none;
+  }
+
+  .masthead__title,
+  .interior-document .masthead__title,
+  .route-open__title,
+  .policy-cover__title,
+  .context-open__headline,
+  .notfound__title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+    font-size: clamp(2.65rem, 13.5vw, 4.35rem);
+    line-height: 0.94;
+    letter-spacing: -0.042em;
+  }
+
+  .masthead__intro,
+  .interior-document .masthead__intro,
+  .route-open__intro,
+  .policy-cover__intro {
+    max-width: 34rem;
+    font-size: clamp(1.05rem, 4.6vw, 1.25rem);
+    line-height: 1.48;
+  }
+
+  .services-open__inner,
+  .work-open__inner {
+    gap: clamp(2.25rem, 10vw, 3.75rem);
+  }
+
+  /* Artwork and argument share one compact cover without sticky scrolling. */
+  .scene__hold,
+  .scene--work .scene__hold {
+    position: static;
+    height: clamp(19rem, 48svh, 24rem);
+    min-height: 0;
+  }
+
+  .scene__shell {
+    margin-top: clamp(-24rem, -48svh, -19rem);
+    min-height: clamp(19rem, 48svh, 24rem);
+    padding-block: clamp(2.25rem, 9vw, 3.5rem);
+    align-content: end;
+    background: transparent;
+  }
+
+  .scene__mark {
+    max-width: 100%;
+    gap: var(--s4);
+    padding-right: clamp(0rem, 5vw, 1.25rem);
+  }
+
+  .scene__title,
+  .scene__title--phrase {
+    max-width: 100%;
+    font-size: clamp(3.15rem, 16vw, 5.25rem);
+    line-height: 0.88;
+    overflow-wrap: anywhere;
+  }
+
+  .scene__lead {
+    max-width: 26ch;
+    font-size: clamp(1.1rem, 5.2vw, 1.4rem);
+    line-height: 1.2;
+  }
+
+  .scene__panel {
+    padding-block: clamp(3rem, 12vw, 4.5rem);
+  }
+
+  .scene__scrim {
+    background: linear-gradient(168deg, color-mix(in oklab, var(--paper-warm) 38%, transparent), color-mix(in oklab, var(--paper-warm) 96%, transparent));
+  }
+
+  .scene--work .scene__scrim {
+    background: linear-gradient(168deg, color-mix(in oklab, var(--ink) 24%, transparent), color-mix(in oklab, var(--ink) 96%, transparent));
+  }
+
+  .scene--attract .scene__canvas img,
+  .scene--convert .scene__canvas img,
+  .scene--operate .scene__canvas img,
+  .scene--scale .scene__canvas img,
+  .scene--studio .scene__canvas img {
+    --canvas-x: 50%;
+  }
+
+  .scene--process .scene__canvas img {
+    --canvas-x: 43%;
+  }
+
+  .scene--studio .scene__canvas img {
+    width: 170%;
+    object-position: 7% 54%;
+  }
+
+  /* These indexes are spatial maps, so a swipeable folio preserves the idea
+     better than a tall stack before the page's actual content. */
+  .stage-gauge__scale,
+  .work-sheet,
+  .process-legend,
+  .studio-system__chapters {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: var(--s3);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: none;
+    padding-bottom: var(--s2);
+  }
+
+  /* The scale deliberately reaches the viewport edge from inside a padded
+     shell. Contain that visual bleed at the gauge, while the scale itself
+     remains independently swipeable. */
+  .stage-gauge {
+    overflow: clip;
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-auto-columns: minmax(15rem, 78vw);
+    border: 0;
+    background: transparent;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .stage-gauge__scale {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+
+  .process-legend {
+    grid-auto-columns: minmax(8.5rem, 43vw);
+  }
+
+  .studio-system__chapters {
+    grid-auto-columns: minmax(16rem, 82vw);
+    gap: var(--s4);
+  }
+
+  .stage-gauge__scale::-webkit-scrollbar,
+  .work-sheet::-webkit-scrollbar,
+  .process-legend::-webkit-scrollbar,
+  .studio-system__chapters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stage-gauge__band,
+  .work-sheet__frame,
+  .process-legend__stop,
+  .studio-system__chapter {
+    scroll-snap-align: start;
+  }
+
+  .stage-gauge__band {
+    min-height: 8.5rem;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-content: start;
+    gap: var(--s4);
+    padding-block: var(--s5);
+    border: var(--hair) solid var(--rule);
+  }
+
+  /* The two ends of the scale sit at opposite edges of a 390px screen, where
+     they meet in the middle and read as one broken sentence. Stacked, each is
+     still tied to the end it labels by its own alignment. */
+  .stage-gauge__span {
+    flex-direction: column;
+    gap: var(--s1);
+  }
+
+  .stage-gauge__span > :last-child {
+    align-self: flex-end;
+  }
+
+  .stage-gauge__n {
+    grid-row: 1 / span 2;
+  }
+
+  .work-sheet__plate {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* The contact opener should expose the intake in the first scroll, rather
+     than spending a phone viewport reproducing the desktop title block. */
+  .masthead:not(.interior-document .masthead) {
+    padding-bottom: 3.25rem;
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__inner {
+    gap: clamp(1.5rem, 7vw, 2.5rem);
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .masthead:not(.interior-document .masthead) .masthead__folio {
+    order: -1;
+    padding: 0;
+    color: var(--accent);
+  }
+
+  .atlas-services__link {
+    position: relative;
+    min-height: 88px;
+    grid-template-columns: 2rem minmax(0, 1fr) 1.5rem;
+    gap: var(--s2) var(--s3);
+    padding-block: var(--s5);
+  }
+
+  .atlas-services__title {
+    font-size: clamp(1.35rem, 7vw, 1.85rem);
+  }
+
+  .atlas-services__summary {
+    grid-column: 2 / 4;
+    font-size: 0.9rem;
+  }
+
+  .atlas-chapter__outcomes ul,
+  .process-stop__deliverables ul {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .atlas-chapter__outcomes li {
+    padding-bottom: var(--s3);
+    border-bottom: var(--hair) solid var(--rule);
+  }
+
+  .process-legend__stop a {
+    min-height: 68px;
+  }
+
+  .process-route__steps {
+    padding-left: 1.5rem;
+  }
+
+  .process-stop {
+    padding-bottom: clamp(3.75rem, 16vw, 5.5rem);
+  }
+
+  .process-stop__head,
+  .process-stop__detail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .process-stop__number {
+    font-size: clamp(3.75rem, 18vw, 6rem);
+    line-height: 0.85;
+  }
+
+  .process-stop h3 {
+    font-size: clamp(1.8rem, 8vw, 2.45rem);
+  }
+
+  .studio-system__chapter {
+    min-height: 21rem;
+  }
+
+  .studio-principles__field {
+    gap: 0;
+  }
+
+  .studio-principle {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s2) var(--s4);
+    min-height: 44px;
+    padding-block: var(--s5);
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .studio-principle > span {
+    grid-row: 1 / span 2;
+  }
+
+  .studio-principle p {
+    grid-column: 2;
+  }
+
+  .svc-balance__list {
+    text-align: left;
+  }
+
+  .svc-balance__list li,
+  .svc-scope__list li,
+  .svc-stair__step,
+  .stageplot__items {
+    min-height: 44px;
+  }
+
+  .svc-stair__step {
+    --stair: 0;
+    padding-inline: 0;
+  }
+
+  .svc-band__title,
+  .svc-balance__title,
+  .svc-method__title,
+  .svc-notes__title,
+  .wk-arc__title {
+    overflow-wrap: anywhere;
+    font-size: clamp(2.15rem, 10vw, 3.25rem);
+    line-height: 0.98;
+  }
+
+  .archive--compact .archive__link,
+  .archive__link,
+  .wk-next {
+    min-height: 72px;
+  }
+
+  .wk-spec__col {
+    padding: var(--s5) 0;
+    border-inline: 0;
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+
+  .wk-plate__frame,
+  .wk-live .reel,
+  .wk-live img {
+    aspect-ratio: 16 / 10;
+  }
+
+  .matrix__scroll {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .matrix__table {
+    min-width: 44rem;
+  }
+
+  .matrix__corner,
+  .matrix__context {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 9.5rem;
+    background: var(--paper-warm);
+    box-shadow: 1px 0 0 var(--rule-strong);
+  }
+
+  .contexts__legend {
+    display: none;
+  }
+
+  .contexts__row > a {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 1.5rem;
+    min-height: 96px;
+    gap: var(--s3);
+    padding-block: var(--s5);
+  }
+
+  .contexts__friction {
+    grid-column: 2 / 4;
+    font-size: 0.78rem;
+  }
+
+  .contexts__name {
+    font-size: clamp(1.25rem, 6vw, 1.65rem);
+  }
+
+  .context-nav__side,
+  .context-nav__index {
+    min-height: 56px;
+    padding-block: var(--s4);
+  }
+
+  /* The intake register repeats what the form's own intro and its closing
+     assurances already say — three sections, a two-day reply, a conversation —
+     so on a phone it is one more screen between the reader and the first
+     field. Dropped here only; it still runs on wider screens where it costs
+     nothing. */
+  .intake-page .masthead__aside {
+    display: none;
+  }
+
+  /* The form comes first on a phone. Stacked in source order the reader had to
+     scroll past the whole memo — heading, paragraph, plate, register, footnote
+     — before reaching a single input, which is a long way to travel to do the
+     one thing this page is for. The memo still follows as context for anyone
+     who wants it. */
+  .intake {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s7);
+  }
+
+  .intake__sheet {
+    order: 1;
+    margin-inline: 0;
+    padding: 0;
+  }
+
+  .intake__memo {
+    order: 2;
+    padding-top: var(--s6);
+    border-top: var(--hair) solid var(--rule-strong);
+    border-bottom: 0;
+  }
+
+  /* The plate is a nice-to-have below the form; at full width it was another
+     screen of scrolling between the reader and the memo's actual content. */
+  .intake__figure {
+    max-width: 18rem;
+  }
+
+  .form input,
+  .form select,
+  .form textarea,
+  .form button,
+  .faq summary,
+  .policy__contents a,
+  .notfound__index a {
+    min-height: 44px;
+  }
+
+  .handoff__step {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--s2) var(--s4);
+    padding-block: var(--s5);
+  }
+
+  .handoff__n {
+    grid-row: 1 / span 2;
+  }
+
+  .handoff__body,
+  .handoff__foot {
+    grid-column: 2;
+  }
+
+  .policy__contents {
+    display: grid;
+    position: static;
+    max-width: none;
+    padding: var(--s4) 0;
+    border-block: var(--hair) solid var(--rule-strong);
+  }
+
+  .policy__contents ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s2) var(--s4);
+  }
+
+  .policy__section-head {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--s3);
+  }
+
+  .policy__section > :not(.policy__section-head) {
+    margin-left: 0;
+  }
+
+  .notfound {
+    min-height: 100svh;
+  }
+
+  .interior-document[data-motion="staged"] .cta__actions,
+  .cta__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cta__actions .btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .work-records__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scene__folio {
+    justify-content: space-between;
+  }
+
+  .scene__folio::after {
+    display: none;
+  }
+
+  .svc-spec__item,
+  .register__row,
+  .index-strip__cell,
+  .wk-spec__list,
+  .policy__contents ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 360px) {
+  .route-open__title,
+  .masthead__title,
+  .interior-document .masthead__title,
+  .policy-cover__title,
+  .context-open__headline,
+  .notfound__title {
+    font-size: clamp(2.35rem, 13vw, 3.15rem);
+  }
+
+  .scene__title,
+  .scene__title--phrase {
+    font-size: clamp(3.1rem, 17vw, 4.75rem);
+  }
+
+  .stage-gauge__scale,
+  .work-sheet {
+    grid-auto-columns: minmax(14rem, 88vw);
+  }
+}

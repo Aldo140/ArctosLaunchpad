@@ -34,6 +34,32 @@ export function HomeMotion() {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      /* The cover drifts on every screen. This used to sit in the >=701px
+         block, so the phone hero was the one place on the site where the
+         backdrop was completely static — and with the plotted mark removed at
+         that width, it was the only motion the cover had left. The survey line
+         below still requires a fine pointer, because there is nothing for it
+         to follow on a touch screen. */
+      const heroTerrain = root.querySelector<HTMLElement>(".hero__terrain");
+      const heroSection = root.querySelector<HTMLElement>(".hero");
+      if (heroTerrain && heroSection) {
+        gsap.fromTo(
+          heroTerrain,
+          { yPercent: -1, scale: 1.035 },
+          {
+            yPercent: 2,
+            scale: 1.075,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heroSection,
+              start: "top top",
+              end: "bottom top",
+              scrub: 0.8,
+            },
+          },
+        );
+      }
+
       const statement = root.querySelector<HTMLElement>(".statement");
       if (!statement) return;
 
@@ -144,49 +170,16 @@ export function HomeMotion() {
             ledger.querySelectorAll(".automation__list--after li"),
           );
           const arrow = ledger.querySelector(".automation__arrow");
-          const press = root.querySelector<HTMLElement>(".pattern-press");
-          const sheets = press
-            ? gsap.utils.toArray<HTMLElement>(press.querySelectorAll(".pattern-press__sheet"))
-            : [];
-          const rolls = press
-            ? gsap.utils.toArray<HTMLElement>(press.querySelectorAll(".pattern-press__roll"))
-            : [];
 
           const tl = gsap.timeline({
             scrollTrigger: { trigger: ledger, start: "top 74%", once: true },
           });
 
-          tl.from(press, {
-            autoAlpha: 0,
-            y: 18,
-            rotationX: 8,
-            transformOrigin: "center center",
-            duration: 0.8,
-            ease: "power3.out",
-          })
-            .from(
-              sheets,
-              {
-                yPercent: -15,
-                autoAlpha: 0,
-                duration: 0.7,
-                stagger: 0.08,
-                ease: "power3.out",
-              },
-              "-=0.6",
-            )
-            .from(
-              rolls,
-              {
-                rotation: -14,
-                autoAlpha: 0,
-                duration: 0.5,
-                stagger: 0.08,
-                ease: "power3.out",
-              },
-              "-=0.55",
-            )
-            .to(
+          // The press instrument is no longer mounted on the illustration
+          // plate, so the ledger animation starts at the strike-through. GSAP
+          // warns on a missing target rather than skipping it, which is why the
+          // tweens are gone rather than left pointing at nothing.
+          tl.to(
               before,
               {
                 "--strike-scale": 1,
@@ -280,33 +273,19 @@ export function HomeMotion() {
           );
         }
 
-        const terrain = root.querySelector<HTMLElement>(".hero__terrain");
         const hero = root.querySelector<HTMLElement>(".hero");
-        if (terrain && hero) {
-          gsap.fromTo(
-            terrain,
-            { yPercent: -1, scale: 1.035 },
-            {
-              yPercent: 2,
-              scale: 1.075,
-              ease: "none",
-              scrollTrigger: {
-                trigger: hero,
-                start: "top top",
-                end: "bottom top",
-                scrub: 0.8,
-              },
-            },
-          );
-        }
 
         const survey = root.querySelector<HTMLElement>(".hero__survey");
         if (survey && hero && window.matchMedia("(pointer: fine)").matches) {
+          // Right to left. The pass now opens on the side the plotted mark sits
+          // on and travels back across the headline, so the sweep runs against
+          // the reading direction and the reader meets it head on instead of
+          // being chased by it.
           const idle = gsap.fromTo(
             survey,
-            { "--scan-x": "18%" },
+            { "--scan-x": "82%" },
             {
-              "--scan-x": "82%",
+              "--scan-x": "18%",
               duration: 8,
               repeat: -1,
               yoyo: true,

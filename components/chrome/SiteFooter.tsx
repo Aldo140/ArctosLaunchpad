@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArctosMark } from "./brand/ArctosMark";
+import { ArctosMark } from "../brand/ArctosMark";
 
 const NAV = [
   ["Services", "/services"],

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useScrolledPast } from "@/lib/useMedia";
-import { ArctosLockup } from "./brand/ArctosLockup";
+import { ArctosLockup } from "../brand/ArctosLockup";
 
 const LINKS = [
   ["Services", "/services"],

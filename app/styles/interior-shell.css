@@ -1,0 +1,656 @@
+/* =========================================================================
+   ARCTOS — masthead, doc sections, steps, register, faq, studio, local brief, contact, policy
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   ARCTOS — interior pages
+   A single document vocabulary shared by services, work, industries, process,
+   studio, contact, and the policy pages. Pages compose these; they do not
+   invent new ones.
+   ========================================================================= */
+
+/* =========================================================================
+   MASTHEAD
+   ========================================================================= */
+
+.masthead {
+  position: relative;
+  padding-block: clamp(8rem, 16vh, 13rem) var(--section-y);
+}
+
+/* The chapter plate.
+   This never appeared. `.masthead` is a `.section`, so it paints an opaque
+   ground, and the plate was a `z-index: -1` pseudo on a host with no stacking
+   context — painted into the root's negative layer, before any block
+   background, and therefore covered by the very section it belonged to. Four
+   more copies of the bug that hid the four homepage watermarks.
+
+   It now opts into the `data-plate` primitive in base.css, which supplies the
+   stacking context and the feathered edge as one thing. What is left here is
+   only what makes a masthead plate a masthead plate: which artwork, how big,
+   and where it sits.
+
+   Inset from the corner rather than flush to it. A feathered plate pushed hard
+   into `top right` loses its subject off two edges at once and reads as a
+   smudge; held off the corner, the drawing stays whole and the falloff does
+   the work it is there to do. */
+.masthead[data-chapter] {
+  --plate-size: clamp(18rem, 28vw, 32rem);
+  --plate-pos: top 2rem right 2rem;
+  --plate-opacity: 0.07;
+}
+
+/* On a cream masthead the same near-black plate carries much further, so it is
+   pulled back to roughly half strength. */
+.masthead[data-chapter][data-material="paper"] {
+  --plate-opacity: 0.04;
+}
+
+.masthead[data-chapter="attract"] {
+  --plate: url("/assets/textures/branching-growth.webp");
+}
+
+.masthead[data-chapter="convert"] {
+  --plate: url("/assets/textures/interface-assembly.webp");
+}
+
+.masthead[data-chapter="operate"] {
+  --plate: url("/assets/textures/connected-automation.webp");
+}
+
+.masthead[data-chapter="scale"] {
+  --plate: url("/assets/textures/growth-curve.webp");
+}
+
+.masthead__inner {
+  display: grid;
+  gap: var(--s7);
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* Breadcrumbs are navigation. At --fg-faint they measured 2.98:1. */
+  color: var(--fg-dim);
+}
+
+.crumbs li + li::before {
+  content: "/";
+  margin-right: 0.5rem;
+  color: var(--rule-strong);
+}
+
+.crumbs a:hover {
+  color: var(--accent);
+}
+
+.masthead__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s6);
+}
+
+.masthead__title {
+  max-width: 17ch;
+  margin-top: var(--s5);
+}
+
+.masthead__intro {
+  margin-top: var(--s5);
+}
+
+.masthead__folio {
+  white-space: nowrap;
+  padding-bottom: 0.4rem;
+}
+
+/* =========================================================================
+   DOC SECTIONS
+   ========================================================================= */
+
+.doc__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 44rem;
+  margin-bottom: var(--s7);
+}
+
+.doc__title {
+  max-width: 18ch;
+}
+
+/* Two-column document: heading rail on the left, content on the right. */
+.doc__split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.doc__split .doc__head {
+  margin-bottom: 0;
+  position: sticky;
+  top: 7rem;
+}
+
+.doc__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s6);
+}
+
+.doc__outcomes {
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+  display: grid;
+  gap: var(--s4);
+}
+
+.doc__aside {
+  max-width: 52rem;
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+}
+
+.doc__aside-title {
+  max-width: 16ch;
+}
+
+/* =========================================================================
+   LEDGER — a list of records with a number, a title, and a summary
+   ========================================================================= */
+
+.ledger {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.ledger__row {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.ledger__row a {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 2rem;
+  gap: var(--s5);
+  align-items: baseline;
+  padding: var(--s5) 0;
+  transition:
+    background var(--dur) var(--ease-out),
+    padding-left var(--dur) var(--ease-out);
+}
+
+.ledger__row a:hover {
+  background: color-mix(in oklab, var(--fg) 4%, transparent);
+  padding-left: var(--s4);
+}
+
+/* =========================================================================
+   ARCHIVE — work index
+   ========================================================================= */
+
+.archive {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.archive__row {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.archive__link {
+  display: grid;
+  grid-template-columns: 3.5rem 12rem minmax(0, 1fr) auto 1.5rem;
+  gap: var(--s5);
+  align-items: center;
+  padding: var(--s5) 0;
+  transition: padding-left var(--dur) var(--ease-out);
+}
+
+.archive__link:hover {
+  padding-left: var(--s4);
+}
+
+.archive--compact .archive__link {
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto 1.5rem;
+}
+
+.archive__n {
+  color: var(--accent);
+}
+
+.archive__text {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.archive__title {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.archive__summary {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 56ch;
+}
+
+.archive__status {
+  white-space: nowrap;
+}
+
+.archive__go {
+  justify-self: end;
+  color: var(--fg-faint);
+  transition:
+    transform var(--dur) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.archive__link:hover .archive__go {
+  color: var(--accent);
+  transform: translateX(0.3rem);
+}
+
+/* =========================================================================
+   NUMBERED / STEPS / CHIPS
+   ========================================================================= */
+
+.numbered {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.numbered li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  align-items: baseline;
+}
+
+.numbered p {
+  color: var(--fg-dim);
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.steps li {
+  background: var(--bg);
+  padding: var(--s5);
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  font-size: var(--t-small);
+  font-weight: 500;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chips li {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  border: var(--hair) solid var(--rule);
+  padding: 0.35rem 0.6rem;
+}
+
+.chips--large li {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 0.55rem 0.85rem;
+  color: var(--fg);
+}
+
+/* =========================================================================
+   REGISTER
+   ========================================================================= */
+
+.register {
+  margin: 0;
+  border-top: var(--hair) solid var(--rule);
+}
+
+.register__row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  align-items: baseline;
+}
+
+.register__row dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+/* =========================================================================
+   CASE FILE
+   ========================================================================= */
+
+
+.case {
+  display: grid;
+  gap: var(--s8);
+}
+
+.case__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--s6);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.proof__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 42rem;
+  margin-bottom: var(--s7);
+}
+
+.proof__gallery {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s5);
+}
+
+.proof__item {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+  grid-column: span 6;
+}
+
+.proof__item figcaption {
+  font-size: var(--t-micro);
+  font-family: var(--font-mono);
+  line-height: 1.6;
+  color: var(--fg-faint);
+}
+
+/* =========================================================================
+   ROUTE (process)
+   ========================================================================= */
+
+.route {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.route__stop {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: var(--s6);
+}
+
+.route__marker {
+  display: grid;
+  justify-items: center;
+  gap: var(--s3);
+  grid-template-rows: auto 1fr;
+}
+
+.route__marker .t-folio {
+  font-size: 0.95rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.route__line {
+  width: var(--hair);
+  height: 100%;
+  min-height: 3rem;
+  background: var(--rule);
+}
+
+.route__stop:last-child .route__line {
+  display: none;
+}
+
+.route__body {
+  display: grid;
+  gap: var(--s4);
+  padding-bottom: var(--s8);
+  max-width: 52rem;
+}
+
+/* =========================================================================
+   FAQ
+   ========================================================================= */
+
+.faq {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.faq__item {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-block: var(--s5);
+  cursor: pointer;
+  list-style: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-stretch: 94%;
+  letter-spacing: -0.015em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary:hover {
+  color: var(--accent);
+}
+
+.faq__sign {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.faq__sign::before,
+.faq__sign::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: var(--hair);
+  background: currentColor;
+}
+
+.faq__sign::after {
+  transform: rotate(90deg);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.faq__item[open] .faq__sign::after {
+  transform: rotate(0deg);
+}
+
+.faq__item p {
+  padding-bottom: var(--s5);
+  color: var(--fg-dim);
+  max-width: 62ch;
+}
+
+/* =========================================================================
+   STUDIO
+   ========================================================================= */
+
+.plate {
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+}
+
+.plate img {
+  width: 100%;
+  height: auto;
+}
+
+/* =========================================================================
+   LOCAL BRIEF
+   ========================================================================= */
+
+.local__proof {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.local__proof > div:first-child {
+  display: grid;
+  gap: var(--s4);
+  justify-items: start;
+}
+
+.local__proof-media img {
+  width: 100%;
+  height: auto;
+  border: var(--hair) solid var(--rule);
+}
+
+/* =========================================================================
+   CONTACT
+   ========================================================================= */
+
+.intake {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.intake__memo {
+  display: grid;
+  gap: var(--s5);
+  position: sticky;
+  top: 7rem;
+}
+
+.intake__memo-title {
+  font-size: var(--t-subtitle);
+}
+
+.intake__note {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.intake__figure {
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+  border-block: var(--hair) solid var(--rule-strong);
+}
+
+.intake__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.intake__figure figcaption {
+  padding-top: var(--s3);
+  color: var(--fg-dim);
+}
+
+/* A plain mount. The form paints its own stock and carries its own edge, so
+   wrapping it in a second padded panel only doubled the framing. */
+.intake__sheet {
+  min-width: 0;
+}
+
+/* =========================================================================
+   POLICY / DOCUMENT PAGES
+   ========================================================================= */
+
+
+/* =========================================================================
+   404
+   ========================================================================= */
+
+.notfound {
+  min-height: 70svh;
+  display: grid;
+  align-items: center;
+}
+
+.notfound__inner {
+  display: grid;
+  gap: var(--s5);
+  justify-items: start;
+  max-width: 46rem;
+}
+
+.notfound__mark {
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.notfound__title {
+  max-width: 14ch;
+}

@@ -1,0 +1,632 @@
+/* =========================================================================
+   ARCTOS — process: a route that draws itself
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   PROCESS / A ROUTE THAT DRAWS ITSELF
+
+   The route keeps its spine — it is the one device on the site that argues
+   its own sentence, and it works. What changes is scale: the stops are set at
+   display size, the numeral is held against the copy, and the whole route now
+   opens from a full-bleed collage scene rather than a flat masthead.
+   ------------------------------------------------------------------------- */
+
+.scene--process .scene__canvas img {
+  --canvas-x: 54%;
+}
+
+.process-legend {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s4);
+  list-style: none;
+  margin: 0;
+  padding-top: var(--s2);
+}
+
+.process-legend__stop a {
+  display: grid;
+  gap: var(--s2);
+  padding-top: var(--s4);
+  min-height: 44px;
+  border-top: 2px solid var(--rule-strong);
+  text-decoration: none;
+  color: var(--fg-dim);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.process-legend__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.process-legend__name {
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .process-legend__stop a:hover {
+    border-color: var(--accent);
+  }
+
+  .process-legend__stop a:hover .process-legend__name {
+    color: var(--accent);
+  }
+}
+
+.process-route__layout {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.24fr) minmax(0, 1fr);
+  column-gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.process-route__rail {
+  position: sticky;
+  top: clamp(6rem, 14vh, 9rem);
+  display: grid;
+  gap: var(--s5);
+}
+
+.process-route__rail > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.process-route__rail h2 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+.process-route__rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.process-route__rail li a {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding-block: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+  text-decoration: none;
+  font-size: var(--t-small);
+  color: color-mix(in oklab, var(--fg) calc(68% + 32% * var(--lit, 1)), var(--bg));
+  transition: color 240ms var(--ease-out);
+}
+
+.process-route__rail li a span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: color-mix(in oklab, var(--accent) calc(55% + 45% * var(--lit, 1)), var(--bg));
+  transition: color 240ms var(--ease-out);
+}
+
+.process-route__rail li[data-current] a {
+  font-weight: 600;
+}
+
+.process-route__steps {
+  position: relative;
+  display: grid;
+  gap: clamp(4rem, 8vw, 8rem);
+  padding-left: clamp(3rem, 6vw, 5.5rem);
+}
+
+.process-route__steps::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--hair);
+  background: var(--rule-strong);
+}
+
+.process-route__steps::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: top;
+  transform: scaleY(var(--run, 1));
+}
+
+/* The stop's copy is never dimmed. Progress rides on the spine and the station
+   tick — geometry, not content — so anyone landing mid-route can read it. */
+.process-stop {
+  position: relative;
+  display: grid;
+  gap: var(--s4);
+  scroll-margin-top: 7rem;
+}
+
+.process-stop::before {
+  content: "";
+  position: absolute;
+  top: 1.5rem;
+  left: calc(clamp(3rem, 6vw, 5.5rem) * -1);
+  width: clamp(1.75rem, 3vw, 2.75rem);
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--lit, 1));
+  transition: transform 420ms var(--ease-draw);
+}
+
+.process-stop__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+.process-stop__number {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--accent);
+}
+
+.process-stop__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.process-stop h3 {
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+.process-stop__summary {
+  max-width: 34ch;
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  line-height: 1.35;
+}
+
+.process-stop__detail {
+  max-width: 60ch;
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+}
+
+.process-stop__deliverables {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s2);
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.process-stop__deliverables > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.process-stop__deliverables ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--t-small);
+}
+
+.process-stop__deliverables li::before {
+  content: "+";
+  margin-right: var(--s2);
+  color: var(--accent);
+}
+
+.process-loop__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 20rem) auto;
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+}
+
+.process-loop__inner > p {
+  grid-column: 1;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.process-loop__inner h2 {
+  grid-column: 1;
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--t-title);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+}
+
+.process-loop__return {
+  grid-column: 3;
+  display: grid;
+  gap: var(--s3);
+  justify-items: end;
+  text-align: right;
+  min-height: 44px;
+  text-decoration: none;
+  color: var(--fg);
+  font-size: var(--t-small);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.process-loop__figure {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.process-loop__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.process-loop__bracket {
+  width: clamp(6rem, 14vw, 12rem);
+  height: 14px;
+  border-inline: var(--hair) solid var(--accent);
+  border-top: var(--hair) solid var(--accent);
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .process-loop__bracket,
+:root:not(.js) .process-loop__bracket {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .process-loop__return:hover {
+    color: var(--accent);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   STUDIO / THE GAP, DIMENSIONED
+
+   The position is a measurement, so it is drawn as one: two witness lines, a
+   dimension span between them, and the studio annotated on the span. The
+   previous version set that sentence inside a saturated blue rectangle, which
+   made a spatial claim with no space in it.
+   ------------------------------------------------------------------------- */
+
+/* The photograph is almost exactly the viewport's aspect, so `object-position`
+   has nothing to crop with and the framed mountain print on the right of the
+   wall stayed in shot. The canvas is overwidened to push it out of frame,
+   landing the crop on the leaf shadows and the lettered card.
+
+   The CONTAINER is widened, not the image: `next/image` with `fill` writes
+   `width: 100%` as an inline style, which no stylesheet rule can override. */
+.scene--studio .scene__canvas {
+  width: 152%;
+  right: auto;
+}
+
+.studio-open__identity {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin: 0;
+  padding-top: 0;
+}
+
+.studio-open__identity > div {
+  padding-top: var(--s4);
+  border-top: 2px solid var(--rule-strong);
+}
+
+.studio-open__identity dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.studio-open__identity dd {
+  margin: var(--s2) 0 0;
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.studio-position__lead {
+  max-width: 42ch;
+  font-size: clamp(1.3rem, 2.4vw, 2.1rem);
+  font-weight: 500;
+  font-stretch: 92%;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.studio-gap {
+  margin-top: clamp(4rem, 8vw, 7rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s5);
+}
+
+.studio-gap__end {
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule-strong);
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.45;
+}
+
+.studio-gap__end--right {
+  text-align: right;
+}
+
+.studio-gap__end span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.studio-gap__span {
+  display: grid;
+  justify-items: center;
+  gap: var(--s6);
+}
+
+.studio-gap__rule {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border-inline: 2px solid var(--accent);
+}
+
+.studio-gap__rule::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: center;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .studio-gap__rule::before,
+:root:not(.js) .studio-gap__rule::before {
+  transform: scaleX(1);
+}
+
+.studio-gap__measure {
+  max-width: 12ch;
+  text-align: center;
+  text-wrap: balance;
+  font-size: clamp(2.2rem, 5.5vw, 5rem);
+  font-weight: 660;
+  font-stretch: 86%;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+}
+
+.studio-gap__measure em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+/* --- the four disciplines, each carrying its own canvas ------------------ */
+
+.studio-system__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s6);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.studio-system__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.studio-system__header h2 {
+  grid-column: 2;
+  max-width: 18ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.studio-system__chapters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+/* A crop of each chapter's collage, so the four disciplines are visibly the
+   same four canvases the Services route is built from. */
+.studio-system__chapter {
+  position: relative;
+  display: grid;
+  align-content: end;
+  gap: var(--s2);
+  min-height: clamp(17rem, 26vw, 24rem);
+  padding: var(--s5);
+  overflow: hidden;
+  isolation: isolate;
+  text-decoration: none;
+  color: var(--ink);
+  border-top: 3px solid var(--accent);
+}
+
+.studio-system__chapter img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.studio-system__chapter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    0deg,
+    var(--paper-warm) 6%,
+    color-mix(in oklab, var(--paper-warm) 82%, transparent) 44%,
+    transparent 88%
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .studio-system__chapter:hover img {
+    transform: scale(1.05);
+  }
+}
+
+/* --- principles --------------------------------------------------------- */
+
+.studio-principles__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: end;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s6);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.studio-principles__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.studio-principles__header h2 {
+  grid-column: 2;
+  max-width: 18ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.studio-principles__field {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem) clamp(2rem, 5vw, 4rem);
+}
+
+.studio-principle {
+  display: grid;
+  align-content: start;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.studio-principle > span {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--accent);
+}
+
+.studio-principle h3 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.studio-principle p {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}

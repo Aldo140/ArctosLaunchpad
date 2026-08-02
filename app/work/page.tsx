@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CTASection } from "@/components/Shared";
-import { ProjectReel } from "@/components/ProjectReel";
+import { ProjectReel } from "@/components/figures/ProjectReel";
 import { SceneMotion } from "@/components/pages/SceneMotion";
 import { projects, type Project } from "@/lib/content";
 import {

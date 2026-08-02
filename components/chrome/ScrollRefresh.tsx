@@ -39,9 +39,24 @@ export function ScrollRefresh() {
     // a hash is left alone.
     if (!window.location.hash) {
       ScrollTrigger.clearScrollMemory();
-      // `instant` matters: the site sets `scroll-behavior: smooth`, and an
-      // animated jump here reads as the page sliding rather than arriving.
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+      // `scroll-behavior: smooth` on <html> applies to programmatic scrolls
+      // too, including the router's own scroll-to-top. An animated jump can
+      // still be in flight when the new route's images settle and reflow the
+      // page, and the interrupted animation leaves the reader partway down the
+      // new page at roughly the offset they left the old one — the "I click a
+      // footer link and land halfway down" symptom. Suppressing the behaviour
+      // for the duration of the jump makes the landing deterministic.
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      // Belt and braces: whichever element is actually scrolling, reset it.
+      root.scrollTop = 0;
+      document.body.scrollTop = 0;
+      requestAnimationFrame(() => {
+        root.style.scrollBehavior = previous;
+      });
     }
 
     // After the new route has painted.

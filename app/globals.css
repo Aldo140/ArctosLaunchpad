@@ -4,12 +4,26 @@
    Load order matters: tokens define the vocabulary, base sets defaults and
    primitives, chrome styles the persistent frame, then page compositions.
    Nothing below tokens.css may hard-code a colour.
+
+   The composition sheets after home.css were one 8,500-line pages.css. They
+   are split for navigation only — this import order reproduces the original
+   file exactly, and several later blocks deliberately override earlier ones,
+   so REORDERING THESE WILL CHANGE THE PAGE.
    ========================================================================= */
 
 @import "tailwindcss";
 
-@import "./tokens.css";
-@import "./base.css";
-@import "./chrome.css";
-@import "./home.css";
-@import "./pages.css";
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/chrome.css";
+@import "./styles/home.css";
+@import "./styles/interior-shell.css";
+@import "./styles/interior-evidence.css";
+@import "./styles/route-case-file.css";
+@import "./styles/interior-rhythm.css";
+@import "./styles/route-services.css";
+@import "./styles/route-work.css";
+@import "./styles/route-process.css";
+@import "./styles/scene-refinements.css";
+@import "./styles/route-work-machine.css";
+@import "./styles/survey-ground.css";

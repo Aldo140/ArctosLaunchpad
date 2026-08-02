@@ -83,9 +83,28 @@ export function ChromeSync() {
       // either — `pages.css` keeps it visible and the two have to agree.
       !(el.closest(".interior-document") && el.closest(".cta"));
 
+    /**
+     * Anything already above the viewport has missed its entrance for good.
+     *
+     * A reload restores the previous scroll position, so the document can mount
+     * with half its sections already scrolled past. IntersectionObserver reports
+     * those as not intersecting once and then stays silent — they can only
+     * intersect again if the reader scrolls back up — so their images and copy
+     * sat at `opacity: 0` until a hard refresh reset the scroll to the top.
+     * That is the "some images do not appear until I hard refresh" symptom.
+     * Anything already behind the reader is simply shown.
+     */
+    const showIfAlreadyPassed = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom > 0) return false;
+      el.classList.add("is-in");
+      return true;
+    };
+
     const observe = () => {
       for (const el of document.querySelectorAll(".reveal:not(.is-in)")) {
         if (!staged(el)) continue;
+        if (showIfAlreadyPassed(el)) continue;
         io.observe(el);
       }
     };
@@ -113,11 +132,54 @@ export function ChromeSync() {
     };
     window.addEventListener("scroll", rescueAtBottom, { passive: true });
 
+    /**
+     * A link to the page you are already on takes you back to the top.
+     *
+     * Next's router treats navigating to the current route as a no-op, so
+     * clicking "Work" while already on /work did nothing at all — from halfway
+     * down the page it read as a broken link. Returning to the top is the
+     * behaviour the click is asking for. Links carrying a hash are left alone;
+     * those are deliberate in-page targets.
+     *
+     * Registered in the capture phase deliberately: Next's <Link> calls
+     * preventDefault() on the way up, so a bubble-phase listener sees a click
+     * that has already been handled and cannot tell it apart from one a
+     * component meant to swallow.
+     */
+    const onSamePageLink = (event: MouseEvent) => {
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
+
+      const anchor = (event.target as Element | null)?.closest?.("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (anchor.target && anchor.target !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      if (url.hash) return;
+
+      const same = (path: string) => path.replace(/\/+$/, "") || "/";
+      if (same(url.pathname) !== same(window.location.pathname)) return;
+
+      event.preventDefault();
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    };
+    document.addEventListener("click", onSamePageLink, true);
+
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("scroll", rescueAtBottom);
+      document.removeEventListener("click", onSamePageLink, true);
       mo.disconnect();
       io.disconnect();
     };

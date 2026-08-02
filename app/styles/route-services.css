@@ -1,0 +1,401 @@
+/* =========================================================================
+   ARCTOS — services: the four held canvases
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   SERVICES / FOUR HELD CANVASES
+
+   Each stage takes a full scene: its collage holds, its name is set into the
+   clear field at mega scale, and the service ledger rises over it as a dark
+   instrument panel. The gauge in the opening still measures the whole system
+   and still fills as you descend, so the reader always knows which of the four
+   canvases they are standing in.
+   ------------------------------------------------------------------------- */
+
+/* The opener carries the survey ground the rest of the site is drawn on, faded
+   far enough back that it reads as paper texture rather than as a picture, and
+   masked so it never sits under the headline. A four-colour spectrum along the
+   bottom edge was tried and cut: the gauge directly above already fills each
+   band with its own accent, so the second rule only repeated it. */
+.services-open {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.services-open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/textures/survey-contours.webp");
+  background-size: cover;
+  background-position: center right;
+  opacity: 0.14;
+  -webkit-mask-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(0 0 0 / 0.25) 34%,
+    #000 78%
+  );
+  mask-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(0 0 0 / 0.25) 34%,
+    #000 78%
+  );
+}
+
+.services-open__inner {
+  display: grid;
+  gap: clamp(3rem, 6vw, 5rem);
+}
+
+/* Headline and intro share the width instead of stacking down the left edge
+   and leaving half the screen empty. The intro sits on the headline's last
+   baseline so the two read as one block. */
+.services-open__lede {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+@media (min-width: 981px) {
+  .services-open__lede {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: end;
+    column-gap: clamp(2.5rem, 6vw, 6rem);
+  }
+
+  .services-open__lede .route-open__overline {
+    grid-column: 1;
+  }
+
+  .services-open__lede .services-open__title {
+    grid-column: 1;
+    margin-top: var(--s3);
+  }
+
+  .services-open__lede .route-open__intro {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* One tier below the route-open default. At the full hero size this headline
+   ran to four lines and pushed the gauge — the part that actually answers
+   "what do you do" — off a laptop screen entirely. */
+.services-open__title {
+  max-width: 18ch;
+  font-size: clamp(2.6rem, 1.2rem + 4.4vw, 5.5rem);
+  line-height: 0.92;
+}
+
+/* --- the gauge ---------------------------------------------------------- */
+
+.stage-gauge {
+  display: grid;
+  gap: var(--s4);
+}
+
+.stage-gauge__scale {
+  display: grid;
+  grid-template-columns: var(--bands);
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.stage-gauge__band {
+  position: relative;
+  display: grid;
+  align-content: space-between;
+  gap: var(--s5);
+  min-height: clamp(7rem, 11vw, 9.5rem);
+  padding: var(--s4) var(--s4) var(--s5);
+  background: var(--bg);
+  text-decoration: none;
+  color: var(--fg);
+  overflow: hidden;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.stage-gauge__band::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--rule-strong);
+}
+
+.stage-gauge__band::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--fill, 1));
+  transition: transform 380ms var(--ease-draw);
+}
+
+.stage-gauge__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  /* Sampled accents land at 2.8-4.1:1 on ink; the soft partner clears AA. */
+  color: var(--accent-soft);
+}
+
+.stage-gauge__name {
+  display: block;
+  font-size: var(--t-subtitle);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+/* The services a band actually holds. Set below the name and above the count so
+   the band reads name → what's in it → how many, which is the order the
+   question arrives in. */
+.stage-gauge__summary {
+  display: block;
+  margin-top: var(--s3);
+  font-size: var(--t-small);
+  line-height: 1.35;
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+.stage-gauge__count {
+  display: block;
+  margin-top: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.08em;
+  color: var(--fg-faint);
+}
+
+.stage-gauge__span {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s4);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stage-gauge__band:hover {
+    background: color-mix(in oklab, var(--accent) 14%, var(--bg));
+  }
+}
+
+/* --- per-canvas framing --------------------------------------------------
+   The clear paper field sits in a different place in each collage. These pull
+   the right part of each composition under the type. Tuned per asset. */
+
+.scene--attract .scene__canvas img {
+  --canvas-x: 58%;
+}
+.scene--convert .scene__canvas img {
+  --canvas-x: 42%;
+}
+.scene--operate .scene__canvas img {
+  --canvas-x: 54%;
+}
+.scene--scale .scene__canvas img {
+  --canvas-x: 38%;
+}
+
+/* --- the service ledger, on the risen panel ------------------------------ */
+
+/* Baseline-aligned, not bottom-aligned. `align-items: end` stretched the row
+   to the height of the problem statement and left the label stranded at the
+   foot of an empty column. */
+/* Three tracks, the same head grammar the homepage route section uses: the
+   label, the plain-language problem, and the plate that shows it. The left
+   column was always mostly empty — a mono label three words long above a lot of
+   nothing — so the plate is added at the right rather than taking width from
+   the prose. */
+.chapter-panel__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(8rem, 0.42fr);
+  align-items: start;
+  gap: var(--s5) clamp(2rem, 6vw, 6rem);
+  padding-bottom: var(--s5);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+/* The plate is evidence beside the claim, not a hero. Capped so it stays a
+   reference figure at the widest viewports instead of growing into the third
+   voice on the panel. */
+.chapter-panel__plate {
+  grid-column: 3;
+  width: 100%;
+  max-width: 13rem;
+  justify-self: end;
+}
+
+.chapter-panel__head > p:first-child {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.chapter-panel__problem {
+  grid-column: 2;
+  max-width: 42ch;
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+}
+
+.atlas-services {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.atlas-services__item {
+  position: relative;
+}
+
+.atlas-services__item::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: var(--hair);
+  background: var(--rule-strong);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+  transition-delay: calc(var(--stagger) * var(--i, 0));
+}
+
+.reveal.is-in .atlas-services__item::after,
+:root:not(.js) .atlas-services__item::after {
+  transform: scaleX(1);
+}
+
+/* Rows are deliberately oversized. This is the offer, and at ledger scale it
+   read as a table of contents rather than as the thing being offered. */
+.atlas-services__link {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 0.9fr) minmax(0, 1.1fr) 2.5rem;
+  align-items: center;
+  gap: var(--s5);
+  padding-block: clamp(1.5rem, 3vw, 2.75rem);
+  text-decoration: none;
+  color: var(--fg);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.atlas-services__number {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--fg-dim);
+}
+
+.atlas-services__title {
+  font-size: clamp(1.6rem, 3vw, 2.9rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.atlas-services__summary {
+  color: var(--fg-dim);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+
+.atlas-services__arrow {
+  justify-self: end;
+  font-size: 1.4rem;
+  color: var(--accent);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+/* A wash of the chapter accent sweeps the row on hover — the loudest
+   interaction on the site, and it only exists where a row is a real link. */
+.atlas-services__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent) 26%, transparent),
+    transparent 72%
+  );
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .atlas-services__link:hover::before {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .atlas-services__link:hover .atlas-services__arrow {
+    transform: translate(6px, -6px);
+  }
+}
+
+.atlas-services__link:focus-visible::before {
+  clip-path: inset(0 0 0 0);
+}
+
+.atlas-chapter__outcomes {
+  display: grid;
+  gap: var(--s3);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.atlas-chapter__outcomes > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.atlas-chapter__bracket {
+  height: 12px;
+  border-inline: var(--hair) solid var(--accent);
+  border-bottom: var(--hair) solid var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-draw) var(--ease-draw);
+}
+
+.reveal.is-in .atlas-chapter__bracket,
+:root:not(.js) .atlas-chapter__bracket {
+  transform: scaleX(1);
+}
+
+.atlas-chapter__outcomes ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}

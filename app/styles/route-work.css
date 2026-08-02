@@ -1,0 +1,281 @@
+/* =========================================================================
+   ARCTOS — work index: the builds at full volume
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   WORK / THE BUILDS AT FULL VOLUME
+
+   The four recorded scrolls through the live sites are the strongest assets in
+   the project and the old page did not play one of them. Each project now gets
+   a full-viewport plate with its reel running, held while its register rises.
+   ------------------------------------------------------------------------- */
+
+.work-open__inner {
+  display: grid;
+  gap: var(--s8);
+}
+
+.work-open__title {
+  max-width: 13ch;
+}
+
+.work-sheet {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--hair);
+  background: var(--rule);
+  border: var(--hair) solid var(--rule);
+}
+
+.work-sheet__frame {
+  position: relative;
+  margin: 0;
+  background: var(--bg-raised);
+}
+
+.work-sheet__plate {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.work-sheet__plate img {
+  object-fit: cover;
+  object-position: top left;
+}
+
+.work-sheet__frame figcaption {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s3) var(--s4) var(--s4);
+}
+
+.work-sheet__name {
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.work-sheet__kind {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+/* --- the held reel ------------------------------------------------------ */
+
+.scene--work .scene__hold {
+  background: var(--ink);
+}
+
+.scene--work .scene__canvas .reel,
+.scene--work .scene__canvas img,
+.scene--work .scene__canvas video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Ink, not paper: the plate underneath is a screen recording, so the scrim
+   that protects the title has to be the screen's own material. */
+/* Denser than the paper scenes, and it has to be. Under a collage the scrim
+   only competes with texture; under a recorded website it competes with that
+   site's own headline, which ghosted through behind the project title and read
+   as two headlines fighting. Opaque across the type column, gone by the time
+   it reaches the part of the build worth showing. */
+.scene--work .scene__scrim {
+  background: linear-gradient(
+    92deg,
+    var(--ink) 0%,
+    var(--ink) 45%,
+    color-mix(in oklab, var(--ink) 72%, transparent) 60%,
+    color-mix(in oklab, var(--ink) 24%, transparent) 76%,
+    transparent 92%
+  );
+}
+
+.scene--work .scene__title {
+  color: var(--glacier);
+}
+
+/* A project summary is a sentence, not a slogan. At the stage-name measure it
+   ran to six lines of display type; this keeps it clearly subordinate to the
+   title without dropping to caption scale. */
+.scene--work .scene__lead {
+  max-width: 40ch;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.42;
+  letter-spacing: -0.01em;
+  color: color-mix(in oklab, var(--glacier) 78%, transparent);
+}
+
+.work-scene__open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding: var(--s3) var(--s5);
+  border: var(--hair) solid color-mix(in oklab, var(--glacier) 42%, transparent);
+  color: var(--glacier);
+  text-decoration: none;
+  font-size: var(--t-small);
+  font-weight: 600;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.work-scene__open span {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .work-scene__open:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .work-scene__open:hover span {
+    transform: translate(3px, -3px);
+  }
+}
+
+.work-scene__open:active {
+  transform: scale(0.98);
+}
+
+/* The register rises over the reel. */
+.work-panel__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.work-panel__summary {
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  max-width: 34ch;
+}
+
+.work-panel__reg {
+  display: grid;
+  gap: var(--s3);
+  margin: 0;
+  padding-top: var(--s4);
+  border-top: 2px solid var(--accent);
+}
+
+.work-panel__reg dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-panel__reg dd {
+  margin: 0;
+  font-size: var(--t-small);
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+/* --- working builds ----------------------------------------------------- */
+
+.work-records__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.work-records__header > p {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--accent);
+}
+
+.work-records__header h2 {
+  margin-top: var(--s4);
+  max-width: 16ch;
+  font-size: var(--t-title);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.work-record {
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: 2px solid var(--rule-strong);
+}
+
+.work-record__status {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-record h3 {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.work-record > p {
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
+  font-size: var(--t-small);
+}
+
+.work-record dl {
+  display: grid;
+  gap: var(--s2);
+  margin: var(--s2) 0 0;
+  padding-top: var(--s4);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.work-record dl > div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--s3);
+  align-items: baseline;
+}
+
+.work-record dt {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.work-record dd {
+  margin: 0;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  line-height: 1.45;
+}

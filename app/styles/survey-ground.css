@@ -1,0 +1,48 @@
+/* =========================================================================
+   ARCTOS — the survey ground
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   THE SURVEY GROUND
+   The process route is a drawn line through a landscape, so it is drawn on
+   one. Same field-survey language as the staff rule in the gutter, and quiet
+   enough to sit under body copy — verified, not assumed.
+   ========================================================================= */
+
+.process-route {
+  position: relative;
+  isolation: isolate;
+}
+
+.process-route::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/assets/textures/survey-contours.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+}
+
+/* The contours are busiest where the route and its rail sit. A wash from the
+   left keeps the spine and the stop copy on an even ground. */
+.process-route::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    var(--ink) 0%,
+    color-mix(in oklab, var(--ink) 86%, transparent) 46%,
+    color-mix(in oklab, var(--ink) 62%, transparent) 100%
+  );
+}

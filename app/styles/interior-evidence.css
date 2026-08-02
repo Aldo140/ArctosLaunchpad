@@ -1,0 +1,477 @@
+/* =========================================================================
+   ARCTOS — interior responsive rules and the evidence band
+   -------------------------------------------------------------------------
+   Was part of one 8,500-line pages.css. Split for navigation only: globals.css
+   imports these in the exact original order, so the cascade is byte-for-byte
+   what it was. Several later blocks deliberately override earlier ones — do
+   not reorder the imports.
+   ========================================================================= */
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+@media (max-width: 1100px) {
+  .doc__split {
+    grid-template-columns: 1fr;
+    gap: var(--s6);
+  }
+  .doc__split .doc__head {
+    position: static;
+  }
+    .archive__link {
+    grid-template-columns: 3rem 9rem minmax(0, 1fr) 1.5rem;
+  }
+  .archive__status {
+    display: none;
+  }
+  .intake {
+    grid-template-columns: 1fr;
+  }
+  .intake__memo {
+    position: static;
+  }
+  .local__proof {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .masthead__body {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: var(--s4);
+  }
+  .archive__link {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--s3) var(--s4);
+    align-items: start;
+  }
+  .archive__go {
+    display: none;
+  }
+  .ledger__row a {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--s3) var(--s4);
+  }
+  .register__row {
+    grid-template-columns: 1fr;
+    gap: var(--s2);
+  }
+  .doc__cols {
+    grid-template-columns: 1fr;
+  }
+  .route__stop {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--s4);
+  }
+  }
+
+/* ===== SERVICES =====================================================
+   The services index and the nine service sheets.
+
+   Rule of the set: no two sections on a page share a composition. Each
+   stage owns a material, an accent, and a shape — a plate, a spread, a
+   console, a gauge — and each section of a service sheet is a different
+   instrument. The accent draws the structural line of the composition
+   (the scale, the card edge, the axis, the sign), never the body copy.
+
+   Marks used throughout: "+" reads as an outcome, "−" as a fault. The
+   diagnostic and the outcomes are the same grid run backwards.
+   =================================================================== */
+
+/* Sequenced entrances. Motion states the order of a list, once. */
+.svc-seq > * {
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svc-seq > * {
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SERVICE SHEET — masthead readout
+   ------------------------------------------------------------------ */
+
+.svc-spec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5) clamp(1.5rem, 4vw, 3.5rem);
+  margin: 0;
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-spec__item {
+  display: grid;
+  gap: var(--s2);
+}
+
+.svc-spec__item dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--fg);
+}
+
+/* ---------------------------------------------------------------------
+   DIAGNOSTIC / OUTCOMES — one grid, run in both directions.
+   Dark, right-hung, minus. Then light, left-hung, plus.
+   ------------------------------------------------------------------ */
+
+.svc-balance__inner {
+  display: grid;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.svc-balance__head {
+  display: grid;
+  gap: var(--s4);
+}
+
+.svc-balance__title {
+  max-width: 17ch;
+}
+
+.svc-balance__note {
+  margin-top: var(--s2);
+  padding-left: var(--s5);
+  border-left: 2px solid var(--accent);
+  max-width: 36ch;
+  color: var(--fg-dim);
+}
+
+.svc-balance__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-balance__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-block: var(--s4);
+  border-bottom: var(--hair) solid var(--rule);
+  font-size: var(--t-subtitle);
+  font-weight: 500;
+  font-stretch: 94%;
+  letter-spacing: -0.018em;
+  line-height: 1.18;
+}
+
+.svc-balance__list li:first-child {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-balance__sign {
+  position: relative;
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.svc-balance__sign::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 1px) 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.svc-balance--gain .svc-balance__sign::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 calc(50% - 1px);
+  width: 2px;
+  background: var(--accent);
+}
+
+@media (min-width: 861px) {
+  .svc-balance--fault .svc-balance__inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+  .svc-balance--fault .svc-balance__head {
+    order: 2;
+    position: sticky;
+    top: 7rem;
+  }
+  .svc-balance--fault .svc-balance__list {
+    order: 1;
+    text-align: right;
+  }
+  .svc-balance--fault .svc-balance__list li {
+    flex-direction: row-reverse;
+  }
+  .svc-balance--gain .svc-balance__inner {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+  .svc-balance--gain .svc-balance__head {
+    position: sticky;
+    top: 7rem;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SCOPE — a ruled index with the count set as a plate
+   ------------------------------------------------------------------ */
+
+.svc-scope__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 0.62fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+  margin-bottom: var(--s7);
+  padding-bottom: var(--s5);
+  border-bottom: var(--hair) solid var(--rule-strong);
+}
+
+.svc-scope__count {
+  font-family: var(--font-ui);
+  font-size: clamp(4.5rem, 11vw, 9.5rem);
+  font-weight: 600;
+  font-stretch: 88%;
+  line-height: 0.72;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+}
+
+.svc-scope__copy {
+  display: grid;
+  gap: var(--s4);
+  max-width: 46ch;
+}
+
+.svc-scope__figure {
+  align-self: stretch;
+  min-width: 0;
+  margin: calc(-1 * var(--s5)) 0 0;
+  overflow: hidden;
+  background: var(--ink);
+  border-left: var(--hair) solid var(--rule-strong);
+}
+
+.svc-scope__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.svc-scope__figure figcaption {
+  padding: var(--s3) var(--s3) 0;
+  color: color-mix(in oklab, var(--glacier) 62%, var(--ink));
+}
+
+.svc-scope__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 3;
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.svc-scope__list li {
+  break-inside: avoid;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  padding-block: var(--s3);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.svc-scope__n {
+  flex: none;
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------
+   METHOD — a stair. Each step steps in; the sequence is the shape.
+   ------------------------------------------------------------------ */
+
+.svc-method__head {
+  display: grid;
+  gap: var(--s4);
+  max-width: 46rem;
+  margin-bottom: var(--s8);
+}
+
+.svc-stair {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-stair__step {
+  --stair: clamp(1rem, 3.4vw, 4rem);
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: baseline;
+  margin-left: calc(var(--i, 0) * var(--stair));
+  padding: var(--s5) 0 var(--s5) var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-stair__step:last-child {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.svc-stair__drop {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+.svc-stair__n {
+  color: var(--accent);
+}
+
+.svc-stair__label {
+  font-size: clamp(1.35rem, 0.95rem + 1.5vw, 2.4rem);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.024em;
+  line-height: 1.06;
+}
+
+/* ---------------------------------------------------------------------
+   EVIDENCE BAND
+   ------------------------------------------------------------------ */
+
+.svc-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s3) var(--s5);
+  align-items: baseline;
+  padding-bottom: var(--s4);
+  margin-bottom: var(--s6);
+  border-bottom: 2px solid var(--accent);
+}
+
+.svc-band__title {
+  grid-column: 1;
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 90%;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+}
+
+.svc-band > .t-folio {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+}
+
+/* The archive is site vocabulary and stays itself here; it only gets the
+   air it needs to hold its own beside the stair and the balance lists. */
+.svc-evidence .archive__link {
+  padding-block: var(--s6);
+}
+
+/* ---------------------------------------------------------------------
+   QUESTIONS — a centred column of notes, set on paper
+   ------------------------------------------------------------------ */
+
+.svc-notes__inner {
+  max-width: 50rem;
+  margin-inline: auto;
+  display: grid;
+  gap: var(--s7);
+}
+
+.svc-notes__head {
+  display: grid;
+  gap: var(--s4);
+  justify-items: center;
+  text-align: center;
+}
+
+.svc-notes__title {
+  font-size: var(--t-title);
+}
+
+.svc-notes__list {
+  border-top: 2px solid var(--accent);
+}
+
+.svc-notes .faq__item summary {
+  align-items: baseline;
+  gap: var(--s4);
+}
+
+.svc-notes__q {
+  flex: none;
+  color: var(--accent);
+}
+
+.svc-notes__ask {
+  flex: 1 1 auto;
+}
+
+.svc-notes .faq__item p {
+  padding-left: calc(var(--s4) + 2.1rem);
+}
+
+/* ---------------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------------ */
+
+@media (max-width: 1100px) {
+  .svc-scope__list {
+    columns: 2;
+  }
+}
+
+@media (max-width: 860px) {
+  .svc-balance__list {
+    text-align: left;
+  }
+}
+
+@media (max-width: 760px) {
+  .svc-scope__head {
+    grid-template-columns: 1fr;
+  }
+  .svc-scope__list {
+    columns: 1;
+  }
+  .svc-stair__step {
+    --stair: 0.5rem;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: var(--s4);
+    padding-left: var(--s4);
+  }
+  .svc-notes .faq__item p {
+    padding-left: 0;
+  }
+  .svc-notes__inner {
+    gap: var(--s6);
+  }
+}
+
+/* =========================================================================
+   ===== WORK =====
+   The archive index and the case file. Appended block — nothing above this
+   line is modified by it.
+
+   Two ideas carry the whole thing:
+
+   1. The projects are not the same size of thing, so the archive does not set
+      them in equal rows. Four plate tiers, assigned in reading order, move the
+      crop ratio, the plate scale and the Archivo width axis together. The two
+      projects with nothing to show are set as records instead of being given
+      an empty grey well.
+
+   2. On a case file, the register is data and the reasoning is narrative, so
+      they are built out of different materials: a hairline parts list on
+      instrument, then a numbered route on paper.
+   ========================================================================= */

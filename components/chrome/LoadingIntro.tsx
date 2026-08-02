@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ArctosMark } from "./brand/ArctosMark";
+import { ArctosMark } from "../brand/ArctosMark";
 
 const WORD = "ARCTOS";
 

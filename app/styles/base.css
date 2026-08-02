@@ -237,10 +237,6 @@ body::after {
   transform: scaleX(1);
 }
 
-.tick-label--plain::before {
-  display: none;
-}
-
 /* --- buttons ----------------------------------------------------------- */
 
 .btn {
@@ -399,6 +395,72 @@ body::after {
 }
 
 /* =========================================================================
+   PLATE
+   A field-guide illustration hung behind a section as a watermark.
+   -------------------------------------------------------------------------
+   Opt in with `data-plate` on the host and name the artwork with `--plate`.
+   The host gets a stacking context and the plate gets a feathered draw, and
+   the two arrive together on purpose — they are the two halves of the same
+   effect, and separating them is the bug this primitive exists to prevent.
+
+   1. THE STACKING CONTEXT IS NOT THE CALLER'S JOB.
+      The plate is a `z-index: -1` pseudo-element and every surface it sits on
+      paints an opaque `background: var(--bg)` (see `.section` above). Without
+      isolation on the host the plate lands in the ROOT's negative layer, which
+      is painted before any block background — so the section draws its own
+      plate and then covers it with its own ground. That shipped eight times:
+      four homepage watermarks and four interior masthead backdrops, every one
+      of them a decorative layer nobody could see. Only `.why` ever worked, and
+      only by accident, because it was isolated for an unrelated reason.
+
+   2. THE PLATE MUST BE FEATHERED.
+      Every one of these files is an OPAQUE square with its own near-black
+      ground, so flat low opacity does not give a watermark — it gives a tinted
+      rectangle with four hard corners. On the cream surfaces that read as a
+      grey block sitting in empty space. The falloff has to track the plate
+      rather than the host, so the mask is driven by the same size and position
+      properties as the background and `closest-side` resolves against the
+      plate tile at every viewport width.
+
+   Hosts override `--plate-opacity` and `--plate-filter` to sit the artwork on
+   their own ground; those defaults suit a dark instrument surface.
+   ========================================================================= */
+[data-plate] {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-plate]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image: var(--plate);
+  background-repeat: no-repeat;
+  background-position: var(--plate-pos, center);
+  background-size: var(--plate-size, cover);
+  opacity: var(--plate-opacity, 0.07);
+  filter: var(--plate-filter, saturate(0.65) brightness(1.06));
+
+  --plate-falloff: radial-gradient(
+    closest-side circle at center,
+    #000 28%,
+    rgb(0 0 0 / 0.5) 62%,
+    transparent 100%
+  );
+  -webkit-mask-image: var(--plate-falloff);
+  mask-image: var(--plate-falloff);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: var(--plate-pos, center);
+  mask-position: var(--plate-pos, center);
+  -webkit-mask-size: var(--plate-size, cover);
+  mask-size: var(--plate-size, cover);
+}
+
+/* =========================================================================
    MOTION
    ========================================================================= */
 
@@ -427,6 +489,30 @@ body::after {
 
 :root.js .is-in[data-wipe],
 :root.js .is-in [data-wipe] {
+  clip-path: inset(0 0 0 0);
+}
+
+/* When the wiped element is also the observed one, the wipe has to move off it.
+   `clip-path: inset(0 0 100% 0)` clips the box to zero area, and a zero-area
+   element never reports an intersection — so the entrance observer could never
+   fire on it, so the clip was never released, and the figure stayed invisible
+   for the whole session. It only ever appeared when the scroll-to-bottom rescue
+   happened to catch it, which is why these images vanished intermittently.
+
+   Clipping the contents instead keeps the plate's box measurable while the
+   artwork still wipes in, so the effect is unchanged and the deadlock is gone.
+   Figures that carry `data-wipe` on a child of a `.reveal` are unaffected. */
+:root.js .reveal[data-wipe] {
+  clip-path: none;
+}
+
+:root.js .reveal[data-wipe] > :is(img, picture, svg, video, figcaption) {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--dur-wipe) var(--ease-set);
+}
+
+:root.js .reveal[data-wipe].is-in
+  > :is(img, picture, svg, video, figcaption) {
   clip-path: inset(0 0 0 0);
 }
 
@@ -472,7 +558,8 @@ body::after {
 
   :root.js .showcase__media,
   :root.js .journey__bracket,
-  :root.js [data-wipe] {
+  :root.js [data-wipe],
+  :root.js .reveal[data-wipe] > :is(img, picture, svg, video, figcaption) {
     clip-path: none;
   }
 

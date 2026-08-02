@@ -39,6 +39,9 @@ export function PageHeader({
       className="masthead section"
       data-material={material}
       data-chapter={chapter}
+      /* Only a chaptered masthead has a plate to hang, so only that one opts
+         into the primitive — see the PLATE block in styles/base.css. */
+      data-plate={chapter ? "" : undefined}
       data-station={title}
     >
       <div className="shell masthead__inner">

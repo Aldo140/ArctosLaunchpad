@@ -156,15 +156,15 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-function Required() {
-  return (
-    <>
-      <span className="field__req" aria-hidden="true">
-        *
-      </span>
-      <span className="visually-hidden"> (required)</span>
-    </>
-  );
+/**
+ * Eight of the ten fields are required, so an asterisk on each one marked the
+ * rule rather than the exception and put eight accent-coloured glyphs into a
+ * form that is trying to read as a quiet sheet. The two genuinely optional
+ * fields carry the tag instead; `required` on the input still announces the
+ * rest to assistive technology, which is where that information belongs.
+ */
+function Optional() {
+  return <span className="field__optional">Optional</span>;
 }
 
 export function ContactForm() {
@@ -241,7 +241,7 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <section className="receipt" aria-live="polite">
+      <section className="receipt" data-material="paper" aria-live="polite">
         <p className="tick-label">Enquiry received</p>
         <h2
           ref={successHeading}
@@ -290,6 +290,11 @@ export function ContactForm() {
   return (
     <form
       className="form"
+      /* The sheet is printed stock sitting on an instrument section. Without
+         declaring the material it kept the dark-ground tokens, so every label
+         rendered near-white on cream. One attribute flips the whole palette,
+         which is exactly what tokens.css is built to do. */
+      data-material="paper"
       onSubmit={handleSubmit}
       onInput={(event) =>
         setCompleted(completedRequiredFields(event.currentTarget))
@@ -300,9 +305,15 @@ export function ContactForm() {
       <div className="form__intro">
         <div className="form__intro-head">
           <p className="tick-label">Confidential project intake</p>
-          <p className="form__progress-value" aria-hidden="true">
-            {String(completed).padStart(2, "0")} / 08
-          </p>
+          {/* The counter only appears once there is progress to report. At
+              00 / 08 it announced the size of the task before the reader had
+              done anything, which is the wrong first impression for a form
+              you want people to start. */}
+          {completed > 0 && (
+            <p className="form__progress-value" aria-hidden="true">
+              {String(completed).padStart(2, "0")} / 08 complete
+            </p>
+          )}
         </div>
         <div
           className="form__progress"
@@ -321,8 +332,8 @@ export function ContactForm() {
           />
         </div>
         <p className="form__intro-note">
-          Three short sections. Required fields are marked with an asterisk —
-          everything else helps us reply with sharper clarity.
+          Three short sections, about four minutes. Everything is needed except
+          the two fields tagged optional.
         </p>
       </div>
 
@@ -362,7 +373,7 @@ export function ContactForm() {
         <div className="form__grid">
           <div className="field">
             <label className="field__label" htmlFor="name">
-              Name <Required />
+              Name
             </label>
             <input
               id="name"
@@ -378,7 +389,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="email">
-              Email <Required />
+              Email
             </label>
             <input
               id="email"
@@ -395,7 +406,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="company">
-              Company or organization <Required />
+              Company or organization
             </label>
             <input
               id="company"
@@ -411,7 +422,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="website">
-              Website <span className="field__optional">Optional</span>
+              Website <Optional />
             </label>
             <input
               id="website"
@@ -442,7 +453,7 @@ export function ContactForm() {
         <div className="form__grid">
           <div className="field">
             <label className="field__label" htmlFor="projectType">
-              Project type <Required />
+              Project type
             </label>
             <span className="field__select">
               <select
@@ -465,7 +476,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="budget">
-              Estimated budget <Required />
+              Estimated budget
             </label>
             <span className="field__select">
               <select
@@ -488,7 +499,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="timeline">
-              Desired timeline <Required />
+              Desired timeline
             </label>
             <span className="field__select">
               <select
@@ -529,7 +540,7 @@ export function ContactForm() {
 
         <div className="field">
           <label className="field__label" htmlFor="challenge">
-            What is not working well today? <Required />
+            What is not working well today?
           </label>
           <textarea
             id="challenge"
@@ -546,7 +557,7 @@ export function ContactForm() {
 
         <div className="field">
           <label className="field__label" htmlFor="outcome">
-            What would a useful outcome look like? <Required />
+            What would a useful outcome look like?
           </label>
           <textarea
             id="outcome"
@@ -563,8 +574,7 @@ export function ContactForm() {
 
         <div className="field">
           <label className="field__label" htmlFor="message">
-            Anything else we should know?{" "}
-            <span className="field__optional">Optional</span>
+            Anything else we should know? <Optional />
           </label>
           <textarea
             id="message"
@@ -585,6 +595,19 @@ export function ContactForm() {
         </label>
       </div>
 
+      {/* Reassurance sits immediately before the button, which is where the
+          hesitation actually happens. Every line is a commitment Arctos can
+          keep — a reply either way, no obligation, and a named person — rather
+          than manufactured urgency or a countdown. Removing the perceived risk
+          of sending is the honest way to raise the number of sends. */}
+      <div className="form__assurance">
+        <ul>
+          <li>A reply either way, within two business days</li>
+          <li>No obligation, and no sales sequence</li>
+          <li>Read by the people who would do the work</li>
+        </ul>
+      </div>
+
       <div className="form__submit">
         <button
           className="btn form__send"
@@ -592,15 +615,15 @@ export function ContactForm() {
           disabled={status === "sending"}
         >
           <span>
-            {status === "sending" ? "Sending enquiry" : "Send project enquiry"}
+            {status === "sending" ? "Sending…" : "Send project enquiry"}
           </span>
           <span className="btn__arrow" aria-hidden="true">
             →
           </span>
         </button>
         <p className="form__submit-note">
-          We reply within two business days. Your information is only used to
-          respond to this enquiry.
+          Your information is only used to respond to this enquiry. It is not
+          added to a mailing list or shared with anyone.
         </p>
       </div>
     </form>

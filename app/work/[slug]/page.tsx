@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ProjectReel } from "@/components/ProjectReel";
-import { SpecimenStrip } from "@/components/SpecimenStrip";
+import { ProjectReel } from "@/components/figures/ProjectReel";
+import { SpecimenStrip } from "@/components/figures/SpecimenStrip";
 import { CTASection, PageHeader } from "@/components/Shared";
 import { getProject, projects } from "@/lib/content";
 import {

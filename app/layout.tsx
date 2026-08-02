@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { fontClass } from "./fonts";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
-import { LoadingIntro, INTRO_BOOTSTRAP } from "@/components/LoadingIntro";
-import { ChromeSync } from "@/components/ChromeSync";
-import { ScrollRefresh } from "@/components/ScrollRefresh";
-import { SurveyRule } from "@/components/SurveyRule";
+import { SiteHeader } from "@/components/chrome/SiteHeader";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { LoadingIntro, INTRO_BOOTSTRAP } from "@/components/chrome/LoadingIntro";
+import { ChromeSync } from "@/components/chrome/ChromeSync";
+import { ScrollRefresh } from "@/components/chrome/ScrollRefresh";
+import { SurveyRule } from "@/components/chrome/SurveyRule";
 import { InteriorMotion } from "@/components/InteriorMotion";
 import {
   SITE_NAME,
