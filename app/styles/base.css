@@ -440,10 +440,30 @@ body::after {
   background-image: var(--plate);
   background-repeat: no-repeat;
   background-position: var(--plate-pos, center);
-  background-size: var(--plate-size, cover);
+  background-size: var(--plate-size) var(--plate-size);
   opacity: var(--plate-opacity, 0.07);
   filter: var(--plate-filter, saturate(0.65) brightness(1.06));
 
+  /* BOTH AXES, STATED. This is the trap that made the feather look like an
+     opacity problem: a one-value `*-size` resolves the other axis to `auto`,
+     and `auto` does not mean the same thing to the two layers. The background
+     is a square photo, so `auto` follows its 1:1 ratio and the artwork stays
+     square. The mask is a gradient with no intrinsic ratio, so `auto` becomes
+     100% OF THE SECTION — the falloff disc ended up centred hundreds of pixels
+     below the artwork it was supposed to feather, and the two barely
+     intersected. The plate was drawn and then masked to nothing, which is why
+     raising its opacity from 0.08 to 0.34 changed almost no pixels.
+
+     `--plate-size` must therefore be a single length, never a keyword: `cover`
+     cannot be doubled up here.
+
+     `--plate-pos` has a matching trap. Chromium parses the THREE-value
+     `<position>` form for `background-position` but rejects it for
+     `mask-position`, which then silently falls back to `0% 0%` — the artwork
+     sits where you asked and the falloff sits in the top-left corner, so the
+     plate is masked away and looks like it was never drawn. Write one or two
+     values (`center`, `center right`) or the full four (`right 4rem top 50%`).
+     Never three: `center right 4rem` and `right 4rem center` both fail. */
   --plate-falloff: radial-gradient(
     closest-side circle at center,
     #000 28%,
@@ -456,8 +476,8 @@ body::after {
   mask-repeat: no-repeat;
   -webkit-mask-position: var(--plate-pos, center);
   mask-position: var(--plate-pos, center);
-  -webkit-mask-size: var(--plate-size, cover);
-  mask-size: var(--plate-size, cover);
+  -webkit-mask-size: var(--plate-size) var(--plate-size);
+  mask-size: var(--plate-size) var(--plate-size);
 }
 
 /* =========================================================================

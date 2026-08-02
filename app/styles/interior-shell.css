@@ -604,17 +604,27 @@
   border-block: var(--hair) solid var(--rule-strong);
 }
 
+/* The plate is shown whole.
+   This was `aspect-ratio: 16 / 10` with `object-fit: cover` over a 1200x1200
+   source — a letterbox cut through a square, circular composition, which threw
+   away about a third of the drawing and took the bear's feet and both ends of
+   the ring with it. There is no layout reason for the crop: the column is a
+   fixed width either way, and the only thing the ratio bought was height.
+   Square, the illustration is legible as a drawing rather than a fragment. */
 .intake__figure img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  object-position: center 42%;
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
+/* The caption was sitting hard against the plate's bottom edge, so it read as
+   part of the artwork rather than a note under it. */
 .intake__figure figcaption {
+  margin-top: var(--s3);
   padding-top: var(--s3);
+  border-top: var(--hair) solid var(--rule);
   color: var(--fg-dim);
 }
 

@@ -293,11 +293,16 @@ main,
   padding-top: clamp(7.5rem, 13vw, 12rem);
 }
 
+/* Set against the route diagram, not the header. At `top right` this plate
+   landed directly behind the small route-mapping figure and the standfirst,
+   so two illustrations competed for the same corner and the watermark read as
+   a smudge behind type. Centred vertically it sits under the drawn route
+   itself, which is the thing it is a picture of. */
 .journey::before {
   --plate: url("/assets/textures/route-compass.webp");
   --plate-size: clamp(16rem, 28vw, 30rem);
-  --plate-pos: top 2rem right 2rem;
-  opacity: 0.08;
+  --plate-pos: right 4rem top 50%;
+  opacity: 0.09;
   filter: saturate(0.7) brightness(1.05);
 }
 
