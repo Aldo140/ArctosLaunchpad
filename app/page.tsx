@@ -268,6 +268,21 @@ export default function HomePage() {
               none of them got one.
             </p>
 
+            {/* Modular blocks, because the section's claim is about assembly:
+                the same studio composing different parts into a different
+                system each time. The plate is held small and set at the end of
+                the head deliberately — four project scrolls follow immediately
+                below, and a large figure here would be a fifth piece of media
+                in front of the work it is introducing. */}
+            <figure className="work__figure field-figure reveal" data-wipe>
+              <Image
+                src={modularBlocks}
+                placeholder="blur"
+                alt="The Arctos bear composing differently coloured modules into one assembled system."
+                sizes="(max-width: 900px) 42vw, 14vw"
+              />
+            </figure>
+
             {/* The clients, named. Every one of these is a real engagement in
                 lib/content.ts — the register is generated from that list
                 rather than typed, so it cannot drift from the case files. */}

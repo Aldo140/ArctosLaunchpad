@@ -2754,6 +2754,21 @@ ol.ascent__stages {
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
+/* The plate goes UNDER the lead, not in a third track.
+   A third column is how the journey head carries its figure, but that head
+   opens on a short claim. This one opens on the largest headline on the page,
+   and taking a column's worth of width off it broke "Different problems
+   deserve different systems." from three lines to five. Set beneath the lead
+   the headline keeps its full measure, and the right column reads as one
+   stack — the plain-language gloss, then the picture of it — which lands
+   level with the headline it answers. */
+.work__figure {
+  grid-column: 2;
+  width: 100%;
+  max-width: 11rem;
+  justify-self: end;
+}
+
 .work__head .tick-label {
   grid-column: 1 / -1;
 }
@@ -2814,6 +2829,15 @@ ul.work__clients {
   .work__title,
   .work__lead {
     grid-column: 1;
+  }
+
+  /* Stacked, the plate is a margin note against the lead, not a banner over
+     the case files. Set to the right so the column keeps a left reading edge. */
+  .work__figure {
+    grid-column: 1;
+    width: 42vw;
+    max-width: 11rem;
+    margin-top: calc(var(--s2) * -1);
   }
 }
 
