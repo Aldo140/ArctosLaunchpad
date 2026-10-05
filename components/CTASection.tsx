@@ -40,8 +40,8 @@ export function CTASection({
         <h2 className="cta__title t-display reveal">{title}</h2>
         <p className="cta__body t-lead reveal">{body}</p>
         <p className="cta__note t-label reveal">
-          Reply within two business days — read by the people who'd do the
-          work, not a queue.
+          Reply within two business days — read by the people who&rsquo;d do
+          the work, not a queue.
         </p>
         <div className="cta__actions reveal">
           <Link className="btn" href="/contact">

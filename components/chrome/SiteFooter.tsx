@@ -23,6 +23,8 @@ const LEGAL = [
   ["Accessibility", "/accessibility"],
 ] as const;
 
+export const INSTAGRAM_URL = "https://www.instagram.com/arctoslaunchpad/";
+
 const LOCAL = [
   ["Calgary web design", "/calgary-web-design"],
   ["Calgary automation", "/calgary-business-automation"],
@@ -97,6 +99,12 @@ export function SiteFooter() {
                   <Link href={href}>{label}</Link>
                 </li>
               ))}
+              <li>
+                <a href={INSTAGRAM_URL} target="_blank" rel="me noreferrer">
+                  Instagram
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </li>
               <li>
                 <a href="#top">Back to top</a>
               </li>

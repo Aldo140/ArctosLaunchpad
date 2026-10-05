@@ -141,10 +141,11 @@ export function organizationSchema() {
     url: SITE_URL,
     description:
       "A Calgary digital growth and technology studio connecting marketing, websites, software, automation, and reporting into one system.",
-    slogan: "The systems behind growing businesses.",
+    slogan: "The system behind the work you repeat.",
     address: ADDRESS,
     areaServed: AREA_SERVED,
     knowsAbout: servicePages.map((service) => service.title),
+    sameAs: ["https://www.instagram.com/arctoslaunchpad/"],
   };
 }
 
