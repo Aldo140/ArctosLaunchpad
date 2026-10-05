@@ -212,48 +212,50 @@
   letter-spacing: -0.045em;
 }
 
-.process-stop__summary {
-  max-width: 34ch;
-  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
-  line-height: 1.35;
+/* The deliverable register is the primary content of a stop — the artefact a
+   client can hold — so it carries the largest type after the title. Summary
+   and detail are the argument *for* it, not the lede, and are sized and set
+   in `--fg-dim` / `--fg-faint` accordingly. See DESIGN-SYSTEM.md §10 and
+   RESEARCH.md R7: a named deliverable is a claim a buyer can hold. */
+.process-stop__deliverables {
+  display: grid;
+  gap: var(--s4);
+  max-width: 44rem;
 }
 
-.process-stop__detail {
-  max-width: 60ch;
+.process-stop__artifacts {
+  margin: 0;
+}
+
+.process-stop__artifacts li {
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+}
+
+.process-stop__artifacts .t-folio {
+  color: var(--accent);
+}
+
+.process-stop__artifacts p {
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.process-stop__summary {
+  max-width: 42ch;
+  font-size: var(--t-body);
   color: var(--fg-dim);
   line-height: var(--lh-copy);
 }
 
-.process-stop__deliverables {
-  display: grid;
-  gap: var(--s3);
-  margin-top: var(--s2);
-  padding-top: var(--s4);
-  border-top: var(--hair) solid var(--rule);
-}
-
-.process-stop__deliverables > p {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--fg-dim);
-}
-
-.process-stop__deliverables ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s2) var(--s5);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.process-stop__detail {
+  max-width: 56ch;
   font-size: var(--t-small);
-}
-
-.process-stop__deliverables li::before {
-  content: "+";
-  margin-right: var(--s2);
-  color: var(--accent);
+  color: var(--fg-dim);
+  line-height: var(--lh-copy);
 }
 
 .process-loop__inner {

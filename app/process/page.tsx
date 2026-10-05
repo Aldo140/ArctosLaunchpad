@@ -4,6 +4,8 @@ import { CTASection } from "@/components/Shared";
 import { ProcessRoute } from "@/components/pages/ProcessRoute";
 import { SceneMotion } from "@/components/pages/SceneMotion";
 import { processDetails } from "@/lib/content";
+
+const pad = (n: number) => String(n).padStart(2, "0");
 import {
   breadcrumbSchema,
   graph,
@@ -145,17 +147,23 @@ export default function ProcessPage() {
                 </div>
 
                 <h3>{step.title}</h3>
+
+                {/* The deliverable is the claim a buyer can hold — it leads
+                    the stop, ahead of the description that argues for it. */}
+                <div className="process-stop__deliverables">
+                  <p className="t-label">What this stop delivers</p>
+                  <ol className="numbered process-stop__artifacts">
+                    {step.deliverables.map((deliverable, i) => (
+                      <li key={deliverable}>
+                        <span className="t-folio">{pad(i + 1)}</span>
+                        <p>{deliverable}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
                 <p className="process-stop__summary">{step.summary}</p>
                 <p className="process-stop__detail">{step.detail}</p>
-
-                <div className="process-stop__deliverables">
-                  <p>Leaves this stop</p>
-                  <ul>
-                    {step.deliverables.map((deliverable) => (
-                      <li key={deliverable}>{deliverable}</li>
-                    ))}
-                  </ul>
-                </div>
               </article>
             ))}
           </div>
