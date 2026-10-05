@@ -98,6 +98,8 @@ export default function HomePage() {
       <HomeMotion />
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
+      {/* ICP-recognition. The visitor needs to see themselves in the first
+          few seconds — this is the only section that must stay first. */}
       <section
         className="hero section"
         data-material="instrument"
@@ -151,10 +153,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── The four stages, as one system ───────────────────────────── */}
-      <GrowthSystem />
-
       {/* ── Positioning ──────────────────────────────────────────────── */}
+      {/* ICP-recognition. Names the exact pain (more leads, more manual
+          admin) the ICP is living with — this is the second beat a
+          recurring-operation visitor needs to recognize themselves, right
+          behind the hero, before anything about how Arctos works. */}
       <section
         id="position"
         className="statement section"
@@ -212,45 +215,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Lead-generation journey ──────────────────────────────────── */}
-      <section
-        id="lead-system"
-        className="journey section"
-        data-plate
-        data-material="instrument"
-        data-station="Lead system"
-      >
-        <div className="shell">
-          <div className="journey__head reveal">
-            <p className="tick-label">The complete path</p>
-            <h2 className="journey__title t-display">
-              Do not stop at the lead.
-            </h2>
-            <p className="t-lead">
-              We connect the campaign, website, CRM, follow-up, sales process,
-              and reporting so opportunities do not disappear into inboxes and
-              spreadsheets.
-            </p>
-            <figure className="journey__figure field-figure reveal" data-wipe>
-              <Image
-                src={routeMapping}
-                placeholder="blur"
-                alt="The Arctos bear inspecting a connected customer route before deciding where to build."
-                sizes="(max-width: 900px) 54vw, 18vw"
-              />
-            </figure>
-          </div>
-
-          <JourneyDiagram />
-
-          <p className="journey__caption t-folio reveal">
-            Most engagements begin somewhere in the middle of this. That is
-            normal — we map what already exists before adding to it.
-          </p>
-        </div>
-      </section>
-
       {/* ── Selected work ────────────────────────────────────────────── */}
+      {/* Fast proof. This used to sit fifth, after two capability-detail
+          sections (the four-stage system diagram, the lead journey) — a
+          visitor had to scroll past a service breakdown to reach a single
+          real case. It now follows ICP-recognition directly, which is what
+          the brief's conversion order calls for: recognize yourself, then
+          see proof, before anything about how the work gets done. */}
       <section
         id="featured-work"
         className="work section"
@@ -311,6 +282,9 @@ export default function HomePage() {
       </section>
 
       {/* ── Craft specimens ──────────────────────────────────────────── */}
+      {/* Fast proof, continued. Stays bound to the work section immediately
+          above it — real material from the same case files, not a separate
+          claim. */}
       <section
         className="section section--tight"
         data-material="instrument"
@@ -326,6 +300,14 @@ export default function HomePage() {
       </section>
 
       {/* ── Automation ───────────────────────────────────────────────── */}
+      {/* Capability detail, demoted behind proof. Previously this already sat
+          after the work section, so its position relative to proof was fine —
+          what moved is everything that used to come *before* it. It now also
+          doubles as the material break between the two proof sections above
+          (instrument, instrument) and the three capability-detail sections
+          below (instrument, instrument, instrument), keeping the longest
+          same-material run at three — the same maximum the page already had
+          before this pass (journey/work/specimens ran three deep). */}
       <section
         id="automation"
         className="automation section"
@@ -386,7 +368,61 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── The four stages, as one system ───────────────────────────── */}
+      {/* Capability detail. This was the page's second section — a full
+          four-stage service breakdown before a single case had been shown.
+          It now follows proof instead of blocking it, alongside the other
+          "how Arctos works" material. */}
+      <GrowthSystem />
+
+      {/* ── Lead-generation journey ──────────────────────────────────── */}
+      {/* Capability detail. Explains the full campaign→CRM→report pipeline —
+          valuable, but a deeper explainer than a first-time ICP visitor
+          needs before they've seen proof or reached a path to contact, so it
+          moves down with the rest of the capability-detail block instead of
+          sitting ahead of the work section. */}
+      <section
+        id="lead-system"
+        className="journey section"
+        data-plate
+        data-material="instrument"
+        data-station="Lead system"
+      >
+        <div className="shell">
+          <div className="journey__head reveal">
+            <p className="tick-label">The complete path</p>
+            <h2 className="journey__title t-display">
+              Do not stop at the lead.
+            </h2>
+            <p className="t-lead">
+              We connect the campaign, website, CRM, follow-up, sales process,
+              and reporting so opportunities do not disappear into inboxes and
+              spreadsheets.
+            </p>
+            <figure className="journey__figure field-figure reveal" data-wipe>
+              <Image
+                src={routeMapping}
+                placeholder="blur"
+                alt="The Arctos bear inspecting a connected customer route before deciding where to build."
+                sizes="(max-width: 900px) 54vw, 18vw"
+              />
+            </figure>
+          </div>
+
+          <JourneyDiagram />
+
+          <p className="journey__caption t-folio reveal">
+            Most engagements begin somewhere in the middle of this. That is
+            normal — we map what already exists before adding to it.
+          </p>
+        </div>
+      </section>
+
       {/* ── Process ──────────────────────────────────────────────────── */}
+      {/* Capability detail — "how Arctos works," which only matters once a
+          visitor has already recognized themselves and seen proof. Closes
+          out the instrument run that started with the four-stage system
+          diagram, three sections deep (growth-system, journey, process). */}
       <section
         id="home-process"
         className="process section"
@@ -436,57 +472,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Industries ───────────────────────────────────────────────── */}
-      <section
-        id="home-industries"
-        className="industries section section--tight"
-        data-material="instrument"
-        data-station="Industries"
-      >
-        <div className="shell industries__inner">
-          <div className="industries__body">
-            <div className="industries__head reveal">
-              <p className="tick-label">Industries</p>
-              <h2 className="industries__title t-title">
-                Systems shaped around the needs of your industry.
-              </h2>
-            </div>
-            {/* Set as one field of names rather than ten identical rows with ten
-                identical arrows. At this scale the section reads as the breadth
-                it is describing in a single glance, which the list never did. */}
-            <ul className="ind-field reveal">
-              {industries.map((industry) => (
-                <li key={industry.slug} className="ind-field__row">
-                  <Link
-                    href={`/industries/${industry.slug}`}
-                    className="ind-field__item"
-                  >
-                    {industry.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="industries__actions reveal">
-              <Link className="btn btn--ghost" href="/industries">
-                Explore all industries
-                <span className="btn__arrow" aria-hidden="true">
-                  →
-                </span>
-              </Link>
-            </div>
-          </div>
-          <figure className="industries__figure field-figure reveal" data-wipe>
-            <Image
-              src={branchingGrowth}
-              placeholder="blur"
-              alt="The Arctos bear tending a branching system with four distinct outcomes."
-              sizes="(max-width: 900px) 70vw, 34vw"
-            />
-          </figure>
-        </div>
-      </section>
-
       {/* ── Why Arctos ───────────────────────────────────────────────── */}
+      {/* Trust / path to contact. Breaks the material run after three
+          instrument sections (growth-system, journey, process) and shifts
+          the page from "how it works" to "why us" right before the final
+          ICP touch (industries) and the CTA. */}
       <section
         id="why-arctos"
         className="why section"
@@ -556,6 +546,60 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Industries ───────────────────────────────────────────────── */}
+      {/* Capability detail, but doubles as a last ICP-recognition touch right
+          before the CTA — "see your industry here" — so it sits closer to
+          the door than the deeper explainers above it. */}
+      <section
+        id="home-industries"
+        className="industries section section--tight"
+        data-material="instrument"
+        data-station="Industries"
+      >
+        <div className="shell industries__inner">
+          <div className="industries__body">
+            <div className="industries__head reveal">
+              <p className="tick-label">Industries</p>
+              <h2 className="industries__title t-title">
+                Systems shaped around the needs of your industry.
+              </h2>
+            </div>
+            {/* Set as one field of names rather than ten identical rows with ten
+                identical arrows. At this scale the section reads as the breadth
+                it is describing in a single glance, which the list never did. */}
+            <ul className="ind-field reveal">
+              {industries.map((industry) => (
+                <li key={industry.slug} className="ind-field__row">
+                  <Link
+                    href={`/industries/${industry.slug}`}
+                    className="ind-field__item"
+                  >
+                    {industry.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="industries__actions reveal">
+              <Link className="btn btn--ghost" href="/industries">
+                Explore all industries
+                <span className="btn__arrow" aria-hidden="true">
+                  →
+                </span>
+              </Link>
+            </div>
+          </div>
+          <figure className="industries__figure field-figure reveal" data-wipe>
+            <Image
+              src={branchingGrowth}
+              placeholder="blur"
+              alt="The Arctos bear tending a branching system with four distinct outcomes."
+              sizes="(max-width: 900px) 70vw, 34vw"
+            />
+          </figure>
+        </div>
+      </section>
+
+      {/* ── Path to contact ──────────────────────────────────────────── */}
       <CTASection />
     </>
   );
