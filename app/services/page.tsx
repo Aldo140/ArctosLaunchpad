@@ -128,11 +128,12 @@ export default function ServicesPage() {
           <div className="services-open__lede">
             <p className="route-open__overline">Connected capabilities</p>
             <h1 className="route-open__title services-open__title">
-              One partner across the whole growth system.
+              The system behind the work you run again.
             </h1>
             <p className="route-open__intro">
-              Marketing creates demand. Digital experiences turn it into action.
-              Software, automation, and reporting keep the operation moving.
+              Built for businesses running the same campaign, event, or
+              production cycle on repeat — not a one-off site. Each stage
+              below removes a specific piece of the manual work in between.
             </p>
           </div>
 
