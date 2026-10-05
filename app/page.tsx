@@ -1,4 +1,4 @@
-import { HeroV2 } from "@/components/home/v2/HeroV2";
+import { HeroV2B as HeroV2 } from "@/components/home/v2/HeroV2B";
 import { GapV2 } from "@/components/home/v2/GapV2";
 import { ProofV2 } from "@/components/home/v2/ProofV2";
 import { TeardownBand } from "@/components/home/v2/TeardownBand";
