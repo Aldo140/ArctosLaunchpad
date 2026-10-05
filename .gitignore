@@ -4,3 +4,4 @@ node_modules
 .backup-pre-redesign
 assets-source
 *.tsbuildinfo
+.claude/worktrees
