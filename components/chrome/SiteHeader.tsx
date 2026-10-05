@@ -121,15 +121,15 @@ export function SiteHeader() {
               </Link>
             );
           })}
-          <Link className="chr-cta-btn" href="/teardown">
-            Free teardown
+          <Link className="chr-cta-btn" href="/contact">
+            Let’s talk
             <span aria-hidden="true">→</span>
           </Link>
         </nav>
 
         <div className="chr-bar-right">
-          <Link className="chr-cta-btn chr-cta-btn--bar" href="/teardown">
-            Free teardown
+          <Link className="chr-cta-btn chr-cta-btn--bar" href="/contact">
+            Let’s talk
           </Link>
           <button
             ref={trigger}
@@ -213,14 +213,14 @@ export function SiteHeader() {
             </ul>
             <Link
               className="chr-menu-cta"
-              href="/teardown"
+              href="/contact"
               onClick={() => close(false)}
             >
-              <span>Get a free reporting teardown</span>
+              <span>Discuss your project</span>
               <span aria-hidden="true">→</span>
             </Link>
             <p className="chr-menu-note">
-              30 minutes. No obligation. Reply within two business days.
+              Start with what needs to change. Reply within two business days.
             </p>
           </div>
         </div>

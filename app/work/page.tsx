@@ -1,114 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
-import {
-  CalgaryPlate,
-  FreshPrepPlate,
-  LeaseFlowPlate,
-  RioPlate,
-  StarlingsPlate,
-  TnkPlate,
-} from "@/components/work/Plates";
+import { ReportArtifact } from "@/components/figures/ReportArtifact";
+import { ProjectReel } from "@/components/figures/ProjectReel";
 import { workOrder } from "@/components/work/order";
-import {
-  absoluteUrl,
-  breadcrumbSchema,
-  graph,
-  jsonLd,
-  pageMetadata,
-  webPageSchema,
-} from "@/lib/seo";
-
-export const metadata: Metadata = pageMetadata({
-  title: "Work",
-  description:
-    "Reporting for recurring events, a production website for a dental lab, and civic, hospitality and product builds from Arctos Launchpad.",
-  path: "/work",
-  eyebrow: "Selected work",
-  cardTitle: "Built for the work you repeat.",
-});
-
-const schema = graph(
-  webPageSchema({
-    type: "CollectionPage",
-    name: "Work",
-    description:
-      "Case files for platforms, internal tools, websites, and product concepts built by Arctos Launchpad.",
-    path: "/work",
-  }),
-  breadcrumbSchema([{ name: "Work", path: "/work" }]),
-  {
-    "@type": "ItemList",
-    name: "Arctos Launchpad case files",
-    numberOfItems: workOrder.length,
-    itemListElement: workOrder.map((project, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: project.title,
-      url: absoluteUrl(project.route),
-    })),
-  },
-);
-
-const PLATES = {
-  "fresh-prep-event-intelligence": FreshPrepPlate,
-  "true-north-kromes": TnkPlate,
-  "calgary-watch": CalgaryPlate,
-  "rio-alto": RioPlate,
-  "starlings-support-map": StarlingsPlate,
-  leaseflow: LeaseFlowPlate,
-} as const;
-
-export default function WorkPage() {
-  const total = workOrder.length;
-  return (
-    <>
-      <section
-        className="wrk-open"
-        data-material="paper"
-        data-station="Selected work"
-      >
-        <div className="shell wrk-open__inner">
-          <p className="t-label wrk-open__eyebrow">Selected work</p>
-          <h1 className="wrk-open__title">
-            Built for the work <em>you repeat.</em>
-          </h1>
-          <div className="wrk-open__side">
-            <p className="wrk-open__intro">
-              Reporting for a recurring events client. A production website for
-              a dental lab. Then civic, hospitality and product builds. Six case
-              files, in the order we would show you.
-            </p>
-            <dl className="wrk-key">
-              <div>
-                <dt>Launched</dt>
-                <dd>live in production</dd>
-              </div>
-              <div>
-                <dt>Internal tool</dt>
-                <dd>built for a client team</dd>
-              </div>
-              <div>
-                <dt>Working demo</dt>
-                <dd>functioning, not yet deployed</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      {workOrder.map((project, i) => {
-        const Plate = PLATES[project.slug as keyof typeof PLATES];
-        return Plate ? (
-          <Plate key={project.slug} project={project} n={i + 1} total={total} />
-        ) : null;
-      })}
-
-      <CTASection />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLd(schema)}
-      />
-    </>
-  );
-}
+import { pageMetadata, breadcrumbSchema, graph, jsonLd, webPageSchema } from "@/lib/seo";
+export const metadata: Metadata = pageMetadata({title:"Work",description:"Explore websites, internal reporting tools, civic platforms and software built by Arctos Launchpad.",path:"/work"});
+export default function WorkPage(){return <div className="v3-page">
+<section className="v3-page-lead" data-material="paper" data-station="Work"><div className="v3-wrap"><p className="v3-kicker">Selected work</p><h1>Real businesses.<br /><em>Working systems.</em></h1><p>A reporting tool used behind the scenes. A specialised business brought online. Platforms that connect people and information. Here is what the work looks like in use.</p></div></section>
+{workOrder.map((project,i)=><section key={project.slug} className="v3-section v3-case" data-material={i%2===0?"instrument":"paper"} data-station={(project.client ?? project.title)}><div className="v3-wrap v3-case__grid"><div><p className="v3-kicker">{String(i+1).padStart(2,"0")} / {project.statusLabel}</p><h2>{(project.client ?? project.title)}</h2><p className="v3-case__summary">{project.summary}</p><div className="v3-case__tags">{project.services.map(service=><span key={service}>{service}</span>)}</div><Link className="v3-text-link" href={project.route}>Inside the project<span aria-hidden="true">↗</span></Link></div><div className="v3-case__visual">{project.slug==="fresh-prep-event-intelligence"?<ReportArtifact caption="Structure of the internal report. Client figures withheld." />:project.reel?.poster?<ProjectReel src={project.reel.src} poster={project.reel.poster} title={(project.client ?? project.title)}/>:project.featuredImage?<Image src={project.featuredImage} alt={project.title} width={1000} height={700} sizes="(max-width:760px) 100vw, 50vw"/>:<div className="v3-concept"><p className="v3-kicker">LeaseFlow / Working demo</p><ol><li>Listing enquiry</li><li>Lease-package request</li><li>Organised review</li></ol><p className="v3-small">A connected flow from first contact to a reviewable request.</p></div>}</div></div></section>)}
+<CTASection title="What could we build for your business?"/><script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(graph(webPageSchema({type:"CollectionPage",name:"Work",path:"/work",description:"Arctos project case files."}),breadcrumbSchema([{name:"Work",path:"/work"}])))} /></div>;}

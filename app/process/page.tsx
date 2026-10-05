@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { CTASection } from "@/components/CTASection";
 import { processDetails } from "@/lib/content";
 import { pageMetadata, breadcrumbSchema, graph, jsonLd, webPageSchema } from "@/lib/seo";
-export const metadata: Metadata = pageMetadata({ title: "Process", description: "Start with a reporting teardown. Map the work, build the connected system, and improve it in daily use.", path: "/process" });
-export default function ProcessPage() {
-  return <>
-    <section className="ctc-editorial" data-material="paper" data-station="Process">
-      <Image className="ctc-editorial__art" src="/assets/chapters/operate.webp" alt="" fill priority sizes="100vw" />
-      <div className="shell ctc-editorial__inner"><p className="tick-label">The process / evidence first</p><h1>Understand the work.<br /><em>Then build.</em></h1><p className="t-lead">Before another tool, a clear picture of where the information goes and where the work gets stuck.</p><Link className="btn" href="/teardown">Get a free reporting teardown</Link></div>
-    </section>
-    <section className="section ctc-start" data-material="instrument" data-station="First step"><div className="shell ctc-start__grid"><p className="ctc-big-number" aria-hidden="true">00</p><div><p className="tick-label">Before the project</p><h2 className="t-display">Bring one report.<br />See what it could be.</h2><p className="t-lead">A recent export, a spreadsheet, or a description of your last campaign, event or production run. We map the manual steps and show you a one-screen mock of the report it should be.</p><Link className="link" href="/teardown">What the free teardown includes</Link></div></div></section>
-    <section className="section" data-material="paper" data-station="The route"><div className="shell"><p className="tick-label">If we work together / six steps</p><div className="ctc-route">{processDetails.map(step => <article className="ctc-route__stop" key={step.id}><span className="ctc-route__number" aria-hidden="true">{step.index}</span><div><h2>{step.title}</h2><p className="t-lead">{step.summary}</p><p className="t-body">{step.detail}</p></div><div><p className="tick-label">What you leave with</p><ul>{step.deliverables.map(item => <li key={item}>{item}</li>)}</ul></div></article>)}</div></div></section>
-    <CTASection title="Start with the report. Decide from there." />
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(graph(webPageSchema({ name: "Process", path: "/process", description: "Reporting and automation built around how your business works." }), breadcrumbSchema([{ name: "Process", path: "/process" }]))) }} />
-  </>;
-}
+export const metadata: Metadata = pageMetadata({title:"Process",description:"Understand the business, design the right system, build and launch it, then improve it in daily use.",path:"/process"});
+export default function ProcessPage(){return <div className="v3-page">
+<section className="v3-page-lead" data-material="paper" data-station="Process"><div className="v3-wrap"><p className="v3-kicker">How we work together</p><h1>A clear plan.<br /><em>A working system.</em></h1><p>Start with the business problem. Make the decisions visible. Build something useful, then put it into daily use.</p><Link className="v3-text-link" href="/contact">Discuss your project<span aria-hidden="true">↗</span></Link></div></section>
+<section className="v3-section" data-material="instrument" data-station="The route"><div className="v3-wrap"><p className="v3-kicker">From the first conversation to everyday use</p><div className="v3-route">{processDetails.map(step=><article key={step.id}><span className="v3-route__number">{step.index}</span><div><h2>{step.title}</h2><p>{step.summary}</p><p className="v3-small">{step.detail}</p></div><div className="v3-route__outputs"><p className="v3-kicker">What it leaves you with</p><ul>{step.deliverables.map(item=><li key={item}>{item}</li>)}</ul></div></article>)}</div></div></section>
+<section className="v3-section" data-material="paper" data-station="The starting point"><div className="v3-wrap v3-editorial-split"><h2>The scope follows<br /><span>the problem.</span></h2><div><p>A new website is a different engagement from a reporting tool or a customer portal. We work out the priorities, responsibilities and technical approach before the build.</p><p>Have a reporting problem and want a smaller first step? Start with the free reporting teardown.</p><Link className="v3-text-link" href="/teardown">What the teardown includes<span aria-hidden="true">↗</span></Link></div></div></section>
+<CTASection title="Tell us where the work gets stuck." /><script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(graph(webPageSchema({name:"Process",path:"/process",description:"The Arctos engagement process."}),breadcrumbSchema([{name:"Process",path:"/process"}])))} /></div>;}

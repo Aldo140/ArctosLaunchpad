@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 type FieldName =
   | "name"
@@ -134,21 +134,17 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-/**
- * Eight of the ten fields are required, so an asterisk on each one marked the
- * rule rather than the exception and put eight accent-coloured glyphs into a
- * form that is trying to read as a quiet sheet. The two genuinely optional
- * fields carry the tag instead; `required` on the input still announces the
- * rest to assistive technology, which is where that information belongs.
- */
-function Optional() {
-  return <span className="field__optional">Optional</span>;
-}
-
 export function ContactForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
   const successHeading = useRef<HTMLHeadingElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const choices: Record<string, string> = { website: "Website", automation: "Business automation", software: "Custom software", reporting: "Dashboard or reporting" };
+    const selected = choices[new URLSearchParams(window.location.search).get("need") ?? ""];
+    const input = formRef.current?.elements.namedItem("projectType") as HTMLSelectElement | null;
+    if (selected && input) input.value = selected;
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -160,7 +156,10 @@ export function ContactForm() {
       setErrors(clientErrors);
       const firstInvalid = Object.keys(clientErrors)[0];
       window.requestAnimationFrame(() => {
-        form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
+        const input = form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`);
+        const extra = input?.closest("details");
+        if (extra) extra.open = true;
+        input?.focus();
       });
       return;
     }
@@ -252,281 +251,24 @@ export function ContactForm() {
   });
 
   const listed = fieldOrder.filter((f) => errors[f]);
-  const showAlert = Boolean(errors.form) || listed.length > 0;
-
-  return (
-    <form
-      className="form"
-      /* The sheet is printed stock sitting on an instrument section. Without
-         declaring the material it kept the dark-ground tokens, so every label
-         rendered near-white on cream. One attribute flips the whole palette,
-         which is exactly what tokens.css is built to do. */
-      data-material="paper"
-      onSubmit={handleSubmit}
-      noValidate
-      aria-busy={status === "sending"}
-    >
-      {showAlert && (
-        <div className="form__alert" role="alert" tabIndex={-1}>
-          <p className="form__alert-title">
-            {errors.form
-              ? "Something interrupted the handoff."
-              : listed.length === 1
-                ? "One field needs attention."
-                : `${listed.length} fields need attention.`}
-          </p>
-          {errors.form && <p className="form__alert-body">{errors.form}</p>}
-          {listed.length > 0 && (
-            <ul className="form__alert-list">
-              {listed.map((f) => (
-                <li key={f}>
-                  <a href={`#${f}`}>{errors[f]}</a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      <fieldset className="form__step">
-        <legend className="form__legend">
-          <span className="form__legend-n" aria-hidden="true">
-            01
-          </span>
-          <span className="form__legend-title">You</span>
-        </legend>
-
-        <div className="form__grid">
-          <div className="field">
-            <label className="field__label" htmlFor="name">
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              maxLength={100}
-              required
-              {...describedBy("name")}
-            />
-            <FieldError id="name-error" message={errors.name} />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              maxLength={254}
-              required
-              {...describedBy("email")}
-            />
-            <FieldError id="email-error" message={errors.email} />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="company">
-              Company or organization <Optional />
-            </label>
-            <input
-              id="company"
-              name="company"
-              type="text"
-              autoComplete="organization"
-              maxLength={150}
-              {...describedBy("company")}
-            />
-            <FieldError id="company-error" message={errors.company} />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="website">
-              Website <Optional />
-            </label>
-            <input
-              id="website"
-              name="website"
-              type="url"
-              inputMode="url"
-              autoComplete="url"
-              placeholder="https://"
-              maxLength={300}
-              {...describedBy("website")}
-            />
-            <FieldError id="website-error" message={errors.website} />
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset className="form__step">
-        <legend className="form__legend">
-          <span className="form__legend-n" aria-hidden="true">
-            02
-          </span>
-          <span className="form__legend-title">The work</span>
-        </legend>
-
-        <div className="form__grid">
-          <div className="field">
-            <label className="field__label" htmlFor="projectType">
-              Project type
-            </label>
-            <span className="field__select">
-              <select
-                id="projectType"
-                name="projectType"
-                defaultValue=""
-                required
-                {...describedBy("projectType")}
-              >
-                <option value="" disabled>
-                  Select the closest fit
-                </option>
-                {projectTypes.map((type) => (
-                  <option key={type}>{type}</option>
-                ))}
-              </select>
-            </span>
-            <FieldError id="projectType-error" message={errors.projectType} />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="budget">
-              Estimated budget <Optional />
-            </label>
-            <span className="field__select">
-              <select
-                id="budget"
-                name="budget"
-                defaultValue=""
-                {...describedBy("budget")}
-              >
-                <option value="" disabled>
-                  Select a range
-                </option>
-                {budgetRanges.map((range) => (
-                  <option key={range}>{range}</option>
-                ))}
-              </select>
-            </span>
-            <FieldError id="budget-error" message={errors.budget} />
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="timeline">
-              Desired timeline <Optional />
-            </label>
-            <span className="field__select">
-              <select
-                id="timeline"
-                name="timeline"
-                defaultValue=""
-                {...describedBy("timeline")}
-              >
-                <option value="" disabled>
-                  Select a timeline
-                </option>
-                {timelines.map((timeline) => (
-                  <option key={timeline}>{timeline}</option>
-                ))}
-              </select>
-            </span>
-            <FieldError id="timeline-error" message={errors.timeline} />
-          </div>
-
-        </div>
-      </fieldset>
-
-      <fieldset className="form__step form__step--last">
-        <legend className="form__legend">
-          <span className="form__legend-n" aria-hidden="true">
-            03
-          </span>
-          <span className="form__legend-title">What needs to change</span>
-        </legend>
-
-        <div className="field">
-          <label className="field__label" htmlFor="challenge">
-            What is not working well today?
-          </label>
-          <textarea
-            id="challenge"
-            name="challenge"
-            rows={4}
-            maxLength={1500}
-            minLength={20}
-            required
-            placeholder="Where does the friction show up for customers or your team?"
-            {...describedBy("challenge")}
-          />
-          <FieldError id="challenge-error" message={errors.challenge} />
-        </div>
-
-        <div className="field">
-          <label className="field__label" htmlFor="outcome">
-            What would a useful outcome look like? <Optional />
-          </label>
-          <textarea
-            id="outcome"
-            name="outcome"
-            rows={4}
-            maxLength={1500}
-            placeholder="Describe the change you want to see after the work is done."
-            {...describedBy("outcome")}
-          />
-          <FieldError id="outcome-error" message={errors.outcome} />
-        </div>
-
-        <div className="field">
-          <label className="field__label" htmlFor="message">
-            Anything else we should know? <Optional />
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows={3}
-            maxLength={3000}
-            placeholder="Constraints, context, systems involved, or a question for us."
-            {...describedBy("message")}
-          />
-          <FieldError id="message-error" message={errors.message} />
-        </div>
-      </fieldset>
-
-      <div className="form__trap" aria-hidden="true">
-        <label>
-          Leave this field empty
-          <input name="address" type="text" tabIndex={-1} autoComplete="off" />
-        </label>
-      </div>
-
-      <div className="form__submit">
-        <button
-          className="btn form__send"
-          type="submit"
-          disabled={status === "sending"}
-        >
-          <span>
-            {status === "sending" ? "Sending…" : "Send it"}
-          </span>
-          <span className="btn__arrow" aria-hidden="true">
-            →
-          </span>
-        </button>
-        <p className="form__submit-note">
-          We reply within two business days. Your details are only used to
-          answer you.{" "}
-          <Link className="link" href="/privacy">
-            Privacy notice
-          </Link>
-        </p>
-      </div>
-    </form>
-  );
+  return <form ref={formRef} className="v3-form" data-material="paper" onSubmit={handleSubmit} noValidate aria-busy={status === "sending"}>
+    <p className="v3-kicker">Tell us a little about the project</p>
+    <p className="v3-form__intro">Start with the problem. We’ll help with the plan.</p>
+    {(errors.form || listed.length > 0) && <div className="v3-form__alert" role="alert"><p>{errors.form ?? "A few details need attention."}</p>{listed.map(field => <a key={field} href={`#${field}`}>{errors[field]}</a>)}</div>}
+    <div className="v3-form__pair">
+      <div className="field"><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" maxLength={100} required {...describedBy("name")} /><FieldError id="name-error" message={errors.name} /></div>
+      <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" maxLength={254} required {...describedBy("email")} /><FieldError id="email-error" message={errors.email} /></div>
+    </div>
+    <div className="field"><label htmlFor="projectType">What can we help with?</label><select id="projectType" name="projectType" defaultValue="Not sure yet" {...describedBy("projectType")}>{projectTypes.map(type => <option key={type}>{type}</option>)}</select><FieldError id="projectType-error" message={errors.projectType} /></div>
+    <div className="field"><label htmlFor="challenge">What would you like to change?</label><textarea id="challenge" name="challenge" rows={4} maxLength={1500} minLength={20} required placeholder="We need a website that brings enquiries. Our team spends too long copying data. We have an idea for a new tool…" {...describedBy("challenge")} /><p className="v3-form__hint">A sentence or two is enough to start.</p><FieldError id="challenge-error" message={errors.challenge} /></div>
+    <details className="v3-form__extras"><summary>Add company, budget or timing <span>Optional +</span></summary><div className="v3-form__extra-fields">
+      <div className="field"><label htmlFor="company">Company</label><input id="company" name="company" autoComplete="organization" maxLength={150} {...describedBy("company")} /><FieldError id="company-error" message={errors.company} /></div>
+      <div className="field"><label htmlFor="website">Current website</label><input id="website" name="website" type="url" placeholder="https://" maxLength={300} {...describedBy("website")} /><FieldError id="website-error" message={errors.website} /></div>
+      <div className="field"><label htmlFor="budget">Budget</label><select id="budget" name="budget" defaultValue="" {...describedBy("budget")}><option value="">Not decided</option>{budgetRanges.map(range => <option key={range}>{range}</option>)}</select><FieldError id="budget-error" message={errors.budget} /></div>
+      <div className="field"><label htmlFor="timeline">Timing</label><select id="timeline" name="timeline" defaultValue="" {...describedBy("timeline")}><option value="">Not decided</option>{timelines.map(timeline => <option key={timeline}>{timeline}</option>)}</select><FieldError id="timeline-error" message={errors.timeline} /></div>
+    </div></details>
+    <div className="form__trap" aria-hidden="true"><label>Leave this empty<input name="address" type="text" tabIndex={-1} autoComplete="off" /></label></div>
+    <button className="v3-button v3-button--ink" type="submit" disabled={status === "sending"}><span>{status === "sending" ? "Sending…" : "Send my project enquiry"}</span><span aria-hidden="true">↗</span></button>
+    <p className="v3-form__privacy">Your details are used to answer your enquiry. <Link href="/privacy">Privacy notice</Link></p>
+  </form>;
 }

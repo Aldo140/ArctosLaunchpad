@@ -12,6 +12,8 @@
    ========================================================================= */
 
 :root {
+  --v3-flame: #f28c61;
+  --v3-flame-deep: #9b431e;
   /* --- ground ---------------------------------------------------------- */
   --ink: #081319; /* arctic black */
   --ink-raised: #0d1c26; /* ink navy, raised surface */
@@ -29,8 +31,8 @@
   --plate-ground: #02131b;
 
   /* --- interactive ----------------------------------------------------- */
-  --signal: #2f9bff;
-  --signal-deep: #1d4ed8;
+  --signal: var(--v3-flame);
+  --signal-deep: var(--v3-flame-deep);
 
   /* The readable partner to --accent. The chapter accents are sampled from the
      artwork and must not be altered, but on instrument they land at 2.8-4.1:1,

@@ -3,10 +3,8 @@ import "./globals.css";
 import { fontClass } from "./fonts";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { LoadingIntro, INTRO_BOOTSTRAP } from "@/components/chrome/LoadingIntro";
 import { ChromeSync } from "@/components/chrome/ChromeSync";
 import { ScrollRefresh } from "@/components/chrome/ScrollRefresh";
-import { SurveyRule } from "@/components/chrome/SurveyRule";
 import { InteriorMotion } from "@/components/InteriorMotion";
 import {
   SITE_NAME,
@@ -25,7 +23,7 @@ import {
  * through `pageMetadata` — Next.js shallow-merges metadata, so a page that
  * declares `openGraph` replaces this one wholesale rather than extending it.
  */
-const homeCardTitle = "The system behind the work you repeat.";
+const homeCardTitle = "More business. Less busywork.";
 const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 
 export const metadata: Metadata = {
@@ -87,19 +85,11 @@ export default function RootLayout({
   const schema = graph(organizationSchema(), websiteSchema());
 
   return (
-    // The bootstrap script stamps `js` and `data-intro` on <html> before React
-    // hydrates, which React would otherwise report as a mismatch.
     <html lang="en-CA" className={fontClass} suppressHydrationWarning>
-      <head>
-        {/* Decides before first paint whether this session sees the loader. */}
-        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOTSTRAP }} />
-      </head>
       <body id="top" data-material="instrument">
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <LoadingIntro />
-        <SurveyRule />
         <SiteHeader />
         <ChromeSync />
         <ScrollRefresh />
