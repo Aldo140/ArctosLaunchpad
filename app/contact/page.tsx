@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ContactForm } from "@/components/ContactForm";
+import { ContactDoors } from "@/components/ContactDoors";
 import { PageHeader } from "@/components/Shared";
 
 const siteUrl = (
@@ -147,7 +147,7 @@ export default function ContactPage() {
           </aside>
 
           <div className="intake__sheet">
-            <ContactForm />
+            <ContactDoors />
           </div>
         </div>
       </section>

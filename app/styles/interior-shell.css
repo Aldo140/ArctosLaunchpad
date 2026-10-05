@@ -634,6 +634,95 @@
   min-width: 0;
 }
 
+/* Enquiry routing. Three doors above the sheet so "just a question" never
+   has to go through the full intake. The active pane replaces the one
+   below it rather than stacking, so the sheet never grows past one form's
+   worth of content. */
+.doors {
+  display: grid;
+  gap: var(--s6);
+  min-width: 0;
+}
+
+.doors__group {
+  display: grid;
+  gap: var(--s4);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.doors__legend {
+  margin: 0;
+}
+
+.doors__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doors__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  flex: 1 1 14rem;
+  padding: var(--s4) var(--s5);
+  border: var(--hair) solid var(--rule-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.doors__option:hover {
+  border-color: var(--accent);
+}
+
+.doors__option--active {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+
+.doors__option input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.25rem;
+  accent-color: var(--accent);
+}
+
+.doors__option-label {
+  display: block;
+  font-weight: 600;
+  font-stretch: 92%;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+}
+
+.doors__option-note {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+}
+
+.doors__panel {
+  min-width: 0;
+}
+
+.doors__panel--plain {
+  display: grid;
+  gap: var(--s4);
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  background: var(--paper-warm);
+  border: var(--hair) solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: calc(var(--radius) * 1.25);
+  color: var(--fg);
+}
+
 /* =========================================================================
    POLICY / DOCUMENT PAGES
    ========================================================================= */
