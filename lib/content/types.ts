@@ -77,6 +77,8 @@ export type Project = {
   challenge: string;
   approach: string;
   solution: string;
+  constraint: string;
+  whatChanged: string;
   services: string[];
   industries: string[];
   technologies?: string[];
