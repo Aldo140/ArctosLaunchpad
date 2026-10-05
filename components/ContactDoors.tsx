@@ -13,7 +13,7 @@ type Door = "project" | "question" | "other";
  * and no change to app/api/contact/route.ts's schema.
  */
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@arctoslaunchpad.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "mrotiz14@gmail.com";
 
 const DOORS: { id: Door; label: string; note: string }[] = [
   {

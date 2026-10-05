@@ -158,7 +158,7 @@ export default function HomePage() {
       <section
         id="position"
         className="statement section"
-        data-material="instrument"
+        data-material="paper"
         data-station="Position"
       >
         <div className="shell statement__inner">
