@@ -1,1 +1,415 @@
 /* v2-hero-b — owned by one agent. Every class in this file must carry that agent's prefix. */
+
+/* Concept B: the monumental plate. Paper-led. Final composition is the default;
+   the arm/ready pair only exists while the entrance has yet to play. */
+
+.hvb {
+  /* The roundel is sized by height, then held clear of the copy column: its
+     left edge (viewport minus 0.86 of its diameter) never crosses the lead. */
+  --hvb-d: min(112vh, calc((96vw - 30.5rem) / 0.86));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: max(100svh, 44rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* ground --------------------------------------------------------------- */
+.hvb__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+}
+
+.hvb__canvas-img {
+  object-fit: cover;
+  object-position: 30% 50%;
+  transform-origin: 72% 40%;
+}
+
+/* crops the burgundy edge so the clear paper field owns the copy */
+.hvb__canvas {
+  scale: 1.22;
+  transform-origin: 72% 40%;
+}
+
+/* roundel -------------------------------------------------------------- */
+.hvb__disc-wrap {
+  position: absolute;
+  z-index: -2;
+  width: var(--hvb-d);
+  aspect-ratio: 1;
+  right: calc(var(--hvb-d) * -0.14);
+  top: calc(var(--hvb-d) * 0.045);
+  transform-origin: 40% 50%;
+}
+
+.hvb__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--plate-ground);
+}
+
+.hvb__disc-img {
+  object-fit: cover;
+}
+
+.hvb__proof .hvb__quiet--proof {
+  display: none;
+}
+
+/* route ---------------------------------------------------------------- */
+.hvb__route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.hvb__route-line {
+  stroke: var(--operate);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.hvb__route-mark {
+  fill: var(--operate);
+}
+
+.hvb__route-end {
+  fill: none;
+  stroke: var(--operate);
+  stroke-width: 2.5;
+}
+
+/* copy ----------------------------------------------------------------- */
+.hvb__inner {
+  /* no z-index here: a stacking context would stop the headline blending
+     with the art behind it */
+  position: relative;
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 7.25rem var(--gutter) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.hvb__eyebrow {
+  color: var(--glacier);
+  mix-blend-mode: difference;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.hvb__eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: var(--hair);
+  background: currentColor;
+  flex: none;
+}
+
+.hvb__title {
+  margin: var(--s5) 0 0;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-stretch: 88%;
+  color: var(--glacier);
+  mix-blend-mode: difference;
+  line-height: 0.9;
+  letter-spacing: var(--track-hero);
+}
+
+.hvb__l1 {
+  display: block;
+  font-size: clamp(4.4rem, min(12.4vw, 21vh), 14rem);
+  white-space: nowrap;
+}
+
+.hvb__l2 {
+  display: block;
+  margin-top: 0.16em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-size: clamp(2rem, 5.2vw, 5.75rem);
+}
+
+.hvb__lead {
+  margin: var(--s6) 0 0;
+  max-width: 24.5rem;
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.hvb__actions {
+  margin-top: var(--s5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4) var(--s6);
+}
+
+.hvb__cta {
+  padding: 1.15rem 1.7rem;
+  font-size: 1rem;
+  min-height: 3.5rem;
+}
+
+.hvb__quiet {
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-thickness: var(--hair);
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hvb__quiet:hover {
+  color: var(--operate);
+}
+
+.hvb__fine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--s5);
+  max-width: 30rem;
+  margin: var(--s2) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+/* proof ---------------------------------------------------------------- */
+.hvb__proof {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--s5) var(--gutter) var(--s6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.hvb__proof::before {
+  content: "";
+  display: block;
+  height: var(--hair);
+  width: min(100%, 46rem);
+  background: var(--rule-strong);
+  margin-bottom: var(--s2);
+}
+
+.hvb__proof-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.hvb__proof ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+
+.hvb__proof a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 600;
+  font-stretch: 92%;
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+}
+
+.hvb__proof a:hover {
+  color: var(--operate);
+  text-decoration-color: currentColor;
+}
+
+/* entrance gate: only while JS is going to play it ---------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  :root.js .hvb:not([data-ready]) .hvb-arm {
+    opacity: 0;
+  }
+  :root.js .hvb:not([data-ready]) .hvb__route-line {
+    stroke-dashoffset: 1;
+  }
+  :root.js .hvb:not([data-ready]) .hvb__route-mark {
+    opacity: 0;
+  }
+  /* If scripting stalls, never leave the first screen blank. */
+  :root.js .hvb:not([data-ready]) .hvb-arm,
+  :root.js .hvb:not([data-ready]) .hvb__route-line,
+  :root.js .hvb:not([data-ready]) .hvb__route-mark {
+    animation: hvb-failsafe 1ms linear 5s forwards;
+  }
+}
+
+@keyframes hvb-failsafe {
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* tablet: the roundel bleeds off the right, where there is room for it */
+@media (min-width: 701px) and (max-width: 1000px) {
+  .hvb__disc-wrap {
+    left: auto !important;
+    right: -14vw !important;
+  }
+
+  .hvb__canvas {
+    scale: 1.3 !important;
+  }
+}
+
+/* mobile: a separate composition ---------------------------------------- */
+@media (max-width: 1000px) {
+  .hvb {
+    --hvb-d: min(120vw, 40rem);
+    min-height: max(100svh, 47rem);
+  }
+
+  .hvb__canvas {
+    scale: 1;
+  }
+
+  .hvb__canvas-img {
+    object-position: 8% 50%;
+  }
+
+  .hvb__disc-wrap {
+    right: auto;
+    left: max(-13vw, -5rem);
+    top: 1.2rem;
+  }
+
+  /* re-crop: bring the bear and the gears up close, let the ring fall away */
+  .hvb__disc-img {
+    inset: -5% !important;
+    width: 110% !important;
+    height: 110% !important;
+  }
+
+  .hvb__eb-long,
+  .hvb__fine .hvb__quiet {
+    display: none;
+  }
+
+  .hvb__proof .hvb__quiet--proof {
+    display: inline-flex;
+  }
+
+  .hvb__inner {
+    padding-top: 0;
+    justify-content: flex-end;
+  }
+
+  .hvb__eyebrow {
+    position: absolute;
+    top: 4.7rem;
+    left: var(--gutter);
+    right: var(--gutter);
+    font-size: 0.68rem;
+  }
+
+  .hvb__title {
+    margin-top: 0;
+  }
+
+  .hvb__l1 {
+    font-size: min(24vw, 9.5rem);
+    white-space: normal;
+    line-height: 0.86;
+  }
+
+  .hvb__l2 {
+    font-size: min(8.8vw, 3.4rem);
+    margin-top: 0.3em;
+  }
+
+  .hvb__lead {
+    margin-top: var(--s4);
+    font-size: 1rem;
+    max-width: 34rem;
+    padding-right: 1.5rem;
+  }
+
+  .hvb__actions {
+    width: 100%;
+    margin-top: var(--s4);
+  }
+
+  .hvb__cta {
+    width: 100%;
+    justify-content: space-between;
+    min-height: 3.6rem;
+  }
+
+  .hvb__fine {
+    max-width: none;
+    margin-top: var(--s2);
+    padding-right: 1.5rem;
+  }
+
+  .hvb__proof {
+    padding-top: var(--s3);
+    padding-bottom: var(--s4);
+    gap: 0;
+  }
+
+  .hvb__proof ul {
+    gap: 0 1rem;
+  }
+
+  .hvb__proof a {
+    min-height: 2.1rem;
+    font-size: 0.86rem;
+  }
+
+  .hvb__fine {
+    font-size: 0.66rem;
+  }
+}
