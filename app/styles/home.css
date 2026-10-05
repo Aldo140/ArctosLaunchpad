@@ -886,6 +886,11 @@ main,
   max-width: 52ch;
 }
 
+.cta__note {
+  opacity: 0.7;
+  margin-top: calc(var(--s3) * -1);
+}
+
 .cta__actions {
   display: flex;
   flex-wrap: wrap;

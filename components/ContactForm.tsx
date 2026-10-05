@@ -48,7 +48,7 @@ const timelines = [
   "No fixed date",
 ] as const;
 
-const requiredFieldCount = 8;
+const requiredFieldCount = 4;
 
 /** Order used by the error summary so it matches the visual order of the form. */
 const fieldOrder: FieldName[] = [
@@ -84,7 +84,7 @@ function validate(formData: FormData): FieldErrors {
   if (name.length < 2) errors.name = "Enter your name.";
   if (!/^\S+@\S+\.\S+$/.test(email))
     errors.email = "Enter a valid email address.";
-  if (company.length < 2)
+  if (company && company.length < 2)
     errors.company = "Enter your company or organization.";
   if (website) {
     try {
@@ -104,16 +104,16 @@ function validate(formData: FormData): FieldErrors {
   if (!projectTypes.includes(projectType as (typeof projectTypes)[number])) {
     errors.projectType = "Choose a project type.";
   }
-  if (!budgetRanges.includes(budget as (typeof budgetRanges)[number])) {
+  if (budget && !budgetRanges.includes(budget as (typeof budgetRanges)[number])) {
     errors.budget = "Choose an estimated budget range.";
   }
-  if (!timelines.includes(timeline as (typeof timelines)[number])) {
+  if (timeline && !timelines.includes(timeline as (typeof timelines)[number])) {
     errors.timeline = "Choose a desired timeline.";
   }
   if (challenge.length < 20)
     errors.challenge = "Tell us a little more about the current challenge.";
-  if (outcome.length < 20)
-    errors.outcome = "Tell us what a useful outcome would look like.";
+  if (outcome && outcome.length < 20)
+    errors.outcome = "Tell us a little more, or leave this one blank.";
   if (message.length > 3000)
     errors.message = "Keep additional context under 3,000 characters.";
 
@@ -126,18 +126,10 @@ function completedRequiredFields(form: HTMLFormElement) {
   return [
     valueOf(formData, "name").length >= 2,
     /^\S+@\S+\.\S+$/.test(valueOf(formData, "email")),
-    valueOf(formData, "company").length >= 2,
     projectTypes.includes(
       valueOf(formData, "projectType") as (typeof projectTypes)[number],
     ),
-    budgetRanges.includes(
-      valueOf(formData, "budget") as (typeof budgetRanges)[number],
-    ),
-    timelines.includes(
-      valueOf(formData, "timeline") as (typeof timelines)[number],
-    ),
     valueOf(formData, "challenge").length >= 20,
-    valueOf(formData, "outcome").length >= 20,
   ].filter(Boolean).length;
 }
 
@@ -311,7 +303,7 @@ export function ContactForm() {
               you want people to start. */}
           {completed > 0 && (
             <p className="form__progress-value" aria-hidden="true">
-              {String(completed).padStart(2, "0")} / 08 complete
+              {String(completed).padStart(2, "0")} / 04 complete
             </p>
           )}
         </div>
@@ -332,9 +324,20 @@ export function ContactForm() {
           />
         </div>
         <p className="form__intro-note">
-          Three short sections, about four minutes. Everything is needed except
-          the two fields tagged optional.
+          Four fields and under a minute. Everything else is genuinely
+          optional — add it if it helps us reply with something useful
+          instead of something generic.
         </p>
+        <dl className="register form__intro-register">
+          <div className="register__row">
+            <dt className="t-label">Reply</dt>
+            <dd>Within two business days, either way</dd>
+          </div>
+          <div className="register__row">
+            <dt className="t-label">Read by</dt>
+            <dd>The people who would do the work, not a queue</dd>
+          </div>
+        </dl>
       </div>
 
       {showAlert && (
@@ -406,7 +409,7 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="company">
-              Company or organization
+              Company or organization <Optional />
             </label>
             <input
               id="company"
@@ -414,7 +417,6 @@ export function ContactForm() {
               type="text"
               autoComplete="organization"
               maxLength={150}
-              required
               {...describedBy("company")}
             />
             <FieldError id="company-error" message={errors.company} />
@@ -476,14 +478,13 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="budget">
-              Estimated budget
+              Estimated budget <Optional />
             </label>
             <span className="field__select">
               <select
                 id="budget"
                 name="budget"
                 defaultValue=""
-                required
                 {...describedBy("budget")}
               >
                 <option value="" disabled>
@@ -499,14 +500,13 @@ export function ContactForm() {
 
           <div className="field">
             <label className="field__label" htmlFor="timeline">
-              Desired timeline
+              Desired timeline <Optional />
             </label>
             <span className="field__select">
               <select
                 id="timeline"
                 name="timeline"
                 defaultValue=""
-                required
                 {...describedBy("timeline")}
               >
                 <option value="" disabled>
@@ -557,15 +557,13 @@ export function ContactForm() {
 
         <div className="field">
           <label className="field__label" htmlFor="outcome">
-            What would a useful outcome look like?
+            What would a useful outcome look like? <Optional />
           </label>
           <textarea
             id="outcome"
             name="outcome"
             rows={4}
             maxLength={1500}
-            minLength={20}
-            required
             placeholder="Describe the change you want to see after the work is done."
             {...describedBy("outcome")}
           />

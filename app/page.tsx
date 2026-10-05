@@ -122,11 +122,12 @@ export default function HomePage() {
               Calgary digital growth &amp; technology studio
             </p>
             <h1 className="hero__title t-hero">
-              The systems <em>behind</em> growing businesses.
+              The system behind the work <em>you repeat</em>.
             </h1>
             <p className="hero__lead t-lead">
-              Websites, campaigns, software, and automation — connected around
-              how your business attracts customers and operates.
+              Campaigns, events, and production runs — connected from the
+              marketing that fills them to the report that closes them out,
+              so each one costs less to run than the last.
             </p>
             <div className="hero__actions">
               <Link className="btn" href="/contact">

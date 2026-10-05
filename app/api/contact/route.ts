@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import { z } from "zod";
 
 function logDevelopmentError(
@@ -131,6 +132,60 @@ export async function POST(request: Request) {
   void _address;
   const receivedAt = new Date().toISOString();
   const webhookUrl = process.env.CONTACT_WEBHOOK_URL;
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const notifyEmail = process.env.CONTACT_NOTIFY_EMAIL;
+
+  /* Direct email delivery takes priority over the webhook pattern — no
+     third-party automation tool required, just an email inbox. Falls
+     through to the webhook / dev-log path below if either var is unset. */
+  if (resendApiKey && notifyEmail) {
+    try {
+      const resend = new Resend(resendApiKey);
+      const { error } = await resend.emails.send({
+        from: "Arctos enquiries <onboarding@resend.dev>",
+        to: notifyEmail,
+        replyTo: submission.email,
+        subject: `New project enquiry — ${submission.company}`,
+        text: [
+          `Name: ${submission.name}`,
+          `Email: ${submission.email}`,
+          `Company: ${submission.company}`,
+          submission.website ? `Website: ${submission.website}` : null,
+          `Project type: ${submission.projectType}`,
+          `Budget: ${submission.budget}`,
+          `Timeline: ${submission.timeline}`,
+          "",
+          `What is not working well today:`,
+          submission.challenge,
+          "",
+          `What a useful outcome looks like:`,
+          submission.outcome,
+          submission.message ? `\nAnything else:\n${submission.message}` : null,
+          "",
+          `Request ID: ${requestId}`,
+          `Received: ${receivedAt}`,
+        ]
+          .filter((line) => line !== null)
+          .join("\n"),
+      });
+
+      if (error) throw new Error(error.message);
+
+      return NextResponse.json({ ok: true, requestId });
+    } catch (error) {
+      logDevelopmentError("[contact] Resend delivery failed", {
+        requestId,
+        reason: error instanceof Error ? error.message : "Unknown error",
+      });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "We could not deliver your enquiry. Please try again.",
+        },
+        { status: 502 },
+      );
+    }
+  }
 
   if (!webhookUrl) {
     if (process.env.NODE_ENV === "development") {

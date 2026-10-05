@@ -427,6 +427,10 @@
   max-width: 48ch;
 }
 
+.form__intro-register {
+  margin-top: var(--s2);
+}
+
 /* --- error summary ------------------------------------------------------- */
 
 .form__alert {

@@ -3,8 +3,8 @@ import Image from "next/image";
 import { ArctosMark } from "./brand/ArctosMark";
 
 export function CTASection({
-  title = "What is slowing your business down?",
-  body = "It might be the website. It might be the marketing. It might be everything that happens after a customer gets in touch. Let's map the problem and build the right system.",
+  title = "What happens after the campaign ends?",
+  body = "If the answer is a spreadsheet nobody opens again, that's the part we fix — from the marketing that filled it to the report that closes it out.",
 }: {
   title?: string;
   body?: string;
@@ -39,6 +39,10 @@ export function CTASection({
         <p className="tick-label reveal">Start a project</p>
         <h2 className="cta__title t-display reveal">{title}</h2>
         <p className="cta__body t-lead reveal">{body}</p>
+        <p className="cta__note t-label reveal">
+          Reply within two business days — read by the people who'd do the
+          work, not a queue.
+        </p>
         <div className="cta__actions reveal">
           <Link className="btn" href="/contact">
             Start a project
