@@ -193,6 +193,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "This can run as a short standalone engagement. There is no obligation for Arctos to build what it recommends.",
+    wrongFit: [
+      "You already know the audience, the problem, and the first release. Go straight to a build service instead.",
+      "You need an answer this week. Most engagements run two to six weeks because they involve real customer interviews.",
+      "You want research that confirms a decision already made, not one that could change it.",
+    ],
     relatedProjects: ["fresh-prep-event-intelligence", "leaseflow"],
     relatedServices: [
       "ui-ux-design",
@@ -259,6 +264,11 @@ export const servicePages: ServicePage[] = [
       "Clearer visibility for relevant services",
       "Content that answers real customer questions",
       "A stronger foundation for local discovery",
+    ],
+    wrongFit: [
+      "You want guaranteed rankings. Search performance depends on competition and demand, and Arctos will not promise a position.",
+      "You need visible results this month. Search and AI search visibility builds over months.",
+      "Your pages and technical foundation are already strong and the real gap is paid media or content distribution.",
     ],
     relatedProjects: ["rio-alto", "true-north-kromes"],
     relatedServices: [
@@ -327,6 +337,11 @@ export const servicePages: ServicePage[] = [
       "A coherent path from advertisement to sales pipeline",
       "Faster and more consistent lead handling",
       "Reporting tied to useful business actions",
+    ],
+    wrongFit: [
+      "You only want someone to manage ad spend. This service is built around connecting the campaign to the page, CRM, and follow-up.",
+      "Your landing pages, lead routing, or follow-up sit with another team and are off-limits to change.",
+      "You need volume at any quality. The goal is qualified enquiries tied to sales outcomes, not click counts.",
     ],
     relatedProjects: ["leaseflow", "fresh-prep-event-intelligence"],
     relatedServices: [
@@ -398,6 +413,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "Design can be bought on its own. Arctos regularly hands finished work to an in-house or third-party development team.",
+    wrongFit: [
+      "You want static mockups turned around fast, not a documented system with states and accessibility notes.",
+      "There is no development team or plan to build what gets designed. The work is written to be built, not just viewed.",
+      "You need screens finished in days. Usability research and flow mapping happen before any screen is drawn.",
+    ],
     relatedProjects: ["starlings-support-map", "leaseflow", "calgary-watch"],
     relatedServices: [
       "web-design-development",
@@ -470,6 +490,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "The right website is shaped around how customers decide and how your team works after they get in touch.",
+    wrongFit: [
+      "You want a template site live this week. Arctos plans content and journeys before building anything.",
+      "You need a site you can rebuild yourself tomorrow in a drag-and-drop tool, not a maintainable build.",
+      "The goal is brand awareness alone, with no enquiry or conversion path you are trying to improve.",
+    ],
     relatedProjects: ["starlings-support-map", "true-north-kromes", "rio-alto"],
     relatedServices: ["branding-content", "seo-ai-search", "crm-integrations"],
     faq: [
@@ -533,6 +558,11 @@ export const servicePages: ServicePage[] = [
       "A more recognizable presence",
       "Clearer language for customers",
       "A practical system for future content",
+    ],
+    wrongFit: [
+      "You want a logo delivered without discussing positioning. Arctos starts there because it is what makes the mark mean something.",
+      "Your identity and messaging are already clear and consistent, and the real gap is distribution.",
+      "You need high-volume content production rather than a defined voice and a small set of core assets.",
     ],
     relatedProjects: ["rio-alto", "true-north-kromes"],
     relatedServices: [
@@ -609,6 +639,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "Automation should improve the systems you already use, not force your business to replace everything.",
+    wrongFit: [
+      "You want to replace every tool at once rather than improve the ones already in use.",
+      "There is no repeatable process yet. Automation needs clear rules to encode, not an undefined one.",
+      "The bottleneck is staffing or training, not a manual step between platforms.",
+    ],
     relatedProjects: ["fresh-prep-event-intelligence", "leaseflow"],
     relatedServices: [
       "crm-integrations",
@@ -679,6 +714,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "Arctos will say when a task is a poor fit for AI. A deterministic automation is often the better and cheaper answer, and that recommendation costs nothing.",
+    wrongFit: [
+      "A deterministic, rules-based automation would solve the problem more reliably and for less money. Arctos will say so instead of selling AI anyway.",
+      "You want a fully autonomous system with no human review on anything consequential.",
+      "There is no existing document or data set for the task to work from. Retrieval and classification need something to retrieve from.",
+    ],
     relatedProjects: ["fresh-prep-event-intelligence", "leaseflow"],
     relatedServices: [
       "business-automation",
@@ -749,6 +789,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "The work is documented and the code is yours. Arctos can continue supporting it or hand it to your team.",
+    wrongFit: [
+      "An existing off-the-shelf tool already covers the common case. This service is for the part no vendor sells.",
+      "You need a native-only build regardless of fit. Arctos builds progressive web and cross-platform mobile applications, and will say when native is genuinely the better answer.",
+      "There is no owner or budget to support the application after launch.",
+    ],
     relatedProjects: ["leaseflow", "fresh-prep-event-intelligence", "calgary-watch"],
     relatedServices: [
       "custom-software",
@@ -820,6 +865,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "Features are planned after the problem, users, and operational constraints are understood.",
+    wrongFit: [
+      "An existing platform or a focused integration would solve the problem. Arctos checks that first and will recommend it instead.",
+      "You want every feature built before the workflow and users are understood.",
+      "The need is a one-off fix, not a system meant to hold up as the operation grows.",
+    ],
     relatedProjects: [
       "starlings-support-map",
       "leaseflow",
@@ -896,6 +946,11 @@ export const servicePages: ServicePage[] = [
     ],
     reassurance:
       "The CRM should support the sales and service process, not become another administrative burden.",
+    wrongFit: [
+      "You want an official Odoo or ERP vendor partnership. Arctos supports these integrations without claiming one.",
+      "The CRM itself is the problem, not how it connects to the rest of the business, and a platform migration is really what is needed.",
+      "Lead routing rules change by exception constantly, and integrations need consistent rules to automate against.",
+    ],
     relatedProjects: ["leaseflow", "fresh-prep-event-intelligence"],
     relatedServices: [
       "business-automation",
@@ -963,6 +1018,11 @@ export const servicePages: ServicePage[] = [
       "A clearer shared view",
       "More consistent performance information",
       "Better questions for continued improvement",
+    ],
+    wrongFit: [
+      "You want every available metric tracked rather than a dashboard built around the decisions the team actually needs to make.",
+      "Your data sources are not accessible yet, or their definitions cannot be aligned, so there is nothing yet to consolidate.",
+      "You need a one-time report, not a maintained dashboard.",
     ],
     relatedProjects: ["fresh-prep-event-intelligence"],
     relatedServices: [
@@ -1032,6 +1092,11 @@ export const servicePages: ServicePage[] = [
       "Better operational visibility",
       "A clearer maintenance path",
       "Infrastructure ready to support growth",
+    ],
+    wrongFit: [
+      "There is no live application or site yet to host, deploy, or monitor.",
+      "You want zero ongoing involvement. Monitoring, backups, and performance work are ongoing by nature.",
+      "The infrastructure decision has already been made elsewhere and is not open to review.",
     ],
     relatedProjects: ["starlings-support-map", "leaseflow"],
     relatedServices: [

@@ -32,6 +32,7 @@ export type ServicePage = {
   process: string[];
   outcomes: string[];
   reassurance?: string;
+  wrongFit: string[];
   relatedProjects: string[];
   relatedServices: string[];
   faq: { question: string; answer: string }[];

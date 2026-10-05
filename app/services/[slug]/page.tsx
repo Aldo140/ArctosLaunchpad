@@ -274,6 +274,27 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ── Fit check — the honest exit ──────────────────────────────── */}
+      <section
+        className="section"
+        data-material="instrument"
+        data-chapter={stage}
+        data-station="Fit"
+      >
+        <div className="shell doc__aside reveal">
+          <p className="tick-label">Fit check</p>
+          <h2 className="t-title">This is the wrong engagement if…</h2>
+          <ol className="numbered">
+            {sheet.wrongFit.map((item, i) => (
+              <li key={item}>
+                <span className="t-folio">{pad(i + 1)}</span>
+                <p>{item}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* ── Evidence ──────────────────────────────────────────────────── */}
       {related.length > 0 && (
         <section
