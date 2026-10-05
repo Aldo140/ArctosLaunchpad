@@ -25,7 +25,7 @@ import {
  * through `pageMetadata` — Next.js shallow-merges metadata, so a page that
  * declares `openGraph` replaces this one wholesale rather than extending it.
  */
-const homeCardTitle = "The systems behind growing businesses.";
+const homeCardTitle = "The system behind the work you repeat.";
 const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 
 export const metadata: Metadata = {

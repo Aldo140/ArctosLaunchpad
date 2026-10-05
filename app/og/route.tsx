@@ -92,7 +92,7 @@ function clean(value: string | null, limit: number) {
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const title =
-    clean(params.get("title"), 130) || "The systems behind growing businesses.";
+    clean(params.get("title"), 130) || "The system behind the work you repeat.";
   const eyebrow = clean(params.get("eyebrow"), 48) || "Arctos Launchpad";
 
   return new ImageResponse(
