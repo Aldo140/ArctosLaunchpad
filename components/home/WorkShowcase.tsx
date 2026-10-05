@@ -174,18 +174,23 @@ export function WorkShowcase({ projects }: { projects: Project[] }) {
             </span>
             <span className="showcase__rule" aria-hidden="true" />
             <span className="t-folio showcase__kind">{layout.kind}</span>
+            {project.externalUrl ? (
+              <a
+                className="link showcase__live"
+                href={project.externalUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {project.externalUrl.replace(/^https?:\/\//, "")}
+                <span aria-hidden="true"> ↗</span>
+              </a>
+            ) : null}
             <span className="t-folio showcase__status">
               {project.statusLabel}
             </span>
           </header>
 
           <div className="showcase__media">
-            {layout.shape === "banner" ? (
-              <div className="showcase__browserbar" aria-hidden="true">
-                <span className="showcase__browserlights" />
-                <span className="showcase__address">calgarywatch.ca</span>
-              </div>
-            ) : null}
             <Link
               href={project.route}
               className="showcase__media-link"

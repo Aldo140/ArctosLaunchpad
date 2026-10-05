@@ -260,8 +260,11 @@ export default function HomePage() {
         <div className="shell">
           <div className="work__head reveal">
             <p className="tick-label">Selected work</p>
+            {/* No <em> here — the hero already spends the page's one
+                italic turn (RESEARCH.md §5.1: once per page, not once per
+                headline, or the device reads as a formula). */}
             <h2 className="work__title t-display">
-              Different problems deserve <em>different systems.</em>
+              Different problems deserve different systems.
             </h2>
             <p className="work__lead t-lead">
               A civic safety platform, a community support map, a restaurant,
