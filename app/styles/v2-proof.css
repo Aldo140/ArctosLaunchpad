@@ -1,1 +1,853 @@
-/* v2-proof — owned by one agent. Every class in this file must carry that agent's prefix. */
+/* v2-proof — GapV2 + ProofV2. Every class in this file carries the prf- prefix. */
+
+/* =========================================================================
+   GAP — one screen, paper
+   ========================================================================= */
+
+.prf-gap {
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding-top: clamp(4.5rem, 8vw, 7rem);
+  padding-bottom: clamp(1.75rem, 3.5vw, 3rem);
+  overflow: hidden;
+}
+
+.prf-gap__top {
+  display: grid;
+  gap: clamp(1rem, 2.2vw, 1.75rem);
+}
+
+.prf-gap__title {
+  display: grid;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-stretch: 88%;
+  text-wrap: balance;
+}
+
+.prf-gap__a {
+  font-size: clamp(3.7rem, min(14.4vw, 23svh), 15.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--accent);
+  margin-left: -0.04em;
+}
+
+.prf-gap__b {
+  font-size: clamp(2.6rem, min(7.9vw, 12.5svh), 9rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-top: 0.06em;
+}
+
+.prf-gap__ne {
+  display: inline-block;
+  color: var(--operate);
+  margin-right: 0.18em;
+  font-weight: 500;
+}
+
+.prf-gap__chart {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(14rem, 34svh, 30rem);
+  margin-top: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.prf-gap__plot {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 10rem;
+}
+
+.prf-gap__plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.prf-gap__grid,
+.prf-gap__axis,
+.prf-gap__line {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.prf-gap__grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.prf-gap__axis {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+}
+
+.prf-gap__line {
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.prf-gap__line--demand {
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+
+.prf-gap__line--hand {
+  stroke: var(--operate);
+}
+
+.prf-gap__line--system {
+  stroke: var(--fg);
+}
+
+/* The gap itself: a flat tint, no gradient. */
+.prf-gap__area {
+  fill: color-mix(in oklab, var(--operate) 19%, transparent);
+  stroke: none;
+}
+
+.prf-gap__tag,
+.prf-gap__key {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.35;
+}
+
+.prf-gap__tag {
+  position: absolute;
+  left: 88.5%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.prf-gap__tag--demand {
+  top: 7%;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.prf-gap__tag--hand {
+  top: 25%;
+  color: var(--operate);
+  font-weight: 700;
+}
+
+.prf-gap__tag--system {
+  top: 79%;
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.prf-gap__tag--gap {
+  top: 52%;
+  left: 89.2%;
+  max-width: calc(10.8% - var(--gutter) / 2);
+  white-space: normal;
+  color: var(--fg);
+}
+
+.prf-gap__bracket {
+  position: absolute;
+  left: 87.4%;
+  top: 25%;
+  height: 54%;
+  width: 0.5rem;
+  border: 1px solid var(--fg-dim);
+  border-right: 0;
+  transform-origin: top;
+}
+
+ul.prf-gap__legend {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: var(--s3) var(--gutter) 0;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+}
+
+.prf-gap__key {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.prf-gap__key::before {
+  content: "";
+  width: 1.4rem;
+  height: 3px;
+  background: currentColor;
+}
+
+.prf-gap__key--demand {
+  color: var(--accent);
+}
+.prf-gap__key--hand {
+  color: var(--operate);
+}
+.prf-gap__key--system {
+  color: var(--fg);
+}
+
+.prf-gap__aside {
+  margin-top: clamp(1rem, 2.4vw, 1.75rem);
+}
+
+.prf-gap__copy {
+  max-width: 44rem;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--fg);
+  text-wrap: pretty;
+  border-top: 1px solid var(--rule-strong);
+  padding-top: var(--s4);
+}
+
+/* On a wide screen the lines leave the lower left empty, so the one concrete
+   sentence sits in that air instead of costing the screen another row. */
+@media (min-width: 1000px) {
+  .prf-gap__chart {
+    min-height: clamp(18rem, 46svh, 36rem);
+  }
+  .prf-gap__aside {
+    position: absolute;
+    inset: 0 0 auto 0;
+    margin: 0 auto;
+    pointer-events: none;
+  }
+  .prf-gap__copy {
+    max-width: 25rem;
+    font-size: clamp(1.1rem, 0.9rem + 0.45vw, 1.4rem);
+    margin-top: clamp(0.5rem, 2.5vw, 2.5rem);
+    /* Paper behind the words so the grid never strikes through them. */
+    background: var(--bg);
+    padding-bottom: var(--s3);
+    width: fit-content;
+  }
+  .prf-gap__b {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 760px) {
+  .prf-gap {
+    min-height: 100svh;
+    padding-top: 4.5rem;
+  }
+  .prf-gap__a {
+    font-size: 21.5vw;
+  }
+  .prf-gap__b {
+    font-size: 16.5vw;
+    line-height: 0.98;
+  }
+  .prf-gap__plot {
+    overflow: hidden;
+  }
+  /* The drawing runs to 86 % of its own width so the desktop labels have a
+     margin. On a phone there is no margin, so the drawing is widened until its
+     lines end at the screen edge, and the labels become a legend. */
+  .prf-gap__plot svg {
+    width: 116.3%;
+    max-width: none;
+  }
+  .prf-gap__tag,
+  .prf-gap__bracket {
+    display: none;
+  }
+  ul.prf-gap__legend {
+    display: flex;
+  }
+  .prf-gap__copy {
+    font-size: 1.05rem;
+  }
+}
+
+/* =========================================================================
+   PROOF — instrument
+   ========================================================================= */
+
+.prf {
+  background: var(--bg);
+  color: var(--fg);
+  padding-top: var(--section-y);
+  padding-bottom: clamp(3.5rem, 7vw, 7rem);
+  overflow: hidden;
+}
+
+.prf-intro {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+
+.prf-intro__title {
+  font-family: var(--font-ui);
+  font-size: var(--t-display);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1;
+  letter-spacing: -0.032em;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+
+.prf-intro__lede {
+  max-width: 34rem;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+
+@media (min-width: 1000px) {
+  .prf-intro {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--s8);
+  }
+  .prf-intro .tick-label {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --- plate: shared --------------------------------------------------------- */
+
+.prf-plate {
+  position: relative;
+  display: grid;
+  gap: var(--s6);
+  padding-block: clamp(2.5rem, 5vw, 4.5rem);
+  border-top: 1px solid var(--rule);
+}
+
+.prf-plate__text {
+  display: contents;
+}
+
+.prf-plate__head {
+  order: 1;
+  display: grid;
+  gap: var(--s4);
+}
+
+.prf-plate__body {
+  order: 3;
+  display: grid;
+  gap: var(--s5);
+  align-content: start;
+}
+
+.prf-folio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.prf-folio span:last-child {
+  color: var(--fg-dim);
+}
+
+.prf-folio__rule {
+  width: 1.75rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.prf-plate__name {
+  font-family: var(--font-ui);
+  font-size: clamp(3.4rem, 0.8rem + 8.4vw, 8.5rem);
+  font-weight: 600;
+  font-stretch: 86%;
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.prf-plate__name a {
+  color: inherit;
+}
+
+.prf-copy {
+  display: grid;
+  gap: var(--s2);
+  max-width: 34rem;
+}
+
+.prf-copy__label {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.prf-copy p {
+  font-size: var(--t-body);
+  line-height: 1.55;
+  color: var(--fg-dim);
+  text-wrap: pretty;
+}
+
+.prf-copy:nth-of-type(2) p {
+  color: var(--fg);
+  font-size: calc(var(--t-body) * 1.08);
+}
+
+.prf-go {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  color: var(--fg);
+  font-weight: 600;
+  font-size: var(--t-small);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.prf-go:hover {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+/* --- plate 1: the report on the desk -------------------------------------- */
+
+.prf-desk {
+  order: 2;
+  position: relative;
+  background: var(--bg-raised);
+  border: 1px solid var(--rule);
+  padding: clamp(2.75rem, 5vw, 4.5rem) clamp(0.9rem, 4vw, 4rem) clamp(1.5rem, 4vw, 3.5rem);
+  display: grid;
+  min-width: 0;
+}
+
+.prf-desk__tag {
+  position: absolute;
+  top: clamp(0.8rem, 1.6vw, 1.2rem);
+  left: clamp(0.9rem, 2vw, 1.5rem);
+  right: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.prf-desk__sheet {
+  rotate: -1.1deg;
+  min-width: 0;
+}
+
+.prf-desk__sheet .rpt__caption {
+  color: color-mix(in oklab, var(--glacier) 62%, var(--ink));
+}
+
+/* --- plate 2: the footage -------------------------------------------------- */
+
+.prf-footage {
+  order: 2;
+  position: relative;
+  min-width: 0;
+}
+
+.prf-footage__frame {
+  position: relative;
+  aspect-ratio: 1024 / 548;
+  background: var(--plate-ground);
+  border: 1px solid var(--rule-strong);
+}
+
+.prf-footage__screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform-origin: 50% 40%;
+}
+
+.prf-footage__screen .reel {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prf-mark {
+  position: absolute;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0 solid var(--accent-soft);
+  pointer-events: none;
+}
+.prf-mark--tl {
+  top: -1px;
+  left: -1px;
+  border-top-width: 3px;
+  border-left-width: 3px;
+}
+.prf-mark--br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+}
+
+.prf-footage__cap {
+  margin-bottom: var(--s3);
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.prf-footage__cap a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-strong);
+}
+
+.prf-prints {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: clamp(0.5rem, 1.4vw, 1rem);
+  margin-top: clamp(-4.5rem, -5vw, -2rem);
+  padding-right: clamp(0.75rem, 3vw, 2.5rem);
+  pointer-events: none;
+}
+
+.prf-print {
+  position: relative;
+  overflow: hidden;
+  border: 6px solid var(--glacier);
+  box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+}
+
+.prf-print img {
+  object-fit: cover;
+}
+
+.prf-print--wide {
+  width: 46%;
+  aspect-ratio: 16 / 10;
+}
+
+.prf-print--tall {
+  width: 24%;
+  aspect-ratio: 3 / 4;
+  margin-bottom: 1.4rem;
+}
+
+/* --- desktop composition --------------------------------------------------- */
+
+@media (min-width: 900px) {
+  .prf-plate--report {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6.6fr);
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+    min-height: min(100svh, 58rem);
+  }
+
+  .prf-plate--report .prf-plate__text {
+    display: grid;
+    gap: var(--s6);
+    align-content: center;
+  }
+
+  .prf-plate--report .prf-plate__head,
+  .prf-plate--report .prf-plate__body {
+    order: 0;
+  }
+
+  .prf-plate--report .prf-desk {
+    order: 0;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Footage bleeds off the left edge of the viewport; the words take the rest. */
+  .prf-plate--reel {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4.2fr);
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+    padding-right: var(--gutter);
+    min-height: min(100svh, 58rem);
+  }
+
+  .prf-plate--reel .prf-footage {
+    order: 0;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .prf-plate--reel .prf-footage__frame {
+    border-left: 0;
+  }
+
+  .prf-plate--reel .prf-mark--tl {
+    display: none;
+  }
+
+  .prf-plate--reel .prf-plate__text {
+    display: grid;
+    gap: var(--s6);
+    grid-column: 2;
+    grid-row: 1;
+    align-content: center;
+  }
+
+  .prf-plate--reel .prf-plate__head,
+  .prf-plate--reel .prf-plate__body {
+    order: 0;
+  }
+
+  .prf-footage__cap {
+    padding-left: var(--gutter);
+  }
+}
+
+/* Very wide screens: keep the footage anchored to the page, not the monitor. */
+@media (min-width: 1700px) {
+  .prf-plate--reel {
+    max-width: 1700px;
+    margin-inline: auto;
+  }
+}
+
+/* --- phone: head, evidence, then the words -------------------------------- */
+
+@media (max-width: 899px) {
+  .prf-plate--report {
+    padding-inline: 0;
+  }
+  .prf-plate--report .prf-plate__head,
+  .prf-plate--report .prf-plate__body,
+  .prf-plate--reel .prf-plate__head,
+  .prf-plate--reel .prf-plate__body {
+    padding-inline: var(--gutter);
+  }
+  .prf-plate--reel .prf-footage__frame {
+    border-inline: 0;
+  }
+  .prf-plate--reel .prf-mark--tl,
+  .prf-plate--reel .prf-mark--br {
+    display: none;
+  }
+  .prf-plate--reel .prf-footage__cap {
+    padding-inline: var(--gutter);
+    max-width: none;
+  }
+  .prf-prints {
+    padding-right: var(--gutter);
+  }
+  .prf-go {
+    width: 100%;
+    justify-content: space-between;
+    min-height: 3rem;
+  }
+  .prf-desk {
+    border-inline: 0;
+    padding: 3.6rem 0.75rem 1.5rem;
+  }
+  .prf-plate__name {
+    font-size: clamp(3.4rem, 20vw, 9rem);
+  }
+  .prf-footage__cap {
+    margin-bottom: var(--s3);
+  }
+  .prf-desk__sheet {
+    rotate: -0.6deg;
+  }
+}
+
+/* --- index ----------------------------------------------------------------- */
+
+.prf-index {
+  margin-top: clamp(1rem, 3vw, 2.5rem);
+  padding-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--rule);
+}
+
+.prf-index__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+  margin-bottom: var(--s5);
+}
+
+.prf-index__more {
+  margin-top: var(--s5);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.prf-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 2.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.prf-quiet:hover {
+  color: var(--fg);
+}
+
+.prf-index__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prf-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1.15fr) minmax(0, 1.2fr) clamp(10rem, 19vw, 18rem) 2rem;
+  align-items: center;
+  column-gap: var(--s6);
+  padding-block: var(--s5);
+  border-top: 1px solid var(--rule);
+  color: var(--fg);
+}
+
+.prf-index__list li:last-child .prf-row {
+  border-bottom: 1px solid var(--rule);
+}
+
+.prf-row__main {
+  display: grid;
+  gap: var(--s2);
+}
+
+.prf-row__name {
+  font-family: var(--font-ui);
+  font-size: var(--t-title);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.prf-row__kind {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.prf-row__line {
+  color: var(--fg-dim);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+
+.prf-row__poster {
+  position: relative;
+  aspect-ratio: 16 / 8.6;
+  overflow: hidden;
+  border: 1px solid var(--rule-strong);
+}
+
+.prf-row__poster img {
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.prf-row__go {
+  justify-self: end;
+  color: var(--fg-dim);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.prf-row:hover .prf-row__name {
+  color: var(--accent-soft);
+}
+.prf-row:hover .prf-row__poster img {
+  transform: scale(1.05);
+}
+.prf-row:hover .prf-row__go {
+  color: var(--fg);
+  transform: translateX(4px);
+}
+
+@media (max-width: 899px) {
+  .prf-row {
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "poster main"
+      "poster line";
+    column-gap: var(--s4);
+    row-gap: var(--s2);
+    align-items: start;
+    padding-block: var(--s4);
+  }
+  .prf-row__n,
+  .prf-row__go {
+    display: none;
+  }
+  .prf-row__poster {
+    grid-area: poster;
+    aspect-ratio: 16 / 11;
+    align-self: start;
+  }
+  .prf-row__poster img {
+    object-position: 0 0;
+  }
+  .prf-row__main {
+    grid-area: main;
+  }
+  .prf-row__line {
+    grid-area: line;
+    font-size: 0.95rem;
+  }
+  .prf-row__name {
+    font-size: 1.55rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prf-row__poster img,
+  .prf-row__go {
+    transition: none;
+  }
+}
