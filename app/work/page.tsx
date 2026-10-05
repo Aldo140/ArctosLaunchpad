@@ -90,6 +90,20 @@ export default function WorkPage() {
               Civic platforms, community resources, hospitality, manufacturing,
               and internal software. Each project begins with its own context.
             </p>
+            <dl className="register work-open__legend">
+              <div className="register__row">
+                <dt className="t-label">Launched</dt>
+                <dd>Live, in production use by the client today.</dd>
+              </div>
+              <div className="register__row">
+                <dt className="t-label">Internal tool</dt>
+                <dd>Built for the client&rsquo;s own team, not public-facing.</dd>
+              </div>
+              <div className="register__row">
+                <dt className="t-label">Working demo</dt>
+                <dd>A functioning build, not yet a client deployment.</dd>
+              </div>
+            </dl>
           </header>
 
           {/* The contact sheet: an index of what follows, at one size. */}
