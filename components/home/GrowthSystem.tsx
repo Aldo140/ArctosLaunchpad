@@ -41,8 +41,13 @@ export function GrowthSystem() {
         <div className="ascent__body">
           <div className="ascent__head reveal">
             <p className="tick-label">The system</p>
+            {/* No <em> here. RESEARCH.md §5.1 tightens the italic-turn rule
+                from "once per headline" to once per page — the hero already
+                spends it, and a second (or third) italic turn on the same
+                page is exactly the repetition that makes the device read as
+                a formula rather than a brand idea. */}
             <h2 className="ascent__title t-display">
-              One route. Four stations. <em>Every one of them climbs.</em>
+              One route. Four stations. Every one of them climbs.
             </h2>
           </div>
 

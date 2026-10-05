@@ -1590,6 +1590,7 @@ main,
     width: 100%;
   }
 
+  .showcase__live,
   .showcase__status {
     grid-column: 3;
     margin-left: 0;
@@ -3997,18 +3998,19 @@ ul.work__clients {
   transform-origin: center;
 }
 
-.octave-field__layer--one {
-  animation: octave-drift-one 18s ease-in-out infinite alternate;
-}
-
+/* Static. An infinite ambient drift ran here regardless of scroll position —
+   atmosphere with no causal meaning, which §6 rules out ("motion must explain
+   sequence or causality... no floating blobs"). The grain itself is not
+   banned imagery; the perpetual-loop animation on it was the problem. */
 .octave-field__layer--two {
   opacity: 0.7;
-  animation: octave-drift-two 24s ease-in-out infinite alternate;
 }
 
 .why__card {
+  /* backdrop-filter: blur() here was glassmorphism, named and banned
+     outright in DESIGN-SYSTEM.md §7. The paper tint alone still separates
+     the card from the field behind it. */
   background: color-mix(in oklab, var(--paper) 82%, transparent);
-  backdrop-filter: blur(7px);
   transition:
     background var(--dur) var(--ease-out),
     transform var(--dur) var(--ease-out);
@@ -4049,54 +4051,20 @@ ul.work__clients {
   }
 }
 
-@keyframes octave-drift-one {
-  to {
-    transform: translate3d(2.5%, -1.5%, 0) scale(1.04);
-  }
-}
+/* --- selected work / real screens, shown edge to edge -------------------
+   A fake browser toolbar (traffic-light dots + an address bar) used to sit
+   over the banner recording. DESIGN-SYSTEM.md §7 explicitly bans fake
+   browser chrome around real screenshots — the dots never were a real
+   window, and dressing a real recording up as one reads as a template tell.
+   The live URL is real evidence, so it still appears — as a plain anchor in
+   `.showcase__head`, next to the project's kind and status, the same place
+   every other fact about the project already lives. */
 
-@keyframes octave-drift-two {
-  to {
-    transform: translate3d(-2%, 2%, 0) scale(1.06);
-  }
-}
-
-/* --- selected work / real screens in device-specific frames ------------ */
-
-.showcase__browserbar {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 3;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  gap: var(--s4);
-  padding-inline: var(--s4);
-  border-bottom: var(--hair) solid var(--rule-strong);
-  background: var(--ink);
-}
-
-.showcase__browserlights {
-  width: 2.4rem;
-  height: 0.45rem;
-  background:
-    radial-gradient(circle at 0.225rem, center, var(--attract) 0 0.2rem, transparent 0.22rem),
-    radial-gradient(circle at 1.2rem, center, var(--operate) 0 0.2rem, transparent 0.22rem),
-    radial-gradient(circle at 2.175rem, center, var(--scale) 0 0.2rem, transparent 0.22rem);
-}
-
-.showcase__address {
-  flex: 1;
-  padding-bottom: 0.15rem;
-  border-bottom: var(--hair) solid var(--rule-strong);
+.showcase__live {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   font-family: var(--font-mono);
   font-size: var(--t-micro);
-  letter-spacing: 0.08em;
-  color: var(--fg-dim);
-}
-
-.showcase__item--banner .showcase__media-link {
-  inset: 2.5rem 0 0;
 }
 
 .showcase__item--portrait .showcase__media {
@@ -4213,15 +4181,6 @@ ul.work__clients {
   .pattern-press,
   .responsive-build {
     width: 40%;
-  }
-
-  .showcase__browserbar {
-    height: 2.1rem;
-    padding-inline: var(--s3);
-  }
-
-  .showcase__item--banner .showcase__media-link {
-    top: 2.1rem;
   }
 }
 

@@ -87,9 +87,13 @@ export function HomeMotion() {
         },
       });
 
+      {/* SET only — each piece resolves in place. Earlier versions slid these
+          in on y/x and popped the operator mark on scale + rotation; the
+          token comment in tokens.css is explicit that nothing translates on
+          entry, so the sequence now carries entirely through timing
+          (the staggered offsets below) and opacity, never position. */}
       tl.from(demand, {
         autoAlpha: 0,
-        y: 14,
         duration: 0.62,
         ease: "power3.out",
       })
@@ -102,8 +106,6 @@ export function HomeMotion() {
           operatorMark,
           {
             autoAlpha: 0,
-            scale: 0.86,
-            rotation: -4,
             duration: 0.48,
             ease: "power3.out",
           },
@@ -113,7 +115,6 @@ export function HomeMotion() {
           admin,
           {
             autoAlpha: 0,
-            y: 18,
             duration: 0.68,
             ease: "power3.out",
           },
@@ -123,7 +124,6 @@ export function HomeMotion() {
           outcomes,
           {
             autoAlpha: 0,
-            x: 10,
             duration: 0.42,
             stagger: 0.09,
             ease: "power2.out",
@@ -204,7 +204,6 @@ export function HomeMotion() {
               after,
               {
                 autoAlpha: 0,
-                y: 18,
                 duration: 0.5,
                 stagger: 0.07,
                 ease: "power3.out",
@@ -220,10 +219,9 @@ export function HomeMotion() {
           );
           gsap.fromTo(
             stops,
-            { autoAlpha: 0, y: 18 },
+            { autoAlpha: 0 },
             {
               autoAlpha: 1,
-              y: 0,
               duration: 0.6,
               stagger: 0.1,
               ease: "power3.out",
@@ -329,7 +327,6 @@ export function HomeMotion() {
           const contents = Array.from(row.children);
           if (!contents.length) continue;
           gsap.from(contents, {
-            x: -8,
             autoAlpha: 0,
             duration: 0.46,
             stagger: 0.055,
