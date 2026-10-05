@@ -18,9 +18,9 @@ export const growthStages: ServiceGroup[] = [
     id: "attract",
     index: "01",
     title: "Attract",
-    statement: "Reach the right people and generate qualified opportunities.",
+    statement: "Get found by the people already looking for you.",
     problem:
-      "Inconsistent visibility and disconnected campaigns make it difficult for the right customers to find the business.",
+      "Search, campaigns and content run separately, so the right customer never lands on a page that says plainly what you do.",
     accent: "#6b7cff",
     includes: [
       "Search engine optimization",
@@ -34,9 +34,9 @@ export const growthStages: ServiceGroup[] = [
       "Marketing analytics",
     ],
     outcomes: [
-      "Clearer search visibility",
-      "More qualified opportunities",
-      "Campaigns tied to meaningful actions",
+      "Service pages that match what customers search for",
+      "Campaigns that end on a page and a form",
+      "Leads you can trace back to the campaign",
     ],
     serviceSlugs: [
       "seo-ai-search",
@@ -49,9 +49,9 @@ export const growthStages: ServiceGroup[] = [
     id: "convert",
     index: "02",
     title: "Convert",
-    statement: "Turn attention into enquiries, customers, and revenue.",
+    statement: "Turn visitors into enquiries you can act on.",
     problem:
-      "An outdated or unclear digital experience can lose interest before a visitor becomes an enquiry.",
+      "A site that is slow, vague or hard to contact loses the visitor before an enquiry ever exists.",
     accent: "#a45a72",
     includes: [
       "Website strategy",
@@ -69,9 +69,9 @@ export const growthStages: ServiceGroup[] = [
       "Loading-speed optimization",
     ],
     outcomes: [
-      "A clearer customer journey",
-      "More useful enquiries",
-      "A faster and more accessible experience",
+      "One clear path to the action you need",
+      "Forms that land in the CRM, not an inbox",
+      "A faster, more accessible site",
     ],
     serviceSlugs: ["web-design-development", "branding-content", "ui-ux-design"],
   },
@@ -79,9 +79,9 @@ export const growthStages: ServiceGroup[] = [
     id: "operate",
     index: "03",
     title: "Operate",
-    statement: "Remove the manual work behind your growth.",
+    statement: "Take the manual steps out of the work behind the work.",
     problem:
-      "Leads, approvals, data, and customer tasks often move through inboxes, spreadsheets, and disconnected platforms.",
+      "Leads, approvals and customer data move through inboxes and spreadsheets, so every campaign, event or run repeats the same hand work.",
     accent: "#c76d3f",
     includes: [
       "Workflow automation",
@@ -104,9 +104,9 @@ export const growthStages: ServiceGroup[] = [
       "AI-assisted task handling",
     ],
     outcomes: [
-      "Less repetitive administration",
-      "More consistent information",
-      "A process that can handle growth",
+      "Data entered once, not re-keyed",
+      "Approvals that route themselves",
+      "A process that holds up on the tenth run",
     ],
     serviceSlugs: [
       "business-automation",
@@ -120,9 +120,9 @@ export const growthStages: ServiceGroup[] = [
     id: "scale",
     index: "04",
     title: "Scale",
-    statement: "Measure what is working and keep improving.",
+    statement: "See what is working without building the report by hand.",
     problem:
-      "Manual reporting and fragmented data leave teams without a dependable view of performance.",
+      "Reports get rebuilt from exports each time, so the numbers arrive late and the answer depends on who made the sheet.",
     accent: "#4b9b80",
     includes: [
       "Analytics dashboards",
@@ -141,9 +141,9 @@ export const growthStages: ServiceGroup[] = [
       "Ongoing support",
     ],
     outcomes: [
-      "A shared view of performance",
-      "Less time spent building reports",
-      "Infrastructure ready for continued improvement",
+      "One dashboard in place of five exports",
+      "Reports that assemble themselves",
+      "Hosting that keeps running as the work grows",
     ],
     serviceSlugs: ["analytics-reporting", "cloud-devops"],
   },
@@ -159,7 +159,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Product strategy consulting",
     headline: "Decide what to build before anyone builds it.",
     summary:
-      "Arctos works through the audience, the problem, and the first release, so the budget goes to the version worth shipping.",
+      "A short engagement that ends in a written first-release scope and roadmap, so the budget goes to the version worth shipping.",
     problem:
       "The expensive decisions are made before any code exists. A roadmap built on assumption is difficult and slow to unwind once a team has built against it.",
     problems: [
@@ -234,7 +234,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Search visibility",
     headline: "Be useful wherever customers search.",
     summary:
-      "Arctos improves the structure, content, and local relevance that help customers and search systems understand a business.",
+      "Service pages that say plainly what you do and where, structured so Google and AI answers can read them, with the local search groundwork behind them.",
     problem:
       "Weak search visibility makes it harder for qualified customers to discover the business at the moment they need it.",
     problems: [
@@ -306,7 +306,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Demand generation",
     headline: "Build the path after the click.",
     summary:
-      "Arctos connects paid campaigns to landing pages, forms, lead routing, follow-up, and reporting.",
+      "Paid campaigns wired to a landing page, a form, lead routing and a report, so every lead is followed up and the spend can be traced.",
     problem:
       "Campaigns underperform when the advertisement is treated separately from the experience and workflow that follow it.",
     problems: [
@@ -379,7 +379,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "UI and UX design",
     headline: "An interface that needs explaining is a cost you pay forever.",
     summary:
-      "Arctos designs the flows, screens, and design system for products and applications, as a standalone engagement or alongside a build.",
+      "The flows, screens and design system for an app or internal tool, as its own engagement or ahead of a build.",
     problem:
       "Software that is hard to use gets worked around, and every workaround becomes a support request, a training session, or a customer who leaves.",
     problems: [
@@ -454,7 +454,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Web design and development",
     headline: "Your website should do more than look current.",
     summary:
-      "Arctos plans, designs, and builds websites around the questions customers ask and the actions the business needs them to take.",
+      "A website built around the one action you need taken: the pages, the forms and a short path to contact, designed and built.",
     problem:
       "An outdated site, unclear message, or slow path to contact can turn qualified attention into lost opportunity.",
     problems: [
@@ -527,7 +527,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Clarity and identity",
     headline: "Make the business easier to recognize and choose.",
     summary:
-      "Arctos shapes identity, copy, and content around the value customers need to understand.",
+      "An identity, plain-language copy and content that make it obvious what you do and why to choose you.",
     problem:
       "A business can be capable and still appear unclear when its identity, language, and digital experience tell different stories.",
     problems: [
@@ -600,7 +600,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Business automation",
     headline: "Eliminate the repetitive work slowing your team down.",
     summary:
-      "Arctos reviews how work moves through the organisation, removes unnecessary manual steps, and connects the platforms already in use.",
+      "The manual steps (re-keyed data, emailed approvals, spreadsheet tracking) replaced by workflows between the tools you already use.",
     problem:
       "Email approvals, spreadsheet tracking, duplicate entry, and repetitive reporting consume time and make information harder to trust.",
     problems: [
@@ -680,7 +680,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "AI product development",
     headline: "Put intelligence where the manual work is.",
     summary:
-      "Arctos builds AI into the parts of an operation that are decision-shaped — routing, summarising, classifying, drafting — and keeps a person in the loop where it matters.",
+      "AI for the work that is judgement applied to text: routing enquiries, summarising calls, classifying documents, drafting replies, with a person approving what matters.",
     problem:
       "A great deal of routine work is judgement applied to text: reading an enquiry and deciding where it goes, summarising a call, classifying a document. It is done by people because nothing else was ever wired up to do it.",
     problems: [
@@ -755,7 +755,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "App and software development",
     headline: "Build the product the off-the-shelf tools cannot.",
     summary:
-      "Arctos designs and builds web and mobile applications, from a first release through to the version that carries real users.",
+      "A web or mobile app for the process no off-the-shelf tool covers, from a first release to the version real users depend on.",
     problem:
       "Off-the-shelf software covers the common case. The part that differentiates a business is usually the part no vendor sells.",
     problems: [
@@ -830,7 +830,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Software built around the work",
     headline: "Some businesses need more than an off-the-shelf tool.",
     summary:
-      "Arctos designs and builds internal and customer-facing software around the way the business actually operates.",
+      "Internal tools, portals and dashboards shaped around how your team actually works, instead of workarounds inside a generic product.",
     problem:
       "Generic software can create workarounds when a team has a specific customer journey, approval process, or information model.",
     problems: [
@@ -910,7 +910,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Connected customer operations",
     headline: "Keep opportunities out of inboxes and spreadsheets.",
     summary:
-      "Arctos connects forms, CRM records, lead routing, follow-up, and operational platforms so information moves with the customer.",
+      "Forms, CRM records, lead routing and follow-up connected, so a lead is entered once and nobody chases it out of an inbox.",
     problem:
       "Leads get lost and teams repeat work when customer information lives in disconnected forms, inboxes, spreadsheets, and platforms.",
     problems: [
@@ -987,7 +987,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Performance visibility",
     headline: "Turn scattered data into a useful view of the business.",
     summary:
-      "Arctos consolidates marketing and operational information into dashboards and automated reports that teams can act on.",
+      "One dashboard and a set of reports that assemble themselves from your campaign, signup and sales data, so nobody rebuilds the report each time.",
     problem:
       "Manual reporting takes time, creates inconsistent answers, and separates marketing activity from customer and operational performance.",
     problems: [
@@ -1060,7 +1060,7 @@ export const servicePages: ServicePage[] = [
     eyebrow: "Reliable digital operations",
     headline: "Give the system a dependable place to run.",
     summary:
-      "Arctos supports the infrastructure, deployment, monitoring, and performance work behind websites and applications.",
+      "Hosting, deployment, monitoring and backups for the sites and apps you run, set up so releases are routine and problems are noticed early.",
     problem:
       "A useful digital product still needs reliable hosting, controlled deployment, monitoring, backups, and ongoing care.",
     problems: [

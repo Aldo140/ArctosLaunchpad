@@ -1,4 +1,4 @@
-/* v2-hero-b — owned by one agent. Every class in this file must carry that agent's prefix. */
+/* v2-hero-b â€” owned by one agent. Every class in this file must carry that agent's prefix. */
 
 /* Concept B: the monumental plate. Paper-led. Final composition is the default;
    the arm/ready pair only exists while the entrance has yet to play. */
@@ -422,4 +422,9 @@
   .hvb__fine {
     font-size: 0.66rem;
   }
+}
+@media(max-width: 760px) {
+  .hvb__proof a { min-height: 44px; }
+  .hvb__eyebrow { top: 5.4rem; }
+  .hvb__disc-wrap { top: 6.8rem; }
 }

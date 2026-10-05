@@ -1,1 +1,846 @@
-/* v2-services — owned by one agent. Every class in this file must carry that agent's prefix. */
+/* v2-services — owned by the services agent. Every class in this file carries
+   the `svc-` prefix. Covers /services, /services/[slug], /industries and
+   /industries/[slug]. Scroll-linked custom properties (--run) default to their
+   FINISHED value so no JS / reduced motion shows the designed page. */
+
+/* =========================================================================
+   SHARED BITS
+   ========================================================================= */
+
+.svc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s4);
+  min-height: 3.4rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 650;
+  font-stretch: 92%;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: var(--hair) solid var(--fg);
+  transition:
+    background var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+}
+
+.svc-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--glacier);
+}
+
+.svc-btn--ghost {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--rule-strong);
+}
+
+.svc-btn--ghost:hover {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* =========================================================================
+   /services — hero
+   ========================================================================= */
+
+.svc-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* Matches the roundel's own ground, so the plate has no seam. */
+  background: var(--plate-ground);
+  color: var(--fg);
+  min-height: min(52rem, 94svh);
+  display: grid;
+  align-items: end;
+  padding-block: clamp(7rem, 12vw, 9rem) clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.svc-hero__art {
+  position: absolute;
+  z-index: -1;
+  right: -16vw;
+  top: 50%;
+  width: min(74vw, 78rem);
+  height: auto;
+  transform: translateY(-46%);
+  pointer-events: none;
+}
+
+.svc-hero__inner {
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-hero__title {
+  max-width: 11ch;
+  margin-top: var(--s2);
+  font-family: var(--font-ui);
+  font-size: clamp(3.2rem, 1rem + 8.6vw, 9.5rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 0.9;
+  letter-spacing: var(--track-hero);
+  text-wrap: balance;
+}
+
+.svc-hero__title em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+}
+
+.svc-hero__lede {
+  max-width: 34rem;
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+.svc-hero__index {
+  list-style: none;
+  margin: clamp(1.5rem, 4vw, 3rem) 0 0;
+  padding: 0;
+  display: grid;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.svc-hero__jump {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s4);
+  min-height: 3.6rem;
+  padding: var(--s3) 0;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: var(--hair) solid var(--rule);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.svc-hero__jump-n {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--accent-soft);
+}
+
+.svc-hero__jump-name {
+  font-size: var(--t-subtitle);
+  font-weight: 600;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.svc-hero__jump-go {
+  color: var(--fg-dim);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-hero__jump:hover {
+  color: var(--accent-soft);
+}
+
+.svc-hero__jump:hover .svc-hero__jump-go {
+  transform: translateY(0.25rem);
+}
+
+@media (min-width: 981px) {
+  .svc-hero__index {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--s6);
+    border-top: 0;
+  }
+
+  .svc-hero__jump {
+    border-top: var(--hair) solid var(--rule-strong);
+    border-bottom: 0;
+    padding-block: var(--s4);
+  }
+}
+
+@media (max-width: 860px) {
+  .svc-hero {
+    min-height: 0;
+    align-items: start;
+    padding-top: 7rem;
+  }
+
+  .svc-hero__art {
+    right: -34vw;
+    top: 4.5rem;
+    width: 118vw;
+    transform: none;
+    opacity: 0.55;
+  }
+
+  .svc-hero__title {
+    max-width: none;
+    font-size: clamp(3.1rem, 15.5vw, 5rem);
+    margin-top: clamp(6rem, 42vw, 14rem);
+  }
+}
+
+/* =========================================================================
+   /services — the three offers
+   ========================================================================= */
+
+.svc-offer {
+  position: relative;
+  overflow: clip;
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4rem, 8vw, 8rem);
+}
+
+.svc-offer__inner {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "plate"
+    "rows"
+    "start";
+}
+
+.svc-offer__head {
+  grid-area: head;
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+}
+
+.svc-offer__kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+}
+
+.svc-offer__n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(5rem, 14vw, 13rem);
+  line-height: 0.7;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+
+.svc-offer__title {
+  font-size: clamp(2.7rem, 1rem + 5.6vw, 6.6rem);
+  font-weight: 640;
+  font-stretch: 88%;
+  line-height: 0.93;
+  letter-spacing: var(--track-hero);
+  text-wrap: balance;
+  max-width: 13ch;
+}
+
+.svc-offer__pain {
+  max-width: 30rem;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+
+.svc-offer__today-label {
+  margin-top: var(--s4);
+}
+
+.svc-offer__today {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.svc-offer__today li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: var(--t-body);
+  color: var(--fg);
+}
+
+.svc-offer__today li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 0.9rem;
+  height: var(--hair);
+  background: var(--accent);
+}
+
+.svc-offer__plate {
+  grid-area: plate;
+  position: relative;
+  width: min(100%, 36rem);
+  aspect-ratio: 1;
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--plate-ground);
+  justify-self: center;
+}
+
+.svc-offer__plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.svc-offer__rows {
+  grid-area: rows;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hair) solid var(--rule-strong);
+}
+
+.svc-offer__rows li {
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+.svc-offer__row {
+  position: relative;
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s5) 0;
+  color: var(--fg);
+  text-decoration: none;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.svc-offer__row-title {
+  font-size: clamp(1.7rem, 1rem + 2.2vw, 3.1rem);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.svc-offer__row-text {
+  max-width: 34rem;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+.svc-offer__row-go {
+  position: absolute;
+  right: 0;
+  top: var(--s5);
+  font-size: 1.4rem;
+  color: var(--accent);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-offer__row:hover .svc-offer__row-title {
+  color: var(--accent);
+}
+
+.svc-offer__row:hover .svc-offer__row-go {
+  transform: translateX(0.35rem);
+}
+
+.svc-offer__start {
+  grid-area: start;
+}
+
+.svc-offer__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s5);
+  min-height: 3.4rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: var(--t-small);
+  font-weight: 650;
+  font-stretch: 92%;
+  text-decoration: none;
+  border: var(--hair) solid var(--fg);
+  transition:
+    background var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+
+.svc-offer__cta:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--glacier);
+}
+
+@media (min-width: 981px) {
+  .svc-offer__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-areas:
+      "head plate"
+      "rows rows"
+      "start start";
+    align-items: center;
+  }
+
+  .svc-offer__plate {
+    width: 112%;
+    max-width: none;
+    justify-self: end;
+    margin-right: -12%;
+  }
+
+  .svc-offer__row {
+    grid-template-columns: 3.2rem minmax(0, 1.15fr) minmax(0, 1fr) 2.5rem;
+    align-items: baseline;
+    gap: var(--s5);
+    padding-block: var(--s6);
+  }
+
+  .svc-offer__row-go {
+    position: static;
+    justify-self: end;
+  }
+
+  .svc-offer__row-n {
+    align-self: start;
+    padding-top: 0.6rem;
+  }
+
+  /* Offer 2: mirrored. The plate sits left, the head right. */
+  .svc-offer--manual .svc-offer__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "plate head"
+      "rows rows"
+      "start start";
+  }
+
+  .svc-offer--manual .svc-offer__plate {
+    justify-self: start;
+    margin-right: 0;
+    margin-left: -12%;
+  }
+}
+
+@media (max-width: 980px) {
+  .svc-offer__plate {
+    width: min(78vw, 24rem);
+  }
+
+  .svc-offer__row-n {
+    display: none;
+  }
+
+  .svc-offer__row {
+    padding-right: 2rem;
+  }
+
+  .svc-offer__cta {
+    width: 100%;
+  }
+}
+
+/* --- offer 2: the steps, struck. The strike lines are drawn by scroll. --- */
+
+.svc-offer--manual .svc-offer__today {
+  gap: var(--s3);
+}
+
+.svc-offer--manual .svc-offer__today li {
+  padding-left: 0;
+  font-size: clamp(1.5rem, 1rem + 2.2vw, 2.9rem);
+  font-weight: 560;
+  font-stretch: 90%;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--fg-dim);
+}
+
+.svc-offer--manual .svc-offer__today li::before {
+  display: none;
+}
+
+.svc-offer--manual .svc-offer__today li span {
+  position: relative;
+  display: inline-block;
+}
+
+.svc-offer--manual .svc-offer__today li span::after {
+  content: "";
+  position: absolute;
+  left: -0.15em;
+  right: -0.15em;
+  top: 54%;
+  height: 0.07em;
+  min-height: 2px;
+  background: var(--accent-soft);
+  transform-origin: left;
+  transform: scaleX(var(--s, 1));
+}
+
+/* `--run` lives on the <ul>; each item reads its own slice of it. */
+.svc-offer--manual .svc-offer__today li:nth-child(1) { --k: 0; }
+.svc-offer--manual .svc-offer__today li:nth-child(2) { --k: 1; }
+.svc-offer--manual .svc-offer__today li:nth-child(3) { --k: 2; }
+.svc-offer--manual .svc-offer__today li:nth-child(4) { --k: 3; }
+
+.svc-offer--manual .svc-offer__today {
+  --run: 1;
+}
+
+.svc-offer--manual .svc-offer__today li span::after {
+  transform: scaleX(clamp(0, calc(var(--run) * 4 - var(--k)), 1));
+}
+
+/* --- offer 3: a route. Four stops on one drawn line. --------------------- */
+
+@media (min-width: 981px) {
+  .svc-offer--front .svc-offer__rows {
+    --run: 1;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 var(--s6);
+    border-top: 0;
+    padding-top: var(--s7);
+  }
+
+  .svc-offer--front .svc-offer__rows::before,
+  .svc-offer--front .svc-offer__rows::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0.45rem;
+    height: 2px;
+  }
+
+  .svc-offer--front .svc-offer__rows::before {
+    background: var(--rule-strong);
+  }
+
+  .svc-offer--front .svc-offer__rows::after {
+    background: var(--accent);
+    transform-origin: left;
+    transform: scaleX(var(--run));
+  }
+
+  .svc-offer--front .svc-offer__rows li {
+    position: relative;
+    border-bottom: 0;
+  }
+
+  .svc-offer--front .svc-offer__rows li::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--s7) * -1 + 0.1rem);
+    left: 0;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    z-index: 1;
+  }
+
+  .svc-offer--front .svc-offer__row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    padding: 0 0 var(--s4);
+    height: 100%;
+    align-content: start;
+  }
+
+  .svc-offer--front .svc-offer__row-n {
+    padding-top: 0;
+  }
+
+  .svc-offer--front .svc-offer__row-title {
+    font-size: clamp(1.5rem, 1rem + 1.2vw, 2.1rem);
+  }
+
+  .svc-offer--front .svc-offer__row-go {
+    justify-self: start;
+    margin-top: var(--s2);
+  }
+}
+
+/* =========================================================================
+   /services — the four stages (depth)
+   ========================================================================= */
+
+.svc-atlas {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4rem, 8vw, 7rem) clamp(2rem, 4vw, 3rem);
+}
+
+.svc-atlas__inner {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+.svc-atlas__head {
+  display: grid;
+  gap: var(--s4);
+}
+
+.svc-atlas__title {
+  max-width: 20ch;
+  font-size: clamp(2.2rem, 1rem + 4vw, 5rem);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.svc-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: min(56rem, 94svh);
+  display: grid;
+  align-items: end;
+}
+
+.svc-stage__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.svc-stage__canvas img {
+  object-fit: cover;
+  object-position: var(--cx, 50%) 50%;
+  will-change: transform;
+}
+
+/* Paper's own colour, so it reads as more paper rather than as a wash. */
+.svc-stage__canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--paper) 94%, transparent) 0%,
+    color-mix(in oklab, var(--paper) 78%, transparent) 36%,
+    transparent 64%
+  );
+}
+
+.svc-stage__inner {
+  display: grid;
+  gap: var(--s6);
+  align-items: end;
+  padding-block: clamp(6rem, 10vw, 8rem) 0;
+}
+
+.svc-stage__mark {
+  display: grid;
+  gap: var(--s3);
+  align-content: end;
+  padding-bottom: clamp(2rem, 4vw, 4rem);
+}
+
+.svc-stage__folio {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.svc-stage__folio::after {
+  content: "";
+  width: 3rem;
+  height: var(--hair);
+  background: var(--accent);
+}
+
+.svc-stage__title {
+  font-size: clamp(4.2rem, 1rem + 11.5vw, 12.5rem);
+  font-weight: 650;
+  font-stretch: 86%;
+  line-height: 0.86;
+  letter-spacing: var(--track-hero);
+  color: var(--fg);
+}
+
+.svc-stage__statement {
+  max-width: 20ch;
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+  font-weight: 560;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--fg);
+}
+
+.svc-stage__problem {
+  max-width: 27rem;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+.svc-stage__panel {
+  --bg: var(--ink);
+  --bg-raised: var(--ink-raised);
+  --fg: var(--glacier);
+  --fg-dim: color-mix(in oklab, var(--glacier) 62%, var(--ink));
+  --fg-faint: color-mix(in oklab, var(--glacier) 38%, var(--ink));
+  --rule: color-mix(in oklab, var(--glacier) 16%, transparent);
+  --rule-strong: color-mix(in oklab, var(--glacier) 34%, transparent);
+  --accent: var(--accent-soft);
+  background: var(--ink);
+  color: var(--glacier);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  display: grid;
+  gap: var(--s5);
+}
+
+.svc-stage__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.svc-stage__list li {
+  border-top: var(--hair) solid var(--rule);
+}
+
+.svc-stage__list li:first-child {
+  border-top: 0;
+}
+
+.svc-stage__link {
+  position: relative;
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s4) 2rem var(--s4) 0;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.svc-stage__link-title {
+  font-size: clamp(1.3rem, 1rem + 0.9vw, 1.9rem);
+  font-weight: 620;
+  font-stretch: 90%;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.svc-stage__link-text {
+  max-width: 44rem;
+  font-size: var(--t-small);
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+
+.svc-stage__link-go {
+  position: absolute;
+  right: 0;
+  top: var(--s4);
+  color: var(--accent);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.svc-stage__link:hover .svc-stage__link-title {
+  color: var(--accent);
+}
+
+.svc-stage__link:hover .svc-stage__link-go {
+  transform: translateX(0.3rem);
+}
+
+.svc-stage__changes {
+  list-style: none;
+  margin: 0;
+  padding: var(--s4) 0 0;
+  border-top: var(--hair) solid var(--rule-strong);
+  display: grid;
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.svc-stage__changes li {
+  display: flex;
+  gap: var(--s3);
+  align-items: baseline;
+}
+
+.svc-stage__changes li::before {
+  content: "+";
+  color: var(--accent);
+}
+
+@media (min-width: 981px) {
+  .svc-stage__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+  }
+
+  .svc-stage__panel {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 980px) {
+  .svc-stage {
+    min-height: 0;
+    align-items: start;
+  }
+
+  .svc-stage__canvas {
+    inset: 0 0 auto 0;
+    height: 62%;
+  }
+
+  .svc-stage__canvas::after {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--paper) 90%, transparent) 0%,
+      color-mix(in oklab, var(--paper) 70%, transparent) 55%,
+      transparent 100%
+    );
+  }
+
+  .svc-stage__inner {
+    padding-block: 5rem 0;
+  }
+
+  .svc-stage__title {
+    font-size: clamp(3.6rem, 22vw, 7rem);
+  }
+
+  .svc-stage__panel {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+}

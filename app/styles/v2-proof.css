@@ -851,3 +851,14 @@ ul.prf-gap__legend {
     transition: none;
   }
 }
+
+.prf { --section-y: var(--s7); }
+@media(min-width: 1000px) {
+  .prf-plate--report, .prf-plate--reel { min-height: 80svh; }
+}
+@media(min-width: 1000px) {
+  .prf { --section-y: var(--s6); padding-bottom: var(--s6); }
+  .prf-intro { margin-bottom: var(--s5); }
+  .prf-plate--report, .prf-plate--reel { min-height: 70svh; }
+  .prf-plate { padding-block: var(--s6); }
+}

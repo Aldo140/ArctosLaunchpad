@@ -16,7 +16,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Clearer patient and client journeys, with better systems behind them.",
     summary:
-      "Digital experiences and operational workflows can be shaped around enquiries, intake, communication, and specialized service delivery.",
+      "Enquiry, intake and case information in one place, instead of spread across a website, an inbox and a spreadsheet.",
     challenges: [
       "Outdated websites",
       "Manual intake",
@@ -38,7 +38,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Connect a specialized offering to the workflow that delivers it.",
     summary:
-      "Websites, portals, integrations, and reporting can make complex offerings easier to understand and operational information easier to manage.",
+      "Product pages, quote and intake forms, and production reporting that connect what you make to how each order moves.",
     challenges: [
       "Complex services",
       "Manual quoting or intake",
@@ -60,7 +60,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Useful digital services for the people and communities you support.",
     summary:
-      "Arctos can help nonprofits improve resource discovery, public experiences, internal workflows, and reporting.",
+      "Resources people can find, intake that does not run on spreadsheets, and reporting that does not eat a team's week.",
     challenges: [
       "Information that is difficult to find",
       "Manual programme administration",
@@ -82,7 +82,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Move enquiries, quotes, approvals, and project information with less friction.",
     summary:
-      "A connected website and workflow can help a busy team respond consistently without adding more spreadsheet and inbox work.",
+      "Enquiry, quote and approval steps moved out of inboxes and spreadsheets, so a busy crew follows up consistently.",
     challenges: [
       "Inconsistent lead quality",
       "Slow quote follow-up",
@@ -103,7 +103,7 @@ export const industryPages: IndustryPage[] = [
     title: "Real estate",
     headline: "Turn property interest into an organized customer workflow.",
     summary:
-      "Arctos connects listing traffic, enquiry experiences, lead handling, and operational information.",
+      "Listing enquiries, applications and follow-up in one tracked workflow, instead of scattered inboxes.",
     challenges: [
       "Scattered listing enquiries",
       "Manual follow-up",
@@ -124,7 +124,7 @@ export const industryPages: IndustryPage[] = [
     title: "Professional services",
     headline: "Make expertise easier to find, understand, and engage.",
     summary:
-      "A clear digital presence and connected intake process can move qualified prospects from research to a useful first conversation.",
+      "Clear positioning, search pages and an intake process that carry a prospect from research to a first conversation.",
     challenges: [
       "Generic positioning",
       "Low-quality enquiries",
@@ -145,7 +145,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Connect product communication, acquisition, and operating insight.",
     summary:
-      "Arctos supports product experiences, lead journeys, internal tools, and the reporting behind continued improvement.",
+      "Product pages, acquisition tracking and reporting that show where signups actually come from.",
     challenges: [
       "Unclear product value",
       "Disconnected acquisition data",
@@ -166,7 +166,7 @@ export const industryPages: IndustryPage[] = [
     headline:
       "Create a digital experience with enough character to be remembered.",
     summary:
-      "Brand storytelling, website design, local discovery, and conversion paths can work together before a guest arrives.",
+      "A site, local search presence and booking path that carry the character of the place before a guest arrives.",
     challenges: [
       "Generic digital presence",
       "Weak local discovery",
@@ -185,7 +185,7 @@ export const industryPages: IndustryPage[] = [
     title: "Events and experiential marketing",
     headline: "See what happens after the event interaction.",
     summary:
-      "Connected campaign data and reporting can provide a clearer view of signups, customer value, event performance, and team performance.",
+      "Signups, event codes and team results pulled into one report, instead of one spreadsheet per activation.",
     challenges: [
       "Scattered signup data",
       "Manual event reports",
@@ -204,7 +204,7 @@ export const industryPages: IndustryPage[] = [
     title: "Financial and insurance services",
     headline: "Make complex services and customer workflows clearer.",
     summary:
-      "Web experiences, structured intake, CRM workflows, and reporting can reduce friction across the customer journey.",
+      "Plain-language service pages, structured intake and CRM follow-up for services with a lot of fine print.",
     challenges: [
       "Complex service information",
       "Manual intake",

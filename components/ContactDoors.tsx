@@ -19,17 +19,17 @@ const DOORS: { id: Door; label: string; note: string }[] = [
   {
     id: "project",
     label: "Start a project",
-    note: "The full intake below. Four fields, under a minute.",
+    note: "Four fields. Under a minute.",
   },
   {
     id: "question",
     label: "Ask a question first",
-    note: "One note by email. No form, no obligation.",
+    note: "One email. No form.",
   },
   {
     id: "other",
-    label: "Careers, press, or suppliers",
-    note: "A direct email, off the project queue.",
+    label: "Everything else",
+    note: "Careers, press, suppliers.",
   },
 ];
 
@@ -59,9 +59,9 @@ export function ContactDoors() {
   )}`;
 
   return (
-    <div className="doors reveal">
+    <div className="doors ctc-doors">
       <fieldset className="doors__group">
-        <legend className="t-label doors__legend">How can we help?</legend>
+        <legend className="ctc-sr">How can we help?</legend>
         <div className="doors__options">
           {DOORS.map((option) => (
             <label
@@ -97,12 +97,7 @@ export function ContactDoors() {
           onSubmit={handleQuestionSubmit}
         >
           <div className="form__intro">
-            <p className="tick-label">Not ready for the full intake</p>
             <h2 className="t-title">Ask us anything.</h2>
-            <p className="form__intro-note">
-              Write your question and open it in your own email app. Nothing
-              is sent until you press send there.
-            </p>
           </div>
 
           <div className="field">
@@ -130,7 +125,7 @@ export function ContactDoors() {
               name="question"
               rows={4}
               required
-              placeholder="What do you want to know before getting in touch properly?"
+              placeholder="What would you like to know?"
               value={question}
               onChange={(event) => setQuestion(event.currentTarget.value)}
             />
@@ -142,14 +137,14 @@ export function ContactDoors() {
               type="submit"
               disabled={question.trim().length === 0}
             >
-              <span>Open your email app to send this</span>
+              <span>Write it in your email app</span>
               <span className="btn__arrow" aria-hidden="true">
                 →
               </span>
             </button>
             <p className="form__submit-note">
-              Opens a new email addressed to {CONTACT_EMAIL}. Nothing is
-              stored on this site.
+              Opens a draft to {CONTACT_EMAIL}. Nothing is sent until you send
+              it.
             </p>
           </div>
         </form>
@@ -157,12 +152,8 @@ export function ContactDoors() {
 
       {door === "other" && (
         <div className="doors__panel doors__panel--plain" data-material="paper">
-          <p className="tick-label">Off the project queue</p>
-          <h2 className="t-title">Careers, press, or suppliers.</h2>
-          <p className="t-body">
-            For anything that is not a project enquiry — a role, a press
-            request, or a supplier pitch — email us directly.
-          </p>
+          <h2 className="t-title">Careers, press, suppliers.</h2>
+          <p className="t-body">Email us directly.</p>
           <a className="btn btn--ghost" href={otherHref}>
             <span>{CONTACT_EMAIL}</span>
           </a>

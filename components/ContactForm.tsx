@@ -49,8 +49,6 @@ const timelines = [
   "No fixed date",
 ] as const;
 
-const requiredFieldCount = 4;
-
 /** Order used by the error summary so it matches the visual order of the form. */
 const fieldOrder: FieldName[] = [
   "name",
@@ -121,19 +119,6 @@ function validate(formData: FormData): FieldErrors {
   return errors;
 }
 
-function completedRequiredFields(form: HTMLFormElement) {
-  const formData = new FormData(form);
-
-  return [
-    valueOf(formData, "name").length >= 2,
-    /^\S+@\S+\.\S+$/.test(valueOf(formData, "email")),
-    projectTypes.includes(
-      valueOf(formData, "projectType") as (typeof projectTypes)[number],
-    ),
-    valueOf(formData, "challenge").length >= 20,
-  ].filter(Boolean).length;
-}
-
 /**
  * Per-field message. Announcement is handled once by the summary at the top of
  * the form rather than by ten simultaneous live regions, which is quieter for
@@ -163,7 +148,6 @@ function Optional() {
 export function ContactForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
-  const [completed, setCompleted] = useState(0);
   const successHeading = useRef<HTMLHeadingElement>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -244,18 +228,8 @@ export function ContactForm() {
           Thank you. <em>We’ll take it from here.</em>
         </h2>
         <p className="t-body">
-          We’ll read through the details and reply with a useful next step.
+          We’ll read it properly and reply within two business days.
         </p>
-        <dl className="register receipt__register">
-          <div className="register__row">
-            <dt className="t-label">Reply</dt>
-            <dd>Within two business days</dd>
-          </div>
-          <div className="register__row">
-            <dt className="t-label">First step</dt>
-            <dd>A focused conversation</dd>
-          </div>
-        </dl>
         <div className="receipt__actions">
           <Link className="btn btn--ghost btn--small" href="/work">
             See recent work
@@ -289,58 +263,9 @@ export function ContactForm() {
          which is exactly what tokens.css is built to do. */
       data-material="paper"
       onSubmit={handleSubmit}
-      onInput={(event) =>
-        setCompleted(completedRequiredFields(event.currentTarget))
-      }
       noValidate
       aria-busy={status === "sending"}
     >
-      <div className="form__intro">
-        <div className="form__intro-head">
-          <p className="tick-label">Confidential project intake</p>
-          {/* The counter only appears once there is progress to report. At
-              00 / 08 it announced the size of the task before the reader had
-              done anything, which is the wrong first impression for a form
-              you want people to start. */}
-          {completed > 0 && (
-            <p className="form__progress-value" aria-hidden="true">
-              {String(completed).padStart(2, "0")} / 04 complete
-            </p>
-          )}
-        </div>
-        <div
-          className="form__progress"
-          role="progressbar"
-          aria-label="Required fields completed"
-          aria-valuemin={0}
-          aria-valuemax={requiredFieldCount}
-          aria-valuenow={completed}
-        >
-          <span
-            style={
-              {
-                "--completion": `${(completed / requiredFieldCount) * 100}%`,
-              } as React.CSSProperties
-            }
-          />
-        </div>
-        <p className="form__intro-note">
-          Four fields and under a minute. Everything else is genuinely
-          optional — add it if it helps us reply with something useful
-          instead of something generic.
-        </p>
-        <dl className="register form__intro-register">
-          <div className="register__row">
-            <dt className="t-label">Reply</dt>
-            <dd>Within two business days, either way</dd>
-          </div>
-          <div className="register__row">
-            <dt className="t-label">Read by</dt>
-            <dd>The people who would do the work, not a queue</dd>
-          </div>
-        </dl>
-      </div>
-
       {showAlert && (
         <div className="form__alert" role="alert" tabIndex={-1}>
           <p className="form__alert-title">
@@ -368,10 +293,7 @@ export function ContactForm() {
           <span className="form__legend-n" aria-hidden="true">
             01
           </span>
-          <span className="form__legend-title">The essentials</span>
-          <span className="form__legend-note">
-            Who you are, and where the reply should go.
-          </span>
+          <span className="form__legend-title">You</span>
         </legend>
 
         <div className="form__grid">
@@ -447,10 +369,7 @@ export function ContactForm() {
           <span className="form__legend-n" aria-hidden="true">
             02
           </span>
-          <span className="form__legend-title">The shape of the work</span>
-          <span className="form__legend-note">
-            Rough answers are fine. None of this is binding.
-          </span>
+          <span className="form__legend-title">The work</span>
         </legend>
 
         <div className="form__grid">
@@ -521,10 +440,6 @@ export function ContactForm() {
             <FieldError id="timeline-error" message={errors.timeline} />
           </div>
 
-          <p className="form__aside">
-            Not sure yet is a real answer. Pick the closest option and we will
-            work the rest out together.
-          </p>
         </div>
       </fieldset>
 
@@ -534,9 +449,6 @@ export function ContactForm() {
             03
           </span>
           <span className="form__legend-title">What needs to change</span>
-          <span className="form__legend-note">
-            The part that matters most. A couple of sentences each is plenty.
-          </span>
         </legend>
 
         <div className="field">
@@ -594,19 +506,6 @@ export function ContactForm() {
         </label>
       </div>
 
-      {/* Reassurance sits immediately before the button, which is where the
-          hesitation actually happens. Every line is a commitment Arctos can
-          keep — a reply either way, no obligation, and a named person — rather
-          than manufactured urgency or a countdown. Removing the perceived risk
-          of sending is the honest way to raise the number of sends. */}
-      <div className="form__assurance">
-        <ul>
-          <li>A reply either way, within two business days</li>
-          <li>No obligation, and no sales sequence</li>
-          <li>Read by the people who would do the work</li>
-        </ul>
-      </div>
-
       <div className="form__submit">
         <button
           className="btn form__send"
@@ -614,15 +513,18 @@ export function ContactForm() {
           disabled={status === "sending"}
         >
           <span>
-            {status === "sending" ? "Sending…" : "Send project enquiry"}
+            {status === "sending" ? "Sending…" : "Send it"}
           </span>
           <span className="btn__arrow" aria-hidden="true">
             →
           </span>
         </button>
         <p className="form__submit-note">
-          Your information is only used to respond to this enquiry. It is not
-          added to a mailing list or shared with anyone.
+          We reply within two business days. Your details are only used to
+          answer you.{" "}
+          <Link className="link" href="/privacy">
+            Privacy notice
+          </Link>
         </p>
       </div>
     </form>

@@ -574,3 +574,7 @@ main:has(.chr-cta) ~ .chr-foot .chr-foot__map {
     width: 100%;
   }
 }
+
+/* An opaque ink bar keeps the wordmark legible over printed artwork. */
+.header, .header.is-condensed { background: var(--ink); backdrop-filter: none; }
+.header.is-menu-open { background: transparent; }

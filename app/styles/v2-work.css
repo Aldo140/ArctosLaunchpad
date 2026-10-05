@@ -1,1 +1,1083 @@
-/* v2-work — owned by one agent. Every class in this file must carry that agent's prefix. */
+/* v2-work — Work index and case files. Prefix: wrk-.
+   Scale, Proof, Offer: monumental plates, evidence first, the argument at pull-quote size. */
+
+/* ------------------------------------------------------------------ shared */
+
+.wrk-flag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  border: 1px solid var(--rule-strong);
+  padding: 0.3rem 0.6rem;
+}
+
+.wrk-flag--lg {
+  font-size: var(--t-small);
+  padding: 0.5rem 0.85rem;
+  width: fit-content;
+}
+
+.wrk-cap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+  margin-top: var(--s3);
+  color: var(--fg-dim);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+}
+
+.wrk-screen {
+  margin: 0;
+  min-width: 0;
+}
+
+.wrk-screen__frame {
+  position: relative;
+  aspect-ratio: 1024 / 548;
+  overflow: hidden;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg-raised);
+}
+
+.wrk-screen__frame .reel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border: 0;
+  display: block;
+}
+
+.wrk-still {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: 1px solid var(--rule-strong);
+  min-width: 0;
+}
+
+.wrk-still img {
+  object-fit: cover;
+}
+
+.wrk-still--tall {
+  aspect-ratio: 4 / 5;
+}
+
+/* Scroll-tied depth only: media settles as it crosses the viewport. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .wrk-screen__frame .reel,
+    .wrk-still img {
+      animation: wrk-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+@keyframes wrk-settle {
+  from {
+    transform: scale(1.09);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* --------------------------------------------------------------- index open */
+
+.wrk-open {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(8rem, 17vh, 12rem) clamp(3rem, 6vw, 6rem);
+}
+
+.wrk-open__inner {
+  display: grid;
+  gap: var(--s6);
+}
+
+.wrk-open__title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 90%;
+  font-size: clamp(3.4rem, 0.8rem + 9.2vw, 10.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+
+.wrk-open__title em {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.wrk-open__side {
+  display: grid;
+  grid-template-columns: minmax(0, 36rem) minmax(0, 1fr);
+  gap: var(--s5) var(--s9);
+  align-items: end;
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.wrk-open__intro {
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--fg-dim);
+  max-width: 34rem;
+}
+
+/* The status key is one slim line of reference, not a block. */
+.wrk-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  justify-content: flex-end;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.wrk-key div {
+  display: flex;
+  gap: var(--s2);
+}
+
+.wrk-key dt {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg);
+}
+
+.wrk-key dd {
+  margin: 0;
+  color: var(--fg-dim);
+}
+
+/* ------------------------------------------------------------------- plates */
+
+.wrk-plate {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4rem, 8vw, 9rem);
+  position: relative;
+}
+
+.wrk-head {
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+  min-width: 0;
+}
+
+.wrk-head__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s4);
+  color: var(--fg-dim);
+}
+
+.wrk-head__title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 90%;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.wrk-head__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.wrk-head--mega .wrk-head__title {
+  font-size: clamp(3rem, 0.7rem + 8.6vw, 9.5rem);
+}
+
+.wrk-head--std .wrk-head__title {
+  font-size: clamp(2.3rem, 1rem + 3.9vw, 5rem);
+}
+
+.wrk-head__sum {
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--fg-dim);
+  max-width: 34rem;
+}
+
+.wrk-head__reg {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  line-height: 1.7;
+}
+
+.wrk-head__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3) var(--s5);
+}
+
+.wrk-open,
+.wrk-ext {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.wrk-head__links .wrk-open {
+  gap: var(--s3);
+  padding: 0 1.25rem;
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 600;
+  font-size: var(--t-small);
+  text-decoration: none;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out);
+}
+
+.wrk-head__links .wrk-open:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.wrk-ext {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-color: var(--rule-strong);
+}
+
+.wrk-ext:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* 01 Fresh Prep: type, then the report at scale. */
+.wrk-fp {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: start;
+}
+
+.wrk-fp > .wrk-head--mega {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.wrk-fp .wrk-head__title {
+  max-width: 12ch;
+}
+
+.wrk-fp__body {
+  grid-column: 1 / span 4;
+  grid-row: 2;
+  position: sticky;
+  top: 7rem;
+}
+
+.wrk-fp__art {
+  grid-column: 5 / -1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+/* 02 True North Kromes: the footage runs full width, the macros sit under it. */
+.wrk-tnk {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: start;
+}
+
+.wrk-tnk > .wrk-head--mega {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.wrk-tnk .wrk-head__title {
+  max-width: 14ch;
+}
+
+.wrk-tnk__screen {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.wrk-tnk__body {
+  grid-column: 1 / span 5;
+  grid-row: 3;
+}
+
+.wrk-tnk__macros {
+  grid-column: 7 / -1;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--s4);
+  align-items: start;
+}
+
+.wrk-tnk__tray {
+  aspect-ratio: 4 / 3;
+}
+
+.wrk-tnk__detail {
+  aspect-ratio: 3 / 4;
+}
+
+.wrk-tnk__cap {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+
+/* 03 Calgary Watch: footage left, case summary and the map capture right. */
+.wrk-cw {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: start;
+}
+
+.wrk-cw {
+  row-gap: var(--s7);
+}
+
+.wrk-cw .wrk-head {
+  grid-column: 1 / span 4;
+  grid-row: 1;
+}
+
+.wrk-cw__screen {
+  grid-column: 5 / -1;
+  grid-row: 1;
+}
+
+.wrk-cw__map {
+  grid-column: 3 / span 6;
+  grid-row: 2;
+  aspect-ratio: 16 / 10;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7);
+}
+
+.wrk-cw__map img {
+  object-position: left top;
+}
+
+.wrk-cw__brief {
+  grid-column: 9 / -1;
+  grid-row: 2;
+  align-self: end;
+  display: grid;
+  gap: var(--s3);
+}
+
+.wrk-brief__text {
+  font-size: var(--t-lead);
+  line-height: 1.4;
+  color: var(--fg);
+}
+
+/* 04 Rio Alto: type left, footage with the kitchen's own colour cutting in. */
+.wrk-rio {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: center;
+}
+
+.wrk-rio .wrk-head {
+  grid-column: 9 / -1;
+  grid-row: 1;
+}
+
+.wrk-rio__stage {
+  grid-column: 1 / span 8;
+  grid-row: 1;
+  position: relative;
+  padding-bottom: clamp(3rem, 7vw, 7rem);
+  min-width: 0;
+}
+
+.wrk-rio__food {
+  position: absolute;
+  right: var(--s6);
+  bottom: 0;
+  width: 32%;
+  aspect-ratio: 1;
+  z-index: 1;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.5);
+}
+
+/* 05 Starlings: the phone in a hand, the recording beside it. */
+.wrk-st {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: start;
+}
+
+.wrk-st__phone {
+  grid-column: 1 / span 4;
+  grid-row: 1 / span 2;
+  aspect-ratio: auto;
+  align-self: stretch;
+  min-height: 30rem;
+}
+
+.wrk-st__screen {
+  grid-column: 5 / -1;
+  grid-row: 1;
+}
+
+.wrk-st .wrk-head {
+  grid-column: 5 / -1;
+  grid-row: 2;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  column-gap: var(--s6);
+  align-items: start;
+}
+
+.wrk-st .wrk-head__meta,
+.wrk-st .wrk-head__title {
+  grid-column: 1 / -1;
+}
+
+/* 06 LeaseFlow: no recording, so the flow, drawn. */
+.wrk-lf {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s6);
+  align-items: center;
+}
+
+.wrk-lf .wrk-head {
+  grid-column: 1 / span 5;
+}
+
+.wrk-lf__flow {
+  grid-column: 7 / -1;
+}
+
+.wrk-flow {
+  margin: 0;
+  display: grid;
+  gap: var(--s5);
+}
+
+.wrk-flow__track {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  position: relative;
+}
+
+.wrk-flow__track::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2.15rem;
+  border-top: 2px dashed var(--rule-strong);
+}
+
+.wrk-flow__stop {
+  position: relative;
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+  padding-right: var(--s4);
+}
+
+.wrk-flow__n {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+  height: 1.5rem;
+}
+
+.wrk-flow__dot {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--accent);
+  position: relative;
+  margin-bottom: var(--s3);
+  margin-top: 0.1rem;
+}
+
+.wrk-flow__name {
+  font-weight: 700;
+  font-stretch: 92%;
+  font-size: clamp(1.15rem, 0.9rem + 1.1vw, 1.7rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.wrk-flow__note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.wrk-flow__cap {
+  color: var(--fg-dim);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  max-width: 34rem;
+}
+
+/* ------------------------------------------------------------- case file */
+
+.wrk-cf {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(7rem, 15vh, 11rem) clamp(3rem, 6vw, 6rem);
+}
+
+.wrk-crumbs {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+  color: var(--fg-dim);
+  margin-bottom: var(--s6);
+}
+
+.wrk-crumbs a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-color: var(--rule-strong);
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.wrk-cf__title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 90%;
+  font-size: clamp(3rem, 0.6rem + 9.4vw, 10.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  max-width: 13ch;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.wrk-cf__lede {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--s6) var(--s9);
+  margin-top: var(--s7);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule-strong);
+  align-items: start;
+}
+
+.wrk-cf__sum {
+  font-size: var(--t-subtitle);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  max-width: 34rem;
+}
+
+.wrk-cf__aside {
+  display: grid;
+  gap: var(--s4);
+  justify-items: start;
+}
+
+/* The live site is the strongest proof, so it is the biggest thing here. */
+.wrk-live {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s4) var(--s5);
+  min-height: 44px;
+  background: var(--fg);
+  color: var(--bg);
+  text-decoration: none;
+  width: 100%;
+  max-width: 28rem;
+  transition: background 0.2s var(--ease-out);
+}
+
+.wrk-live:hover {
+  background: var(--accent);
+}
+
+.wrk-live .t-folio {
+  color: inherit;
+  opacity: 0.75;
+}
+
+.wrk-live__host {
+  font-weight: 700;
+  font-stretch: 92%;
+  font-size: clamp(1.4rem, 1rem + 1.4vw, 2.2rem);
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.wrk-live--none {
+  background: none;
+  color: var(--fg-dim);
+  padding: 0;
+}
+
+.wrk-cf__visual {
+  margin-top: var(--s8);
+}
+
+.wrk-cf__visual:empty {
+  display: none;
+}
+
+.wrk-cf__report {
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.wrk-screen--hero .wrk-screen__frame {
+  aspect-ratio: 1024 / 548;
+}
+
+/* evidence */
+
+.wrk-ev {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: 0 clamp(4rem, 8vw, 8rem);
+}
+
+.wrk-ev .shell {
+  display: grid;
+  gap: var(--s8);
+}
+
+.wrk-ev__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--s4) var(--s9);
+  align-items: end;
+  padding-top: var(--s7);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.wrk-ev__head .t-label {
+  grid-column: 1 / -1;
+}
+
+.wrk-ev__title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 90%;
+  font-size: clamp(2.2rem, 1rem + 4.2vw, 5.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.wrk-ev__intro {
+  color: var(--fg-dim);
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+.wrk-ev__plate {
+  margin: 0;
+}
+
+.wrk-ev__plate img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg-raised);
+}
+
+.wrk-ev__plate .wrk-cap {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+}
+
+.wrk-ev__photos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  gap: var(--s5);
+  align-items: start;
+}
+
+.wrk-ev__photos .wrk-cap {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+}
+
+/* the argument */
+
+.wrk-arg {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4rem, 8vw, 9rem);
+}
+
+.wrk-arg__eyebrow {
+  margin-bottom: var(--s7);
+}
+
+.wrk-arg__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wrk-arg__row {
+  display: grid;
+  grid-template-columns: clamp(4rem, 12vw, 11rem) minmax(0, 18rem) minmax(0, 1fr);
+  gap: var(--s5) var(--s6);
+  align-items: start;
+  padding-block: var(--s7);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.wrk-arg__row:last-child {
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.wrk-arg__n {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 88%;
+  font-size: clamp(3rem, 1rem + 7vw, 8rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: var(--accent);
+}
+
+.wrk-arg__label {
+  display: grid;
+  gap: var(--s2);
+}
+
+.wrk-arg__h {
+  font-size: var(--t-subtitle);
+  font-weight: 700;
+  font-stretch: 92%;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.wrk-arg__copy {
+  font-size: clamp(1.25rem, 0.9rem + 1.2vw, 2rem);
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  max-width: 36ch;
+}
+
+/* the two pull quotes */
+
+.wrk-pull {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4.5rem, 9vw, 10rem);
+}
+
+.wrk-pull .shell {
+  display: grid;
+  gap: var(--s4);
+}
+
+.wrk-pull__label {
+  color: var(--fg-dim);
+}
+
+.wrk-pull__label span {
+  color: var(--accent);
+  margin-right: var(--s2);
+}
+
+.wrk-pull__h {
+  font-size: var(--t-subtitle);
+  font-weight: 700;
+  font-stretch: 92%;
+  letter-spacing: -0.02em;
+}
+
+.wrk-pull__q {
+  margin: var(--s5) 0 0;
+  padding-left: clamp(1rem, 3vw, 2.5rem);
+  border-left: 4px solid var(--accent);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 0.9rem + 2.9vw, 3.9rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  max-width: 26em;
+  text-wrap: pretty;
+}
+
+.wrk-pull--constraint .wrk-pull__q {
+  max-width: 28em;
+}
+
+/* register */
+
+.wrk-reg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--s6);
+  margin: var(--s9) 0 0;
+  padding-top: var(--s5);
+  border-top: 1px solid var(--rule-strong);
+}
+
+.wrk-reg dd {
+  margin: var(--s3) 0 0;
+}
+
+.wrk-reg ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.wrk-reg li {
+  font-size: var(--t-body);
+  line-height: 1.35;
+}
+
+/* next case file */
+
+.wrk-next {
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: clamp(4rem, 8vw, 8rem);
+}
+
+.wrk-next .shell {
+  display: grid;
+  gap: var(--s6);
+}
+
+.wrk-next__link {
+  display: grid;
+  gap: var(--s4);
+  color: inherit;
+  text-decoration: none;
+  padding-block: var(--s6);
+  border-block: 1px solid var(--rule-strong);
+}
+
+.wrk-next__title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-stretch: 90%;
+  font-size: clamp(2.6rem, 0.8rem + 7.6vw, 8.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  overflow-wrap: break-word;
+  transition: color 0.2s var(--ease-out);
+}
+
+.wrk-next__link:hover .wrk-next__title {
+  color: var(--accent);
+}
+
+.wrk-next__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s4);
+}
+
+.wrk-next__go {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1;
+}
+
+.wrk-next__all {
+  color: var(--fg-dim);
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  width: fit-content;
+}
+
+/* ------------------------------------------------------------------ mobile */
+
+@media (max-width: 1000px) {
+  .wrk-open__side,
+  .wrk-cf__lede,
+  .wrk-ev__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wrk-key {
+    justify-content: flex-start;
+  }
+
+  .wrk-fp,
+  .wrk-tnk,
+  .wrk-cw,
+  .wrk-rio,
+  .wrk-st,
+  .wrk-lf {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s6);
+    align-items: stretch;
+  }
+
+  .wrk-fp__body {
+    position: static;
+  }
+
+  /* Footage bleeds to the edges on a phone: it is the proof. */
+  .wrk-screen__frame {
+    margin-inline: calc(var(--gutter) * -1);
+    border-inline: 0;
+    aspect-ratio: 3 / 2;
+  }
+
+  .wrk-screen__frame .reel {
+    object-position: 22% top;
+  }
+
+  .wrk-cw__map {
+    aspect-ratio: 16 / 11;
+  }
+
+  .wrk-rio__stage {
+    padding-bottom: 0;
+  }
+
+  .wrk-rio__food {
+    position: relative;
+    right: auto;
+    width: 58%;
+    margin: calc(var(--s6) * -1) 0 0 auto;
+  }
+
+  .wrk-st__phone {
+    aspect-ratio: 4 / 4.4;
+    min-height: 0;
+  }
+
+  .wrk-st .wrk-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wrk-tnk__macros {
+    grid-template-columns: 1.4fr 1fr;
+  }
+
+  .wrk-flow__track {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s6);
+    padding-left: var(--s6);
+  }
+
+  .wrk-flow__track::before {
+    left: 0.55rem;
+    right: auto;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    border-top: 0;
+    border-left: 2px dashed var(--rule-strong);
+  }
+
+  .wrk-flow__track {
+    padding-left: 0;
+  }
+
+  .wrk-flow__stop {
+    padding: 0 0 0 var(--s6);
+  }
+
+  .wrk-flow__n {
+    display: none;
+  }
+
+  .wrk-flow__dot {
+    position: absolute;
+    left: 0;
+    top: 0.2rem;
+    margin: 0;
+  }
+
+  .wrk-arg__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s4);
+    padding-block: var(--s6);
+  }
+
+  .wrk-arg__n {
+    font-size: 3.4rem;
+  }
+
+  .wrk-ev__photos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wrk-ev__plate .wrk-cap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wrk-cf__visual {
+    margin-top: var(--s7);
+  }
+
+  .wrk-screen--hero .wrk-screen__frame {
+    aspect-ratio: 16 / 10;
+  }
+
+  .wrk-head__links .wrk-open {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .wrk-live {
+    max-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .wrk-ev__photos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

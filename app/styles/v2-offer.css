@@ -1111,3 +1111,28 @@
     font-size: clamp(1.8rem, 0.6rem + 7.4vw, 2.6rem);
   }
 }
+
+/* Integration rhythm: preserve scale while removing empty space between ideas. */
+.ofr-td, .ofr-of, .ofr-au { --section-y: var(--s7); }
+.ofr-td__title { font-size: clamp(3.1rem, 11vw, 10rem); }
+.ofr-of__head { margin-bottom: var(--s7); }
+.ofr-of__plate { min-height: 34rem; margin-block: var(--s7); }
+.ofr-au { --top: 34rem; }
+@media(max-width: 760px) {
+  .ofr-td__title { font-size: clamp(3rem, 13.3vw, 5.2rem); }
+  .ofr-of__plate { min-height: 0; }
+  .ofr-au { --top: 0px; }
+}
+
+@media(min-width: 1000px) {
+  .ofr-td, .ofr-of, .ofr-au { --section-y: var(--s6); }
+  .ofr-td__title { font-size: clamp(5rem, 9.3vw, 9rem); }
+  .ofr-td__body { margin-top: var(--s6); }
+  .ofr-td__ticket { margin-top: var(--s6); }
+  .ofr-of__plate { min-height: 27rem; margin-block: var(--s6); }
+  .ofr-of__plate-shell { padding-block: var(--s6); }
+  .ofr-of__num { font-size: 20rem; }
+  .ofr-au { --top: 28rem; }
+  .ofr-au__row { padding-block: var(--s4); }
+}
+@media(min-width: 1000px) { .ofr-of__numeral { font-size: 20rem; } .ofr-of__sources { grid-auto-rows: 5.5rem; } }

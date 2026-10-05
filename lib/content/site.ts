@@ -106,6 +106,7 @@ export const siteRoutes = [
   "/process",
   "/studio",
   "/contact",
+  "/teardown",
   "/industries",
   ...industryPages.flatMap((industry) =>
     industry.route ? [industry.route] : [],
