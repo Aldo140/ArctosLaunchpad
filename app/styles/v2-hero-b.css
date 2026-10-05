@@ -297,7 +297,7 @@
 @media (min-width: 701px) and (max-width: 1000px) {
   .hvb__disc-wrap {
     left: auto !important;
-    right: -14vw !important;
+    right: -4vw !important;
   }
 
   .hvb__canvas {
@@ -308,8 +308,18 @@
 /* mobile: a separate composition ---------------------------------------- */
 @media (max-width: 1000px) {
   .hvb {
-    --hvb-d: min(120vw, 40rem);
+    /* also bounded by height: the type stack below is fixed, the art takes
+       whatever the screen has left, so it never runs under the headline */
+    --hvb-d: min(78vw, 30rem, max(13rem, calc(100svh - 34.5rem)));
     min-height: max(100svh, 47rem);
+  }
+
+  /* On a phone the type never crosses the art: it stays plain ink on paper,
+     below the roundel, so there is no split glyph to decode. */
+  .hvb__title,
+  .hvb__eyebrow {
+    mix-blend-mode: normal;
+    color: var(--fg);
   }
 
   .hvb__canvas {
@@ -321,16 +331,16 @@
   }
 
   .hvb__disc-wrap {
-    right: auto;
-    left: max(-13vw, -5rem);
-    top: 1.2rem;
+    left: auto;
+    right: -4vw;
+    top: 6.5rem;
   }
 
   /* re-crop: bring the bear and the gears up close, let the ring fall away */
   .hvb__disc-img {
-    inset: -5% !important;
-    width: 110% !important;
-    height: 110% !important;
+    inset: -9% !important;
+    width: 118% !important;
+    height: 118% !important;
   }
 
   .hvb__eb-long,
@@ -349,7 +359,7 @@
 
   .hvb__eyebrow {
     position: absolute;
-    top: 4.7rem;
+    top: 5.1rem;
     left: var(--gutter);
     right: var(--gutter);
     font-size: 0.68rem;
@@ -360,8 +370,8 @@
   }
 
   .hvb__l1 {
-    font-size: min(24vw, 9.5rem);
-    white-space: normal;
+    font-size: min(15.6vw, 8rem);
+    white-space: nowrap;
     line-height: 0.86;
   }
 
