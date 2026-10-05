@@ -27,3 +27,16 @@
 @import "./styles/scene-refinements.css";
 @import "./styles/route-work-machine.css";
 @import "./styles/survey-ground.css";
+
+/* v2 rebuild — one sheet per owner, loaded last so it wins over legacy rules. */
+@import "./styles/v2-report.css";
+@import "./styles/v2-chrome.css";
+@import "./styles/v2-hero.css";
+@import "./styles/v2-hero-b.css";
+@import "./styles/v2-proof.css";
+@import "./styles/v2-offer.css";
+@import "./styles/v2-trust.css";
+@import "./styles/v2-teardown.css";
+@import "./styles/v2-services.css";
+@import "./styles/v2-work.css";
+@import "./styles/v2-contact.css";
