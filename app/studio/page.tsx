@@ -67,10 +67,16 @@ export default function StudioPage() {
             <p className="scene__folio">
               <span>A Calgary digital growth and technology studio</span>
             </p>
-            {/* Three words at mega scale. The full sentence ran to five lines
-                and filled the viewport before it finished; the rest of it is
-                the standfirst, where it reads properly. */}
-            <h1 className="scene__title">
+            {/* The full sentence ran to five lines and filled the viewport
+                before it finished; the rest of it is the standfirst, where it
+                reads properly. "Close the gap." is still three words, though,
+                not the single word mega scale is reserved for
+                (DESIGN-SYSTEM.md §6: "Mega scale is for one word... a
+                sentence at 14rem runs off the bottom of the viewport"), so
+                this takes the phrase tier the same way /process's scene title
+                does, instead of running the bare mega size (clamp to 14rem)
+                off the bottom of the viewport on a tall screen. */}
+            <h1 className="scene__title scene__title--phrase">
               Close the <em>gap.</em>
             </h1>
             <p className="scene__lead">
@@ -120,9 +126,13 @@ export default function StudioPage() {
 
             <div className="studio-gap__span">
               <div className="studio-gap__rule" aria-hidden="true" />
-              <p className="studio-gap__measure">
-                We work in the <em>space between.</em>
-              </p>
+              {/* No <em> here. The h1 above already spends this page's one
+                  Newsreader-italic drop (DESIGN-SYSTEM.md §3: "once per
+                  headline, never twice" — tightened by docs/RESEARCH.md §5.1
+                  to once per page, since two headline-scale italic drops on
+                  one route is closer to the generated-site tell than to the
+                  system's own intent). */}
+              <p className="studio-gap__measure">We work in the space between.</p>
             </div>
 
             <p className="studio-gap__end studio-gap__end--right">
