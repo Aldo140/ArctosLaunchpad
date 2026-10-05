@@ -56,7 +56,7 @@ export function NeedFinder() {
         <Link className="v3-button" href={`/contact?need=${need.id}`}>{need.action}<span aria-hidden="true">↗</span></Link>
         <div className="v3-finder__links">{need.services.map(slug => <Link key={slug} href={`/services/${slug}`}>{slug === "seo-ai-search" ? "SEO & AI search" : slug.replaceAll("-", " ")}<span aria-hidden="true">↗</span></Link>)}</div>
       </div>
-      <div className="v3-flow" aria-label="An example of the connected workflow">
+      <div className="v3-flow" key={`flow-${need.id}`} aria-label="An example of the connected workflow">
         <p className="v3-mono">The pieces, connected</p>
         <ol>{need.steps.map((step, index) => <li key={step}><span className="v3-flow__number">{String(index + 1).padStart(2,"0")}</span><span>{step}</span></li>)}</ol>
         <span className="v3-flow__stamp">Built around your business.</span>

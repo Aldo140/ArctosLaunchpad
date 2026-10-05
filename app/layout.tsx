@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { ChromeSync } from "@/components/chrome/ChromeSync";
 import { ScrollRefresh } from "@/components/chrome/ScrollRefresh";
 import { InteriorMotion } from "@/components/InteriorMotion";
+import { PremiumMotion } from "@/components/studio/PremiumMotion";
 import {
   SITE_NAME,
   SITE_URL,
@@ -95,6 +96,7 @@ export default function RootLayout({
         <ScrollRefresh />
         <main id="main">
           <InteriorMotion />
+          <PremiumMotion />
           {children}
         </main>
         <SiteFooter />

@@ -41,6 +41,7 @@ export function InteriorMotion() {
 
       const main = document.querySelector<HTMLElement>("#main");
       if (!main) return;
+      if (main.querySelector(".v3-page")) return;
 
       const mm = gsap.matchMedia();
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NeedFinder } from "./NeedFinder";
 import { ReportArtifact } from "@/components/figures/ReportArtifact";
 import { ProjectReel } from "@/components/figures/ProjectReel";
+import { ConnectionJourney } from "./ConnectionJourney";
 
 export function StudioHome() {
   return <div className="v3-home">
@@ -10,13 +11,13 @@ export function StudioHome() {
       <div className="v3-wrap">
         <div className="v3-hero__mast"><p className="v3-kicker">Digital growth & technology studio</p><p className="v3-mono">Calgary, AB · Built for your business</p></div>
         <div className="v3-hero__content">
-          <h1>More business.<br /><em>Less busywork.</em></h1>
+          <h1><span className="v3-hero__line">More business.</span><em className="v3-hero__line">Less busywork.</em></h1>
           <div className="v3-hero__copy"><p>Websites that bring customers in.<br />Software and automation that keep the work moving.</p><p className="v3-hero__support">We connect how your business grows with how it runs.</p>
             <div className="v3-actions"><Link className="v3-button" href="/contact">Discuss your project<span aria-hidden="true">↗</span></Link><a className="v3-text-link" href="#what-you-need">Find your starting point<span aria-hidden="true">↓</span></a></div>
             <p className="v3-hero__note">You don’t need a technical brief. Start with what isn’t working.</p>
           </div>
         </div>
-        <div className="v3-hero__art"><Image src="/assets/v3/the-work-moves.webp" alt="A bear guiding scattered paperwork through a connected system into an organised output" width={1536} height={1024} priority sizes="(max-width: 760px) 110vw, 65vw" /></div>
+        <div className="v3-hero__art"><div className="v3-hero__machine"><Image src="/assets/v3/the-work-moves.webp" alt="A bear guiding scattered paperwork through a connected system into an organised output" width={1536} height={1024} priority sizes="(max-width: 760px) 110vw, 65vw" /><span className="v3-gear v3-gear--large" aria-hidden="true" /><span className="v3-gear v3-gear--small" aria-hidden="true" /></div></div>
         <div className="v3-hero__index"><Link href="/services/web-design-development"><span>01</span>Websites & growth</Link><Link href="/services/business-automation"><span>02</span>Automation & reporting</Link><Link href="/services/custom-software"><span>03</span>Custom software<span aria-hidden="true">↗</span></Link></div>
       </div>
     </section>
@@ -33,7 +34,7 @@ export function StudioHome() {
       </div>
     </section>
 
-    <section className="v3-section v3-connection" data-material="paper" data-station="Connected by design"><div className="v3-wrap"><p className="v3-kicker">03 / One connected partner</p><h2>The website is<br />only the <span>beginning.</span></h2><div className="v3-connection__bottom"><p>A customer clicks. A form arrives. Someone follows up. A job moves forward. A report tells you what happened.<br /><br />We build the connections between those moments, so your next stage of growth has a working system behind it.</p><ol><li><span>Attract</span>Help the right customers find you.</li><li><span>Convert</span>Give them a clear next step.</li><li><span>Operate</span>Move the work through your team.</li><li><span>Understand</span>See what’s working and what needs attention.</li></ol></div><Link className="v3-text-link" href="/services">The full set of capabilities<span aria-hidden="true">↗</span></Link></div></section>
+    <section className="v3-section v3-connection" data-material="paper" data-station="Connected by design"><div className="v3-wrap"><p className="v3-kicker">03 / One connected partner</p><h2>The website is<br />only the <span>beginning.</span></h2><ConnectionJourney /><div className="v3-connection__bottom"><p>A customer clicks. A form arrives. Someone follows up. A job moves forward. A report tells you what happened.<br /><br />We build the connections between those moments, so your next stage of growth has a working system behind it.</p><ol><li><span>Attract</span>Help the right customers find you.</li><li><span>Convert</span>Give them a clear next step.</li><li><span>Operate</span>Move the work through your team.</li><li><span>Understand</span>See what’s working and what needs attention.</li></ol></div><Link className="v3-text-link" href="/services">The full set of capabilities<span aria-hidden="true">↗</span></Link></div></section>
 
     <section className="v3-section v3-process" data-material="instrument" data-station="Working together"><div className="v3-wrap"><div className="v3-section-head"><p className="v3-kicker">04 / How we get there</p><h2>Clear thinking.<br /><span>Then a working thing.</span></h2><p>A practical process, from the first conversation to everyday use.</p></div><ol className="v3-process__steps"><li><span className="v3-mono">01 / Understand</span><h3>Show us the friction.</h3><p>We look at your goals, your customers and how the work happens today.</p></li><li><span className="v3-mono">02 / Shape & build</span><h3>Make the right thing.</h3><p>A clear scope, a considered design and a connected system tested against the actual workflow.</p></li><li><span className="v3-mono">03 / Put it to work</span><h3>Launch. Learn. Improve.</h3><p>Get it into daily use, support the handover and refine it from real behaviour.</p></li></ol><Link className="v3-text-link" href="/process">How we work together<span aria-hidden="true">↗</span></Link></div></section>
 
