@@ -10,6 +10,7 @@ function logDevelopmentError(
 }
 
 const projectTypes = [
+  "Free reporting teardown",
   "Website",
   "SEO or AI search",
   "Paid advertising",
@@ -58,26 +59,44 @@ const contactSchema = z
     name: z.string().trim().min(2, "Enter your name.").max(100),
     email: z.string().trim().email("Enter a valid email address.").max(254),
     company: z
-      .string()
-      .trim()
-      .min(2, "Enter your company or organization.")
-      .max(150),
+      .union([
+        z.literal(""),
+        z
+          .string()
+          .trim()
+          .min(2, "Enter your company or organization.")
+          .max(150),
+      ])
+      .default(""),
     website: optionalUrl.default(""),
     projectType: z.enum(projectTypes, { error: "Choose a project type." }),
-    budget: z.enum(budgetRanges, {
-      error: "Choose an estimated budget range.",
-    }),
-    timeline: z.enum(timelines, { error: "Choose a desired timeline." }),
+    budget: z
+      .union([
+        z.literal(""),
+        z.enum(budgetRanges, { error: "Choose an estimated budget range." }),
+      ])
+      .default(""),
+    timeline: z
+      .union([
+        z.literal(""),
+        z.enum(timelines, { error: "Choose a desired timeline." }),
+      ])
+      .default(""),
     challenge: z
       .string()
       .trim()
       .min(20, "Tell us a little more about the current challenge.")
       .max(1500),
     outcome: z
-      .string()
-      .trim()
-      .min(20, "Tell us what a useful outcome would look like.")
-      .max(1500),
+      .union([
+        z.literal(""),
+        z
+          .string()
+          .trim()
+          .min(20, "Tell us a little more, or leave this one blank.")
+          .max(1500),
+      ])
+      .default(""),
     message: z.string().trim().max(3000).default(""),
     address: z.string().max(0).optional(),
   })
@@ -145,21 +164,21 @@ export async function POST(request: Request) {
         from: "Arctos enquiries <onboarding@resend.dev>",
         to: notifyEmail,
         replyTo: submission.email,
-        subject: `New project enquiry — ${submission.company}`,
+        subject: `New enquiry — ${submission.company || submission.name} (${submission.projectType})`,
         text: [
           `Name: ${submission.name}`,
           `Email: ${submission.email}`,
-          `Company: ${submission.company}`,
+          submission.company ? `Company: ${submission.company}` : null,
           submission.website ? `Website: ${submission.website}` : null,
           `Project type: ${submission.projectType}`,
-          `Budget: ${submission.budget}`,
-          `Timeline: ${submission.timeline}`,
+          submission.budget ? `Budget: ${submission.budget}` : null,
+          submission.timeline ? `Timeline: ${submission.timeline}` : null,
           "",
           `What is not working well today:`,
           submission.challenge,
-          "",
-          `What a useful outcome looks like:`,
-          submission.outcome,
+          submission.outcome
+            ? `\nWhat a useful outcome looks like:\n${submission.outcome}`
+            : null,
           submission.message ? `\nAnything else:\n${submission.message}` : null,
           "",
           `Request ID: ${requestId}`,

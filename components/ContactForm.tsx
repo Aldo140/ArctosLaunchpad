@@ -18,6 +18,7 @@ type FieldName =
 type FieldErrors = Partial<Record<FieldName | "form", string>>;
 
 const projectTypes = [
+  "Free reporting teardown",
   "Website",
   "SEO or AI search",
   "Paid advertising",
