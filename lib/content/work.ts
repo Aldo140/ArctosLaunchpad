@@ -24,6 +24,10 @@ export const projects: Project[] = [
       "Treat the city as a living information system, with a clear path from discovery to the live map, incident reporting, verification, and local context.",
     solution:
       "A responsive civic platform with live incident mapping, community reporting, official data layers, neighbourhood views, and mobile-first field controls.",
+    constraint:
+      "The information had to stay trustworthy and fast-moving at once: official alerts, unverified community reports, and neighbourhood context all needed to sit in one view without becoming confusing or misleading during an actual urgent moment.",
+    whatChanged:
+      "Live at calgarywatch.ca, the live map, public reporting flow, and official data layers now run as one operating view instead of separate alert sources a resident would have to piece together themselves.",
     services: [
       "Product strategy",
       "Custom software",
@@ -67,6 +71,10 @@ export const projects: Project[] = [
       "Shape the experience around a map, resource discovery, and the operational need to moderate community content.",
     solution:
       "An interactive support map with anonymous participation, community resources, and a moderation system.",
+    constraint:
+      "The subject matter is sensitive and personal, so participation had to stay anonymous — which meant the platform also needed a moderation system to keep community-submitted content safe and appropriate without ever requiring anyone to identify themselves.",
+    whatChanged:
+      "The anonymous map and moderation system are live, so young people affected by a family member's substance use can discover shared experiences and support resources without surrendering their anonymity to do it.",
     services: [
       "Custom software",
       "Interactive mapping",
@@ -116,6 +124,10 @@ export const projects: Project[] = [
       "Organize the reporting around the decisions event and marketing teams need to make rather than around raw exports.",
     solution:
       "An internal business intelligence and data automation tool for event performance reporting.",
+    constraint:
+      "Event performance only existed as raw signup-code exports — useful as data, not as a decision. The reporting had to be organized around the conversion, customer-value, event, and team-performance questions the event and marketing teams actually needed answered, not just the shape the exports arrived in.",
+    whatChanged:
+      "Internally, the raw signup-code data now resolves automatically into the conversion, customer-value, event, and team-performance views the event and marketing teams use to make decisions, instead of someone working the exports by hand.",
     services: [
       "Business intelligence",
       "Automated reporting",
@@ -140,6 +152,10 @@ export const projects: Project[] = [
       "Connect the listing experience, lead conversion, and lease-package request flow around the needs of independent landlords and property managers.",
     solution:
       "A working product demo for listing management, rental lead conversion, and workflow organisation.",
+    constraint:
+      "Rental interest from independent landlords and property managers arrives as scattered listing enquiries with no connected path from first contact to an organized lease-package request — the demo had to tie the listing experience, lead conversion, and request workflow together as one system rather than three separate tools.",
+    whatChanged:
+      "The working demo shows listing traffic flowing into organized, reviewable lease-package requests end to end, proving the workflow holds together as one connected system rather than requiring a separate handoff at each step.",
     services: [
       "Product design",
       "Custom software",
@@ -165,6 +181,10 @@ export const projects: Project[] = [
       "Build the visual system from the lab itself: hard-edged inspection frames, real process photography, precise progress states, and direct client actions.",
     solution:
       "A responsive production story spanning CAD design, laser printing, plasma polishing, finished work, technical content, and case intake.",
+    constraint:
+      "Cobalt-chrome framework production is a specialized, multi-stage technical process that most dental laboratories have no reason to understand — the site had to make that process legible to an outside lab while still giving them a confident, direct way to submit a case, not just a description of the work.",
+    whatChanged:
+      "Live at tnkromes.ca, dental laboratories can now follow the CAD-to-finish production process and submit a case directly on the site, instead of the process only being explainable in person or over a call.",
     services: [
       "Website design",
       "Digital operations",
@@ -226,6 +246,10 @@ export const projects: Project[] = [
       "Use brand storytelling and a distinctive visual direction to shape a more memorable digital experience.",
     solution:
       "A hospitality website concept centred on history, identity, and a warmer customer experience.",
+    constraint:
+      "The restaurant's existing web presence carried none of the warmth, character, or connection to its history and Mexican identity that made the physical restaurant distinctive — the site had to be rebuilt around brand storytelling rather than a standard menu-and-hours template.",
+    whatChanged:
+      "Live at rioalto.ca, the restaurant's menu and story now run as one searchable, browsable experience built around its history and Mexican identity, instead of a generic restaurant web presence disconnected from the brand.",
     services: ["Website design", "Brand storytelling", "UX and UI design"],
     industries: ["Hospitality"],
     technologies: ["Eleventy", "Nunjucks", "JavaScript", "CSS"],

@@ -38,6 +38,7 @@ const STORY = [
   ["Challenge", "What needed to change", "challenge"],
   ["Approach", "How the problem was framed", "approach"],
   ["Solution", "What took shape", "solution"],
+  ["Constraint", "What made it hard", "constraint"],
 ] as const;
 
 export default async function ProjectPage({ params }: Props) {
@@ -231,7 +232,7 @@ export default async function ProjectPage({ params }: Props) {
           <div className="doc__head">
             <p className="tick-label">Reasoning</p>
             <h2 className="t-title doc__title">
-              Three moves, <em>in order.</em>
+              Five moves, <em>in order.</em>
             </h2>
             <p className="t-body">
               Every project here starts as somebody&rsquo;s stuck process. This
@@ -255,6 +256,29 @@ export default async function ProjectPage({ params }: Props) {
                 </div>
               </li>
             ))}
+            <li className="route__stop reveal">
+              <div className="route__marker" aria-hidden="true">
+                <span className="t-folio">
+                  {String(STORY.length + 1).padStart(2, "0")}
+                </span>
+                <span className="route__line" />
+              </div>
+              <div className="route__body">
+                <p className="t-label">
+                  {project.status === "internal-tool" ||
+                  project.status === "working-demo"
+                    ? "Status and what it proves"
+                    : "What changed"}
+                </p>
+                <h3 className="wk-arc__title">
+                  {project.status === "internal-tool" ||
+                  project.status === "working-demo"
+                    ? "What the demo proves"
+                    : "What changed"}
+                </h3>
+                <p className="t-body wk-arc__copy">{project.whatChanged}</p>
+              </div>
+            </li>
           </ol>
         </div>
       </section>
