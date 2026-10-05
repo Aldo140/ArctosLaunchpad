@@ -1,1 +1,576 @@
-/* v2-chrome — owned by one agent. Every class in this file must carry that agent's prefix. */
+/* v2-chrome — owned by the chrome agent. Every new class carries the chr- prefix.
+   Loads after chrome.css, so where a legacy chrome rule is overridden it is
+   deliberate. */
+
+/* The survey rule earned its place but not 72px of it. Narrowed to a slim
+   gauge; everything that pads by --rail follows. */
+:root {
+  --rail: 3.25rem;
+}
+
+/* =========================================================================
+   HEADER
+   ========================================================================= */
+
+.header__inner {
+  padding-block: 1.1rem;
+}
+
+.header__nav {
+  gap: clamp(1.4rem, 2.6vw, 2.75rem);
+}
+
+.header__link {
+  font-size: 1rem;
+  font-weight: 600;
+  font-stretch: 94%;
+  color: color-mix(in oklab, var(--glacier) 86%, var(--ink));
+}
+
+.header__link::after {
+  height: 2px;
+  bottom: -0.1rem;
+}
+
+/* The one action. Solid signal blue on ink: the only filled thing in the bar. */
+.chr-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 44px;
+  padding: 0.7rem 1.15rem 0.7rem 1.3rem;
+  margin-left: var(--s2);
+  background: var(--signal);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: var(--radius);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.chr-cta-btn > span {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.chr-cta-btn:hover {
+  background: var(--glacier);
+}
+
+.chr-cta-btn:hover > span {
+  transform: translateX(0.22rem);
+}
+
+.chr-bar-right {
+  display: none;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.chr-cta-btn--bar {
+  margin-left: 0;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 860px) {
+  .chr-bar-right {
+    display: flex;
+  }
+  .header__menu {
+    min-width: 0;
+    padding-inline: var(--s2) 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .chr-cta-btn--bar {
+    padding-inline: 0.7rem;
+    font-size: 0.68rem;
+  }
+  .header__menu-bars {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   MENU OVERLAY — a designed screen, not a drawer
+   ========================================================================= */
+
+.menu__panel {
+  width: min(34rem, 100vw);
+}
+
+@media (max-width: 520px) {
+  .menu__panel {
+    padding-bottom: max(var(--s5), env(safe-area-inset-bottom));
+  }
+}
+
+.menu__nav {
+  margin-top: var(--s4);
+}
+
+.menu__item {
+  grid-template-columns: 2.25rem 1fr;
+  padding-block: clamp(0.7rem, 2.2vh, 1.1rem);
+  min-height: 0;
+}
+
+.menu__item-label {
+  font-size: clamp(3rem, 15vw, 4.8rem);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.chr-menu-foot {
+  margin-top: auto;
+  padding-top: var(--s6);
+  display: grid;
+  gap: var(--s4);
+}
+
+.chr-menu-more {
+  display: flex;
+  gap: var(--s6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chr-menu-more a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.chr-menu-more a:hover {
+  color: var(--fg);
+}
+
+.chr-menu-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  min-height: 4.25rem;
+  padding: 1rem 1.4rem;
+  background: var(--signal);
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 650;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  border-radius: var(--radius);
+}
+
+.chr-menu-cta:hover,
+.chr-menu-cta:focus-visible {
+  background: var(--glacier);
+}
+
+.chr-menu-note {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+  text-align: center;
+}
+
+@media (max-height: 720px) {
+  .menu__item {
+    padding-block: 0.4rem;
+  }
+  .menu__item-label {
+    font-size: clamp(2.1rem, 9.5vw, 2.8rem);
+  }
+  .chr-menu-foot {
+    padding-top: var(--s4);
+    gap: var(--s3);
+  }
+  .chr-menu-cta {
+    min-height: 3.5rem;
+  }
+}
+
+/* =========================================================================
+   SURVEY RULE
+   ========================================================================= */
+
+.staff__ticks {
+  align-items: flex-end;
+}
+
+.staff__tick {
+  width: 0.35rem;
+}
+
+.staff__tick--major {
+  width: 0.8rem;
+}
+
+.staff__index {
+  width: 1.3rem;
+}
+
+/* =========================================================================
+   FOOTER — a closing argument, then a sitemap
+   ========================================================================= */
+
+.chr-foot {
+  border-top: var(--hair) solid var(--rule);
+  padding-block: clamp(5rem, 9vw, 9rem) var(--s6);
+}
+
+.chr-foot__close {
+  display: grid;
+  gap: var(--s5);
+  padding-bottom: clamp(4rem, 7vw, 7rem);
+  border-bottom: var(--hair) solid var(--rule);
+}
+
+/* The page above already made the offer; the footer does not repeat it. */
+main:has(.chr-cta) ~ .chr-foot .chr-foot__close {
+  display: none;
+}
+
+.chr-foot:not(:has(.chr-foot__close)),
+main:has(.chr-cta) ~ .chr-foot {
+  padding-top: var(--s7);
+}
+
+.chr-foot:not(:has(.chr-foot__close)) .chr-foot__map,
+main:has(.chr-cta) ~ .chr-foot .chr-foot__map {
+  padding-top: var(--s5);
+}
+
+.chr-foot__eyebrow {
+  color: var(--accent-soft);
+}
+
+.chr-foot__statement {
+  font-family: var(--font-ui);
+  font-size: clamp(2.7rem, 0.9rem + 7.3vw, 8.5rem);
+  font-weight: 650;
+  font-stretch: 88%;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  max-width: 13ch;
+  text-wrap: balance;
+}
+
+.chr-foot__act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4) var(--s6);
+  margin-top: var(--s4);
+}
+
+.chr-foot__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s6);
+  min-height: 4rem;
+  padding: 1rem 1.6rem 1rem 1.9rem;
+  background: var(--signal);
+  color: var(--ink);
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.3rem);
+  font-weight: 650;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  border-radius: var(--radius);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.chr-foot__cta:hover {
+  background: var(--glacier);
+}
+
+.chr-foot__cta-arrow {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.chr-foot__cta:hover .chr-foot__cta-arrow {
+  transform: translateX(0.3rem);
+}
+
+.chr-foot__micro {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+  max-width: 30rem;
+}
+
+.chr-foot__map {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s7) var(--s5);
+  padding-block: clamp(3rem, 5vw, 4.5rem);
+}
+
+.chr-foot__col h2 {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: var(--s4);
+}
+
+.chr-foot__col ul {
+  display: grid;
+  gap: 0.15rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chr-foot__col a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  font-size: var(--t-small);
+  color: color-mix(in oklab, var(--glacier) 82%, var(--ink));
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.chr-foot__col a:hover {
+  color: var(--accent-soft);
+}
+
+.chr-foot__base {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: var(--s4) var(--s6);
+  padding-top: var(--s5);
+  border-top: var(--hair) solid var(--rule);
+}
+
+.chr-foot__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.chr-foot__brand:hover {
+  opacity: 0.72;
+}
+
+.chr-foot__brand > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+  line-height: 1;
+}
+
+.chr-foot__place {
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  max-width: 34ch;
+}
+
+.chr-foot__top {
+  color: var(--fg-dim);
+}
+
+.chr-foot__top:hover {
+  color: var(--fg);
+}
+
+@media (max-width: 1180px) {
+  .chr-foot__map {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .chr-foot__base {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chr-foot__place {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
+@media (max-width: 1024px) {
+  .chr-foot {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .chr-foot__map {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s6) var(--s5);
+  }
+  .chr-foot__col a {
+    min-height: 2.75rem;
+  }
+  .chr-foot__act {
+    display: grid;
+    gap: var(--s4);
+  }
+  .chr-foot__cta {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .chr-foot__base {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+  }
+  .chr-foot__place {
+    order: 0;
+    grid-column: auto;
+  }
+}
+
+/* =========================================================================
+   CTA SECTION — interior pages' closing offer
+   ========================================================================= */
+
+.chr-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--plate-ground);
+  color: var(--fg);
+  padding-block: clamp(5.5rem, 11vw, 10rem);
+}
+
+/* The roundel bleeds off the right edge at close to the full height of the
+   band, so the section reads as a picture with type on it. */
+.chr-cta__art {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  right: clamp(-16rem, -11vw, -4rem);
+  width: min(62vw, 58rem);
+  height: auto;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.chr-cta__inner {
+  display: grid;
+  gap: var(--s6);
+  max-width: var(--max);
+}
+
+.chr-cta__eyebrow {
+  color: var(--accent-soft);
+}
+
+.chr-cta__title {
+  font-family: var(--font-ui);
+  font-size: clamp(2.7rem, 0.9rem + 7.2vw, 8rem);
+  font-weight: 650;
+  font-stretch: 88%;
+  line-height: 0.93;
+  letter-spacing: -0.05em;
+  max-width: 12ch;
+  text-wrap: balance;
+}
+
+.chr-cta__side {
+  display: grid;
+  justify-items: start;
+  gap: var(--s4);
+  max-width: 31rem;
+}
+
+.chr-cta__body {
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--glacier) 82%, var(--ink));
+  text-wrap: pretty;
+}
+
+.chr-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s6);
+  min-height: 4rem;
+  margin-top: var(--s2);
+  padding: 1rem 1.6rem 1rem 1.9rem;
+  background: var(--signal);
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 650;
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+  border-radius: var(--radius);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.chr-cta__btn:hover {
+  background: var(--glacier);
+}
+
+.chr-cta__btn-arrow {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.chr-cta__btn:hover .chr-cta__btn-arrow {
+  transform: translateX(0.3rem);
+}
+
+.chr-cta__micro {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+}
+
+.chr-cta__alt {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--t-small);
+  color: var(--fg-dim);
+  text-decoration: underline;
+  text-decoration-thickness: var(--hair);
+  text-underline-offset: 0.3em;
+  text-decoration-color: var(--rule-strong);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.chr-cta__alt:hover {
+  color: var(--fg);
+  text-decoration-color: currentColor;
+}
+
+@media (max-width: 860px) {
+  /* Re-composed, not shrunk: the picture takes the top of the band and the
+     type starts beneath it, so nothing sits on the bear. */
+  .chr-cta {
+    padding-block: 88vw 3.5rem;
+  }
+  .chr-cta__art {
+    top: 0;
+    right: -8vw;
+    width: 100vw;
+    transform: none;
+    opacity: 1;
+  }
+  .chr-cta__btn {
+    width: 100%;
+  }
+}

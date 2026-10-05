@@ -7,11 +7,16 @@ import { useScrolledPast } from "@/lib/useMedia";
 import { ArctosLockup } from "../brand/ArctosLockup";
 
 const LINKS = [
-  ["Services", "/services"],
   ["Work", "/work"],
-  ["Industries", "/industries"],
+  ["Services", "/services"],
   ["Process", "/process"],
   ["Studio", "/studio"],
+] as const;
+
+/** Secondary destinations: still one tap away, but not competing with the offer. */
+const MORE = [
+  ["Industries", "/industries"],
+  ["Contact", "/contact"],
 ] as const;
 
 export function SiteHeader() {
@@ -116,27 +121,33 @@ export function SiteHeader() {
               </Link>
             );
           })}
-          <Link className="btn btn--small header__cta" href="/contact">
-            Start a project
+          <Link className="chr-cta-btn" href="/teardown">
+            Free teardown
+            <span aria-hidden="true">→</span>
           </Link>
         </nav>
 
-        <button
-          ref={trigger}
-          type="button"
-          className="header__menu"
-          onClick={() => setOpen(true)}
-          aria-expanded={open}
-          aria-controls="site-menu"
-          aria-haspopup="dialog"
-          aria-label="Open site menu"
-        >
-          <span className="header__menu-bars" aria-hidden="true">
-            <i />
-            <i />
-          </span>
-          Menu
-        </button>
+        <div className="chr-bar-right">
+          <Link className="chr-cta-btn chr-cta-btn--bar" href="/teardown">
+            Free teardown
+          </Link>
+          <button
+            ref={trigger}
+            type="button"
+            className="header__menu"
+            onClick={() => setOpen(true)}
+            aria-expanded={open}
+            aria-controls="site-menu"
+            aria-haspopup="dialog"
+            aria-label="Open site menu"
+          >
+            <span className="header__menu-bars" aria-hidden="true">
+              <i />
+              <i />
+            </span>
+            Menu
+          </button>
+        </div>
       </div>
 
       {/* Full-screen menu. The page stays faintly visible behind it so you keep
@@ -169,13 +180,15 @@ export function SiteHeader() {
           </div>
 
           <nav className="menu__nav" aria-label="Site">
-            {[...LINKS, ["Contact", "/contact"] as const].map(
-              ([label, href], i) => (
+            {LINKS.map(([label, href], i) => {
+              const active =
+                pathname === href || pathname.startsWith(`${href}/`);
+              return (
                 <Link
                   key={href}
                   href={href}
-                  className={`menu__item${pathname === href ? " is-active" : ""}`}
-                  aria-current={pathname === href ? "page" : undefined}
+                  className={`menu__item${active ? " is-active" : ""}`}
+                  aria-current={active ? "page" : undefined}
                   onClick={() => close(false)}
                 >
                   <span className="t-folio">
@@ -184,14 +197,30 @@ export function SiteHeader() {
                   <span className="menu__item-label">{label}</span>
                   <span className="menu__item-rule" aria-hidden="true" />
                 </Link>
-              ),
-            )}
+              );
+            })}
           </nav>
 
-          <div className="menu__foot">
-            <p className="t-label">Calgary, Alberta</p>
-            <p className="menu__foot-note">
-              Working with organizations anywhere in Canada.
+          <div className="chr-menu-foot">
+            <ul className="chr-menu-more">
+              {MORE.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href} onClick={() => close(false)}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              className="chr-menu-cta"
+              href="/teardown"
+              onClick={() => close(false)}
+            >
+              <span>Get a free reporting teardown</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            <p className="chr-menu-note">
+              30 minutes. No obligation. Reply within two business days.
             </p>
           </div>
         </div>

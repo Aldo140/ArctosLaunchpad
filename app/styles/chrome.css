@@ -329,19 +329,6 @@
   background: color-mix(in oklab, var(--accent) 52%, var(--rule));
 }
 
-.menu__foot {
-  margin-top: auto;
-  padding-top: var(--s7);
-  display: grid;
-  gap: var(--s3);
-}
-
-.menu__foot-note {
-  font-size: var(--t-small);
-  color: var(--fg-dim);
-  max-width: 26ch;
-}
-
 /* =========================================================================
    SURVEY RULE — the signature
    ========================================================================= */
@@ -488,25 +475,25 @@
    entrance may never be allowed to become an invisible click shield or leave
    the document permanently scroll-locked. */
 :root[data-intro="show"] .intro {
-  animation: intro-overlay-failsafe 1ms linear 2800ms forwards;
+  animation: intro-overlay-failsafe 1ms linear 1000ms forwards;
 }
 
 :root[data-intro="show"] body {
-  animation: intro-scroll-failsafe 1ms linear 2800ms forwards;
+  animation: intro-scroll-failsafe 1ms linear 1000ms forwards;
 }
 
 :root[data-intro="done"] .intro {
   transform: translateY(-100%);
-  transition: transform 500ms var(--ease-in-out);
-  animation: intro-overlay-failsafe 1ms linear 520ms forwards;
+  transition: transform 300ms var(--ease-in-out);
+  animation: intro-overlay-failsafe 1ms linear 320ms forwards;
 }
 
 :root[data-intro="done"] body {
-  animation: intro-scroll-failsafe 1ms linear 520ms forwards;
+  animation: intro-scroll-failsafe 1ms linear 320ms forwards;
 }
 
 .intro__stage {
-  --stagger: 70ms;
+  --stagger: 34ms;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -515,7 +502,7 @@
 
 .intro__mark {
   opacity: 0;
-  animation: intro-mark 620ms var(--ease-out) forwards;
+  animation: intro-mark 300ms var(--ease-out) forwards;
 }
 
 .intro__word {
@@ -533,19 +520,9 @@
   text-indent: 0.3em;
   line-height: 1.1;
   transform: translateY(110%);
-  animation: intro-rise 900ms cubic-bezier(0.86, 0, 0.07, 1) forwards;
+  animation: intro-rise 380ms cubic-bezier(0.86, 0, 0.07, 1) forwards;
   animation-delay: calc(var(--stagger) * var(--i));
-  /* The texture reveal the brief asks for: the fill is a clipped gradient, so
-     the letters come up lit rather than flat. */
-  background: linear-gradient(
-    100deg,
-    var(--glacier) 0%,
-    color-mix(in oklab, var(--signal) 45%, var(--glacier)) 52%,
-    var(--glacier) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--glacier);
 }
 
 @keyframes intro-rise {
@@ -585,100 +562,7 @@
   }
 }
 
-/* =========================================================================
-   FOOTER
-   ========================================================================= */
-
-.footer {
-  background: var(--bg);
-  color: var(--fg);
-  border-top: var(--hair) solid var(--rule);
-  padding-block: var(--s9) var(--s6);
-}
-
-.footer__statement {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3.2vw, 2.5rem);
-  font-style: italic;
-  font-weight: 400;
-  line-height: 1.22;
-  letter-spacing: -0.02em;
-  max-width: 22ch;
-  margin-bottom: var(--s8);
-}
-
-.footer__grid {
-  display: grid;
-  grid-template-columns: 1.35fr repeat(4, minmax(0, 1fr));
-  gap: var(--s7) var(--s5);
-  padding-bottom: var(--s8);
-}
-
-/* These name the footer's three link groups — navigation, not decoration. */
-.footer__col h2 {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  font-weight: 500;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--fg-dim);
-  margin-bottom: var(--s4);
-}
-
-.footer__col ul {
-  display: grid;
-  gap: 0.6rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer__col a {
-  font-size: var(--t-small);
-  color: var(--fg-dim);
-  transition: color var(--dur-fast) var(--ease-out);
-}
-
-.footer__col a:hover {
-  color: var(--accent);
-}
-
-.footer__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  transition: opacity var(--dur-fast) var(--ease-out);
-}
-
-.footer__brand:hover {
-  opacity: 0.72;
-}
-
-/* The wordmark stacks under itself, matching the header lockup. Inline it
-   reads as one long word. */
-.footer__brand > span {
-  display: flex;
-  flex-direction: column;
-  gap: 0.14em;
-  line-height: 1;
-}
-
-.footer__place {
-  font-size: var(--t-small);
-  color: var(--fg-dim);
-  max-width: 28ch;
-  margin-top: var(--s4);
-}
-
-.footer__base {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s4) var(--s6);
-  justify-content: space-between;
-  align-items: center;
-  padding-top: var(--s5);
-  border-top: var(--hair) solid var(--rule);
-}
+/* Footer, closing CTA and the menu's foot live in v2-chrome.css (chr-). */
 
 /* =========================================================================
    RESPONSIVE CHROME
@@ -690,9 +574,6 @@
   }
   .progress-hair {
     display: block;
-  }
-  .footer__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -712,66 +593,12 @@
   .header__menu {
     display: inline-flex;
   }
-  .footer__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 520px) {
   .menu__panel {
     width: 100%;
     border-left: 0;
-  }
-
-  /* One column turned sixteen 44px links into roughly four phone screens of
-     footer. Two columns halve that without shrinking a single tap target: the
-     lists are short and their labels are short, so they pair cleanly. The
-     brand block keeps the full width because its sentence needs the measure. */
-  .footer__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s6) var(--s5);
-    padding-bottom: var(--s7);
-  }
-  .footer__col:first-child {
-    grid-column: 1 / -1;
-  }
-  .footer__col h2 {
-    margin-bottom: var(--s2);
-  }
-  .footer__col ul {
-    gap: 0;
-  }
-  /* Hairlines between rows keep the denser list scannable. */
-  .footer__col li + li {
-    border-top: var(--hair) solid var(--rule);
-  }
-  .footer__statement {
-    margin-bottom: var(--s6);
-  }
-  .footer__base {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--s2);
-  }
-  .footer a {
-    display: flex;
-    min-height: 2.75rem;
-    align-items: center;
-  }
-}
-
-@media (max-width: 520px) and (max-height: 720px) {
-  .menu__nav {
-    margin-top: var(--s3);
-  }
-  .menu__item {
-    padding-block: 0.65rem;
-  }
-  .menu__item-label {
-    font-size: clamp(1.65rem, 8vw, 2.1rem);
-  }
-  .menu__foot {
-    padding-top: var(--s4);
   }
 }
 
@@ -790,3 +617,4 @@
     transition-duration: 0.01ms !important;
   }
 }
+

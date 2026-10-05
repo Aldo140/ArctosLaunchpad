@@ -15,7 +15,8 @@ const WORD = "ARCTOS";
  * server-rendered and a blocking script in <head> decides — before paint —
  * whether this session has already seen it. React only has to end it.
  *
- * Skipped entirely for a returning session in the same tab, and for anyone who
+ * Held to ~0.7s and only ever on the homepage: a cold landing from an ad or
+ * email must not wait. Skipped for a returning session in the same tab, and for anyone who
  * asked for reduced motion.
  */
 export function LoadingIntro() {
@@ -28,8 +29,8 @@ export function LoadingIntro() {
       // Match the plate's exit transition before taking it out of the layout.
       window.setTimeout(() => {
         root.dataset.intro = "skip";
-      }, 520);
-    }, 1150);
+      }, 300);
+    }, 380);
 
     return () => window.clearTimeout(done);
   }, []);
@@ -62,7 +63,7 @@ export function LoadingIntro() {
  * visitor who should not be seeing it.
  */
 export const INTRO_BOOTSTRAP = `(function(){var r=document.documentElement;r.classList.add('js');try{
-var skip=sessionStorage.getItem('arctos-intro')||matchMedia('(prefers-reduced-motion: reduce)').matches;
+var seen=sessionStorage.getItem('arctos-intro');sessionStorage.setItem('arctos-intro','seen');var skip=location.pathname!=='/'||seen||matchMedia('(prefers-reduced-motion: reduce)').matches;
 r.dataset.intro=skip?'skip':'show';
-if(!skip){sessionStorage.setItem('arctos-intro','seen');setTimeout(function(){if(r.dataset.intro==='show'||r.dataset.intro==='done')r.dataset.intro='skip';},2400);}
+if(!skip){setTimeout(function(){if(r.dataset.intro==='show'||r.dataset.intro==='done')r.dataset.intro='skip';},1100);}
 }catch(e){r.dataset.intro='skip';}})();`;
