@@ -26,6 +26,7 @@ Copy `.env.example` to `.env.local`.
 | ---------------------------- | -------- | -------------------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL`       | no       | Canonical origin for metadata, sitemap, and OG images. Defaults to `https://arctoslaunchpad.com`. |
 | `NEXT_PUBLIC_CONTACT_ENDPOINT` | no     | Public HTTPS endpoint used by static deployments for the project intake form. |
+| `NEXT_PUBLIC_CONTACT_EMAIL`  | no       | Public address used by the "Ask a question first" and "Careers, press, or suppliers" doors on `/contact` (mailto: links). Defaults to `hello@arctoslaunchpad.com` — set this to a real, monitored inbox before launch. |
 | `CONTACT_WEBHOOK_URL`        | no       | Where `/api/contact` forwards enquiries. **Without it, in production the route rejects the submission rather than silently discarding it.** In development it logs to the server console instead. |
 
 No secrets are read on the client. `.env.local` is gitignored.
