@@ -56,6 +56,9 @@ export function Footer() {
               <li>
                 <Link href="/teardown">Free reporting teardown</Link>
               </li>
+              <li>
+                <Link href="/pro-bono">Pro bono: Keystone</Link>
+              </li>
             </ul>
           </nav>
           <nav aria-label="Studio">

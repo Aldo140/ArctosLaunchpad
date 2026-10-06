@@ -20,6 +20,7 @@ const projectTypes = [
   "CRM or integration",
   "Dashboard or reporting",
   "Ongoing support",
+  "Pro bono (Keystone)",
   "Not sure yet",
 ] as const;
 

@@ -1,4 +1,4 @@
-import { calgaryLandingPages, guides, industries, projects, servicePages } from "@/lib/content";
+import { KEYSTONE, calgaryLandingPages, guides, industries, projects, servicePages } from "@/lib/content";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
@@ -47,6 +47,10 @@ export function GET() {
     ...servicePages.flatMap((s) =>
       s.faq.map((f) => `- **${f.question}** (${s.title}) ${f.answer}`),
     ),
+    "",
+    "## Pro bono",
+    "",
+    `- [Keystone, the Arctos pro bono program](${url("/pro-bono")}): ${KEYSTONE.cadence}, Arctos designs and builds for a nonprofit, community group, social enterprise or small business in a hard season at no cost: websites, automation and impact reporting, with the same team and standards as paid work. The organization owns everything; Arctos asks to share the work as a case study.`,
     "",
     "## Contact",
     "",

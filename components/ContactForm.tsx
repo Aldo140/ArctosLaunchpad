@@ -42,7 +42,7 @@ const typeGroups = [
     label: "See the numbers",
     types: ["Dashboard or reporting", "Free reporting teardown"],
   },
-  { island: null, label: "Something else", types: ["Ongoing support", "Not sure yet"] },
+  { island: null, label: "Something else", types: ["Ongoing support", "Pro bono (Keystone)", "Not sure yet"] },
 ] as const;
 
 const projectTypes = [
@@ -57,6 +57,7 @@ const projectTypes = [
   "CRM or integration",
   "Dashboard or reporting",
   "Ongoing support",
+  "Pro bono (Keystone)",
   "Not sure yet",
 ] as const;
 
@@ -241,6 +242,7 @@ const CHOICES: Record<string, string> = {
   automation: "Business automation",
   software: "Custom software",
   reporting: "Dashboard or reporting",
+  "pro-bono": "Pro bono (Keystone)",
 };
 
 export function ContactForm({
