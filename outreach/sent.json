@@ -82,5 +82,75 @@
     "subject": "How custom cake orders reach you",
     "at": "2026-10-06T20:45:24.764Z",
     "messageId": "<202610062045.14658650487@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@eatcake.ca",
+    "business": "Cakeworks",
+    "subject": "How custom cake orders reach you",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.49393512644@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@olaluna.com",
+    "business": "OLA LUNA Cake & Bakeshop",
+    "subject": "How custom cake orders reach you",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.41906430601@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@boldsigns.com",
+    "business": "Bold Signs & Graphics",
+    "subject": "Tracking sign jobs from proof to install",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.74057385070@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@littlerockprinting.com",
+    "business": "Little Rock Printing",
+    "subject": "Print orders from proof to shipping",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.10992192308@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@printshopcalgary.ca",
+    "business": "Minuteman Press Beltline",
+    "subject": "Tracking print jobs at Minuteman Beltline",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.22025854698@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@calgaryprint.ca",
+    "business": "Calgary Print",
+    "subject": "Print orders from upload to delivery",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.49080474682@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@AllRush.ca",
+    "business": "AllRush",
+    "subject": "Tracking print, apparel and signage jobs",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.65773282736@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@rynoprinting.com",
+    "business": "RYNO Print & Design",
+    "subject": "Tracking print and design jobs",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.13582357347@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sungreen@sungreen.net",
+    "business": "Sungreen Landscaping",
+    "subject": "Landscaping quotes and job tracking",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.15879108520@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@blueaspen.ca",
+    "business": "Blue Aspen Landscaping",
+    "subject": "Landscaping quotes and job tracking",
+    "at": "2026-10-06T21:02:14.107Z",
+    "messageId": "<202610062102.62995717982@smtp-relay.mailin.fr>"
   }
 ]
