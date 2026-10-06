@@ -9,7 +9,7 @@ custom bakeries).
 - Send only from `aldo@arctoslaunchpad.com`, never from the Vow Motion address
   or jorti104@mtroyal.ca. `.github/workflows/outreach.yml` sends the queue
   through Brevo (`BREVO_API_KEY` repository secret), one email per run,
-  weekdays 9:00–16:30 Calgary time, two per run, at most 50 a day; `sent.json` records each
+  weekdays 9:00–16:30 Calgary time, up to ten per run, at most 50 a day; `sent.json` records each
   send. Replies reach mrotiz14@gmail.com through ForwardEmail (MX + TXT records
   on Vercel DNS).
 - Up to 50 new businesses a day, weekdays, spaced through the day. No link in

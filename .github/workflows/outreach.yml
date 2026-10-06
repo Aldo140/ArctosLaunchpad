@@ -1,7 +1,8 @@
 name: Arctos outreach
 
 # Sends queued outreach (outreach/batch-*.json) from aldo@arctoslaunchpad.com
-# through Brevo, two emails per run (every 15 minutes), weekdays 9:00-16:30
+# through Brevo, up to ten emails per run (GitHub runs the schedule only a few
+# times a day, so runs are also started by the daily outreach routine), weekdays 9:00-16:30
 # Calgary time, at most 50 a day. The send window is enforced in scripts/send-outreach.mjs.
 on:
   schedule:

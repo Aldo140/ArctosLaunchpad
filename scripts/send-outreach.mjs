@@ -12,7 +12,7 @@ import { join } from "node:path";
 
 const DIR = "outreach";
 const SENT_FILE = join(DIR, "sent.json");
-const PER_RUN = 2;
+const PER_RUN = 10;
 const DAILY_CAP = 50;
 const WINDOW = { start: 9 * 60, end: 16 * 60 + 30, days: [1, 2, 3, 4, 5] }; // Calgary time
 const SENDER = { name: "Aldo Ortiz", email: "aldo@arctoslaunchpad.com" };
