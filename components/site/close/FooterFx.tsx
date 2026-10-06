@@ -48,6 +48,9 @@ export function FooterFx() {
     const setSh = shadow ? gsap.quickSetter(shadow, "opacity") : null;
     // touch: no pointer to tilt with, so the scroll tips the bridge up out of the page instead
     const setRX = !fine && tilt ? gsap.quickSetter(tilt, "rotationX", "deg") : null;
+    // Most of the page sits above the footer, where the bridge holds still:
+    // only write when the rise has actually moved.
+    let lastP = -1;
     const update = () => {
       raf = 0;
       if (!rise || !setY || !setSX || !setSY) return;
@@ -55,6 +58,8 @@ export function FooterFx() {
       const vh = window.innerHeight;
       // 0 when the footer's top meets the viewport bottom, 1 once it's 20% from the top
       const p = clamp((vh - r.top) / (vh * 0.8), 0, 1);
+      if (p === lastP) return;
+      lastP = p;
       const e = 1 - Math.pow(1 - p, 3);
       setY((1 - e) * 180);
       setSX(0.84 + 0.16 * e);

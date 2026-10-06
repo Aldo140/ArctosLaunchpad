@@ -138,8 +138,11 @@ export function CloseFx() {
       return r.top + r.height / 2;
     };
 
+    let painted = -1;
     const paint = () => {
       const p = clamp(progress, 0, 1);
+      if (p === painted) return;
+      painted = p;
       line.style.strokeDasharray = `${length} ${length}`;
       line.style.strokeDashoffset = `${length * (1 - p)}`;
       nodeA.classList.toggle("is-on", p > 0.01);
@@ -249,12 +252,17 @@ export function CloseFx() {
       doorY.forEach((sy, i) => {
         stopAt[i] = prefix && sy >= railTop - 1 ? (before + sy - railTop) / length : 2;
       });
+      painted = -1;
       paint();
     };
 
     // ---- Scroll-driven draw (rect based, survives other sections' pins) ---
     let raf = 0;
-    const onScroll = () => {
+    // The line only repaints when its progress changes, and the islands only
+    // drift while the section is near the screen.
+    let near = false;
+    const onScroll = () => update();
+    const update = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -269,7 +277,7 @@ export function CloseFx() {
           progress = (vh * 0.92 - r.top) / (vh * 0.62);
         }
         paint();
-        if (!fine) {
+        if (!fine && near) {
           // depth without a pointer: each island drifts and settles as its row passes
           thumbs.forEach((img) => {
             const tr = img.getBoundingClientRect();
@@ -284,9 +292,21 @@ export function CloseFx() {
     if (motion) section.classList.add("is-live");
     build();
     if (motion) {
-      onScroll();
+      update();
+      const nearby = new IntersectionObserver(
+        ([entry]) => {
+          near = entry.isIntersecting;
+          update();
+        },
+        { rootMargin: "50% 0px" },
+      );
+      nearby.observe(section);
       window.addEventListener("scroll", onScroll, { passive: true });
-      cleanups.push(() => window.removeEventListener("scroll", onScroll));
+      cleanups.push(() => {
+        nearby.disconnect();
+        cancelAnimationFrame(raf);
+        window.removeEventListener("scroll", onScroll);
+      });
     }
     // measure again once layout settles (fonts, images, the rail indent)
     const settle = requestAnimationFrame(() => requestAnimationFrame(build));

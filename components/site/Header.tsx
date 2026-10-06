@@ -28,27 +28,51 @@ type Tone = "ink" | "paper" | "bone" | "pine";
 function useToneUnderHeader(pathname: string) {
   const [tone, setTone] = useState<Tone>("ink");
   useEffect(() => {
-    let frame = 0;
-    const read = () => {
-      frame = 0;
-      const sections = document.querySelectorAll<HTMLElement>("main [data-tone]");
+    // Watch a one-pixel line 36px down the screen rather than measuring every
+    // section on every scroll frame: the browser reports crossings for free.
+    const sections = [...document.querySelectorAll<HTMLElement>("main [data-tone]")];
+    const under = new Set<HTMLElement>();
+    let observer: IntersectionObserver | null = null;
+    const pick = () => {
+      // The last match in document order wins, so a nested section beats its parent.
       let next: Tone = "ink";
-      for (const section of sections) {
-        const r = section.getBoundingClientRect();
-        if (r.top <= 36 && r.bottom > 36) next = section.dataset.tone as Tone;
-      }
+      for (const section of sections) if (under.has(section)) next = section.dataset.tone as Tone;
       setTone(next);
     };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(read);
+    const watch = () => {
+      observer?.disconnect();
+      under.clear();
+      const below = Math.max(0, window.innerHeight - 37);
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) under.add(e.target as HTMLElement);
+            else under.delete(e.target as HTMLElement);
+          }
+          pick();
+        },
+        { rootMargin: `-36px 0px -${below}px 0px` },
+      );
+      sections.forEach((section) => observer!.observe(section));
     };
-    read();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    let height = window.innerHeight;
+    let frame = 0;
+    const onResize = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (window.innerHeight === height) return;
+        height = window.innerHeight;
+        watch();
+      });
+    };
+    watch();
+    if (!sections.length) pick();
+    window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      observer?.disconnect();
+      window.removeEventListener("resize", onResize);
     };
   }, [pathname]);
   return tone;

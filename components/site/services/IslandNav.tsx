@@ -31,6 +31,7 @@ export function IslandNav({ items }: { items: Item[] }) {
     if (!el || chapters.length !== items.length) return;
 
     let raf = 0;
+    let lastP = "";
     const update = () => {
       raf = 0;
       const mid = window.innerHeight * 0.5;
@@ -43,7 +44,11 @@ export function IslandNav({ items }: { items: Item[] }) {
         const t = Math.min(1, Math.max(0, (mid - tops[i]) / span));
         p += t / (tops.length - 1);
       }
-      el.style.setProperty("--p", p.toFixed(4));
+      const nextP = p.toFixed(4);
+      if (nextP !== lastP) {
+        lastP = nextP;
+        el.style.setProperty("--p", nextP);
+      }
       let current = 0;
       tops.forEach((top, i) => {
         if (top <= mid) current = i;

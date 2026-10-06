@@ -20,14 +20,21 @@ export function DepthField({ children, className = "" }: { children: ReactNode; 
     let x = 0;
     let y = 0;
     let raf = 0;
+    let written = "";
     const loop = () => {
       x += (tx - x) * 0.07;
       y += (ty - y) * 0.07;
       const r = el.getBoundingClientRect();
       const sy = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height)));
-      el.style.setProperty("--px", x.toFixed(4));
-      el.style.setProperty("--py", y.toFixed(4));
-      el.style.setProperty("--sy", sy.toFixed(4));
+      // Once the terrain has scrolled away the values stop changing: skip the
+      // writes, so the rest of the page doesn't pay for a restyle each frame.
+      const next = `${x.toFixed(4)} ${y.toFixed(4)} ${sy.toFixed(4)}`;
+      if (next !== written) {
+        written = next;
+        el.style.setProperty("--px", x.toFixed(4));
+        el.style.setProperty("--py", y.toFixed(4));
+        el.style.setProperty("--sy", sy.toFixed(4));
+      }
       raf = Math.abs(tx - x) > 0.0005 || Math.abs(ty - y) > 0.0005 ? requestAnimationFrame(loop) : 0;
     };
     const kick = () => {
