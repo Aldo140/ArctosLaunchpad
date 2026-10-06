@@ -1222,6 +1222,35 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   .demo-bars i.is-today {
     background: linear-gradient(180deg, #ffb48a, var(--rust));
     box-shadow: 0 0 12px rgb(229 122 66 / 0.6);
+    animation: demo-breathe 2.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes demo-breathe {
+    to {
+      box-shadow: 0 0 20px rgb(229 122 66 / 0.95);
+    }
+  }
+
+  /* the active step: a soft rust rim light that glows in and fades out */
+  .demo-leads,
+  .demo-dash,
+  .demo-phone__frame {
+    transition: box-shadow 0.6s var(--ease-out, ease-out);
+  }
+
+  .demo-leads.is-active,
+  .demo-dash.is-active {
+    box-shadow:
+      inset 0 0 0 1px rgb(229 122 66 / 0.7),
+      0 0 34px -6px rgb(229 122 66 / 0.55),
+      0 24px 50px -12px rgb(0 0 0 / 0.75);
+  }
+
+  .demo-phone.is-active .demo-phone__frame {
+    box-shadow:
+      inset 0 0 0 1px rgb(229 122 66 / 0.75),
+      0 0 34px -4px rgb(229 122 66 / 0.6),
+      0 30px 50px -10px rgb(0 0 0 / 0.7);
   }
 
   /* the bear sits between the boards and behind the dashboard, whose top
@@ -1538,6 +1567,21 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     stroke: none;
   }
 
+  .demo-trail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: #ffb48a;
+    box-shadow: 0 0 8px 2px rgb(229 122 66 / 0.7);
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .demo-signal {
     position: absolute;
     left: 0;
@@ -1593,6 +1637,10 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   /* nothing moves on its own, so there is nothing to pause */
   .demo-pause {
     display: none;
+  }
+
+  .demo-bars i.is-today {
+    animation: none;
   }
 
   /* the finished state: the lead is in and followed up */

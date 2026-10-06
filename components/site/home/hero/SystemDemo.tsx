@@ -218,6 +218,8 @@ export function SystemDemo() {
               pathLength={1}
             />
           </svg>
+          <span className="demo-trail" />
+          <span className="demo-trail" />
           <span className="demo-signal" />
           {/* the automation's reply, written live */}
           <div className="demo-mail">

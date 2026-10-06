@@ -355,6 +355,7 @@ export function BridgeHero() {
       const toast = $(".demo-toast");
       const toastWhat = $(".demo-toast__what");
       const signal = $(".demo-signal");
+      const trail = gsap.utils.toArray<HTMLElement>(".demo-trail", stage);
       const newRow = $(".demo-row--new");
       const rowName = $(".demo-name");
       const rowWhat = $(".demo-what");
@@ -439,8 +440,11 @@ export function BridgeHero() {
         const width = lines[i].querySelector<HTMLElement>(".hero__words")?.offsetWidth ?? 0;
         gsap.fromTo(spark, { x: 0, opacity: 1 }, { x: width, duration: 0.9, ease: "expo.out", onComplete: () => void gsap.to(spark, { opacity: 0, duration: 0.3 }) });
       };
-      const pop = (card: Element) =>
-        gsap.fromTo(card, { scale: 1 }, { scale: 1.035, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 });
+      // A step lights its screen with a soft rust rim rather than a jump.
+      const pop = (card: Element) => {
+        card.classList.add("is-active");
+        window.setTimeout(() => card.classList.remove("is-active"), 1300);
+      };
 
       // ---- intro: the screens arrive in depth -----------------------------
       const tl = gsap.timeline({ delay: 0.05 });
@@ -490,8 +494,12 @@ export function BridgeHero() {
         newRow.classList.remove("is-you");
         const prev = site;
         site = (site + 1) % DEMO_SITES.length;
-        gsap.to(sites[prev], { opacity: 0, duration: 0.6 });
-        gsap.to(sites[site], { opacity: 1, duration: 0.6 });
+        // Swipe to the next client, the way a phone moves between apps.
+        gsap.timeline({ defaults: { duration: 0.75, ease: "power3.inOut" } })
+          .set(sites[site], { opacity: 1, xPercent: 100 })
+          .to(sites[prev], { xPercent: -35, opacity: 0.4 }, 0)
+          .to(sites[site], { xPercent: 0 }, 0)
+          .set(sites[prev], { opacity: 0, xPercent: 0 });
         gsap.fromTo(glare, { xPercent: -120 }, { xPercent: 120, duration: 1.1, ease: "power2.inOut" });
         drawRoutes();
         // GSAP records function-based starts and motion paths on first play;
@@ -513,12 +521,9 @@ export function BridgeHero() {
           rowWhat.textContent = lead.what;
           rowAv.textContent = lead.who[0];
         }, [], 0.96)
-        .fromTo(
-          toast,
-          { opacity: 0, scale: 0.6, x: () => points().tap.x - 20, y: () => points().tap.y - 40 },
-          { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" },
-          1,
-        )
+        // Appear exactly where the flight begins, so there is no snap when it leaves.
+        .set(toast, { motionPath: { path: routeA, align: routeA, alignOrigin: [0.1, 0.5], start: 0, end: 0 } }, 0.99)
+        .fromTo(toast, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 1)
         .to(toast, {
           motionPath: { path: routeA, align: routeA, alignOrigin: [0.1, 0.5] },
           duration: 0.8,
@@ -558,9 +563,12 @@ export function BridgeHero() {
         }, [], 3.6)
         .to(mail, { autoAlpha: 0, y: "-=10", scale: 0.92, duration: 0.4, ease: "power2.in" }, 4.15)
         // 03 — the dashboard counts it
-        .fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 4.4)
+        .fromTo([signal, ...trail], { opacity: 0 }, { opacity: (i) => [1, 0.5, 0.25][i], duration: 0.15 }, 4.4)
+        // the signal and two fading echoes, a beat apart: a comet, not a dot
         .to(signal, { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 4.4)
-        .to(signal, { opacity: 0, duration: 0.2 }, 5.1)
+        .to(trail[0], { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 4.45)
+        .to(trail[1], { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 4.5)
+        .to([signal, ...trail], { opacity: 0, duration: 0.25, stagger: 0.05 }, 5.1)
         .call(() => {
           n += 1;
           gsap.to(counter, { v: n, duration: 0.5, ease: "power2.out", onUpdate: () => { count.textContent = String(Math.round(counter.v)); } });
