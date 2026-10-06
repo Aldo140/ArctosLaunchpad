@@ -1052,3 +1052,84 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     --art-w: 104vw;
   }
 }
+
+/* ---- Phones & tablets: framing ---------------------------------------------- */
+
+@media (max-width: 900px) {
+  /* The outer labels hang inward from their island instead of centring on it.
+     Centred, "01 Win the customer" and "03 See the numbers" ran off the screen
+     edges; anchored at the island they always read toward the middle. */
+  .hero .hero__label {
+    left: var(--x);
+  }
+
+  .hero .hero__label--win,
+  .hero .hero__label--win.is-active,
+  .hero .hero__label--win:hover,
+  .hero .hero__label--win:focus-visible {
+    translate: -10px 0;
+    transform-origin: 10px 0;
+  }
+
+  .hero .hero__label--win::before {
+    left: 10px;
+  }
+
+  .hero .hero__label--win::after {
+    left: 7.5px;
+  }
+
+  .hero .hero__label--see,
+  .hero .hero__label--see.is-active,
+  .hero .hero__label--see:hover,
+  .hero .hero__label--see:focus-visible {
+    translate: calc(-100% + 10px) 0;
+    transform-origin: calc(100% - 10px) 0;
+  }
+
+  .hero .hero__label--see::before {
+    left: auto;
+    right: 10px;
+  }
+
+  .hero .hero__label--see::after {
+    left: auto;
+    right: 7.5px;
+  }
+
+  /* Decorative coordinates: on a phone "Calgary · AB" landed behind the CTAs. */
+  .hero__coords {
+    display: none;
+  }
+
+  /* The first frame now carries the lead and actions where the cue sat. */
+  html.js-motion .hero .hero__cue {
+    display: none;
+  }
+
+  /* During an act the camera is close on one island: the other labels would
+     only show as fragments cut by the screen edge. */
+  html.js-motion .hero[data-act] .hero__label:not(.is-active) {
+    visibility: hidden;
+  }
+
+  /* The act rail belongs to the acts. Shown on the first frame it sat on the
+     end of "Win the customer." */
+  html.js-motion .hero .hero__rail {
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  html.js-motion .hero[data-act] .hero__rail {
+    opacity: 1;
+  }
+}
+
+/* Short phones (SE-class): the overview bridge is small enough that the three
+   labels crowd each other and the lead. The headline already names all three,
+   so the labels wait for the acts, where each island has the screen. */
+@media (max-width: 600px) and (max-height: 700px) {
+  html.js-motion .hero:not([data-act]) .hero__label {
+    visibility: hidden;
+  }
+}

@@ -212,8 +212,10 @@ export function BridgeHero() {
         .from(".hero__cue", { opacity: 0, duration: 1 }, 1.4);
 
       if (story) {
-        // The first frame lands whole: lines light in order, no scrolling needed.
+        // The first frame lands whole — headline, bridge, what Arctos does and
+        // the way in — so the pitch is complete before anyone scrolls.
         tl.from(".hero__eyebrow-in", { opacity: 0, y: 14, duration: 1, ease: "expo.out" }, 0.4)
+          .from([".hero__lead", ".hero__copy .actions"], { opacity: 0, y: 18, duration: 1, ease: "expo.out", stagger: 0.08 }, 0.75)
           .from(".hero__label", { opacity: 0, duration: 0.9, ease: "power2.out", stagger: 0.12 }, 0.9)
           .call(() => light("win", false), [], 1.15)
           .call(() => light("run", false), [], 1.4)
@@ -349,12 +351,18 @@ export function BridgeHero() {
           const f = FRAMES[id];
           return cam(f.ax, f.ay, f.s, W() / 2, H() * 0.66);
         };
-        // The final frame: the whole bridge between the headline and the lead.
+        // The whole bridge between the headline and the lead: the first frame
+        // and the last. Sized to the height between them and, on narrow
+        // phones, to the width too, so both outer islands (and the labels
+        // hanging from them) land inside the screen instead of off its edges.
         const finale = () => {
           const top = title.offsetTop + title.offsetHeight;
           const bottom = lead.offsetTop;
           const artH = stage.offsetWidth * (ART_H / ART_W);
-          const s = Math.min(1, ((bottom - top) * 1.04) / (artH * 0.98));
+          const byHeight = ((bottom - top) * 1.04) / (artH * 0.98);
+          const reach = Math.max(0.5 - ISLES.win.cx / ART_W, ISLES.see.cx / ART_W - 0.5);
+          const byWidth = (W() / 2 - 24) / (reach * stage.offsetWidth);
+          const s = Math.min(1, byHeight, byWidth);
           return cam(0.5, 0.56, s, W() / 2, top + (bottom - top) * 0.5);
         };
         const fv = (f: () => { x: number; y: number; scale: number }, key: "x" | "y" | "scale", k = 1) => () =>
@@ -372,12 +380,17 @@ export function BridgeHero() {
             end: "bottom bottom",
             scrub: 0.5,
             invalidateOnRefresh: true,
+            // Re-read the camera scale once a refresh has re-rendered the
+            // first frame, so the labels' counter-scale matches it.
+            onRefresh: () => requestAnimationFrame(setZoom),
             onUpdate: (self) => {
               const p = self.progress;
               const id: IslandId | null =
                 p < 0.075 ? null : p < 0.37 ? "win" : p < 0.6 ? "run" : p < 0.8 ? "see" : null;
               if (id === current) return;
               current = id;
+              if (id) el!.dataset.act = id;
+              else delete el!.dataset.act;
               if (id) pulse(id);
               setActive(id);
             },
@@ -385,8 +398,11 @@ export function BridgeHero() {
           onUpdate: setZoom,
         });
 
-        const moveTo = (f: () => { x: number; y: number; scale: number }, at: number, dur: number) => {
-          st.to(dolly, { x: fv(f, "x"), y: fv(f, "y"), scale: fv(f, "scale"), duration: dur }, at);
+        type Cam = () => { x: number; y: number; scale: number };
+        const moveTo = (f: Cam, at: number, dur: number, from?: Cam) => {
+          const to = { x: fv(f, "x"), y: fv(f, "y"), scale: fv(f, "scale"), duration: dur };
+          if (from) st.fromTo(dolly, { x: fv(from, "x"), y: fv(from, "y"), scale: fv(from, "scale") }, to, at);
+          else st.to(dolly, to, at);
           // Depth: far planes drift a little, near planes a lot, in the same direction.
           const rel = (k: number) => () => f().x * k * 0.12;
           st.to(".hero__sky", { x: rel(0.25), duration: dur }, at)
@@ -406,11 +422,13 @@ export function BridgeHero() {
         st.set({}, {}, 0)
           // Act 1 — win
           .to([".hero__eyebrow", title], { autoAlpha: 0, y: -36, duration: 0.6, ease: "power2.in", stagger: 0.05 }, 0.6)
+          .to(lead, { autoAlpha: 0, y: 20, duration: 0.5, ease: "power2.in" }, 0.6)
           .to(".hero__cue", { autoAlpha: 0, duration: 0.3 }, 0.6)
           // The CTAs step aside while the camera works (island labels pass
           // through that strip) and come back with the whole bridge.
           .to(".hero__copy .actions", { autoAlpha: 0, y: 20, duration: 0.5, ease: "power2.in" }, 0.6);
-        moveTo(frame("win"), 0.6, 1.4);
+        // The camera opens on the whole bridge, the same frame it closes on.
+        moveTo(frame("win"), 0.6, 1.4, finale);
         actIn(0, 1.3);
         st.fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "none" }, 1.5)
           .fromTo(sig, { p: 0 }, { p: 0, duration: 0.01, onUpdate: place }, 1.5);
@@ -430,9 +448,10 @@ export function BridgeHero() {
         moveTo(finale, 7.6, 1.4);
         st.to(signal, { opacity: 0, duration: 0.4 }, 8.4)
           .to([".hero__eyebrow", title], { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.05 }, 8.3)
-          .fromTo(lead, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", immediateRender: true }, 8.5)
+          .to(lead, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 8.5)
           .to(".hero__copy .actions", { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 8.62)
           .to({}, { duration: 0.8 }, 9.2);
+        setZoom();
       }
 
       ScrollTrigger.create({
@@ -463,6 +482,7 @@ export function BridgeHero() {
 
     return () => {
       mm.revert();
+      delete el.dataset.act;
       el.dataset.intro = "pending";
       setLit(ORDER);
       setActive(null);
