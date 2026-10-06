@@ -20,11 +20,10 @@ export default function PrivacyPage() {
   return (
     <>
       <section
-        className="masthead section policy-cover"
-        data-material="instrument"
-        data-station="Privacy"
+        className="phero tone-ink policy-cover"
+        data-tone="ink"
       >
-        <div className="shell policy-cover__inner">
+        <div className="wrap policy-cover__inner">
           <nav className="crumbs" aria-label="Breadcrumb">
             <ol>
               <li>
@@ -37,11 +36,11 @@ export default function PrivacyPage() {
           </nav>
 
           <div>
-            <p className="tick-label">Policy record</p>
-            <h1 className="t-display policy-cover__title">
+            <p className="eyebrow">Policy record</p>
+            <h1 className="h1 policy-cover__title">
               Privacy, in <em>plain language.</em>
             </h1>
-            <p className="t-lead policy-cover__intro">
+            <p className="lead policy-cover__intro">
               What this website collects, why it is needed, and what you can ask
               us to do with it.
             </p>
@@ -49,30 +48,30 @@ export default function PrivacyPage() {
 
           <dl className="policy-cover__meta">
             <div>
-              <dt className="t-label">Document</dt>
-              <dd className="t-folio">Privacy notice</dd>
+              <dt className="mono">Document</dt>
+              <dd className="index">Privacy notice</dd>
             </div>
             <div>
-              <dt className="t-label">Scope</dt>
-              <dd className="t-folio">This website and project enquiries</dd>
+              <dt className="mono">Scope</dt>
+              <dd className="index">This website and project enquiries</dd>
             </div>
             <div>
-              <dt className="t-label">Last reviewed</dt>
-              <dd className="t-folio">30 July 2026</dd>
+              <dt className="mono">Last reviewed</dt>
+              <dd className="index">30 July 2026</dd>
             </div>
           </dl>
         </div>
       </section>
 
-      <section className="section" data-material="paper" data-station="Record">
-        <div className="shell policy">
+      <section className="section tone-paper" data-tone="paper">
+        <div className="wrap policy">
           <nav className="policy__contents" aria-label="On this page">
-            <p className="t-label">Contents</p>
+            <p className="mono">Contents</p>
             <ol>
               {contents.map(([n, label, id]) => (
                 <li key={id}>
                   <a href={`#${id}`}>
-                    <span className="t-folio">{n}</span>
+                    <span className="index">{n}</span>
                     <span>{label}</span>
                   </a>
                 </li>
@@ -89,7 +88,7 @@ export default function PrivacyPage() {
 
             <section id="information" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">01</span>
+                <span className="index policy__n">01</span>
                 <h2 className="policy__h2">Information we collect</h2>
               </div>
               <p>
@@ -103,19 +102,11 @@ export default function PrivacyPage() {
                 information, such as browser type, device type, and IP address,
                 through hosting and security infrastructure.
               </p>
-              <aside className="policy__note">
-                <p className="policy__note-title">One small browser detail</p>
-                <p>
-                  Session storage remembers whether the brief loading
-                  introduction has already appeared. It clears when the browsing
-                  session ends.
-                </p>
-              </aside>
             </section>
 
             <section id="use" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">02</span>
+                <span className="index policy__n">02</span>
                 <h2 className="policy__h2">How information is used</h2>
               </div>
               <p>
@@ -132,7 +123,7 @@ export default function PrivacyPage() {
 
             <section id="providers" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">03</span>
+                <span className="index policy__n">03</span>
                 <h2 className="policy__h2">Service providers</h2>
               </div>
               <p>
@@ -149,7 +140,7 @@ export default function PrivacyPage() {
 
             <section id="retention" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">04</span>
+                <span className="index policy__n">04</span>
                 <h2 className="policy__h2">Retention and your choices</h2>
               </div>
               <p>
@@ -167,7 +158,7 @@ export default function PrivacyPage() {
 
             <section id="contact" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">05</span>
+                <span className="index policy__n">05</span>
                 <h2 className="policy__h2">Questions or requests</h2>
               </div>
               <p>
@@ -177,11 +168,8 @@ export default function PrivacyPage() {
                 through the form.
               </p>
               <p className="policy__action">
-                <Link className="btn btn--ghost btn--small" href="/contact">
-                  Contact Arctos
-                  <span className="btn__arrow" aria-hidden="true">
-                    →
-                  </span>
+                <Link className="link" href="/contact">
+                  Contact Arctos<span aria-hidden="true">→</span>
                 </Link>
               </p>
             </section>

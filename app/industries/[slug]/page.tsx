@@ -1,287 +1,162 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CTASection, PageHeader } from "@/components/Shared";
-import { getIndustry, industries, services } from "@/lib/content";
+import {
+  getIslandForStage,
+  getServicePageBySlug,
+  industryPages,
+  type ServicePage,
+} from "@/lib/content";
+import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo";
+import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
+import { ProjectPlate } from "@/components/site/ProjectPlate";
+import { Lines, d } from "@/components/site/ui";
+import { DepthField } from "@/components/site/industries/DepthField";
+import { NextIndustry } from "@/components/site/industries/NextIndustry";
+import { ResolveMap } from "@/components/site/industries/ResolveMap";
+import { TerrainSvg } from "@/components/site/industries/TerrainSvg";
+import { TiltGroup } from "@/components/site/industries/TiltGroup";
+import { litIslands, routesFor, workIn } from "@/components/site/industries/data";
 
 type Props = { params: Promise<{ slug: string }> };
 
-type Stage = "attract" | "convert" | "operate" | "scale";
-
-const STAGES: { id: Stage; label: string; note: string }[] = [
-  { id: "attract", label: "Attract", note: "Being found and understood" },
-  { id: "convert", label: "Convert", note: "Turning interest into contact" },
-  { id: "operate", label: "Operate", note: "Running the work afterwards" },
-  { id: "scale", label: "Scale", note: "Seeing what is actually happening" },
-];
-
-const stageFigures = {
-  attract: {
-    src: "/assets/illustrations/branching-growth.webp",
-    alt: "A bear tending a branching system of connected growth channels.",
-  },
-  convert: {
-    src: "/assets/illustrations/route-compass.webp",
-    alt: "A bear using a compass to choose a route through connected paths.",
-  },
-  operate: {
-    src: "/assets/illustrations/modular-blocks.webp",
-    alt: "A bear assembling modular blocks into a connected operating system.",
-  },
-  scale: {
-    src: "/assets/illustrations/growth-curve.webp",
-    alt: "A bear tracing measured progress along a growth curve.",
-  },
-} as const;
-
-/**
- * The signature turn: the closing clause of the industry's own headline drops
- * into the paper voice. Split at the final comma where the tail can stand on
- * its own, otherwise on the last three words.
- */
-function turn(sentence: string): [string, string] {
-  const comma = sentence.lastIndexOf(", ");
-  if (comma > 0) {
-    const tail = sentence.slice(comma + 2);
-    if (tail.split(/\s+/).length >= 2) {
-      return [sentence.slice(0, comma + 2), tail];
-    }
-  }
-  const words = sentence.split(" ");
-  const tail = words.slice(-3).join(" ");
-  return [sentence.slice(0, sentence.length - tail.length), tail];
-}
+const find = (slug: string) => industryPages.find((i) => i.slug === slug);
 
 export function generateStaticParams() {
-  return industries.map(({ slug }) => ({ slug }));
+  return industryPages.map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const industry = getIndustry((await params).slug);
-  return industry
-    ? {
-        title: industry.title,
-        description: industry.summary,
-        alternates: { canonical: `/industries/${industry.slug}` },
-      }
-    : {};
+  const industry = find((await params).slug);
+  if (!industry) return {};
+  return pageMetadata({
+    title: industry.title,
+    description: industry.summary,
+    path: `/industries/${industry.slug}`,
+    eyebrow: "Industries",
+    cardTitle: industry.headline,
+  });
 }
 
 export default async function IndustryPage({ params }: Props) {
-  const industry = getIndustry((await params).slug);
+  const industry = find((await params).slug);
   if (!industry) notFound();
 
-  const position = industries.findIndex((i) => i.slug === industry.slug);
-  const previous = industries[(position - 1 + industries.length) % industries.length];
-  const next = industries[(position + 1) % industries.length];
-
-  const related = services.filter((s) => industry.services.includes(s.slug));
-
-  // Where this context's usual starting points actually sit on the growth arc.
-  // The heaviest stage tints the page, so two industries with different mixes
-  // do not arrive looking like the same document.
-  const plotted = STAGES.map((stage) => ({
-    ...stage,
-    items: related.filter((s) => s.group === stage.id),
-  }));
-  const focus = plotted.reduce((best, stage) =>
-    stage.items.length > best.items.length ? stage : best,
-  );
-  const leaders = plotted.filter((s) => s.items.length === focus.items.length);
-  const reading =
-    leaders.length === 1
-      ? `The usual mix here concentrates in the ${focus.label.toLowerCase()} stage.`
-      : `The usual mix here spreads across ${leaders.length} of the four stages.`;
-
-  const [headlineHead, headlineTurn] = turn(industry.priorities[0] ?? industry.summary);
-  const note = industry.priorities[1];
+  const path = `/industries/${industry.slug}`;
+  const services = industry.relevantServices
+    .map(getServicePageBySlug)
+    .filter((s): s is ServicePage => Boolean(s));
+  const routes = routesFor(industry, services);
+  const work = workIn(industry.title).slice(0, 2);
+  const index = industryPages.findIndex((i) => i.slug === industry.slug);
+  const nextIndex = (index + 1) % industryPages.length;
+  const next = industryPages[nextIndex];
+  const total = industryPages.length;
 
   return (
     <>
-      <PageHeader
-        eyebrow="Operating context"
-        title={industry.title}
-        intro={industry.summary}
-        folio={`Context ${String(position + 1).padStart(2, "0")} / ${String(
-          industries.length,
-        ).padStart(2, "0")}`}
-        chapter={focus.id}
-        breadcrumbs={[
-          { label: "Industries", href: "/industries" },
-          { label: industry.title, href: `/industries/${industry.slug}` },
-        ]}
-      />
-
-      {/* ---- intent, then the four recurring conditions ------------------ */}
-      <section
-        className="section"
-        data-material="paper"
-        data-chapter={focus.id}
-        data-station="Intent"
-      >
-        <div className="shell context-open">
-          <div className="context-open__statement reveal">
-            <p className="tick-label">Intent</p>
-            <h2 className="t-display context-open__headline">
-              {headlineHead}
-              <em>{headlineTurn}</em>
-            </h2>
-          </div>
-
-          <figure className="context-open__figure reveal">
-            <Image
-              src={stageFigures[focus.id].src}
-              alt={stageFigures[focus.id].alt}
-              width={1254}
-              height={1254}
-              sizes="(max-width: 760px) 100vw, 36vw"
-            />
-            <figcaption className="t-folio">
-              Context {String(position + 1).padStart(2, "0")} / usual center of
-              gravity: {focus.label}
-            </figcaption>
-          </figure>
-
-          <div className="context-open__friction">
-            <p className="t-label reveal">
-              Observed friction — the conditions that recur here
-            </p>
-            <ul className="quadrant">
-              {industry.challenges.map((challenge, i) => (
-                <li
-                  key={challenge}
-                  className="quadrant__cell reveal"
-                  style={{ "--i": i } as React.CSSProperties}
-                >
-                  <span className="t-folio quadrant__n">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <p className="quadrant__term">{challenge}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <section className="inx-hero tone-ink" data-tone="ink" aria-labelledby="inx-title">
+        <DepthField className="inx-hero__terrain">
+          <TerrainSvg seed={industry.slug} bridge lit={litIslands(services)} preserve="xMaxYMid slice" />
+        </DepthField>
+        <div className="inx-hero__scrim" aria-hidden="true" />
+        <div className="wrap inx-hero__inner">
+          <Crumbs
+            trail={[
+              { label: "Industries", href: "/industries" },
+              { label: industry.title, href: path },
+            ]}
+          />
+          <p className="eyebrow" data-reveal>
+            Terrain {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")} · {industry.title}
+          </p>
+          <Lines as="h1" id="inx-title" className="h1 inx-hero__title" lines={[industry.headline]} />
+          <p className="lead inx-hero__lead" data-reveal style={d(2)}>
+            {industry.summary}
+          </p>
+          <p className="inx-hero__legend mono" data-reveal style={d(3)}>
+            <span className="inx-hero__key" aria-hidden="true" />
+            Contours drawn from this industry’s name. The bridge is the same on every page.
+          </p>
         </div>
       </section>
 
-      {/* ---- where the connected work lands on the growth arc ------------ */}
-      <section
-        className="section"
-        data-material="instrument"
-        data-station="Capabilities"
-      >
-        <div className="shell">
-          <div className="doc__head reveal">
-            <p className="tick-label">Connected capabilities</p>
-            <h2 className="t-title">
-              Common starting points, plotted where they land.
-            </h2>
-            <p className="t-body">
-              Four stages, one arc. {reading} The final mix depends on the
-              business, not on the category.
-            </p>
-          </div>
-
-          <ol className="stageplot">
-            {plotted.map((stage, i) => (
-              <li
-                key={stage.id}
-                data-chapter={stage.id}
-                className={`stageplot__col${stage.items.length ? "" : " is-empty"} reveal`}
-                style={{ "--i": i } as React.CSSProperties}
-              >
-                <div className="stageplot__head">
-                  <span className="t-folio stageplot__n">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="stageplot__name">{stage.label}</h3>
-                  <p className="stageplot__note">{stage.note}</p>
-                </div>
-
-                {stage.items.length ? (
-                  <ul className="stageplot__items">
-                    {stage.items.map((service) => (
-                      <li key={service.slug}>
-                        <Link
-                          className="stageplot__item"
-                          href={`/services/${service.slug}`}
-                        >
-                          <span className="stageplot__item-title">
-                            {service.title}
-                          </span>
-                          <span className="stageplot__item-summary">
-                            {service.summary}
-                          </span>
-                          <span className="stageplot__item-go" aria-hidden="true">
-                            →
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="stageplot__empty">
-                    Not part of the usual starting mix here.
-                  </p>
-                )}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ---- the caveat this context carries, then the way out ----------- */}
-      <section className="section" data-material="paper" data-station="Note">
-        <div className="shell">
-          <div className="context-note reveal">
-            <div className="context-note__head">
-              <p className="tick-label">Note</p>
-              <h2 className="t-paper context-note__title">
-                No industry template.
-              </h2>
-            </div>
-            <div className="context-note__body">
-              {note ? <p className="t-quote context-note__pull">{note}</p> : null}
-              <p className="t-body">
-                We build around your actual customers, approvals, team,
-                software, and reporting needs.
+      <section className="section tone-paper inx-resolve" data-tone="paper" aria-labelledby="where">
+        <div className="wrap">
+          <div className="inx-resolve__head">
+            <div>
+              <p className="eyebrow" data-reveal>
+                Where it usually breaks
               </p>
-              <Link className="link" href="/process">
-                See how discovery works
-                <span aria-hidden="true">→</span>
-              </Link>
+              <Lines as="h2" id="where" className="h2" lines={["From the friction", <em key="t">to the first fix.</em>]} />
             </div>
+            <p className="body inx-resolve__note" data-reveal style={d(2)}>
+              {industry.note}
+            </p>
           </div>
-
-          <nav className="context-nav" aria-label="Other operating contexts">
-            <Link className="context-nav__side" href={`/industries/${previous.slug}`}>
-              <span className="t-label">Previous</span>
-              <span className="context-nav__name">
-                <span aria-hidden="true">← </span>
-                {previous.title}
-              </span>
-            </Link>
-            <Link className="context-nav__index t-folio" href="/industries">
-              All {industries.length} contexts
-            </Link>
-            <Link
-              className="context-nav__side context-nav__side--next"
-              href={`/industries/${next.slug}`}
-            >
-              <span className="t-label">Next</span>
-              <span className="context-nav__name">
-                {next.title}
-                <span aria-hidden="true"> →</span>
-              </span>
-            </Link>
-          </nav>
+          <ResolveMap
+            challenges={industry.challenges}
+            routes={routes.map((r) => r.targets)}
+            services={services.map((s) => {
+              const isle = getIslandForStage(s.stage);
+              return {
+                slug: s.slug,
+                route: s.route,
+                title: s.title,
+                summary: s.summary,
+                island: { id: isle.id, index: isle.index, name: isle.name },
+              };
+            })}
+          />
         </div>
       </section>
 
-      <CTASection
-        title={`What needs to work better in your ${industry.title.toLowerCase()} organization?`}
-        body="Tell us where customers, staff, information, or follow-up are getting stuck."
+      {work.length ? (
+        <section className="section tone-ink inx-work" data-tone="ink" aria-labelledby="related-work">
+          <div className="inx-work__ground" aria-hidden="true">
+            <TerrainSvg seed={`${industry.slug}-work`} cols={44} rows={25} count={10} />
+          </div>
+          <div className="wrap">
+            <p className="eyebrow" data-reveal>
+              In this terrain
+            </p>
+            <Lines
+              as="h2"
+              id="related-work"
+              className="h2"
+              lines={["Real work", <em key="s">on this ground.</em>]}
+            />
+            <TiltGroup className={`plates-2 inx-work__plates${work.length === 1 ? " is-single" : ""}`}>
+              {work.map((p) => (
+                <div className="inx-tilt" key={p.slug} data-reveal>
+                  <ProjectPlate project={p} sizes="(max-width: 900px) 92vw, 46vw" />
+                </div>
+              ))}
+            </TiltGroup>
+          </div>
+        </section>
+      ) : null}
+
+      <nav className="section--tight section tone-paper inx-nextband" data-tone="paper" aria-label="Next industry">
+        <div className="wrap">
+          <NextIndustry
+            href={`/industries/${next.slug}`}
+            title={next.title}
+            index={nextIndex}
+            total={total}
+            terrain={<TerrainSvg seed={next.slug} cols={44} rows={25} count={11} />}
+          />
+        </div>
+      </nav>
+
+      <StartBand title={["How does", <>your business <em key="r">run?</em></>]} size="h1" />
+      <JsonLd
+        data={graph(
+          webPageSchema({ name: industry.title, path, description: industry.summary }),
+          breadcrumbSchema([
+            { name: "Industries", path: "/industries" },
+            { name: industry.title, path },
+          ]),
+        )}
       />
     </>
   );

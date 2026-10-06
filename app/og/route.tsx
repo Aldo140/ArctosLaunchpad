@@ -22,10 +22,10 @@ export const dynamic = "force-static";
  * values are the only place in the codebase that is allowed to restate them;
  * if a token changes, change it here too.
  */
-const INK = "#081319"; /* --ink */
-const INK_HAIRLINE = "#14262f"; /* --ink-hairline */
-const GLACIER = "#f2f1ea"; /* --glacier */
-const SIGNAL = "#2f9bff"; /* --signal */
+const INK = "#0d1b1e"; /* --ink */
+const INK_HAIRLINE = "#1c3438"; /* --ink-3 */
+const GLACIER = "#f1ebdf"; /* --paper */
+const SIGNAL = "#e57a42"; /* --rust-hi */
 
 const SIZE = { width: 1200, height: 630 };
 

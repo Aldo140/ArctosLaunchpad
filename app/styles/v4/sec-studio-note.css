@@ -1,0 +1,472 @@
+/* ARCTOS v4 — sec-studio-note (owned by one section agent; overrides earlier sheets) */
+
+.studio-note {
+  --bg: var(--ink-deep);
+  --sn-paper: #ece4d3;
+  --sn-ink: #1b2628;
+  position: relative;
+  padding-block: var(--section);
+  background: var(--ink-deep);
+  overflow: clip; /* clip, not hidden: keeps position: sticky working */
+}
+
+.studio-note__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.42fr);
+  grid-template-areas: "copy art";
+  align-items: center;
+  gap: clamp(24px, 3vw, 56px);
+}
+
+.studio-note__copy {
+  grid-area: copy;
+  display: grid;
+  gap: clamp(18px, 2.6vh, 28px);
+  justify-items: start;
+  max-width: 500px;
+}
+
+.studio-note__title {
+  font-size: min(var(--fs-1), 8.4vh);
+}
+
+.studio-note .lead {
+  max-width: 36ch;
+}
+
+/* ---- Art plate --------------------------------------------------------- */
+
+.studio-note__art {
+  grid-area: art;
+  position: static;
+  width: auto;
+  margin: 0 calc(-1 * var(--gutter)) 0 0;
+  transform: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  perspective: 1400px;
+}
+
+.studio-note__plate {
+  position: relative;
+  aspect-ratio: 1536 / 1024;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.studio-note__plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image: radial-gradient(120% 120% at 55% 50%, #000 62%, transparent 76%);
+  mask-image: radial-gradient(120% 120% at 55% 50%, #000 62%, transparent 76%);
+}
+
+.studio-note__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Authored layers exist only once the script runs (and motion is welcome). */
+.studio-note__overlay > g,
+.studio-note__overlay > path {
+  visibility: hidden;
+}
+
+.studio-note.is-live .studio-note__overlay > g,
+.studio-note.is-live .studio-note__overlay > path {
+  visibility: visible;
+}
+
+.studio-note .sn-paper {
+  fill: var(--sn-paper);
+  stroke: var(--sn-ink);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+
+.studio-note .sn-ink {
+  fill: none;
+  stroke: var(--sn-ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.studio-note .sn-ink--thin {
+  stroke-width: 1.1;
+}
+
+.studio-note .sn-tick {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.studio-note .sn-sheet {
+  filter: drop-shadow(0 6px 5px rgb(0 0 0 / 0.45));
+}
+
+.studio-note .sn-layer__front {
+  fill: #d8cdb6;
+  stroke: var(--sn-ink);
+  stroke-width: 0.8;
+}
+
+.studio-note .sn-layer__side {
+  fill: #b9ad95;
+  stroke: var(--sn-ink);
+  stroke-width: 0.8;
+}
+
+.studio-note .sn-thread {
+  fill: none;
+  stroke: var(--rust-hi);
+  stroke-width: 3.2;
+  stroke-dasharray: 0.1 8;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+/* ---- Status: Scattered → Sorting → Sorted ----------------------------- */
+
+.studio-note__status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: clamp(4px, 1.2vh, 16px) var(--gutter) 0 4%;
+  font-family: var(--mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.studio-note__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.4s var(--ease-out);
+}
+
+.studio-note__step::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background 0.4s var(--ease-out), border-color 0.4s;
+}
+
+.studio-note__rule {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.studio-note__rule-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--rust-hi);
+  transform-origin: left;
+  transform: scaleX(1);
+}
+
+/* Static default (no JS / reduced motion): the sorted state, fully legible. */
+.studio-note:not(.is-live) .studio-note__step[data-step="2"],
+.studio-note[data-state="scattered"] .studio-note__step[data-step="0"],
+.studio-note[data-state="sorting"] .studio-note__step[data-step="1"],
+.studio-note[data-state="sorted"] .studio-note__step[data-step="2"] {
+  color: var(--fg);
+}
+
+.studio-note:not(.is-live) .studio-note__step[data-step="2"]::before,
+.studio-note[data-state="scattered"] .studio-note__step[data-step="0"]::before,
+.studio-note[data-state="sorting"] .studio-note__step[data-step="1"]::before,
+.studio-note[data-state="sorted"] .studio-note__step[data-step="2"]::before {
+  background: var(--rust-hi);
+  border-color: var(--rust-hi);
+}
+
+/* ---- Principles as sheets of paper ------------------------------------- */
+
+.studio-note__list {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio-note__list .studio-note__card {
+  --filed: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 10px;
+  padding: 13px 18px 14px 16px;
+  border: 0;
+  border-radius: 2px;
+  background:
+    linear-gradient(135deg, transparent 0 calc(100% - 14px), #cfc3aa calc(100% - 14px)) no-repeat,
+    var(--sn-paper);
+  color: var(--sn-ink);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.25), 0 14px 26px -14px rgb(0 0 0 / 0.7);
+  will-change: transform;
+}
+
+/* A rust edge marks a card as filed: the signal reaching it. */
+.studio-note__card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rust);
+  transform-origin: top;
+  transform: scaleY(var(--filed));
+}
+
+.studio-note__index {
+  padding-top: 3px;
+  font-family: var(--mono);
+  font-size: var(--fs-mono);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--rust-deep);
+}
+
+.studio-note__list h3 {
+  margin: 0 0 3px;
+  font-family: var(--sans);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--sn-ink);
+}
+
+.studio-note__list p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #3a4446;
+}
+
+@media (min-width: 1024px) {
+  .studio-note__status {
+    position: relative;
+    z-index: 1;
+    margin-top: -7%;
+  }
+}
+
+/* ---- Desktop: held stage ---------------------------------------------- */
+
+@media (min-width: 1024px) and (pointer: fine) and (min-height: 720px) {
+  .js-motion .studio-note {
+    padding-block: 0;
+  }
+
+  .js-motion .studio-note__track {
+    height: 290vh;
+  }
+
+  .js-motion .studio-note__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    padding-top: 64px;
+  }
+
+  .js-motion .studio-note__stage > .wrap {
+    width: 100%;
+  }
+
+  .js-motion .studio-note__copy {
+    gap: clamp(12px, 2.1vh, 24px);
+  }
+
+  .js-motion .studio-note__title {
+    font-size: min(var(--fs-1), 7.2vh);
+  }
+
+  .js-motion .studio-note .lead {
+    font-size: min(var(--fs-lead), 2.25vh);
+  }
+
+  .js-motion .studio-note__list .studio-note__card {
+    padding-block: min(13px, 1.4vh) min(14px, 1.5vh);
+  }
+}
+
+/* ---- Big state word (phones/tablet only) ---------------------------- */
+
+.studio-note__state {
+  display: none;
+}
+
+/* ---- Tablet / phone ---------------------------------------------------- */
+/* Headline first, then the machine holds for a short stretch (CSS sticky)
+   while the camera pans from the bear to the stack, then the principles. */
+
+@media (max-width: 1023px) {
+  .studio-note {
+    padding-block: clamp(64px, 16vw, 112px) clamp(72px, 18vw, 120px);
+  }
+
+  .studio-note__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: none;
+    gap: 20px;
+  }
+
+  .studio-note__copy {
+    display: contents;
+  }
+
+  .studio-note__copy > * {
+    max-width: 620px;
+  }
+
+  .studio-note__art {
+    grid-area: auto;
+    order: 1;
+    margin: 12px calc(-1 * var(--gutter)) 4px;
+  }
+
+  .studio-note__copy > :nth-child(n + 4) {
+    order: 2;
+  }
+
+  .studio-note__title {
+    font-size: clamp(2.7rem, 11.6vw, 5.4rem);
+  }
+
+  .studio-note .lead {
+    font-size: clamp(1.08rem, 4.3vw, 1.36rem);
+  }
+
+  .studio-note__status {
+    margin: 12px var(--gutter) 0;
+  }
+
+  .studio-note__list p {
+    font-size: 1rem;
+  }
+
+  .studio-note__list h3 {
+    font-size: 1.08rem;
+  }
+
+  .studio-note .link {
+    min-height: 44px;
+  }
+
+  .studio-note__state {
+    display: grid;
+    margin: 18px var(--gutter) 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(2rem, 9vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .studio-note__state > span {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translate3d(0, 0.35em, 0);
+    transition: opacity 0.45s var(--ease-out), transform 0.6s var(--ease-out);
+  }
+
+  .studio-note__state > [data-step="2"] {
+    color: var(--accent);
+  }
+
+  .studio-note:not(.is-live) .studio-note__state > [data-step="2"],
+  .studio-note[data-state="scattered"] .studio-note__state > [data-step="0"],
+  .studio-note[data-state="sorting"] .studio-note__state > [data-step="1"],
+  .studio-note[data-state="sorted"] .studio-note__state > [data-step="2"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Motion welcome, portrait-ish screen: a held, art-directed machine view. */
+@media (max-width: 1023px) and (min-height: 560px) {
+  .js-motion .studio-note__art {
+    --pw: min(225vw, 130svh);
+  }
+
+  .js-motion .studio-note__art::after {
+    content: "";
+    display: block;
+    height: 46svh;
+  }
+
+  .js-motion .studio-note__frame {
+    position: sticky;
+    top: 64px;
+    z-index: 1;
+    padding-bottom: 14px;
+    background: var(--ink-deep);
+  }
+
+  .js-motion .studio-note__window {
+    position: relative;
+    height: calc(var(--pw) / 1.5 * 0.76);
+    overflow: hidden;
+  }
+
+  .js-motion .studio-note__window .studio-note__plate {
+    position: absolute;
+    left: 0;
+    top: calc(var(--pw) / 1.5 * -0.15);
+    width: var(--pw);
+  }
+
+  .js-motion .studio-note__window .studio-note__plate img {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .js-motion .studio-note__window::before,
+  .js-motion .studio-note__window::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 1;
+    width: 24px;
+    background: linear-gradient(90deg, var(--ink-deep), transparent);
+    pointer-events: none;
+  }
+
+  .js-motion .studio-note__window::after {
+    inset: 0 0 0 auto;
+    background: linear-gradient(270deg, var(--ink-deep), transparent);
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-note__status {
+    gap: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .studio-note__list .studio-note__card {
+    grid-template-columns: 28px 1fr;
+    padding: 14px 16px;
+  }
+}

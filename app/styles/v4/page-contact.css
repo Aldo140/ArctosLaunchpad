@@ -1,0 +1,1986 @@
+/* ARCTOS v4 — page-contact (owned by one section agent; overrides earlier sheets)
+   Scope: /contact (.cx), /teardown (.tdh hero, .tdv visualisation, .tds steps,
+   .tdf questions) and the two forms (.cx__card .form, .tdn-sheet). */
+
+/* =========================================================================
+   CONTACT — layout
+   ========================================================================= */
+
+.cx {
+  padding-top: clamp(112px, 14vh, 156px);
+  background:
+    radial-gradient(60% 55% at 18% 62%, rgb(33 70 63 / 0.55), transparent 70%),
+    radial-gradient(40% 40% at 90% 10%, rgb(196 83 28 / 0.08), transparent 70%),
+    var(--ink);
+}
+
+.cx__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
+  grid-template-areas:
+    "head card"
+    "map card"
+    "foot card";
+  grid-template-rows: auto auto 1fr;
+  gap: 0 clamp(40px, 6vw, 104px);
+  align-items: start;
+}
+
+.cx__head {
+  grid-area: head;
+  display: grid;
+  gap: 24px;
+  justify-items: start;
+}
+
+.cx__map {
+  grid-area: map;
+  margin: clamp(12px, 2vw, 28px) 0 clamp(8px, 1.5vw, 20px);
+}
+
+.cx__foot {
+  grid-area: foot;
+  display: grid;
+  gap: 26px;
+  justify-items: start;
+}
+
+.cx__card {
+  grid-area: card;
+  position: sticky;
+  top: 92px;
+  background: transparent;
+  perspective: 1600px;
+}
+
+/* =========================================================================
+   CONTACT — the bridge map
+   ========================================================================= */
+
+.bmap {
+  --x: 50%;
+  --y: 70%;
+  --r: 0%;
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: 620px;
+}
+
+.bmap[data-island="win"] { --x: 12.5%; --y: 64%; --r: 17%; }
+.bmap[data-island="run"] { --x: 53.5%; --y: 72%; --r: 19%; }
+.bmap[data-island="see"] { --x: 89%; --y: 65%; --r: 15%; }
+
+.bmap__art {
+  position: relative;
+  aspect-ratio: 3 / 2;
+}
+
+.bmap__base,
+.bmap__lit,
+.bmap__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.bmap__base {
+  filter: saturate(0.85) brightness(0.92);
+  transition: filter 0.8s var(--ease-out);
+}
+
+.bmap:not([data-island="none"]) .bmap__base {
+  filter: saturate(0.45) brightness(0.5);
+}
+
+.bmap__lit {
+  clip-path: circle(var(--r) at var(--x) var(--y));
+  filter: drop-shadow(0 0 28px rgb(229 122 66 / 0.35));
+  transition: clip-path 0.9s var(--ease-out);
+}
+
+.bmap[data-state="delivered"] .bmap__base {
+  filter: saturate(1) brightness(1);
+}
+
+.bmap__svg {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.bmap__track {
+  stroke: rgb(241 235 223 / 0.5);
+  stroke-width: 2;
+  stroke-dasharray: 0.006 0.012;
+  stroke-linecap: round;
+}
+
+.bmap__signal {
+  stroke: var(--rust-hi);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px rgb(229 122 66 / 0.9));
+}
+
+.bmap__rings ellipse {
+  stroke: var(--rust-hi);
+  stroke-width: 2;
+  stroke-dasharray: 6 8;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.8);
+  transition: opacity 0.6s var(--ease-out), transform 0.9s var(--ease-out);
+}
+
+.bmap[data-island="win"] [data-ring="win"],
+.bmap[data-island="run"] [data-ring="run"],
+.bmap[data-island="see"] [data-ring="see"] {
+  opacity: 0.9;
+  transform: none;
+  animation: bmap-orbit 14s linear infinite;
+}
+
+@keyframes bmap-orbit {
+  to { stroke-dashoffset: -280; }
+}
+
+.bmap__dot {
+  fill: var(--bone);
+  stroke: var(--rust);
+  stroke-width: 3;
+}
+
+.bmap__halo {
+  fill: rgb(229 122 66 / 0.25);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bmap-pulse 2.2s var(--ease-out) infinite;
+}
+
+@keyframes bmap-pulse {
+  from { transform: scale(0.4); opacity: 1; }
+  to { transform: scale(1.6); opacity: 0; }
+}
+
+.bmap__stamp {
+  position: absolute;
+  right: 2%;
+  top: 40%;
+  padding: 6px 10px;
+  border-radius: 3px;
+  background: var(--rust);
+  color: var(--bone);
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px) rotate(-6deg) scale(1.4);
+  transition: opacity 0.4s 1.3s, transform 0.6s 1.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.bmap[data-state="delivered"] .bmap__stamp {
+  opacity: 1;
+  transform: rotate(-6deg);
+}
+
+.bmap__tags {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -2% 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bmap__tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 8px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.5s var(--ease-out), color 0.5s, box-shadow 0.5s, transform 0.5s var(--ease-out);
+}
+
+.bmap__idx {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+}
+
+.bmap__tags li.is-on {
+  background: var(--rust);
+  color: var(--bone);
+  box-shadow: 0 10px 30px -10px rgb(196 83 28 / 0.8);
+  transform: translateY(-3px);
+}
+
+.bmap__tags li.is-on .bmap__idx {
+  background: var(--bone);
+  color: var(--rust-deep);
+  box-shadow: none;
+}
+
+.bmap__cap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.bmap__led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: background 0.4s, box-shadow 0.4s;
+}
+
+.bmap[data-state="ready"] .bmap__led,
+.bmap[data-state="sending"] .bmap__led {
+  background: var(--rust-hi);
+  box-shadow: 0 0 0 4px rgb(229 122 66 / 0.2);
+}
+
+.bmap[data-state="delivered"] .bmap__led {
+  background: #5fc28e;
+  box-shadow: 0 0 0 4px rgb(95 194 142 / 0.22);
+}
+
+/* =========================================================================
+   CONTACT — the form as a paper object
+   ========================================================================= */
+
+.cx__sheet {
+  position: relative;
+  padding: clamp(22px, 3.2vw, 44px);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.5), transparent 140px),
+    var(--bone);
+  color: var(--ink);
+  box-shadow: var(--shadow-3), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transform-origin: 50% 0;
+  transform: rotateX(2deg) rotateY(-4deg) rotateZ(0.4deg);
+  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
+}
+
+/* Two sheets underneath: it is a pad, not a panel. */
+.cx__sheet::before,
+.cx__sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--paper-2);
+  box-shadow: var(--shadow-1);
+  transition: transform 0.9s var(--ease-out);
+}
+
+.cx__sheet::before {
+  transform: translate(10px, 10px) rotate(1.6deg);
+  background: var(--paper);
+}
+
+.cx__sheet::after {
+  transform: translate(-6px, 16px) rotate(-1.2deg);
+  opacity: 0.7;
+}
+
+.cx__sheet:hover,
+.cx__sheet:focus-within {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 6px rgb(6 14 16 / 0.12),
+    0 40px 90px -30px rgb(6 14 16 / 0.65),
+    0 0 0 1px rgb(196 83 28 / 0.12);
+}
+
+.cx__sheet:focus-within::before {
+  transform: translate(14px, 14px) rotate(2.4deg);
+}
+
+.cx__sheet:focus-within::after {
+  transform: translate(-10px, 20px) rotate(-2deg);
+}
+
+.cx__grid[data-status="success"] .cx__sheet {
+  transform: none;
+}
+
+/* ---- header + progress ---- */
+
+.cx .form__head,
+.tdn-sheet__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.cx .form__meter,
+.tdn-sheet__req {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--faint);
+}
+
+.cx .form__meter .mono {
+  font-size: 0.68rem;
+}
+
+.form__pips,
+.tdn-pips {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.form__pips i,
+.tdn-pips i {
+  display: block;
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  transition: background 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+
+.form__pips i[data-on],
+.tdn-pips i[data-on] {
+  background: var(--rust);
+  transform: scaleY(1.5);
+}
+
+.form__meter[data-filled="3"],
+.tdn-sheet__req[data-filled="3"] {
+  color: var(--rust-deep);
+  font-weight: 600;
+}
+
+/* ---- fields: ink line + tick ---- */
+
+.field__control,
+.tdn-control {
+  position: relative;
+  display: block;
+}
+
+.field__ink,
+.tdn-ink {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--rust);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-out);
+  pointer-events: none;
+}
+
+.field__control:focus-within .field__ink,
+.tdn-control:focus-within .tdn-ink {
+  transform: scaleX(1);
+}
+
+.cx .field input:focus,
+.cx .field select:focus,
+.cx .field textarea:focus,
+.tdn-field input:focus,
+.tdn-field textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--fg), 0 12px 24px -16px rgb(6 14 16 / 0.35);
+  background: #fff;
+}
+
+.cx .field [aria-invalid="true"],
+.tdn-field [aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px #a3261b;
+}
+
+.field__ok,
+.tdn-ok {
+  position: absolute;
+  right: 14px;
+  top: 17px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pine);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.3s, transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+  pointer-events: none;
+}
+
+.field__ok::after,
+.tdn-ok::after {
+  content: "";
+  position: absolute;
+  left: 6.5px;
+  top: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--bone);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.field__ok.is-ok,
+.tdn-ok.is-ok {
+  opacity: 1;
+  transform: none;
+}
+
+.cx .field input,
+.tdn-field input {
+  padding-right: 42px;
+}
+
+.cx .field label,
+.tdn-label {
+  transition: color 0.3s;
+}
+
+.cx .field:focus-within > label,
+.tdn-field:focus-within .tdn-label {
+  color: var(--rust-deep);
+}
+
+/* ---- project type chips ---- */
+
+.chips {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  gap: 12px;
+}
+
+.chips legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.chips__group {
+  display: grid;
+  grid-template-columns: 7.2em minmax(0, 1fr);
+  gap: 6px 12px;
+  align-items: start;
+}
+
+.chips__label {
+  padding-top: 11px;
+  color: var(--faint);
+  font-size: 0.62rem;
+  line-height: 1.3;
+}
+
+.chips__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.chip input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.35s var(--ease-out);
+}
+
+.chip:hover span {
+  box-shadow: inset 0 0 0 1px var(--fg);
+  transform: translateY(-1px);
+}
+
+.chip input:checked + span {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 8px 18px -10px rgb(6 14 16 / 0.7);
+}
+
+.chip input:checked + span::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--rust-hi);
+  box-shadow: 0 0 0 3px rgb(229 122 66 / 0.25);
+}
+
+.chip input:focus-visible + span {
+  outline: 2px solid var(--rust-deep);
+  outline-offset: 3px;
+}
+
+.chips[aria-invalid="true"] .chip span {
+  box-shadow: inset 0 0 0 1px #a3261b;
+}
+
+/* ---- send + receipt ---- */
+
+.cx .form__send .btn__dot {
+  transition: transform 0.45s var(--ease-out), background var(--dur);
+}
+
+.cx .form[aria-busy="true"] .form__send .btn__dot {
+  animation: cx-send 0.9s var(--ease-in-out) infinite;
+}
+
+@keyframes cx-send {
+  50% { transform: translateX(6px); }
+}
+
+.cx .receipt {
+  gap: 18px;
+  animation: cx-receipt 0.9s var(--ease-out);
+  transform-origin: 50% 0;
+}
+
+@keyframes cx-receipt {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(-14deg) translateY(26px);
+  }
+}
+
+.receipt__seal,
+.tdn-seal {
+  width: 64px;
+  height: 64px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.receipt__ring,
+.tdn-seal__ring {
+  fill: var(--pine);
+  stroke: var(--rust);
+  stroke-width: 2.5;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: cx-draw 1s 0.15s var(--ease-out) forwards;
+}
+
+.receipt__check,
+.tdn-seal__check {
+  stroke: var(--bone);
+  stroke-width: 4;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: cx-draw 0.6s 0.7s var(--ease-out) forwards;
+}
+
+@keyframes cx-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.receipt__trail {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  margin: 4px 0 4px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.receipt__trail li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.receipt__trail li span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+
+.receipt__trail li.is-done {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.receipt__trail li.is-done span {
+  background: var(--rust);
+  box-shadow: 0 0 0 4px rgb(196 83 28 / 0.18);
+}
+
+/* ---- contact responsive ---- */
+
+@media (max-width: 960px) {
+  .cx__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "map" "card" "foot";
+    grid-template-rows: none;
+  }
+
+  .cx__card {
+    position: static;
+    margin-bottom: 48px;
+  }
+
+  .cx__sheet {
+    transform: none;
+  }
+
+  .bmap {
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 560px) {
+  .cx__sheet {
+    padding: 22px 18px;
+  }
+
+  .cx__sheet::before {
+    transform: translate(5px, 8px) rotate(1deg);
+  }
+
+  .cx__sheet::after {
+    transform: translate(-4px, 12px) rotate(-0.8deg);
+  }
+
+  .chips__group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .chips__label {
+    padding-top: 6px;
+  }
+
+  .bmap__tags li {
+    padding: 5px 9px 5px 5px;
+    font-size: 0.72rem;
+    gap: 5px;
+  }
+
+  .bmap__idx {
+    width: 18px;
+    height: 18px;
+    font-size: 0.56rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .bmap__idx {
+    display: none;
+  }
+}
+
+/* =========================================================================
+   TEARDOWN — hero
+   ========================================================================= */
+
+.tdh {
+  isolation: isolate;
+}
+
+/* The ruled grid of a spreadsheet, fading out behind the headline. */
+.tdh::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgb(241 235 223 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(241 235 223 / 0.06) 1px, transparent 1px);
+  background-size: 96px 32px;
+  mask-image: radial-gradient(60% 70% at 22% 40%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(60% 70% at 22% 40%, #000, transparent 75%);
+}
+
+.tdh__gets {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.tdh__gets li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.tdh__gets li::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--rust-hi), var(--rust-hi)) center / 8px 8px no-repeat;
+  box-shadow: inset 0 0 0 1px var(--accent);
+  border-radius: 50%;
+}
+
+.tdh__jump {
+  display: inline-flex;
+  gap: 10px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.tdh__jump span {
+  transition: transform 0.4s var(--ease-out);
+}
+
+.tdh__jump:hover span {
+  transform: translateY(4px);
+}
+
+/* The teardown sheet: lifted paper, settling flat when you work in it. */
+.tdh .contact__form-plain {
+  perspective: 1600px;
+}
+
+.tdh .tdn-sheet {
+  position: relative;
+  transform: rotateX(2deg) rotateY(-4deg) rotateZ(0.4deg);
+  transform-origin: 50% 0;
+  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
+}
+
+.tdh .tdn-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--paper);
+  box-shadow: var(--shadow-1);
+  transform: translate(10px, 10px) rotate(1.6deg);
+  transition: transform 0.9s var(--ease-out);
+}
+
+.tdh .tdn-sheet:hover,
+.tdh .tdn-sheet:focus-within {
+  transform: translateY(-4px);
+}
+
+.tdh .tdn-sheet:focus-within::before {
+  transform: translate(14px, 14px) rotate(2.4deg);
+}
+
+.tdh .tdn-sheet--done {
+  transform: none;
+  animation: cx-receipt 0.9s var(--ease-out);
+}
+
+@media (max-width: 960px) {
+  .tdh .tdn-sheet {
+    transform: none;
+  }
+}
+
+/* =========================================================================
+   TEARDOWN — the offer, visualised
+   ========================================================================= */
+
+.tdv__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 48px clamp(40px, 5vw, 88px);
+  align-items: center;
+}
+
+.tdv__copy {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+.tdv__calls {
+  display: grid;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.tdv__calls li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.tdv__calls li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background: var(--rust);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.7s var(--ease-out);
+}
+
+.tdv__n {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  transition: background 0.5s, color 0.5s;
+}
+
+.tdv__title {
+  margin: 0 0 4px;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.tdv__calls p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+/* Live: the callout for the stage on screen carries the signal. */
+.tdv[data-step="1"] [data-call="1"] .tdv__n,
+.tdv[data-step="2"] [data-call="2"] .tdv__n,
+.tdv[data-step="3"] [data-call="3"] .tdv__n,
+.tdv[data-step="2"] [data-call="1"] .tdv__n,
+.tdv[data-step="3"] [data-call="1"] .tdv__n,
+.tdv[data-step="3"] [data-call="2"] .tdv__n {
+  background: var(--rust-deep);
+  color: var(--bone);
+}
+
+.tdv[data-step="1"] [data-call="1"]::after,
+.tdv[data-step="2"] [data-call="2"]::after,
+.tdv[data-step="3"] [data-call="3"]::after {
+  transform: scaleX(1);
+}
+
+/* ---- the stage ---- */
+
+.tdv__stage {
+  position: relative;
+  aspect-ratio: 7 / 5;
+  perspective: 1800px;
+}
+
+.tdv__flag {
+  position: absolute;
+  right: 0;
+  top: -30px;
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.66rem;
+}
+
+.tdv__sheet,
+.tdv__report {
+  position: absolute;
+  border-radius: var(--radius-lg);
+}
+
+/* Static composition (no JS, reduced motion): before behind, after in front. */
+.tdv__sheet {
+  left: -2%;
+  top: -4%;
+  width: 66%;
+  height: 74%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 10px;
+  background: #fffdf8;
+  box-shadow: var(--shadow-2);
+  transform: rotate(-4deg);
+  overflow: hidden;
+  font-family: var(--mono);
+}
+
+.tdv__report {
+  right: 0;
+  bottom: 0;
+  width: 78%;
+  height: 82%;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 12px;
+  padding: clamp(14px, 1.8vw, 24px);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow-3);
+}
+
+.tdv.is-live .tdv__sheet,
+.tdv.is-live .tdv__report {
+  inset: 0;
+  width: auto;
+  height: auto;
+  transform: none;
+}
+
+.tdv.is-live .tdv__sheet {
+  z-index: 3;
+}
+
+/* ---- sheet ---- */
+
+.tdv__fx {
+  display: flex;
+  gap: 12px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgb(13 27 30 / 0.15);
+  color: #4a5555;
+  font-size: 0.66rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tdv__fx span:first-child {
+  color: var(--rust-deep);
+  font-style: italic;
+}
+
+.tdv__cells {
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  min-height: 0;
+  border-top: 1px solid rgb(13 27 30 / 0.14);
+  border-left: 1px solid rgb(13 27 30 / 0.14);
+}
+
+.tdv__cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 5px;
+  border-right: 1px solid rgb(13 27 30 / 0.14);
+  border-bottom: 1px solid rgb(13 27 30 / 0.14);
+  background: #fffdf8;
+  color: #a3261b;
+  font-size: clamp(0.5rem, 0.4rem + 0.25vw, 0.66rem);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tdv__cell i {
+  display: block;
+  height: 5px;
+  border-radius: 2px;
+  background: rgb(13 27 30 / 0.28);
+}
+
+.tdv__cell--head {
+  background: #ece6d9;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tdv__cell--hi {
+  background: #f5d9a8;
+}
+
+.tdv__cell--sage {
+  background: #d6e2d3;
+}
+
+.tdv__cell--err {
+  font-weight: 600;
+}
+
+.tdv__tabs {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.tdv__tabs span {
+  padding: 4px 8px;
+  border-radius: 0 0 4px 4px;
+  background: #ece6d9;
+  color: #4a5555;
+  font-size: 0.6rem;
+  white-space: nowrap;
+}
+
+.tdv__tabs .is-on {
+  background: #fffdf8;
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--rust);
+}
+
+.tdv__note {
+  position: absolute;
+  right: 8%;
+  top: 32%;
+  padding: 14px 14px 18px;
+  background: #f5d9a8;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  box-shadow: 0 12px 20px -10px rgb(6 14 16 / 0.5);
+  transform: rotate(6deg);
+}
+
+/* ---- report ---- */
+
+.tdv__rhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(241 235 223 / 0.14);
+}
+
+.tdv__rtitle {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 0.9rem + 0.7vw, 1.6rem);
+}
+
+.tdv__rhead .mono {
+  color: var(--rust-hi);
+  font-size: 0.62rem;
+}
+
+.tdv__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tdv__tile {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--ink-2);
+  box-shadow: inset 0 0 0 1px rgb(241 235 223 / 0.1);
+}
+
+.tdv__tile .mono {
+  color: rgb(241 235 223 / 0.68);
+  font-size: 0.58rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tdv__val {
+  display: block;
+  width: 62%;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.tdv__sub {
+  display: block;
+  width: 40%;
+  height: 5px;
+  border-radius: 2px;
+  background: rgb(241 235 223 / 0.25);
+}
+
+.tdv__tile--flag {
+  box-shadow: inset 0 0 0 1px var(--rust);
+}
+
+.tdv__tile--flag .tdv__val {
+  background: var(--rust-hi);
+}
+
+.tdv__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 10px;
+  min-height: 0;
+}
+
+.tdv__chart,
+.tdv__auto {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--ink-2);
+  box-shadow: inset 0 0 0 1px rgb(241 235 223 / 0.1);
+  min-height: 0;
+}
+
+.tdv__chart .mono,
+.tdv__auto .mono {
+  color: rgb(241 235 223 / 0.68);
+  font-size: 0.58rem;
+}
+
+.tdv__chart svg {
+  width: 100%;
+  height: clamp(44px, 6vw, 84px);
+  overflow: visible;
+}
+
+.tdv__grid-line {
+  stroke: rgb(241 235 223 / 0.1);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.tdv__line {
+  fill: none;
+  stroke: var(--rust-hi);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.tdv__bars {
+  display: grid;
+  gap: 5px;
+}
+
+.tdv__bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(241 235 223 / 0.08);
+}
+
+.tdv__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--pine-hi);
+  transform-origin: left;
+}
+
+.tdv__steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: tdv;
+}
+
+.tdv__steps li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 4px;
+  background: rgb(241 235 223 / 0.05);
+  font-size: clamp(0.66rem, 0.55rem + 0.25vw, 0.8rem);
+  line-height: 1.25;
+  counter-increment: tdv;
+}
+
+.tdv__steps li span::before {
+  content: counter(tdv) ". ";
+  color: var(--rust-hi);
+  font-family: var(--mono);
+}
+
+.tdv__steps b {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--rust);
+  color: var(--bone);
+  font: 500 0.56rem/1.4 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tdv__stamp {
+  position: absolute;
+  right: -3%;
+  bottom: -6%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  width: clamp(96px, 11vw, 136px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--rust);
+  color: var(--bone);
+  box-shadow: 0 0 0 5px var(--paper), 0 0 0 6px var(--rust), var(--shadow-2);
+  font-family: var(--serif);
+  font-size: clamp(0.92rem, 0.7rem + 0.5vw, 1.2rem);
+  line-height: 1;
+  text-align: center;
+  transform: rotate(-8deg);
+}
+
+.tdv__stamp small {
+  margin-top: 6px;
+  font: 500 0.5rem/1.2 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Desktop pinned: the section is one viewport tall while it plays. */
+@media (min-width: 1024px) and (pointer: fine) and (min-height: 700px) {
+  .tdv.is-live {
+    min-height: 100vh;
+    display: grid;
+    align-items: center;
+    padding-block: 104px 56px;
+  }
+
+  .tdv.is-live .tdv__stage {
+    max-height: calc(100vh - 220px);
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .tdv__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tdv__stage {
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 560px) {
+  .tdv__stage {
+    aspect-ratio: 4 / 5;
+  }
+
+  .tdv__sheet {
+    width: 84%;
+    height: 50%;
+  }
+
+  .tdv__report {
+    width: 92%;
+    height: 66%;
+    gap: 8px;
+  }
+
+  .tdv__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tdv__tile {
+    padding: 9px;
+  }
+
+  .tdv__chart svg {
+    height: 48px;
+  }
+
+  .tdv__bars {
+    display: none;
+  }
+
+  .tdv__note {
+    font-size: 0.82rem;
+    padding: 10px 10px 14px;
+  }
+
+  .tdv.is-live .tdv__sheet,
+  .tdv.is-live .tdv__report {
+    inset: 0;
+  }
+}
+
+/* =========================================================================
+   TEARDOWN — three steps, with depth
+   ========================================================================= */
+
+.tds__list {
+  position: relative;
+  perspective: 1400px;
+}
+
+/* The signal wire that runs through the three steps. */
+.tds__list::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 31px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--rust), var(--rust-hi));
+  transform-origin: left;
+  transition: transform 1.6s var(--ease-out) 0.2s;
+}
+
+.tds .tdn-steps li.tds__card {
+  position: relative;
+  gap: 14px;
+  padding: 64px clamp(20px, 2.4vw, 32px) clamp(24px, 2.6vw, 36px);
+  border-top: 0;
+  border-radius: var(--radius-lg);
+  background: var(--pine-2);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-2);
+  transform-style: preserve-3d;
+  transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+}
+
+.tds .tdn-steps li.tds__card:hover {
+  transform: translateY(-8px) rotateX(4deg);
+  box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow-3);
+}
+
+.tds__node {
+  position: absolute;
+  left: clamp(20px, 2.4vw, 32px);
+  top: 24px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pine);
+  box-shadow: inset 0 0 0 2px var(--rust-hi), 0 0 0 6px rgb(229 122 66 / 0.14);
+}
+
+.tds__glyph {
+  position: absolute;
+  right: clamp(16px, 2vw, 28px);
+  top: 16px;
+  width: 52px;
+  height: 52px;
+  color: var(--muted);
+}
+
+.tds__glyph svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tds__glyph .g-rust {
+  stroke: var(--accent);
+}
+
+.tds .tdn-steps p {
+  color: var(--muted);
+}
+
+/* Motion: the wire draws, the cards rise and settle from a tilt. */
+.js-motion .tds__list[data-reveal]::before {
+  transform: scaleX(0);
+}
+
+.js-motion .tds__list[data-reveal].is-in::before {
+  transform: scaleX(1);
+}
+
+.js-motion .tds__list[data-reveal] .tds__card {
+  opacity: 0;
+  transform: translateY(70px) rotateX(28deg);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 1.2s var(--ease-out),
+    box-shadow 0.6s var(--ease-out);
+  transition-delay: calc(0.25s + var(--d, 0) * 0.18s);
+}
+
+.js-motion .tds__list[data-reveal].is-in .tds__card {
+  opacity: 1;
+  transform: none;
+}
+
+.js-motion .tds__list[data-reveal].is-in .tds__card:hover {
+  transform: translateY(-8px) rotateX(4deg);
+  transition-delay: 0s;
+}
+
+@media (max-width: 960px) {
+  .tds__list::before {
+    left: 31px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+    transform-origin: top;
+  }
+
+  .js-motion .tds__list[data-reveal]::before {
+    transform: scaleY(0);
+  }
+
+  .js-motion .tds__list[data-reveal].is-in::before {
+    transform: scaleY(1);
+  }
+}
+
+/* =========================================================================
+   TEARDOWN — questions that open smoothly
+   ========================================================================= */
+
+.tdn-faq .faq__item {
+  interpolate-size: allow-keywords;
+}
+
+.tdn-faq .faq__item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition: block-size 0.55s var(--ease-out), content-visibility 0.55s allow-discrete;
+}
+
+.tdn-faq .faq__item[open]::details-content {
+  block-size: auto;
+}
+
+.tdn-faq .faq__item summary {
+  position: relative;
+  transition: color 0.3s, padding-left 0.5s var(--ease-out);
+}
+
+.tdn-faq .faq__item summary::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--rust);
+  transition: width 0.5s var(--ease-out);
+}
+
+.tdn-faq .faq__item summary:hover,
+.tdn-faq .faq__item[open] summary {
+  padding-left: 22px;
+}
+
+.tdn-faq .faq__item summary:hover::before,
+.tdn-faq .faq__item[open] summary::before {
+  width: 12px;
+}
+
+/* =========================================================================
+   Reduced motion: everything settled and readable.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cx__sheet,
+  .tdh .tdn-sheet {
+    transform: none;
+  }
+
+  .bmap__rings ellipse,
+  .bmap__halo {
+    animation: none !important;
+  }
+
+  .receipt__ring,
+  .receipt__check,
+  .tdn-seal__ring,
+  .tdn-seal__check {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .tds .tdn-steps li.tds__card:hover {
+    transform: none;
+  }
+}
+
+/* ---- refinements ---- */
+.tdv__body {
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .tdv__chart svg {
+    height: clamp(84px, 9vw, 140px);
+  }
+}
+
+@media (max-width: 560px) {
+  .bmap__tags {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .tdv__stamp {
+    right: 2%;
+    bottom: -5%;
+  }
+
+  /* The proof plate's stamp hangs past the gutter on phones. */
+  .tdn-proof__stage {
+    overflow-x: clip;
+  }
+}
+
+.tdv {
+  overflow-x: clip;
+}
+
+.cx .form__extras summary span {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   MOBILE + TABLET PASS
+   ========================================================================= */
+
+/* ---- signal strip: the bridge, riding along with the card ---- */
+
+.strip {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .cx {
+    padding-top: 104px;
+  }
+
+  .cx__head {
+    gap: 18px;
+  }
+
+  .cx .cx__head .h1 {
+    font-size: clamp(3rem, 1.2rem + 9vw, 5rem);
+  }
+
+  /* Art bleeds a little past the gutter: cropped with intent, not shrunk. */
+  .cx__map {
+    margin: 8px calc(var(--gutter) * -0.6) 0;
+  }
+
+  .bmap {
+    max-width: none;
+  }
+
+  .bmap__art {
+    will-change: transform;
+  }
+
+  .bmap__cap {
+    justify-content: center;
+  }
+
+  .cx__card {
+    margin-top: 8px;
+  }
+
+  .strip {
+    position: sticky;
+    top: 68px;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0 6px 14px;
+    padding: 12px 16px 10px;
+    border-radius: 999px;
+    background: rgb(13 27 30 / 0.92);
+    color: var(--paper);
+    box-shadow: 0 14px 30px -14px rgb(6 14 16 / 0.7), inset 0 0 0 1px rgb(241 235 223 / 0.12);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .strip__rail {
+    position: relative;
+    height: 26px;
+    margin: 0 12px;
+  }
+
+  .strip__rail::before,
+  .strip__fill {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 6px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(241 235 223 / 0.22);
+  }
+
+  .strip__fill {
+    right: auto;
+    width: 100%;
+    background: var(--rust-hi);
+    box-shadow: 0 0 8px rgb(229 122 66 / 0.8);
+    transform: scaleX(var(--p));
+    transform-origin: left;
+    transition: transform 0.9s var(--ease-out);
+  }
+
+  .strip[data-state="delivered"] .strip__fill {
+    transition-duration: 1.6s;
+  }
+
+  .strip__node {
+    position: absolute;
+    top: 0;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    transform: translateX(-50%);
+  }
+
+  .strip__node[data-node="win"] { left: 0; }
+  .strip__node[data-node="run"] { left: 50%; }
+  .strip__node[data-node="see"] { left: 100%; }
+
+  .strip__node b {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: inset 0 0 0 2px rgb(241 235 223 / 0.4);
+    transition: box-shadow 0.4s, background 0.4s, transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .strip__node em {
+    font: 500 0.6875rem/1 var(--mono);
+    font-style: normal;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(241 235 223 / 0.68);
+  }
+
+  .strip__node.is-on b {
+    background: var(--rust);
+    box-shadow: 0 0 0 4px rgb(229 122 66 / 0.28);
+    transform: scale(1.15);
+  }
+
+  .strip__node.is-on em {
+    color: var(--rust-hi);
+  }
+
+  .strip__dot {
+    position: absolute;
+    top: 1px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: var(--bone);
+    box-shadow: 0 0 0 3px var(--rust), 0 0 14px 2px rgb(229 122 66 / 0.8);
+    left: calc(var(--p) * 100%);
+    transition: left 0.9s var(--ease-out);
+  }
+
+  .strip[data-state="delivered"] .strip__dot {
+    transition-duration: 1.6s;
+  }
+
+  .strip__cap {
+    min-width: 7.5em;
+    color: rgb(241 235 223 / 0.78);
+    font-size: 0.6875rem;
+    text-align: right;
+  }
+
+  .strip[data-state="ready"] .strip__cap,
+  .strip[data-state="sending"] .strip__cap {
+    color: var(--rust-hi);
+  }
+
+  .strip[data-state="delivered"] .strip__cap {
+    color: #7fd6a6;
+  }
+
+  /* Thumb-sized chips. */
+  .chip span {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 0.95rem;
+  }
+
+  .chips__label {
+    font-size: 0.6875rem;
+  }
+
+  .cx .form__meter .mono {
+    font-size: 0.6875rem;
+  }
+
+  .cx .form__intro {
+    font-size: 1.45rem;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 960px) {
+  /* Tablet: the card gets room to breathe and the art leads like a plate. */
+  .cx__card {
+    max-width: 640px;
+    width: 100%;
+    justify-self: center;
+  }
+
+  .cx__map {
+    margin-inline: 0;
+  }
+
+  .bmap {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  .bmap__tags {
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .cx__foot {
+    max-width: 640px;
+    width: 100%;
+    justify-self: center;
+  }
+
+}
+
+/* ---- teardown: sticky scrubbed stage on touch / narrow ---- */
+
+.tdv__track {
+  position: relative;
+}
+
+.tdv__now {
+  display: none;
+}
+
+@media (max-width: 1023px), (pointer: coarse) {
+  .tdv.is-scrub .tdv__track {
+    height: calc(var(--stage-h, 120vw) + 170svh);
+    margin-top: 12px;
+  }
+
+  .tdv.is-scrub .tdv__stage {
+    position: sticky;
+    top: 76px;
+    margin-top: 40px;
+  }
+
+  .tdv.is-scrub .tdv__now {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -52px;
+    display: grid;
+    justify-items: center;
+    margin: 0;
+    font-size: 0.6875rem;
+  }
+
+  .tdv__now span {
+    grid-area: 1 / 1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s, transform 0.5s var(--ease-out);
+  }
+
+  .tdv:not([data-step]) [data-now="0"],
+  .tdv[data-step="0"] [data-now="0"],
+  .tdv[data-step="1"] [data-now="1"],
+  .tdv[data-step="2"] [data-now="2"],
+  .tdv[data-step="3"] [data-now="3"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .tdv[data-step="1"] [data-now="1"],
+  .tdv[data-step="2"] [data-now="2"],
+  .tdv[data-step="3"] [data-now="3"] {
+    background: var(--rust-deep);
+    color: var(--bone);
+  }
+
+  /* The report sizes to its content: no tall, empty panel. */
+  .tdv.is-scrub .tdv__report {
+    bottom: auto;
+    align-content: start;
+    grid-template-rows: auto;
+  }
+
+  .tdv.is-scrub .tdv__steps li {
+    min-height: 34px;
+    box-shadow: inset 0 0 0 1px rgb(241 235 223 / 0.1);
+  }
+}
+
+@media (max-width: 1023px) and (min-width: 561px) {
+  .tdv__stage {
+    max-width: 680px;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .tdv__copy {
+    max-width: 680px;
+  }
+
+  .tdv__calls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 20px;
+  }
+
+  .tdv__calls li {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .tdv__tile .mono,
+  .tdv__chart .mono,
+  .tdv__auto .mono,
+  .tdv__rhead .mono {
+    font-size: 0.6875rem;
+  }
+
+  .tdv__tiles {
+    gap: 6px;
+  }
+
+  .tdv__tile .mono {
+    letter-spacing: 0.04em;
+    white-space: normal;
+    line-height: 1.25;
+    min-height: 2.5em;
+  }
+
+  .tdv__steps li {
+    font-size: 0.82rem;
+  }
+
+  .tdv__cell {
+    font-size: 0.6875rem;
+  }
+
+  .tdv__flag {
+    font-size: 0.6875rem;
+  }
+
+  .tdh .tdh__gets li {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip__fill,
+  .strip__dot {
+    transition: none;
+  }
+}
+
+/* overflow: hidden on .contact made it a scroll container and broke sticky. */
+.cx {
+  overflow: clip;
+}
+
+@media (max-width: 960px) {
+  .cx .bmap__cap {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px), (pointer: coarse) {
+  .tdv.is-scrub .tdv__flag {
+    top: auto;
+    bottom: -88px;
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 960px) {
+  .tdh .h1 {
+    font-size: clamp(2.7rem, 1rem + 8.4vw, 4.6rem);
+  }
+
+  .tdh {
+    padding-top: 104px;
+  }
+}

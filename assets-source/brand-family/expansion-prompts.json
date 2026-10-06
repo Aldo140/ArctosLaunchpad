@@ -1,0 +1,20 @@
+{
+  "generator": "Built-in image_gen",
+  "assets": [
+    {
+      "key": "paper-fibres",
+      "transparent": false,
+      "prompt": "Use case: texture. Create an exceptionally restrained premium warm ivory uncoated cotton paper texture for a website background, landscape. Flat evenly lit scanned surface only, no objects, no shadows, no vignette, no border, no lettering. Base colour #f1ebdf, extremely fine natural fibres and subtle irregular grain, almost imperceptible tonal variation. Quiet tactile editorial paper, not parchment, no stains or heavy mottling. Consistent brightness edge to edge."
+    },
+    {
+      "key": "bridge-keystone",
+      "transparent": true,
+      "prompt": "Use case: brand detail, transparent cutout. Use image 1 as exact material and palette reference. Create a single small sculptural rust-orange folded-paper architectural bridge arch on one deep sage floating stone-paper island, a cream inset deck passing through its arch and one tiny orange signal sphere at one end. No bear, no environment, no words, no badge or containing shape. Strong compact asymmetric silhouette designed as an editorial brand punctuation mark, handcrafted black ink outline and fine paper speckles. Cream #e7e2d7, rust #c1541f, sage #336a61. All object within frame, generous transparent margins. Sophisticated midcentury linocut and paper collage, no photorealistic plastic or glow."
+    },
+    {
+      "key": "reporting-observatory",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Image 1 is exact approved Arctos style reference: intelligent cream polar bear, hand ink outline, rust-orange folded architecture and deep sage floating paper islands with tactile speckles. New scene 'see what matters': a cream polar bear standing behind a broad rust-orange open architectural viewing frame on a sage floating island. The bear carefully aligns three cream rising rectangular paper pillars visible through the frame, each topped with a small sage or orange node, connected by one elegant thin cream route. One smaller island to the left feeds a cream folded parcel into the scene over a low orange bridge. Clear calm metaphor for trustworthy reporting and visibility. Wide 3:2 composition, all parts within canvas. True transparent background, no text, no numbers, no charts on screens, no devices, no logos, no containing badge, no glow. Match the reference bear and paper construction faithfully."
+    }
+  ]
+}

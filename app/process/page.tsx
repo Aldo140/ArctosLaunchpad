@@ -1,11 +1,88 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { CTASection } from "@/components/CTASection";
+import type { CSSProperties } from "react";
+import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo";
 import { processDetails } from "@/lib/content";
-import { pageMetadata, breadcrumbSchema, graph, jsonLd, webPageSchema } from "@/lib/seo";
-export const metadata: Metadata = pageMetadata({title:"Process",description:"Understand the business, design the right system, build and launch it, then improve it in daily use.",path:"/process"});
-export default function ProcessPage(){return <div className="v3-page">
-<section className="v3-page-lead" data-material="paper" data-station="Process"><div className="v3-wrap"><p className="v3-kicker">How we work together</p><h1>A clear plan.<br /><em>A working system.</em></h1><p>Start with the business problem. Make the decisions visible. Build something useful, then put it into daily use.</p><Link className="v3-text-link" href="/contact">Discuss your project<span aria-hidden="true">↗</span></Link></div></section>
-<section className="v3-section" data-material="instrument" data-station="The route"><div className="v3-wrap"><p className="v3-kicker">From the first conversation to everyday use</p><div className="v3-route">{processDetails.map(step=><article key={step.id}><span className="v3-route__number">{step.index}</span><div><h2>{step.title}</h2><p>{step.summary}</p><p className="v3-small">{step.detail}</p></div><div className="v3-route__outputs"><p className="v3-kicker">What it leaves you with</p><ul>{step.deliverables.map(item=><li key={item}>{item}</li>)}</ul></div></article>)}</div></div></section>
-<section className="v3-section" data-material="paper" data-station="The starting point"><div className="v3-wrap v3-editorial-split"><h2>The scope follows<br /><span>the problem.</span></h2><div><p>A new website is a different engagement from a reporting tool or a customer portal. We work out the priorities, responsibilities and technical approach before the build.</p><p>Have a reporting problem and want a smaller first step? Start with the free reporting teardown.</p><Link className="v3-text-link" href="/teardown">What the teardown includes<span aria-hidden="true">↗</span></Link></div></div></section>
-<CTASection title="Tell us where the work gets stuck." /><script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(graph(webPageSchema({name:"Process",path:"/process",description:"The Arctos engagement process."}),breadcrumbSchema([{name:"Process",path:"/process"}])))} /></div>;}
+import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
+import { ProcessHero } from "@/components/site/process/ProcessHero";
+import { Journey } from "@/components/site/process/Journey";
+import { Shapes } from "@/components/site/process/Shapes";
+import { Lines, TextLink, d } from "@/components/site/ui";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Process",
+  description:
+    "Understand the business, map where the work gets stuck, design the right system, build and launch it, then improve it in daily use.",
+  path: "/process",
+  cardTitle: "One route, six stops.",
+});
+
+export default function ProcessPage() {
+  return (
+    <>
+      <ProcessHero crumbs={<Crumbs trail={[{ label: "Process", href: "/process" }]} />} />
+
+      <section className="pj-journey tone-paper" data-tone="paper" aria-labelledby="pj-route">
+        <div className="wrap pj-journey__head">
+          <p className="eyebrow" data-reveal>
+            The route, stop by stop
+          </p>
+          <Lines as="h2" id="pj-route" className="h1" lines={["Six stops.", <em key="r">Laid plank by plank.</em>]} />
+          <p className="body pj-journey__intro" data-reveal style={d(2)}>
+            Each stop ends with something the team can see and check before the next one starts: a map,
+            a plan, a working system, then what real use teaches.
+          </p>
+        </div>
+        <Journey />
+      </section>
+
+      <section className="pjs-section section tone-ink" data-tone="ink" aria-labelledby="shapes">
+        <div className="wrap">
+          <div className="pjs-section__head">
+            <p className="eyebrow" data-reveal>
+              Same route, different shapes
+            </p>
+            <Lines as="h2" id="shapes" className="h2" lines={["Every project", <em key="d">weighs the stops differently.</em>]} />
+          </div>
+          <Shapes />
+        </div>
+      </section>
+
+      <section className="pjo section--tight section tone-pine" data-tone="pine" aria-labelledby="pjo-title">
+        <div className="wrap pjo__grid">
+          <div>
+            <p className="eyebrow" data-reveal>
+              A smaller first step
+            </p>
+            <Lines as="h2" id="pjo-title" className="h2" lines={["Try the first two stops", <em key="f">for free.</em>]} />
+          </div>
+          <div className="pjo__side" data-reveal style={d(2)}>
+            <ol className="pjo__route" aria-label="What the teardown covers">
+              {processDetails.map((step, i) => (
+                <li key={step.id} className={i < 2 ? "is-free" : ""} style={{ "--i": i } as CSSProperties}>
+                  <span className="pjo__dot" aria-hidden="true" />
+                  <span className="pjo__name">
+                    {step.index} {step.title}
+                  </span>
+                  {i < 2 ? <span className="visually-hidden"> (included)</span> : null}
+                </li>
+              ))}
+            </ol>
+            <p className="body">
+              The reporting teardown is Discover and Map on one spreadsheet: we show you the one-screen
+              report it should be and the first three manual steps we would automate.
+            </p>
+            <TextLink href="/teardown">Get the free teardown</TextLink>
+          </div>
+        </div>
+      </section>
+
+      <StartBand title={["Tell us where", <>the work gets <em key="s">stuck.</em></>]} size="h1" />
+      <JsonLd
+        data={graph(
+          webPageSchema({ name: "Process", path: "/process", description: "The Arctos engagement process." }),
+          breadcrumbSchema([{ name: "Process", path: "/process" }]),
+        )}
+      />
+    </>
+  );
+}

@@ -1,0 +1,993 @@
+/* ARCTOS v4 — page-work (owned by one section agent; overrides earlier sheets)
+   /work: the floating-captures hero, the editorial wall of plates, Flip
+   filtering, depth/tilt cards and the animated typeset figures (the figures
+   are also used on case studies and /teardown, so they are unscoped). */
+
+/* =========================================================================
+   Hero — every real capture at its own depth
+   ========================================================================= */
+
+.whero {
+  position: relative;
+  display: flex;
+  min-height: max(780px, 100svh);
+  padding: clamp(112px, 14vh, 160px) 0 clamp(48px, 6vw, 88px);
+  overflow: hidden;
+  background:
+    radial-gradient(60% 55% at 74% 34%, rgb(196 83 28 / 0.12), transparent 70%),
+    radial-gradient(50% 60% at 90% 90%, rgb(33 70 63 / 0.45), transparent 70%),
+    var(--ink);
+}
+
+.whero__field {
+  position: absolute;
+  inset: 70px 0 0;
+  z-index: 0;
+  pointer-events: none;
+  perspective: 1200px;
+}
+
+.whero__tile {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  z-index: calc(var(--z) * 10);
+  filter: brightness(calc(0.42 + var(--z) * 0.5)) saturate(calc(0.6 + var(--z) * 0.4))
+    blur(max(0px, calc((0.7 - var(--z)) * 4px)));
+  will-change: transform;
+}
+
+.whero__inner {
+  position: relative;
+  aspect-ratio: 1280 / 682;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ink-2);
+  box-shadow:
+    0 0 0 1px rgb(241 235 223 / 0.08),
+    0 30px 70px -26px rgb(0 0 0 / 0.8),
+    0 40px 120px -40px color-mix(in srgb, var(--plate), #fff 18%);
+  will-change: transform;
+}
+
+.whero__inner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.whero__tile--phone .whero__inner {
+  aspect-ratio: 390 / 844;
+  border-radius: clamp(9px, 1vw, 16px);
+  box-shadow:
+    0 0 0 clamp(2px, 0.3vw, 5px) #0a1416,
+    0 0 0 clamp(3px, 0.36vw, 6px) rgb(241 235 223 / 0.16),
+    0 30px 60px -20px rgb(0 0 0 / 0.85);
+}
+
+/* A scrim under the type, so captures never cost the title its contrast. */
+.whero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent 38%, rgb(13 27 30 / 0.78) 66%, var(--ink) 96%),
+    linear-gradient(90deg, rgb(13 27 30 / 0.85) 0%, rgb(13 27 30 / 0.4) 34%, transparent 58%);
+}
+
+.whero__grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: clamp(18px, 2.4vw, 32px);
+}
+
+.whero__top {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+
+.whero__top .crumbs ol {
+  margin: 0;
+}
+
+.whero__title {
+  grid-row: 3;
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3.1rem, 0.6rem + 8.4vw, 9.8rem);
+  line-height: 0.9;
+  letter-spacing: -0.042em;
+
+}
+
+.whero__line {
+  display: block;
+}
+
+.whero__title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.whero__count {
+  display: inline-block;
+  min-width: 0.56em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.whero__foot {
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 32px clamp(40px, 7vw, 120px);
+  align-items: end;
+  padding-top: clamp(8px, 1.4vw, 20px);
+}
+
+.whero__lead {
+  max-width: 40ch;
+}
+
+.whero__ledger {
+  display: grid;
+  gap: 18px;
+}
+
+.whero__strip {
+  display: flex;
+  gap: 5px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.whero__cell {
+  flex: 1;
+  border-radius: 3px;
+  background: var(--sage);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+}
+
+.whero__cell--live {
+  background: linear-gradient(180deg, #74d3a1, #3f9c6b);
+}
+
+.whero__cell--internal {
+  background: linear-gradient(180deg, #c9d4c9, #8e9e8f);
+}
+
+.whero__cell--studio {
+  background: linear-gradient(180deg, var(--rust-hi), var(--rust));
+}
+
+.whero__legend {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.whero__row {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.whero__row dd {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 0;
+}
+
+.whero__n {
+  min-width: 1.2ch;
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--fg);
+}
+
+.whero__def {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .whero {
+    min-height: 0;
+    padding-top: 100px;
+  }
+
+  .whero__field {
+    inset: 160px 0 auto;
+    height: 96vw;
+  }
+
+  .whero__tile {
+    left: var(--mx);
+    top: var(--my);
+    width: var(--mw);
+  }
+
+  .whero::after {
+    background: linear-gradient(180deg, transparent 0, transparent calc(160px + 60vw), rgb(13 27 30 / 0.88) calc(160px + 86vw), var(--ink) calc(160px + 100vw));
+  }
+
+  .whero__title {
+    margin-top: calc(66vw);
+    font-size: clamp(2.9rem, 1rem + 9vw, 5rem);
+  }
+
+  .whero__foot {
+    grid-template-columns: 1fr;
+  }
+
+  .whero__row {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  .whero__row dd {
+    gap: 12px;
+  }
+
+  .whero__n {
+    font-size: 1.4rem;
+  }
+
+  .whero__def {
+    font-size: 0.86rem;
+  }
+}
+
+/* =========================================================================
+   The wall — editorial rhythm, recomposed per filter
+   ========================================================================= */
+
+.wx {
+  position: relative;
+}
+
+.wx .wfilter {
+  position: sticky;
+  isolation: isolate;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-radius: 999px;
+  background: rgb(19 38 41 / 0.86);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+
+.wx .wfilter::-webkit-scrollbar {
+  display: none;
+}
+
+.wfilter__ind {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+}
+
+.wx .wfilter__btn {
+  position: relative;
+  flex: none;
+  white-space: nowrap;
+}
+
+.wx .wfilter[data-ready] .wfilter__btn[aria-pressed="true"] {
+  background: transparent;
+  transition: color 0.4s var(--ease-out) 0.1s;
+}
+
+.wx .wgrid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(72px, 8vw, 150px) clamp(20px, 3vw, 48px);
+  align-items: start;
+}
+
+.wx .wgrid__item {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  min-width: 0;
+}
+
+.wx .wgrid__item--lead {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 1200px) {
+  .wx .wgrid__item--a { grid-column: 1 / span 7; }
+  .wx .wgrid__item--b { grid-column: 9 / span 4; margin-top: clamp(120px, 14vw, 240px); }
+  .wx .wgrid__item--c { grid-column: 2 / span 5; }
+  .wx .wgrid__item--d { grid-column: 7 / span 6; margin-top: clamp(100px, 11vw, 190px); }
+  .wx .wgrid__item--e { grid-column: 4 / span 9; }
+}
+
+@media (min-width: 901px) and (max-width: 1199px) {
+  .wx .wgrid__item--a { grid-column: 1 / span 7; }
+  .wx .wgrid__item--b { grid-column: 8 / span 5; margin-top: 140px; }
+  .wx .wgrid__item--c { grid-column: 1 / span 6; }
+  .wx .wgrid__item--d { grid-column: 7 / span 6; margin-top: 120px; }
+  .wx .wgrid__item--e { grid-column: 3 / span 10; }
+}
+
+/* Neutralise case.css's odd-child offset — the slots own the rhythm now. */
+@media (min-width: 901px) {
+  .wx .wgrid:has(.wgrid__item--lead:first-child) .wgrid__item:not(.wgrid__item--lead):nth-child(odd) {
+    margin-top: 0;
+  }
+
+  .wx .wgrid .wgrid__item--b,
+  .wx .wgrid .wgrid__item--d {
+    margin-top: clamp(110px, 12vw, 220px) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .wx .wgrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 72px;
+  }
+
+  .wx .wgrid__item {
+    grid-column: 1;
+  }
+
+  .wx .wgrid__item--b,
+  .wx .wgrid__item--d {
+    width: 90%;
+    justify-self: end;
+  }
+
+  .wx .wgrid__item--c {
+    width: 94%;
+  }
+
+  .wx .wfilter {
+    top: 66px;
+    border-radius: 999px;
+  }
+}
+
+/* The narrow slot gets a taller stage so the captures still read. */
+.wx .wgrid__item--b .stage {
+  aspect-ratio: 4 / 3.6;
+}
+
+.wx .wgrid__item--b .stage__screen {
+  left: 7%;
+  top: 10%;
+  width: 82%;
+}
+
+.wx .wgrid__item--b .stage__phone {
+  right: 6%;
+  width: 30%;
+}
+
+.wx .wgrid__item--e .stage {
+  aspect-ratio: 16 / 8.6;
+}
+
+.wx .wgrid__item--e .stage__screen {
+  width: 66%;
+}
+
+.wx .wgrid__item--e .stage__phone {
+  right: 10%;
+  width: 18%;
+}
+
+/* ---- Card meta: an editorial caption, not a footer ------------------- */
+
+.wx .plate__meta {
+  position: relative;
+}
+
+.wx .plate .index {
+  font-size: 0.78rem;
+}
+
+.wx .plate__row::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), transparent);
+}
+
+.wx .wgrid__item--lead .plate__title {
+  font-size: clamp(2.2rem, 1rem + 3.6vw, 4.4rem);
+}
+
+/* ---- Depth: glow, sheen, tilt ---------------------------------------- */
+
+.wx .plate__link {
+  position: relative;
+  isolation: isolate;
+}
+
+.wx .plate__link::before {
+  content: "";
+  position: absolute;
+  inset: 12% 8% -6%;
+  z-index: -1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--plate), #fff 22%);
+  filter: blur(70px);
+  opacity: 0.18;
+  transition: opacity 0.8s var(--ease-out);
+  pointer-events: none;
+}
+
+.wx .plate__link:hover::before,
+.wx .plate__link:focus-visible::before {
+  opacity: 0.62;
+}
+
+.wx .stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(45% 55% at var(--mx, 50%) var(--my, 30%), rgb(255 255 255 / 0.13), transparent 72%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.wx .plate__link:hover .stage::before {
+  opacity: 1;
+}
+
+/* JS owns the transforms while tilt is on; CSS transitions would fight it. */
+.wx.is-tilt .stage,
+.wx.is-tilt .stage__screen,
+.wx.is-tilt .stage__phone,
+.wx.is-tilt .fig-report__sheet,
+.wx.is-tilt .fig-flow ol {
+  transition: none;
+}
+
+.wx.is-tilt .plate__link {
+  cursor: none;
+}
+
+.wx.is-tilt .plate__link:hover .stage__screen,
+.wx.is-tilt .plate__link:hover .stage__phone {
+  transform: none;
+}
+
+.wx.is-tilt .plate__link:hover .stage__phone {
+  transform: rotate(-3deg);
+}
+
+/* ---- "View case" cursor ---------------------------------------------- */
+
+.wx-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 0.66rem/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 0 8px rgb(241 235 223 / 0.14), 0 20px 40px -10px rgb(0 0 0 / 0.6);
+}
+
+.wx.is-tilt .wx-cursor {
+  display: grid;
+}
+
+/* =========================================================================
+   Typeset figures (Fresh Prep, LeaseFlow) — honest, and alive
+   ========================================================================= */
+
+.stage--figure {
+  container-type: inline-size;
+}
+
+.fig-report__deck {
+  position: relative;
+}
+
+.fig-report__sheet {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    9px 9px 0 -3px #ddd4c2,
+    18px 18px 0 -6px #c3b9a5,
+    var(--shadow-3);
+}
+
+.fig-report__cols,
+.fig-report__rows > div {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(4, 1fr);
+  gap: 10px;
+}
+
+.fig-report__cols .mono {
+  font-size: 0.48rem;
+  color: #5d6664;
+  letter-spacing: 0.06em;
+}
+
+.fig-report__rows > div:not(.fig-report__cols) {
+  padding-top: 7px;
+  border-top: 1px solid rgb(13 27 30 / 0.07);
+}
+
+.fig-report__tiles i,
+.fig-report__rows i {
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--ink) 0 70%, #2a3b3e);
+}
+
+.fig-report__scan {
+  position: absolute;
+  inset: -40% 0 auto;
+  height: 40%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgb(196 83 28 / 0.1) 70%, rgb(196 83 28 / 0.28) 98%, transparent);
+  opacity: 0;
+}
+
+.fig-report__stamp {
+  position: absolute;
+  right: -2%;
+  bottom: 14%;
+  z-index: 2;
+  padding: 8px 12px;
+  border: 2px solid var(--rust);
+  border-radius: 3px;
+  background: rgb(248 244 236 / 0.94);
+  color: var(--rust-deep);
+  font-size: clamp(0.52rem, 0.9cqi, 0.7rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  transform: rotate(-7deg);
+  box-shadow: 0 14px 30px -10px rgb(0 0 0 / 0.55);
+}
+
+@container (max-width: 460px) {
+  .fig-report__cols,
+  .fig-report__tiles .mono {
+    display: none;
+  }
+
+  .fig-report__tiles div {
+    padding: 6px;
+  }
+
+  .fig-report__rows > div:nth-child(n + 4) {
+    display: none;
+  }
+
+  .fig-report__stamp {
+    right: 3%;
+    padding: 6px 8px;
+  }
+}
+
+.js-motion .fig-report.is-in .fig-report__sheet {
+  animation: fig-sheet 1.3s var(--ease-out) backwards;
+}
+
+.js-motion .fig-report.is-in .fig-report__tiles i,
+.js-motion .fig-report.is-in .fig-report__rows i {
+  animation: fig-redact 0.8s var(--ease-out) backwards;
+  animation-delay: calc(0.45s + var(--i, 0) * 0.05s);
+}
+
+.js-motion .fig-report.is-in .fig-report__chart .line {
+  stroke-dasharray: 1;
+  animation: fig-draw 1.8s var(--ease-in-out) 0.6s backwards;
+}
+
+.js-motion .fig-report.is-in .fig-report__stamp {
+  animation: fig-stamp 0.9s var(--ease-out) 1.9s backwards;
+}
+
+.js-motion .fig-report.is-in .fig-report__scan {
+  animation: fig-scan 5.5s var(--ease-in-out) 2.8s infinite;
+}
+
+@keyframes fig-sheet {
+  from {
+    transform: rotate(-5deg) translateY(34px);
+  }
+}
+
+@keyframes fig-redact {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fig-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes fig-stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-16deg) scale(1.9);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(0.94);
+  }
+}
+
+@keyframes fig-scan {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  55%,
+  100% {
+    opacity: 1;
+    transform: translateY(350%);
+  }
+}
+
+/* ---- LeaseFlow: the signal travels the flow -------------------------- */
+
+.fig-flow ol {
+  padding-bottom: 30px;
+}
+
+.fig-flow ol::before {
+  top: auto;
+  bottom: 9px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  transform-origin: 0 50%;
+}
+
+.fig-flow li::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(var(--rust-hi), transparent);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.fig-flow li:nth-child(2)::after {
+  height: calc(40px + 14%);
+}
+
+.fig-flow ol::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 8%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--bone);
+  box-shadow: 0 0 0 4px var(--rust-hi), 0 0 26px 8px rgb(229 122 66 / 0.7);
+}
+
+.js-motion .fig-flow.is-in ol::before {
+  animation: fig-redact 1.2s var(--ease-out) 0.3s backwards;
+}
+
+.js-motion .fig-flow.is-in li {
+  animation: fig-stop 0.9s var(--ease-out) backwards;
+  animation-delay: calc(0.2s + var(--i) * 0.18s);
+}
+
+.js-motion .fig-flow.is-in ol::after {
+  animation: fig-signal 4.8s linear 1.2s infinite backwards;
+}
+
+.js-motion .fig-flow.is-in li .index {
+  animation: fig-lit 4.8s ease-out infinite;
+  animation-delay: calc(1.2s + 0.37s + var(--i) * 1.44s);
+}
+
+@keyframes fig-stop {
+  from {
+    opacity: 0;
+    translate: 0 30px;
+  }
+}
+
+@keyframes fig-signal {
+  0% {
+    left: 8%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  76% {
+    left: 92%;
+    opacity: 1;
+  }
+  86%,
+  100% {
+    left: 92%;
+    opacity: 0;
+  }
+}
+
+@keyframes fig-lit {
+  0% {
+    color: var(--bone);
+    background: var(--rust);
+    box-shadow: 0 0 0 4px var(--rust), 0 0 20px 4px rgb(229 122 66 / 0.6);
+  }
+  30%,
+  100% {
+    color: var(--rust-deep);
+    background: transparent;
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+.fig-flow .index {
+  justify-self: start;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+@container (max-width: 460px) {
+  .fig-flow ol {
+    gap: 8px;
+  }
+
+  .fig-flow li {
+    padding: 10px 8px;
+  }
+
+  .fig-flow__name {
+    font-size: 0.86rem;
+  }
+
+  .fig-flow__note {
+    display: none;
+  }
+}
+
+@container (max-width: 460px) {
+  .fig-report__rows > .fig-report__cols {
+    display: none;
+  }
+}
+
+.fig-report__tiles i {
+  min-width: 34px;
+  height: 14px;
+}
+
+/* On phones the typeset figures get the height they need instead of a
+   letterbox they would spill out of. */
+@media (max-width: 900px) {
+  .wx .wgrid__item .stage--figure {
+    aspect-ratio: auto;
+    min-height: 62vw;
+    padding: 34px 18px 26px;
+  }
+}
+
+.whero__row .status {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .whero__row {
+    grid-template-columns: 124px minmax(0, 1fr);
+  }
+}
+
+.wx .plate {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* =========================================================================
+   Mobile + tablet pass
+   ========================================================================= */
+
+/* Touch: scroll owns the card transforms, so CSS transitions and the sticky
+   :hover lift from work.css must not fight it. */
+.wx.is-scroll .stage,
+.wx.is-scroll .stage__screen,
+.wx.is-scroll .stage__phone,
+.wx.is-scroll .fig-report__stamp {
+  transition: none;
+  will-change: transform;
+}
+
+.wx.is-scroll .plate__link:hover .stage__screen,
+.wx.is-scroll .plate__link:hover .stage__phone {
+  transform: none;
+}
+
+@media (max-width: 900px) {
+  /* Hero: no blur filters on phones; depth reads from brightness and scale. */
+  .whero__tile {
+    filter: brightness(calc(0.45 + var(--z) * 0.48)) saturate(calc(0.65 + var(--z) * 0.35));
+  }
+
+  .whero__ledger {
+    gap: 14px;
+  }
+
+  .whero__strip {
+    height: 34px;
+    gap: 4px;
+  }
+
+  /* Ledger rows: label and count on one line, definition beneath. */
+  .whero__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "dt n" "def def";
+    row-gap: 6px;
+    align-items: center;
+  }
+
+  .whero__row dt {
+    grid-area: dt;
+  }
+
+  .whero__row dd {
+    display: contents;
+  }
+
+  .whero__n {
+    grid-area: n;
+    font-size: 1.6rem;
+  }
+
+  .whero__def {
+    grid-area: def;
+    font-size: 0.95rem;
+  }
+
+  /* Filter bar: a thumb-sized swipe strip that hints there is more. */
+  .wx .wfilter {
+    -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, #000 82%, transparent);
+    padding-right: 40px;
+  }
+
+  .wx .wfilter__btn {
+    height: 44px;
+    font-size: 0.92rem;
+  }
+
+  .wx .plate__summary {
+    font-size: 1rem;
+  }
+
+  .wx .plate__meta {
+    padding-top: 28px;
+  }
+
+  /* Phones sit a little larger on the near plane so they read at 390px. */
+  .wx .stage__phone {
+    width: 25%;
+    right: 5%;
+  }
+
+  .wx .wgrid__item--b .stage:not(.stage--figure),
+  .wx .wgrid__item--e .stage:not(.stage--figure) {
+    aspect-ratio: 16 / 10.4;
+  }
+
+  .wx .wgrid__item--b .stage__screen,
+  .wx .wgrid__item--e .stage__screen {
+    left: 6%;
+    top: 9%;
+    width: 72%;
+  }
+}
+
+/* Tablet portrait: give the hero field room and pair the narrow slots. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .whero__field {
+    height: 78vw;
+  }
+
+  .whero__title {
+    margin-top: 56vw;
+    font-size: clamp(4rem, 1rem + 9vw, 6.4rem);
+  }
+
+  .whero__foot {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .wx .wgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+  }
+
+  .wx .wgrid__item {
+    grid-column: 1 / -1;
+    width: auto;
+    justify-self: stretch;
+  }
+
+  .wx .wgrid__item--b {
+    grid-column: 1;
+  }
+
+  .wx .wgrid__item--c {
+    grid-column: 2;
+    margin-top: 120px;
+  }
+
+  .wx .wgrid__item--b .stage:not(.stage--figure),
+  .wx .wgrid__item--c .stage {
+    aspect-ratio: 4 / 3.8;
+  }
+
+  .wx .wgrid__item--b .stage__screen,
+  .wx .wgrid__item--c .stage__screen {
+    width: 84%;
+    left: 6%;
+  }
+
+  .wx .wgrid__item--b .stage__phone,
+  .wx .wgrid__item--c .stage__phone {
+    width: 32%;
+  }
+}
+
+.stage--figure {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (max-width: 460px) {
+  .fig-report__tiles i {
+    min-width: 0;
+  }
+}
+
+/* Scrubbed phones lean past the gutter on narrow screens; clip (not hidden)
+   keeps the page from scrolling sideways without breaking the sticky bar. */
+.work-index:has(.wx) {
+  overflow-x: clip;
+}

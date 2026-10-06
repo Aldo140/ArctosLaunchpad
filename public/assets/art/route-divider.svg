@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" fill="none">
+  <path d="M30 112H260C310 112 310 48 360 48H550C600 48 600 112 650 112H890C940 112 940 48 990 48H1170" stroke="#c4531c" stroke-width="3"/>
+  <path d="M30 122H260C310 122 310 58 360 58H550C600 58 600 122 650 122H890C940 122 940 58 990 58H1170" stroke="#21463f" stroke-width="1" opacity=".45"/>
+  <g fill="#f1ebdf" stroke="#21463f" stroke-width="2"><circle cx="70" cy="112" r="12"/><circle cx="600" cy="80" r="12"/><circle cx="1130" cy="48" r="12"/></g>
+  <g fill="#c4531c"><circle cx="70" cy="112" r="4"/><circle cx="600" cy="80" r="4"/><circle cx="1130" cy="48" r="4"/></g>
+</svg>

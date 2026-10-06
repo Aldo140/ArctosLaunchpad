@@ -68,6 +68,19 @@ export function TeardownForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
   const successHeading = useRef<HTMLHeadingElement>(null);
+  const [ready, setReady] = useState({ name: false, email: false, challenge: false });
+
+  function handleInput(event: FormEvent<HTMLFormElement>) {
+    const data = new FormData(event.currentTarget);
+    const next = {
+      name: valueOf(data, "name").length >= 2,
+      email: /^\S+@\S+\.\S+$/.test(valueOf(data, "email")),
+      challenge: valueOf(data, "challenge").length >= 20,
+    };
+    setReady((prev) =>
+      prev.name === next.name && prev.email === next.email && prev.challenge === next.challenge ? prev : next,
+    );
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -151,6 +164,7 @@ export function TeardownForm() {
       }
 
       form.reset();
+      setReady({ name: false, email: false, challenge: false });
       setStatus("success");
       window.requestAnimationFrame(() => successHeading.current?.focus());
     } catch {
@@ -171,23 +185,27 @@ export function TeardownForm() {
 
   if (status === "success") {
     return (
-      <div className="tdn-sheet tdn-sheet--done" data-material="paper">
+      <div className="tdn-sheet tdn-sheet--done">
         {live}
-        <p className="tick-label">Request received</p>
+        <svg className="tdn-seal" viewBox="0 0 64 64" aria-hidden="true">
+          <circle className="tdn-seal__ring" cx="32" cy="32" r="29" pathLength={1} />
+          <path className="tdn-seal__check" d="M20 33.5 28.5 42 45 24" pathLength={1} />
+        </svg>
+        <p className="eyebrow">Request received</p>
         <h2 ref={successHeading} tabIndex={-1} className="tdn-done__title">
           Got it. We&rsquo;ll take it from here.
         </h2>
         <ol className="tdn-done__list">
           <li>
-            <span className="t-folio">01</span>
+            <span className="index">01</span>
             <span>We read what you sent, in full.</span>
           </li>
           <li>
-            <span className="t-folio">02</span>
+            <span className="index">02</span>
             <span>You get a reply to book the 30 minutes, within two business days.</span>
           </li>
           <li>
-            <span className="t-folio">03</span>
+            <span className="index">03</span>
             <span>
               We show you the one-screen mock, the first three steps, and a
               straight answer.
@@ -215,15 +233,17 @@ export function TeardownForm() {
 
   const listed = fieldOrder.filter((f) => errors[f]);
   const showAlert = Boolean(errors.form) || listed.length > 0;
+  const filled = Number(ready.name) + Number(ready.email) + Number(ready.challenge);
 
   return (
     <form
       className="tdn-sheet"
       /* A printed sheet on an instrument section: declaring the material flips
          the palette to paper, as the contact form does. */
-      data-material="paper"
-      data-chapter="operate"
+
+
       onSubmit={handleSubmit}
+      onInput={handleInput}
       noValidate
       aria-busy={status === "sending"}
       id="teardown-form"
@@ -231,10 +251,17 @@ export function TeardownForm() {
     >
       {live}
       <div className="tdn-sheet__head">
-        <p className="tick-label" id="tdn-form-title">
+        <p className="eyebrow" id="tdn-form-title">
           Free reporting teardown
         </p>
-        <p className="tdn-sheet__req t-folio">Three fields to start</p>
+        <p className="tdn-sheet__req mono" data-filled={filled}>
+          <span className="tdn-pips" aria-hidden="true">
+            <i data-on={ready.name || undefined} />
+            <i data-on={ready.email || undefined} />
+            <i data-on={ready.challenge || undefined} />
+          </span>
+          {filled === 3 ? "Ready to send" : filled === 0 ? "Three fields to start" : `${filled} of 3 fields`}
+        </p>
       </div>
 
       {showAlert && (
@@ -264,31 +291,39 @@ export function TeardownForm() {
           <label className="tdn-label" htmlFor="tdn-name">
             Name
           </label>
-          <input
-            id="tdn-name"
-            name="name"
-            type="text"
-            autoComplete="name"
-            maxLength={100}
-            required
-            {...describedBy("name")}
-          />
+          <span className="tdn-control">
+            <input
+              id="tdn-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              maxLength={100}
+              required
+              {...describedBy("name")}
+            />
+            <span className="tdn-ink" aria-hidden="true" />
+            <span className={`tdn-ok${ready.name ? " is-ok" : ""}`} aria-hidden="true" />
+          </span>
           <FieldError id="tdn-name-error" message={errors.name} />
         </div>
         <div className="tdn-field">
           <label className="tdn-label" htmlFor="tdn-email">
             Email
           </label>
-          <input
-            id="tdn-email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            maxLength={254}
-            required
-            {...describedBy("email")}
-          />
+          <span className="tdn-control">
+            <input
+              id="tdn-email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={254}
+              required
+              {...describedBy("email")}
+            />
+            <span className="tdn-ink" aria-hidden="true" />
+            <span className={`tdn-ok${ready.email ? " is-ok" : ""}`} aria-hidden="true" />
+          </span>
           <FieldError id="tdn-email-error" message={errors.email} />
         </div>
       </div>
@@ -297,15 +332,19 @@ export function TeardownForm() {
         <label className="tdn-label" htmlFor="tdn-challenge">
           What do you report on by hand today?
         </label>
-        <textarea
-          id="tdn-challenge"
-          name="challenge"
-          rows={4}
-          maxLength={1500}
-          required
-          placeholder="Weekly campaign numbers, event signups, production runs…"
-          {...describedBy("challenge", "tdn-challenge-help")}
-        />
+        <span className="tdn-control">
+          <textarea
+            id="tdn-challenge"
+            name="challenge"
+            rows={4}
+            maxLength={1500}
+            required
+            placeholder="Weekly campaign numbers, event signups, production runs…"
+            {...describedBy("challenge", "tdn-challenge-help")}
+          />
+          <span className="tdn-ink" aria-hidden="true" />
+          <span className={`tdn-ok${ready.challenge ? " is-ok" : ""}`} aria-hidden="true" />
+        </span>
         <span className="tdn-help" id="tdn-challenge-help">
           A sentence or two is plenty.
         </span>
@@ -317,32 +356,38 @@ export function TeardownForm() {
           <label className="tdn-label" htmlFor="tdn-company">
             Company <span className="tdn-opt">Optional</span>
           </label>
-          <input
-            id="tdn-company"
-            name="company"
-            type="text"
-            autoComplete="organization"
-            maxLength={150}
-            {...describedBy("company")}
-          />
+          <span className="tdn-control">
+            <input
+              id="tdn-company"
+              name="company"
+              type="text"
+              autoComplete="organization"
+              maxLength={150}
+              {...describedBy("company")}
+            />
+            <span className="tdn-ink" aria-hidden="true" />
+          </span>
           <FieldError id="tdn-company-error" message={errors.company} />
         </div>
         <div className="tdn-field">
           <label className="tdn-label" htmlFor="tdn-sample">
             Link to a sample <span className="tdn-opt">Optional</span>
           </label>
-          <input
-            id="tdn-sample"
-            name="sample"
-            type="text"
-            inputMode="url"
-            autoComplete="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            maxLength={300}
-            placeholder="Drive, Dropbox…"
-            {...describedBy("sample")}
-          />
+          <span className="tdn-control">
+            <input
+              id="tdn-sample"
+              name="sample"
+              type="text"
+              inputMode="url"
+              autoComplete="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              maxLength={300}
+              placeholder="Drive, Dropbox…"
+              {...describedBy("sample")}
+            />
+            <span className="tdn-ink" aria-hidden="true" />
+          </span>
           <FieldError id="tdn-sample-error" message={errors.sample} />
         </div>
       </div>

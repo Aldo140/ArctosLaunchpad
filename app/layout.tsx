@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { fontClass } from "./fonts";
-import { SiteHeader } from "@/components/chrome/SiteHeader";
-import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { ChromeSync } from "@/components/chrome/ChromeSync";
-import { ScrollRefresh } from "@/components/chrome/ScrollRefresh";
-import { InteriorMotion } from "@/components/InteriorMotion";
-import { PremiumMotion } from "@/components/studio/PremiumMotion";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { Motion } from "@/components/site/Motion";
 import {
   SITE_NAME,
   SITE_URL,
@@ -24,7 +21,7 @@ import {
  * through `pageMetadata` — Next.js shallow-merges metadata, so a page that
  * declares `openGraph` replaces this one wholesale rather than extending it.
  */
-const homeCardTitle = "More business. Less busywork.";
+const homeCardTitle = "Win the customer. Run the work. See the numbers.";
 const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 
 export const metadata: Metadata = {
@@ -55,7 +52,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: homeCardTitle,
     description:
-      "Marketing, websites, software, automation, and reporting connected around how your business works.",
+      "Arctos designs and builds the websites, software, automation and reporting that connect how a business wins customers, runs its work and sees its numbers.",
     images: [
       { url: homeCard, width: 1200, height: 630, alt: homeCardTitle },
     ],
@@ -71,7 +68,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#081319",
+  themeColor: "#0d1b1e",
 };
 
 export default function RootLayout({
@@ -87,19 +84,25 @@ export default function RootLayout({
 
   return (
     <html lang="en-CA" className={fontClass} suppressHydrationWarning>
-      <body id="top" data-material="instrument">
+      <head>
+        {/* Reveal states are only armed when motion is welcome, before first paint. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-motion')}catch(e){}",
+          }}
+        />
+      </head>
+      <body id="top">
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <SiteHeader />
-        <ChromeSync />
-        <ScrollRefresh />
+        <Header />
         <main id="main">
-          <InteriorMotion />
-          <PremiumMotion />
+          <Motion />
           {children}
         </main>
-        <SiteFooter />
+        <Footer />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLd(schema)}

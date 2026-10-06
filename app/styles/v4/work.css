@@ -1,0 +1,302 @@
+/* =========================================================================
+   ARCTOS v4 — project media: stage, plate, typeset figures,
+   the work index and the case study
+   ========================================================================= */
+
+/* ---- Stage: real artifacts on depth planes --------------------------- */
+
+.stage {
+  --plate: var(--ink-3);
+  position: relative;
+  aspect-ratio: 16 / 10.4;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(90% 70% at 18% 0%, color-mix(in srgb, var(--plate) 70%, #fff 16%), transparent 70%),
+    radial-gradient(70% 60% at 100% 100%, color-mix(in srgb, var(--plate) 80%, #000 30%), transparent 70%),
+    var(--plate);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  isolation: isolate;
+}
+
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: url("/assets/textures/contour-field.webp") center / cover;
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+}
+
+.stage__screen {
+  position: absolute;
+  left: 6%;
+  top: 9%;
+  width: 72%;
+  aspect-ratio: 1280 / 682;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ink-2);
+  box-shadow: var(--shadow-3);
+  transition: transform 0.9s var(--ease-out);
+}
+
+.stage__screen video,
+.stage__screen .stage__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.stage__screen video {
+  z-index: 1;
+}
+
+.stage__phone {
+  position: absolute;
+  right: 7%;
+  bottom: -7%;
+  width: 21%;
+  border-radius: clamp(12px, 1.6vw, 22px);
+  transform: rotate(-3deg);
+  transition: transform 0.9s var(--ease-out);
+  box-shadow: 0 0 0 clamp(3px, 0.4vw, 6px) #0a1416, 0 0 0 clamp(4px, 0.45vw, 7px) rgb(241 235 223 / 0.14),
+    var(--shadow-3);
+}
+
+.stage:not(:has(.stage__phone)) .stage__screen {
+  left: 9%;
+  width: 82%;
+}
+
+.plate__link:hover .stage__screen {
+  transform: translateY(-6px) scale(1.012);
+}
+
+.plate__link:hover .stage__phone {
+  transform: translateY(-14px) rotate(-1deg);
+}
+
+.plate {
+  display: grid;
+  gap: 0;
+}
+
+.plate__link {
+  display: block;
+  border-radius: var(--radius-lg);
+  color: inherit;
+}
+
+.plate__meta {
+  display: grid;
+  gap: 10px;
+  padding-top: clamp(22px, 2.6vw, 36px);
+}
+
+.plate__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.plate__title a {
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(var(--accent), var(--accent)) left 95% / 0% 1px no-repeat;
+  transition: background-size 0.5s var(--ease-out);
+}
+
+.plate:hover .plate__title a {
+  background-size: 100% 1px;
+}
+
+.plate__summary {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.97rem;
+}
+
+/* ---- Typeset figures ------------------------------------------------- */
+
+.stage--figure {
+  display: grid;
+  place-items: center;
+  padding: 7% 9%;
+}
+
+.fig-report {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+}
+
+.fig-report__sheet {
+  display: grid;
+  gap: clamp(10px, 1.4vw, 18px);
+  padding: clamp(14px, 2vw, 26px);
+  border-radius: 6px;
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow: var(--shadow-3);
+  transform: rotate(-1.2deg);
+}
+
+.fig-report__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgb(13 27 30 / 0.15);
+  font-family: var(--serif);
+  font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+}
+
+.fig-report__head .mono {
+  font-size: 0.6rem;
+  color: #5d6664;
+}
+
+.fig-report__tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.fig-report__tiles div {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgb(13 27 30 / 0.12);
+  border-radius: 3px;
+}
+
+.fig-report__tiles .mono {
+  font-size: 0.52rem;
+  color: #5d6664;
+}
+
+.fig-report i,
+.fig-report__rows i {
+  display: block;
+  width: var(--w);
+  height: 10px;
+  border-radius: 1px;
+  background: var(--ink);
+}
+
+.fig-report__tiles i {
+  height: 16px;
+}
+
+.fig-report__chart {
+  width: 100%;
+  height: clamp(40px, 6vw, 72px);
+}
+
+.fig-report__chart path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.fig-report__chart .grid {
+  stroke: rgb(13 27 30 / 0.1);
+}
+
+.fig-report__chart .ghost {
+  stroke: rgb(13 27 30 / 0.25);
+  stroke-dasharray: 4 4;
+}
+
+.fig-report__chart .line {
+  stroke: var(--rust);
+  stroke-width: 2.5;
+}
+
+.fig-report__rows {
+  display: grid;
+  gap: 7px;
+}
+
+.fig-report__rows div {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(4, 1fr);
+  gap: 10px;
+}
+
+.fig-report__rows i {
+  height: 7px;
+  opacity: 0.85;
+}
+
+.fig-report figcaption,
+.fig-flow figcaption {
+  color: rgb(241 235 223 / 0.6);
+  font-size: 0.62rem;
+  text-align: center;
+}
+
+.fig-flow {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.fig-flow ol {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fig-flow ol::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 3px;
+  background: var(--rust);
+  box-shadow: 0 0 14px rgb(229 122 66 / 0.6);
+}
+
+.fig-flow li {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: clamp(12px, 1.6vw, 20px);
+  border-radius: 6px;
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow: var(--shadow-2);
+}
+
+.fig-flow li:nth-child(2) {
+  transform: translateY(-14%);
+}
+
+.fig-flow .index {
+  color: var(--rust-deep);
+}
+
+.fig-flow__name {
+  font-family: var(--serif);
+  font-size: clamp(0.95rem, 1.3vw, 1.3rem);
+  line-height: 1.1;
+}
+
+.fig-flow__note {
+  font-size: 0.72rem;
+  color: #5d6664;
+}

@@ -1,44 +1,33 @@
 /* =========================================================================
-   ARCTOS LAUNCHPAD
+   ARCTOS LAUNCHPAD — v4 "The bridge"
    -------------------------------------------------------------------------
-   Load order matters: tokens define the vocabulary, base sets defaults and
-   primitives, chrome styles the persistent frame, then page compositions.
-   Nothing below tokens.css may hard-code a colour.
-
-   The composition sheets after home.css were one 8,500-line pages.css. They
-   are split for navigation only — this import order reproduces the original
-   file exactly, and several later blocks deliberately override earlier ones,
-   so REORDERING THESE WILL CHANGE THE PAGE.
+   One small system, replacing four layered rebuilds. Order:
+   tokens → base primitives → chrome → home chapters → interior pages → forms.
+   Colour lives only in tokens.css.
    ========================================================================= */
 
 @import "tailwindcss";
 
-@import "./styles/tokens.css";
-@import "./styles/base.css";
-@import "./styles/chrome.css";
-@import "./styles/home.css";
-@import "./styles/interior-shell.css";
-@import "./styles/interior-evidence.css";
-@import "./styles/route-case-file.css";
-@import "./styles/interior-rhythm.css";
-@import "./styles/route-services.css";
-@import "./styles/route-work.css";
-@import "./styles/route-process.css";
-@import "./styles/scene-refinements.css";
-@import "./styles/route-work-machine.css";
-@import "./styles/survey-ground.css";
-
-/* v2 rebuild — one sheet per owner, loaded last so it wins over legacy rules. */
-@import "./styles/v2-report.css";
-@import "./styles/v2-chrome.css";
-@import "./styles/v2-hero.css";
-@import "./styles/v2-hero-b.css";
-@import "./styles/v2-proof.css";
-@import "./styles/v2-offer.css";
-@import "./styles/v2-trust.css";
-@import "./styles/v2-teardown.css";
-@import "./styles/v2-services.css";
-@import "./styles/v2-work.css";
-@import "./styles/v2-contact.css";
-@import "./styles/v3-studio.css";
-@import "./styles/v3-motion.css";
+@import "./styles/v4/tokens.css";
+@import "./styles/v4/base.css";
+@import "./styles/v4/chrome.css";
+@import "./styles/v4/home.css";
+@import "./styles/v4/work.css";
+@import "./styles/v4/case.css";
+@import "./styles/v4/pages.css";
+@import "./styles/v4/forms.css";
+@import "./styles/v4/sec-hero.css";
+@import "./styles/v4/sec-islands.css";
+@import "./styles/v4/sec-rail.css";
+@import "./styles/v4/sec-method.css";
+@import "./styles/v4/sec-studio-note.css";
+@import "./styles/v4/sec-close.css";
+@import "./styles/v4/page-services.css";
+@import "./styles/v4/page-service.css";
+@import "./styles/v4/page-work.css";
+@import "./styles/v4/page-case.css";
+@import "./styles/v4/page-process.css";
+@import "./styles/v4/page-studio.css";
+@import "./styles/v4/page-industries.css";
+@import "./styles/v4/page-contact.css";
+@import "./styles/v4/page-local.css";

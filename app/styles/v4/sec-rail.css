@@ -1,0 +1,925 @@
+/* ARCTOS v4 — sec-rail (owned by one section agent; overrides earlier sheets)
+   "Proof, not promises." — the selected-work rail.
+   Base = native swipe carousel (mobile, touch, no-JS). `.wr--pinned` (added
+   by JS only for wide + fine pointer + motion welcome) = cinematic travel.
+   Every selector is scoped under `.wr`. */
+
+.rail.wr {
+  --cw: min(82vw, 520px);
+  position: relative;
+  padding-block: 0;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--ink);
+}
+
+.wr__pin {
+  position: relative;
+  padding-block: var(--section) clamp(48px, 7vw, 88px);
+}
+
+/* ---- Ground: washes to the focused project's own colour ------------- */
+
+.wr__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--wash, var(--ink));
+  transition: background-color 1.1s var(--ease-out);
+}
+
+.wr__wash::before,
+.wr__wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* A soft key light behind the stage and a vignette that keeps edges ink. */
+.wr__wash::before {
+  background:
+    radial-gradient(60% 55% at 50% 58%, rgb(241 235 223 / 0.07), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 45%, rgb(2 19 27 / 0.62) 100%);
+}
+
+/* Fine film grain so large flat washes never band. */
+.wr__wash::after {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---- Head ------------------------------------------------------------ */
+
+.wr__head {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 24px clamp(32px, 6vw, 96px);
+  margin-bottom: clamp(36px, 5vw, 64px);
+}
+
+.wr__head h2 {
+  margin-top: 18px;
+}
+
+.wr__lead {
+  padding-bottom: 6px;
+}
+
+/* ---- Kinetic index (pinned only) ------------------------------------ */
+
+.wr__numeral {
+  display: none;
+}
+
+/* ---- Viewport & track (native carousel) ------------------------------ */
+
+.wr__viewport {
+  position: relative;
+  z-index: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  padding-block: 6px 52px;
+}
+
+.wr__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.wr__viewport:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.wr__track {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 3vw, 36px);
+  width: max-content;
+  margin: 0;
+  padding: 0 var(--gutter);
+  list-style: none;
+}
+
+.wr__item {
+  flex: 0 0 var(--cw);
+  scroll-snap-align: center;
+}
+
+.wr__item--end {
+  flex-basis: min(76vw, 440px);
+  align-self: stretch;
+}
+
+/* ---- Project card ---------------------------------------------------- */
+
+.rc {
+  position: relative;
+}
+
+.rc__depth {
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+
+.rc__media {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+}
+
+.rc__tilt {
+  position: relative;
+  will-change: transform;
+}
+
+.rc__screen {
+  position: relative;
+  aspect-ratio: 1280 / 682;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--plate);
+  box-shadow:
+    0 0 0 1px rgb(241 235 223 / 0.12),
+    0 30px 60px -28px rgb(2 10 12 / 0.85),
+    0 80px 120px -60px rgb(2 10 12 / 0.7);
+}
+
+.rc__poster,
+.rc__screen video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.rc__screen video {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.rc__screen video.is-playing {
+  opacity: 1;
+}
+
+.rc__type {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: var(--fs-2);
+  font-style: italic;
+  color: var(--paper);
+}
+
+.rc__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #040b0d;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s var(--ease-out);
+}
+
+.rc__glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--gx, 50%) var(--gy, 50%),
+    rgb(255 248 236 / 0.26),
+    transparent 55%
+  );
+}
+
+.rc__phone {
+  position: absolute;
+  z-index: 2;
+  right: 5%;
+  bottom: -15%;
+  width: 24%;
+  will-change: transform;
+}
+
+.rc__phone .phone {
+  border-radius: clamp(10px, 1.6vw, 20px);
+  box-shadow:
+    0 0 0 clamp(3px, 0.45vw, 6px) #0a1416,
+    0 0 0 clamp(4px, 0.52vw, 7px) rgb(241 235 223 / 0.16),
+    0 40px 70px -24px rgb(2 10 12 / 0.9);
+}
+
+.rc__meta {
+  display: grid;
+  gap: 10px;
+  padding: 22px 31% 0 0;
+}
+
+.rc__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.rc__of {
+  color: var(--faint);
+}
+
+.rc__title a {
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.5s var(--ease-out);
+}
+
+.rc__title a:hover,
+.rc__title a:focus-visible {
+  background-size: 100% 1px;
+}
+
+.rc__title a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.rc__summary {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Carousel: the snapped card is lit, the others rest in shade. */
+.wr:not(.wr--pinned) .wr__item:not(.is-active) .rc__shade {
+  opacity: 0.38;
+}
+
+/* ---- Finale ---------------------------------------------------------- */
+
+.rf {
+  --o: calc(var(--open, 1) + var(--hov, 0) * 0.4);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 22px;
+  height: 100%;
+  min-height: 420px;
+  padding: clamp(22px, 2.6vw, 40px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  color: var(--bone);
+  text-decoration: none;
+  background:
+    radial-gradient(90% 60% at 50% 18%, rgb(229 122 66 / 0.55), transparent 70%),
+    linear-gradient(180deg, #a94612 0%, var(--rust-deep) 46%, #6e2a08 100%);
+  box-shadow:
+    0 0 0 1px rgb(248 244 236 / 0.14),
+    0 40px 90px -40px rgb(2 10 12 / 0.9);
+}
+
+.rf:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 4px;
+}
+
+.rf:hover {
+  --hov: 1;
+}
+
+.rf__deck {
+  position: absolute;
+  left: 50%;
+  top: 9%;
+  width: 52%;
+  aspect-ratio: 1280 / 682;
+  translate: -50% 0;
+}
+
+.rf__card {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--plate);
+  box-shadow:
+    0 0 0 1px rgb(248 244 236 / 0.22),
+    0 18px 30px -14px rgb(20 6 0 / 0.75);
+  transform-origin: 50% 160%;
+  transform: translateX(calc(var(--k) * var(--o) * 14%)) rotate(calc(var(--k) * (1.5deg + var(--o) * 5.5deg)));
+  transition: transform 0.7s var(--ease-out);
+}
+
+.rf__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.rf__text {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+.rf__kicker {
+  color: rgb(248 244 236 / 0.88);
+}
+
+.rf__title {
+  font-family: var(--serif);
+  font-size: clamp(2.1rem, 1.3rem + 2.2vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+.rf__title em {
+  font-style: italic;
+  color: #ffe1cc;
+}
+
+.rf__note {
+  max-width: 34ch;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: rgb(248 244 236 / 0.9);
+}
+
+.rf__go {
+  position: absolute;
+  right: clamp(22px, 2.6vw, 40px);
+  bottom: clamp(22px, 2.6vw, 40px);
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bone);
+  color: var(--rust-deep);
+  transition: transform 0.6s var(--ease-out);
+}
+
+.rf:hover .rf__go,
+.rf:focus-visible .rf__go {
+  transform: translateX(6px) rotate(-45deg) scale(1.08);
+}
+
+.rf__text {
+  padding-right: 80px;
+}
+
+/* ---- Foot: counter, dots, progress ---------------------------------- */
+
+.wr__foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px 24px;
+}
+
+.wr__count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.wr__count-win,
+.wr__numeral-win {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.wr__count-roll,
+.wr__numeral-roll {
+  display: block;
+  transition: transform 0.75s var(--ease-out);
+}
+
+.wr__count-roll > span,
+.wr__numeral-roll > span {
+  display: block;
+  height: 1em;
+}
+
+.wr__count-of {
+  font-family: var(--mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.wr__dots {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.wr__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--fg);
+}
+
+.wr__dot i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: rgb(241 235 223 / 0.36);
+  transition:
+    width 0.5s var(--ease-out),
+    background 0.4s;
+}
+
+.wr__dot[aria-current="true"] i {
+  width: 22px;
+  background: var(--rust-hi);
+}
+
+.wr__dot:hover i {
+  background: var(--paper);
+}
+
+.wr__dot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.wr.is-finale .wr__dot[aria-current] i {
+  background: rgb(241 235 223 / 0.36);
+  width: 7px;
+}
+
+.wr__progress {
+  display: none;
+}
+
+.wr__hint {
+  display: none;
+  margin: 0;
+  color: var(--faint);
+}
+
+.wr__hint-pin {
+  display: none;
+}
+
+/* ---- Cursor follower (pinned + fine pointer only) -------------------- */
+
+.wr__cursor {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.wr__cursor-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2);
+  transition:
+    transform 0.5s var(--ease-out),
+    opacity 0.3s var(--ease-out);
+  box-shadow: 0 20px 40px -18px rgb(2 10 12 / 0.7);
+}
+
+.wr__cursor.is-on .wr__cursor-label {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* =====================================================================
+   Pinned: the cinematic travel (JS-applied, wide + fine pointer only)
+   ===================================================================== */
+
+.wr.wr--pinned {
+  --cw: min(46vw, calc((100vh - 430px) * 1.55));
+  --gap: max(5vw, 56px);
+}
+
+.wr--pinned .wr__pin {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100vh;
+  padding: clamp(88px, 11vh, 108px) 0 clamp(18px, 3.4vh, 34px);
+  overflow: hidden;
+}
+
+.wr--pinned .wr__wash {
+  transition: none;
+}
+
+.wr--pinned .wr__head {
+  margin-bottom: 0;
+  align-items: end;
+}
+
+.wr--pinned .wr__head h2 {
+  margin-top: 14px;
+  font-size: clamp(2.3rem, 0.9rem + 2.9vw, 4.1rem);
+}
+
+.wr--pinned .wr__title .ln {
+  display: inline-block;
+  margin-right: 0.24em;
+  vertical-align: top;
+}
+
+.wr--pinned .wr__lead {
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.18rem);
+  justify-self: end;
+}
+
+.wr--pinned .wr__viewport {
+  align-self: center;
+  overflow: visible;
+  padding: 0;
+  scroll-snap-type: none;
+}
+
+.wr--pinned .wr__track {
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  will-change: transform;
+}
+
+.wr--pinned .wr__item {
+  flex: 0 0 var(--cw);
+  margin-inline: calc(var(--gap) / 2);
+}
+
+.wr--pinned .wr__item--end {
+  flex-basis: calc(var(--cw) * 0.74);
+  align-self: center;
+}
+
+.wr--pinned .rf {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1 / 0.98;
+  max-height: calc(100vh - 300px);
+}
+
+.wr--pinned .rc__media,
+.wr--pinned .rc__title a,
+.wr--pinned .rf {
+  cursor: none;
+}
+
+.wr--pinned .rc__tilt {
+  transform-style: preserve-3d;
+}
+
+.wr--pinned .rc__shade {
+  transition: none;
+}
+
+.wr--pinned .rc__summary {
+  -webkit-line-clamp: 2;
+}
+
+/* The kinetic index: a vast outlined numeral that rolls with the travel. */
+.wr--pinned .wr__numeral {
+  display: block;
+  position: absolute;
+  z-index: 0;
+  left: calc(var(--gutter) - 0.06em);
+  bottom: 2vh;
+  font-family: var(--serif);
+  font-size: clamp(11rem, 38vh, 24rem);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(241 235 223 / 0.2);
+  pointer-events: none;
+  user-select: none;
+}
+
+.wr--pinned .wr__numeral-roll,
+.wr--pinned .wr__count-roll {
+  transition: none;
+}
+
+.wr--pinned .wr__numeral-win {
+  height: 1.02em;
+}
+
+.wr--pinned .wr__foot {
+  gap: 28px;
+}
+
+.wr--pinned .wr__count {
+  font-size: 2.3rem;
+}
+
+.wr--pinned .wr__dots {
+  margin-left: 0;
+}
+
+.wr--pinned .wr__progress {
+  display: block;
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.wr--pinned .wr__progress i {
+  display: block;
+  height: 100%;
+  background: var(--rust-hi);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.wr--pinned .wr__hint,
+.wr--pinned .wr__hint-pin {
+  display: inline;
+}
+
+.wr--pinned .wr__hint-swipe {
+  display: none;
+}
+
+.wr--pinned .wr__cursor {
+  display: block;
+}
+
+/* ---- Small screens --------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .wr__head {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1023px) {
+  .wr__hint {
+    display: inline;
+  }
+
+  .wr__dots {
+    margin-left: 0;
+  }
+
+  .wr__foot {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 600px) {
+  .rc__phone {
+    width: 26%;
+    right: 4%;
+  }
+
+  .rc__meta {
+    padding-right: 30%;
+    padding-top: 18px;
+  }
+
+  .rc__title {
+    font-size: 1.45rem;
+  }
+
+  .rf {
+    min-height: 0;
+    justify-content: space-between;
+  }
+
+  .rf__deck {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 62%;
+    flex: none;
+    margin: 6% auto 16%;
+    translate: none;
+  }
+
+  .rf__text {
+    padding-right: 60px;
+    padding-bottom: 0;
+  }
+
+  .rf__note {
+    display: none;
+  }
+
+  .rf__go {
+    width: 52px;
+    height: 52px;
+  }
+
+  .wr__hint {
+    display: none;
+  }
+}
+
+/* ---- Reduced motion: still, complete, nothing dimmed ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .wr__wash {
+    background-color: var(--ink);
+    transition: none;
+  }
+
+  .wr .rc__shade {
+    opacity: 0 !important;
+    transition: none;
+  }
+
+  .wr__count-roll,
+  .wr__numeral-roll,
+  .rf__card,
+  .rf__go,
+  .wr__dot i {
+    transition: none;
+  }
+
+  .rf__card {
+    transform: translateX(calc(var(--k) * 17%)) rotate(calc(var(--k) * 7deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (min-width: 1024px) {
+  .wr__viewport {
+    overflow: visible;
+    padding-bottom: 0;
+    scroll-snap-type: none;
+  }
+
+  .wr__track {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 88px clamp(28px, 3vw, 48px);
+    width: auto;
+    max-width: var(--max);
+    margin-inline: auto;
+  }
+
+  .wr__item {
+    min-width: 0;
+  }
+
+  .wr__item--end {
+    grid-column: 1 / -1;
+  }
+
+  .wr__item--end .rf {
+    min-height: 300px;
+    justify-content: center;
+    padding-left: 48%;
+  }
+
+  .wr__item--end .rf__deck {
+    left: 23%;
+    top: 50%;
+    width: 22%;
+    translate: -50% -50%;
+  }
+
+  .wr__item--end .rf__card {
+    transform-origin: 50% 200%;
+    transform: translateX(calc(var(--k) * 9%)) rotate(calc(var(--k) * 4deg));
+  }
+
+  .wr__foot {
+    display: none;
+  }
+}
+
+/* =====================================================================
+   Touch choreography (native carousel with motion welcome)
+   The swipe drives depth inline, so nothing here may transition-lag it.
+   ===================================================================== */
+
+.wr--live:not(.wr--pinned) .wr__wash,
+.wr--live:not(.wr--pinned) .rc__shade,
+.wr--live:not(.wr--pinned) .wr__count-roll,
+.wr--live:not(.wr--pinned) .rf__card {
+  transition: none;
+}
+
+.wr:not(.wr--pinned) .rc__depth {
+  transform-origin: 50% 50%;
+}
+
+.wr:not(.wr--pinned) .wr__viewport {
+  padding-block: 18px 22px;
+}
+
+@media (max-width: 1023px) {
+  .rail.wr {
+    --cw: min(84vw, 560px);
+  }
+
+  .wr__dot {
+    width: 34px;
+    height: 44px;
+  }
+
+  .wr__count {
+    font-size: 2.6rem;
+  }
+
+  .rc__summary {
+    font-size: 1rem;
+  }
+}
+
+/* Tablet portrait: a wider card with a clear peek either side. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .rail.wr {
+    --cw: 66vw;
+  }
+
+  .wr__item--end {
+    flex-basis: 50vw;
+  }
+}
+
+@media (max-width: 420px) {
+  .wr__dot {
+    width: 30px;
+  }
+}
+
+/* Roll cells are taller than the em box so tall serif numerals never bleed
+   into the window from the next row. JS rolls by --cell. */
+.wr {
+  --cell: 1.2;
+}
+
+.wr__count-win,
+.wr .wr__numeral-win {
+  height: calc(var(--cell) * 1em);
+}
+
+.wr__count-roll > span,
+.wr__numeral-roll > span {
+  height: calc(var(--cell) * 1em);
+  line-height: calc(var(--cell) * 1em);
+}

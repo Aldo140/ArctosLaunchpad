@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <path d="M20 108L45 95L70 108L45 126Z M90 108L115 95L140 108L115 126Z" fill="#21463f"/>
+  <path d="M20 108V126L45 141V126Z M70 108V126L45 141V126Z M90 108V126L115 141V126Z M140 108V126L115 141V126Z" fill="#0d1b1e"/>
+  <path d="M38 106V67C38 37 122 37 122 67V106H102V69C102 56 58 56 58 69V106Z" fill="#c4531c"/>
+  <path d="M38 67C38 37 122 37 122 67M38 106H58M102 106H122" stroke="#f1ebdf" stroke-width="1.5"/>
+  <circle cx="80" cy="39" r="8" fill="#f1ebdf" stroke="#21463f" stroke-width="2"/>
+</svg>

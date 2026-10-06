@@ -1,0 +1,113 @@
+/* =========================================================================
+   ARCTOS v4 — tokens
+   Palette sampled from the bridge illustration: the arctic ink the islands
+   float in, the paper of the bear and the deck, the rust of the bridge, the
+   pine of the islands. Rust is the signal: the path a customer or a task
+   takes across the system. Nothing below this file hard-codes a colour.
+   ========================================================================= */
+
+:root {
+  --ink: #0d1b1e;
+  --ink-2: #132629;
+  --ink-3: #1c3438;
+  --ink-deep: #02131b; /* ground of the-work-moves illustration */
+  --paper: #f1ebdf;
+  --paper-2: #e7dfcf;
+  --bone: #f8f4ec;
+  --rust: #c4531c;
+  --rust-hi: #e57a42;
+  --rust-deep: #9f3f0e;
+  --pine: #21463f;
+  --pine-2: #2e5c52;
+  --pine-hi: #8fb3a4;
+  --sage: #b4c2b4;
+
+  --serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --fs-hero: clamp(2.6rem, 0.9rem + 5.4vw, 6.6rem);
+  --fs-1: clamp(2.4rem, 1.1rem + 4.4vw, 5.5rem);
+  --fs-2: clamp(1.85rem, 1.05rem + 2.5vw, 3.35rem);
+  --fs-3: clamp(1.32rem, 1.04rem + 0.85vw, 1.85rem);
+  --fs-lead: clamp(1.08rem, 0.98rem + 0.42vw, 1.36rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9rem;
+  --fs-mono: 0.74rem;
+
+  --gutter: clamp(16px, 4.4vw, 72px);
+  --max: 1440px;
+  --section: clamp(84px, 11vw, 176px);
+  --radius: 4px;
+  --radius-lg: 10px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur: 0.28s;
+
+  --shadow-1: 0 1px 2px rgb(6 14 16 / 0.12), 0 10px 24px -12px rgb(6 14 16 / 0.32);
+  --shadow-2: 0 2px 4px rgb(6 14 16 / 0.1), 0 22px 48px -20px rgb(6 14 16 / 0.45);
+  --shadow-3: 0 2px 6px rgb(6 14 16 / 0.12), 0 30px 70px -26px rgb(6 14 16 / 0.55),
+    0 70px 140px -60px rgb(6 14 16 / 0.45);
+}
+
+/* Tones. A section declares one; everything inside reads from it. */
+.tone-ink,
+.tone-paper,
+.tone-bone,
+.tone-pine {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.tone-ink {
+  --bg: var(--ink);
+  --fg: var(--paper);
+  --muted: rgb(241 235 223 / 0.68);
+  --faint: rgb(241 235 223 / 0.58);
+  --line: rgb(241 235 223 / 0.14);
+  --line-strong: rgb(241 235 223 / 0.32);
+  --accent: var(--rust-hi);
+  --surface: var(--ink-2);
+  --btn-bg: var(--paper);
+  --btn-fg: var(--ink);
+}
+
+.tone-pine {
+  --bg: var(--pine);
+  --fg: var(--bone);
+  --muted: rgb(248 244 236 / 0.74);
+  --faint: rgb(248 244 236 / 0.62);
+  --line: rgb(248 244 236 / 0.16);
+  --line-strong: rgb(248 244 236 / 0.36);
+  --accent: #f0a074;
+  --surface: var(--pine-2);
+  --btn-bg: var(--bone);
+  --btn-fg: var(--pine);
+}
+
+.tone-paper {
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --muted: #4a5555;
+  --faint: #5d6664;
+  --line: rgb(13 27 30 / 0.13);
+  --line-strong: rgb(13 27 30 / 0.3);
+  --accent: var(--rust-deep);
+  --surface: var(--bone);
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+}
+
+.tone-bone {
+  --bg: var(--bone);
+  --fg: var(--ink);
+  --muted: #4a5555;
+  --faint: #5d6664;
+  --line: rgb(13 27 30 / 0.12);
+  --line-strong: rgb(13 27 30 / 0.28);
+  --accent: var(--rust-deep);
+  --surface: #fffdf8;
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+}

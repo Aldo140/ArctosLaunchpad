@@ -13,7 +13,11 @@ export type ProjectStatus =
   | "internal-tool"
   | "working-demo"
   | "prototype"
+  | "launch-preview"
   | "in-development";
+
+/** How the work index groups projects. Honest about who the work was for. */
+export type ProjectCategory = "client-site" | "platform" | "studio";
 
 export type MockupType = "browser" | "dashboard" | "mobile" | "map";
 
@@ -66,6 +70,19 @@ export type ServiceGroup = {
   serviceSlugs: string[];
 };
 
+/** Extra real media for a case study: the project's own photography or art. */
+export type CaseMedia = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** Honest caption: what it is and where it comes from. */
+  caption: string;
+  kind: "photo" | "illustration" | "poster" | "screen";
+  /** Colours taken from the project's own data for this item (e.g. a theme palette). */
+  palette?: string[];
+};
+
 export type Project = {
   slug: string;
   route: `/work/${string}`;
@@ -96,6 +113,17 @@ export type Project = {
     layout?: "wide" | "portrait";
   }[];
   mockupType?: MockupType;
+  category: ProjectCategory;
+  /** The client's own photography, shown as a strip on the case study. */
+  specimens?: { src: string; alt: string; width: number; height: number }[];
+  /** Extra real media for the case study (the project's own photography or art). */
+  caseMedia?: CaseMedia[];
+  /** Where caseMedia comes from, shown above the case-study filmstrip. */
+  caseMediaCredit?: string;
+  /** A real phone capture of the live product. */
+  phone?: string;
+  /** Ground colour sampled from the project's own identity, used behind its media. */
+  accent?: string;
   externalUrl?: string;
   featured: boolean;
 };

@@ -1,0 +1,1193 @@
+/* ARCTOS v4 — sec-islands (owned by one section agent; overrides earlier sheets)
+   Default rules render the CONNECTED end state (no JS / reduced motion).
+   Motion (useIslandsMotion) starts things adrift with explicit fromTo values. */
+
+.isles {
+  --band: clamp(210px, 18.5vw, 272px);
+  overflow-x: clip;
+  padding-bottom: clamp(56px, 7vw, 112px);
+}
+
+.isles__frame {
+  padding-top: clamp(48px, 6vw, 88px);
+}
+
+/* ---- progress meter (desktop) ------------------------------------------ */
+
+.isles__meter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(20px, 2.6vw, 36px);
+  font-family: var(--mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.isles__step {
+  display: inline-flex;
+  gap: 8px;
+  white-space: nowrap;
+  color: var(--fg);
+  transition: color 0.4s;
+}
+
+.isles__step b {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.isles.is-live .isles__step:not(.is-on) {
+  color: var(--faint);
+}
+
+.isles.is-live .isles__step:not(.is-on) b {
+  color: var(--faint);
+}
+
+.isles__track {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.isles__track i {
+  position: absolute;
+  inset: -0.5px 0;
+  background: var(--rust);
+  transform-origin: left center;
+}
+
+/* ---- scene --------------------------------------------------------------- */
+
+.isles__scene {
+  position: relative;
+}
+
+.isles__grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
+}
+
+.isles__water {
+  position: absolute;
+  left: calc(var(--gutter) * -1);
+  right: calc(var(--gutter) * -1);
+  top: calc(var(--band) * 0.62);
+  height: calc(var(--band) * 0.5);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28' viewBox='0 0 160 28'%3E%3Cpath d='M0 7 q20 -6 40 0 t40 0 t40 0 t40 0 M0 21 q20 -5 40 0 t40 0 t40 0 t40 0' fill='none' stroke='%2321463f' stroke-opacity='0.16' stroke-width='1.2'/%3E%3C/svg%3E")
+    0 0 / 160px 28px repeat;
+  -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, #000 30%, transparent 75%);
+}
+
+.isles.is-live .isles__water {
+  animation: isles-tide 18s linear infinite;
+}
+
+@keyframes isles-tide {
+  to {
+    background-position: 160px 0;
+  }
+}
+
+/* island art */
+.isl__art {
+  position: relative;
+  height: var(--band);
+  perspective: 900px;
+}
+
+.isl__bob,
+.isl__lift {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.isl__lift {
+  transform: translate3d(0, var(--lift, 0px), 0) rotateX(calc(var(--py, 0) * -7deg)) rotateY(calc(var(--px, 0) * 9deg));
+  transition: transform 0.7s var(--ease-out), filter 0.7s var(--ease-out);
+}
+
+.isl__lift {
+  filter: drop-shadow(0 22px 22px rgb(13 27 30 / 0.18));
+}
+
+.isl__lift img {
+  width: auto;
+  max-width: none;
+}
+
+.isl--win .isl__lift img {
+  height: calc(var(--band) * 0.86);
+  -webkit-mask-image: linear-gradient(90deg, #000 64%, transparent 99%);
+  mask-image: linear-gradient(90deg, #000 64%, transparent 99%);
+}
+
+.isl--run .isl__lift img {
+  height: var(--band);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+
+.isl--see .isl__lift img {
+  height: calc(var(--band) * 0.82);
+  -webkit-mask-image: linear-gradient(90deg, transparent 2%, #000 32%);
+  mask-image: linear-gradient(90deg, transparent 2%, #000 32%);
+}
+
+.isl__shadow {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: -14px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(13 27 30 / 0.2), transparent);
+  transition: transform 0.7s var(--ease-out), opacity 0.7s;
+}
+
+/* ---- bridges ------------------------------------------------------------- */
+
+.isles__bridges {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--band);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.isl-span {
+  position: absolute;
+  top: calc(var(--band) * 0.47);
+  transform: translateY(-62.5%);
+}
+
+.isl-span--1 {
+  left: calc(16.667% + var(--band) * 0.28);
+  width: calc(33.333% - var(--band) * 0.5);
+}
+
+.isl-span--2 {
+  left: calc(50% + var(--band) * 0.22);
+  width: calc(33.333% - var(--band) * 0.5);
+}
+
+.isl-bridge {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.isl-bridge__post {
+  fill: var(--ink);
+}
+
+.isl-bridge__rope {
+  fill: none;
+  stroke: var(--ink);
+  stroke-opacity: 0.55;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.isl-bridge__hanger {
+  stroke-opacity: 0.35;
+  stroke-width: 0.6;
+}
+
+.isl-plank__top {
+  fill: var(--rust);
+  stroke: var(--paper);
+  stroke-width: 0.5;
+}
+
+.isl-plank__edge {
+  fill: var(--rust-deep);
+}
+
+.isl-bridge__signal {
+  opacity: 0;
+}
+
+.isl-bridge__glow {
+  fill: var(--rust-hi);
+  opacity: 0.28;
+}
+
+.isl-bridge__dot {
+  fill: var(--rust-hi);
+  stroke: var(--bone);
+  stroke-width: 1.2;
+}
+
+.isl-bridge__pulse {
+  fill: var(--rust-hi);
+  opacity: 0;
+}
+
+.isles.is-connected .isl-bridge__signal {
+  visibility: hidden;
+}
+
+.isles.is-connected .isl-bridge__pulse {
+  animation: isles-pulse 3.2s linear infinite;
+}
+
+.isles.is-connected .isl-span--2 .isl-bridge__pulse {
+  animation-delay: 1.6s;
+}
+
+@keyframes isles-pulse {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10%,
+  40% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    transform: translateX(240px);
+    opacity: 0;
+  }
+}
+
+/* ---- scraps of lost work ------------------------------------------------- */
+
+.isles__scraps {
+  display: none;
+}
+
+.isles.is-live .isles__scraps {
+  display: block;
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--band);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.isl-scrap {
+  position: absolute;
+  width: 132px;
+  margin-left: -66px;
+}
+
+.isl-scrap__card {
+  display: grid;
+  gap: 6px;
+  padding: 9px 11px 10px;
+  border-radius: 3px;
+  background: var(--bone);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  transform: rotate(var(--r)) scale(var(--s));
+}
+
+.isl-scrap__subject {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.isl-scrap--mail .isl-scrap__card {
+  border-top: 3px solid var(--pine-hi);
+}
+
+.isl-scrap__unread {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rust);
+  flex: none;
+}
+
+.isl-scrap__lines {
+  height: 14px;
+  background: repeating-linear-gradient(180deg, var(--line-strong) 0 1.5px, transparent 1.5px 6px);
+  -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent);
+  mask-image: linear-gradient(90deg, #000 70%, transparent);
+}
+
+.isl-scrap__file {
+  color: var(--pine);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.isl-scrap__grid {
+  height: 26px;
+  background:
+    repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 8.5px);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.isl-scrap--note .isl-scrap__card {
+  background: #e9dfb8;
+  box-shadow: var(--shadow-1);
+}
+
+.isl-scrap__hand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+/* ---- card body ----------------------------------------------------------- */
+
+.isl__body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.isl__name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+
+.isl__node {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rust);
+  box-shadow: 0 0 0 4px rgb(196 83 28 / 0.16);
+  flex: none;
+}
+
+.isl__symptom {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--fs-3);
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.isl__syms {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.93rem;
+  line-height: 1.4;
+}
+
+.isl__sym {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.isl__mark {
+  width: 14px;
+  height: 12px;
+  margin-top: 0.3em;
+  overflow: visible;
+}
+
+.isl__mark path {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.isl__mark-dash {
+  stroke: var(--faint);
+  opacity: 0;
+}
+
+.isl__mark-tick {
+  stroke: var(--rust);
+}
+
+.isl__sym-text > span {
+  background: linear-gradient(rgb(196 83 28 / 0.75), rgb(196 83 28 / 0.75)) 0 58% / var(--strike, 100%) 1.5px no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.isl__builds {
+  position: relative;
+  border-radius: var(--radius);
+  outline: 1px dashed var(--line-strong);
+  outline-offset: -1px;
+}
+
+.isl__builds-in {
+  padding: 14px 16px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: box-shadow 0.45s var(--ease-out);
+}
+
+.isl__builds .mono {
+  margin: 0 0 10px;
+  color: var(--accent);
+}
+
+.isl__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.isl__chips li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  font-size: 0.86rem;
+  line-height: 1.35;
+  transition: box-shadow 0.35s, color 0.35s, background-color 0.35s;
+}
+
+.isl__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  margin-top: 2px;
+}
+
+.isl__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.3s var(--ease-out);
+}
+
+.isl__cta span {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.isl__cta:hover {
+  background: var(--rust-deep);
+}
+
+.isl__cta:hover span {
+  transform: translateX(3px);
+}
+
+.isl__cta:focus-visible,
+.isles .link:focus-visible {
+  outline: 2px solid var(--rust-deep);
+  outline-offset: 3px;
+}
+
+/* ---- hover / focus: the island lifts, what we build lights up ----------- */
+
+.isl:hover,
+.isl:focus-within {
+  --lift: -16px;
+}
+
+.isl:hover .isl__lift,
+.isl:focus-within .isl__lift {
+  filter: drop-shadow(0 40px 30px rgb(13 27 30 / 0.24));
+}
+
+.isl:hover .isl__shadow,
+.isl:focus-within .isl__shadow {
+  transform: scale(0.78);
+  opacity: 0.6;
+}
+
+.isl:hover .isl__builds-in,
+.isl:focus-within .isl__builds-in {
+  box-shadow: inset 0 0 0 1px rgb(196 83 28 / 0.55), 0 18px 34px -24px rgb(159 63 14 / 0.6);
+}
+
+.isl:hover .isl__chips li,
+.isl:focus-within .isl__chips li {
+  box-shadow: inset 0 0 0 1px rgb(196 83 28 / 0.5);
+  background-color: rgb(196 83 28 / 0.07);
+}
+
+.isl__chips li:nth-child(2) {
+  transition-delay: 0.05s;
+}
+
+.isl__chips li:nth-child(3) {
+  transition-delay: 0.1s;
+}
+
+.isl__chips li:nth-child(4) {
+  transition-delay: 0.15s;
+}
+
+/* ---- desktop pinned stage ------------------------------------------------ */
+
+@media (min-width: 1024px) {
+  .isles__spine {
+    display: none;
+  }
+
+  .isles.is-pinned .isles__stage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    padding-block: 76px 20px;
+  }
+
+  .isles.is-pinned .isles__frame {
+    padding-top: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 880px) {
+  .isles {
+    --band: clamp(190px, 16vw, 230px);
+  }
+
+  .isl__body {
+    margin-top: 22px;
+    padding-top: 16px;
+    gap: 12px;
+  }
+}
+
+/* ---- tablet + phone: vertical narrative with a plank spine ---------------- */
+
+@media (max-width: 1023.98px) {
+  .isles {
+    --band: 230px;
+  }
+
+  .isles__meter,
+  .isles__bridges,
+  .isles__scraps,
+  .isles.is-live .isles__scraps {
+    display: none;
+  }
+
+  .isles__water {
+    display: none;
+  }
+
+  .isles__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 80px;
+    padding-left: 40px;
+  }
+
+  .isles__spine {
+    position: absolute;
+    left: 0;
+    top: 24px;
+    bottom: 40px;
+    width: 14px;
+    z-index: 1;
+  }
+
+  .isles__spine-ghost {
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1.5px dashed var(--line-strong);
+  }
+
+  .isles__spine-fill {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(var(--rust), var(--rust)) 6px 0 / 1.5px 100% no-repeat,
+      repeating-linear-gradient(180deg, var(--rust) 0 3px, transparent 3px 12px) 1px 0 / 12px 100% no-repeat;
+    border-radius: 2px;
+  }
+
+  .isl {
+    position: relative;
+  }
+
+  .isl__art {
+    height: var(--band);
+  }
+
+  .isl__bob,
+  .isl__lift {
+    justify-content: flex-start;
+  }
+
+  .isl--run {
+    --band: 280px;
+  }
+
+  .isl__shadow {
+    left: 4%;
+    right: auto;
+    width: 60%;
+  }
+
+  .isl__body {
+    margin-top: 26px;
+  }
+
+  /* the node sits on the spine, level with the island name */
+  .isl__node {
+    position: absolute;
+    left: -42px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--rust);
+    background: var(--rust);
+    box-shadow: 0 0 0 5px var(--bg);
+    transition: background-color 0.4s;
+  }
+
+  .isles.is-live-m .isl:not(.is-reached) .isl__node {
+    background: var(--bg);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .isl {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 40px;
+    align-items: center;
+  }
+
+  .isl__body {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .isles {
+    --band: 200px;
+  }
+
+  .isl--run {
+    --band: 250px;
+  }
+
+  .isles__grid {
+    padding-left: 34px;
+    gap: 64px;
+  }
+
+  .isl__node {
+    left: -36px;
+  }
+}
+
+/* ---- reduced motion: the connected state, still --------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .isl__lift,
+  .isl__shadow,
+  .isl__chips li,
+  .isl__builds-in {
+    transition: none;
+  }
+
+  .isl__lift {
+    transform: none;
+  }
+
+  .isles__water {
+    animation: none;
+  }
+}
+
+/* ---- phone/tablet sticky stage (MobileStage) -------------------------------
+   Shown only while the motion hook runs below 1024px (.is-live-m). Reduced
+   motion and no-JS keep the static stacked cards above. */
+
+.ism {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .isles.is-live-m .ism {
+    display: block;
+    position: relative;
+    height: 270svh;
+    margin-top: clamp(16px, 5vw, 40px);
+  }
+
+  .ism__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    padding: 78px var(--gutter) max(18px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  .ism__meter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .ism__step {
+    display: inline-flex;
+    gap: 6px;
+    white-space: nowrap;
+    transition: color 0.4s;
+  }
+
+  .ism__step b {
+    font-weight: 500;
+  }
+
+  .ism__step.is-on {
+    color: var(--fg);
+  }
+
+  .ism__step.is-on b {
+    color: var(--accent);
+  }
+
+  .ism__track {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .ism__track i {
+    position: absolute;
+    inset: -0.5px 0;
+    background: var(--rust);
+    transform-origin: left center;
+  }
+
+  .ism__scene {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin-top: 18px;
+    container-type: size;
+  }
+
+  .ism__scene::before {
+    /* the water the islands float in */
+    content: "";
+    position: absolute;
+    inset: 18% -20% 6%;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='26' viewBox='0 0 120 26'%3E%3Cpath d='M0 6 q15 -5 30 0 t30 0 t30 0 t30 0 M0 19 q15 -4 30 0 t30 0 t30 0 t30 0' fill='none' stroke='%2321463f' stroke-opacity='0.14' stroke-width='1.1'/%3E%3C/svg%3E")
+      0 0 / 120px 26px repeat;
+    -webkit-mask-image: radial-gradient(ellipse 55% 50% at 50% 50%, #000 35%, transparent 75%);
+    mask-image: radial-gradient(ellipse 55% 50% at 50% 50%, #000 35%, transparent 75%);
+    animation: isles-tide 16s linear infinite;
+    pointer-events: none;
+  }
+
+  .ism__deck {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .ism__rope {
+    fill: none;
+    stroke: var(--ink);
+    stroke-opacity: 0.5;
+    stroke-width: 1.1;
+    stroke-linecap: round;
+  }
+
+  .ism__plank-top {
+    fill: var(--rust);
+    stroke: var(--paper);
+    stroke-width: 0.7;
+  }
+
+  .ism__signal {
+    opacity: 0;
+  }
+
+  .ism__glow {
+    fill: var(--rust-hi);
+    opacity: 0.3;
+  }
+
+  .ism__sigdot {
+    fill: var(--rust-hi);
+    stroke: var(--bone);
+    stroke-width: 1.4;
+  }
+
+  .ism__isl {
+    position: absolute;
+    z-index: 2;
+  }
+
+  .ism__isl img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 16px 14px rgb(13 27 30 / 0.18));
+  }
+
+  .ism__isl--win {
+    left: 0;
+    top: 0;
+    width: min(46cqw, 29cqh);
+  }
+
+  .ism__isl--run {
+    right: 0;
+    top: 27cqh;
+    width: min(41cqw, 24cqh);
+  }
+
+  .ism__isl--see {
+    left: 3cqw;
+    top: 66cqh;
+    width: min(43cqw, 27cqh);
+  }
+
+  .ism__scrap {
+    position: absolute;
+    z-index: 1;
+    width: 128px;
+  }
+
+  .ism__scrap .isl-scrap__card {
+    font-size: 11px;
+  }
+
+  .ism__scrap .isl-scrap__hand {
+    font-size: 15px;
+  }
+
+  .ism__label {
+    position: absolute;
+    z-index: 3;
+    display: grid;
+    gap: 6px;
+    width: 46cqw;
+    margin: 0;
+  }
+
+  .ism__label--win {
+    left: 54cqw;
+    top: 3cqh;
+  }
+
+  .ism__label--run {
+    left: 0;
+    top: 34cqh;
+    width: 50cqw;
+  }
+
+  .ism__label--see {
+    left: 54cqw;
+    top: 72cqh;
+  }
+
+  .ism__tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .ism__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--rust);
+    box-shadow: 0 0 0 4px rgb(196 83 28 / 0.16);
+    flex: none;
+  }
+
+  .ism__quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 5cqw, 1.6rem);
+    line-height: 1.14;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .ism__caption {
+    position: relative;
+    height: 3.1em;
+    margin: 14px 0 0;
+    font-size: clamp(1.02rem, 3.6vw, 1.3rem);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .ism__cap {
+    position: absolute;
+    inset: 0;
+  }
+
+  .ism__cap em {
+    font-family: var(--serif);
+    color: var(--accent);
+  }
+
+  /* the cards that follow carry a smaller island each */
+  .isles.is-live-m .isl {
+    --band: 160px;
+  }
+
+  .isles.is-live-m .isl--run {
+    --band: 200px;
+  }
+
+  .isles.is-live-m .isles__frame {
+    padding-top: 24px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .ism__stage {
+    padding-top: 92px;
+  }
+
+  .ism__meter {
+    font-size: 12px;
+  }
+
+  .ism__label {
+    width: 40cqw;
+  }
+
+  .ism__tag {
+    font-size: 0.95rem;
+  }
+}
+
+/* ---- mobile pass 2: bigger stage art, shorter track, cards ride over ----- */
+
+.isles__dots {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .isles.is-live-m .ism {
+    height: 200svh;
+  }
+
+  /* islands scaled up and cropped at the edges; the bridge dominates */
+  .ism__isl--win {
+    left: -7cqw;
+    top: 1cqh;
+    width: min(62cqw, 36cqh);
+  }
+
+  .ism__isl--run {
+    right: -9cqw;
+    top: 25cqh;
+    width: min(56cqw, 32cqh);
+  }
+
+  .ism__isl--see {
+    left: -5cqw;
+    top: 61cqh;
+    width: min(60cqw, 35cqh);
+  }
+
+  .ism__label {
+    text-shadow: 0 0 14px var(--paper), 0 0 6px var(--paper), 0 0 2px var(--paper);
+  }
+
+  .ism__label--win {
+    left: auto;
+    right: 0;
+    top: 0;
+    width: 46cqw;
+    text-align: right;
+  }
+
+  .ism__label--win .ism__tag {
+    justify-content: flex-end;
+  }
+
+  .ism__label--run {
+    top: 31cqh;
+    width: 46cqw;
+  }
+
+  .ism__label--see {
+    left: auto;
+    right: 0;
+    top: 74cqh;
+    width: 44cqw;
+    text-align: right;
+  }
+
+  .ism__label--see .ism__tag {
+    justify-content: flex-end;
+  }
+
+  .ism__quote {
+    font-size: clamp(1.05rem, 4.6cqw, 1.5rem);
+  }
+
+  .ism__rope {
+    stroke-width: 1.4;
+    stroke-opacity: 0.6;
+  }
+
+  .ism__plank-top {
+    stroke-width: 0.9;
+    filter: drop-shadow(0 2px 0 var(--rust-deep));
+  }
+
+  /* the cards: one swipe rail that rides up over the end of the stage */
+  .isles.is-live-m .isles__stage {
+    position: relative;
+    z-index: 4;
+    margin-top: -30svh;
+  }
+
+  .isles.is-live-m .isles__frame {
+    max-width: none;
+    padding: 0;
+  }
+
+  .isles.is-live-m .isles__spine,
+  .isles.is-live-m .isl__art {
+    display: none;
+  }
+
+  .isles.is-live-m .isles__grid {
+    display: flex;
+    gap: 12px;
+    padding: 6px var(--gutter) 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .isles.is-live-m .isles__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .isles.is-live-m .isl {
+    display: block;
+    flex: 0 0 min(84vw, 440px);
+    scroll-snap-align: start;
+  }
+
+  .isles.is-live-m .isl__body {
+    height: 100%;
+    margin: 0;
+    padding: 20px 18px;
+    gap: 14px;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--bone);
+    box-shadow: var(--shadow-2), inset 0 0 0 1px var(--line);
+  }
+
+  .isles.is-live-m .isl__node,
+  .isles.is-live-m .isl:not(.is-reached) .isl__node {
+    position: static;
+    width: 10px;
+    height: 10px;
+    border: 0;
+    background: var(--rust);
+    box-shadow: 0 0 0 4px rgb(196 83 28 / 0.16);
+  }
+
+  .isles.is-live-m .isl__chips li {
+    padding: 3px 9px;
+    font-size: 0.84rem;
+  }
+
+  .isles.is-live-m .isles__dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .isles__dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--line-strong);
+    transition: width 0.3s var(--ease-out), background-color 0.3s;
+  }
+
+  .isles__dots i.is-on {
+    width: 22px;
+    background: var(--rust);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .isles.is-live-m .isl {
+    flex-basis: min(46vw, 420px);
+  }
+}

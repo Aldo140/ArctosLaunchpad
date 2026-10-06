@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 type FieldName =
   | "name"
@@ -17,6 +17,32 @@ type FieldName =
 
 type FieldErrors = Partial<Record<FieldName | "form", string>>;
 
+export type ContactStatus = "idle" | "sending" | "success";
+export type IslandKey = "win" | "run" | "see";
+
+/**
+ * Project types, grouped by the island they belong to. The submitted values
+ * are exactly the strings the API accepts; the grouping is presentation only.
+ */
+const typeGroups = [
+  {
+    island: "win",
+    label: "Win the customer",
+    types: ["Website", "SEO or AI search", "Paid advertising", "Branding", "Lead-generation system"],
+  },
+  {
+    island: "run",
+    label: "Run the work",
+    types: ["Business automation", "Custom software", "CRM or integration"],
+  },
+  {
+    island: "see",
+    label: "See the numbers",
+    types: ["Dashboard or reporting", "Free reporting teardown"],
+  },
+  { island: null, label: "Something else", types: ["Ongoing support", "Not sure yet"] },
+] as const;
+
 const projectTypes = [
   "Free reporting teardown",
   "Website",
@@ -31,6 +57,14 @@ const projectTypes = [
   "Ongoing support",
   "Not sure yet",
 ] as const;
+
+/** Which island a project type lights on the bridge. */
+export function islandFor(type: string): IslandKey | null {
+  for (const group of typeGroups) {
+    if ((group.types as readonly string[]).includes(type)) return group.island;
+  }
+  return null;
+}
 
 const budgetRanges = [
   "Under $10,000",
@@ -63,6 +97,8 @@ const fieldOrder: FieldName[] = [
   "message",
 ];
 
+const EMAIL = /^\S+@\S+\.\S+$/;
+
 function valueOf(formData: FormData, name: FieldName) {
   return String(formData.get(name) ?? "").trim();
 }
@@ -81,7 +117,7 @@ function validate(formData: FormData): FieldErrors {
   const message = valueOf(formData, "message");
 
   if (name.length < 2) errors.name = "Enter your name.";
-  if (!/^\S+@\S+\.\S+$/.test(email))
+  if (!EMAIL.test(email))
     errors.email = "Enter a valid email address.";
   if (company && company.length < 2)
     errors.company = "Enter your company or organization.";
@@ -119,6 +155,16 @@ function validate(formData: FormData): FieldErrors {
   return errors;
 }
 
+/** The three details we need before we can reply: name, email, challenge. */
+function readiness(form: HTMLFormElement) {
+  const data = new FormData(form);
+  return {
+    name: valueOf(data, "name").length >= 2,
+    email: EMAIL.test(valueOf(data, "email")),
+    challenge: valueOf(data, "challenge").length >= 20,
+  };
+}
+
 /**
  * Per-field message. Announcement is handled once by the summary at the top of
  * the form rather than by ten simultaneous live regions, which is quieter for
@@ -134,17 +180,70 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export function ContactForm() {
+/** Rust line that draws in on focus, and a tick once the value is usable. */
+function Ink({ ok }: { ok?: boolean }) {
+  return (
+    <>
+      <span className="field__ink" aria-hidden="true" />
+      {ok !== undefined ? <span className={`field__ok${ok ? " is-ok" : ""}`} aria-hidden="true" /> : null}
+    </>
+  );
+}
+
+const CHOICES: Record<string, string> = {
+  website: "Website",
+  automation: "Business automation",
+  software: "Custom software",
+  reporting: "Dashboard or reporting",
+};
+
+export function ContactForm({
+  onTypeChange,
+  onProgress,
+  onStatusChange,
+}: {
+  onTypeChange?: (type: string) => void;
+  onProgress?: (filled: number) => void;
+  onStatusChange?: (status: ContactStatus) => void;
+} = {}) {
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+  const [status, setStatusState] = useState<ContactStatus>("idle");
+  const [type, setTypeState] = useState<string>("Not sure yet");
+  const [ready, setReady] = useState({ name: false, email: false, challenge: false });
   const successHeading = useRef<HTMLHeadingElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  useEffect(() => {
-    const choices: Record<string, string> = { website: "Website", automation: "Business automation", software: "Custom software", reporting: "Dashboard or reporting" };
-    const selected = choices[new URLSearchParams(window.location.search).get("need") ?? ""];
-    const input = formRef.current?.elements.namedItem("projectType") as HTMLSelectElement | null;
-    if (selected && input) input.value = selected;
-  }, []);
+  const [context, setContext] = useState<string | null>(null);
+
+  const setStatus = (next: ContactStatus) => {
+    setStatusState(next);
+    onStatusChange?.(next);
+  };
+  const setType = (next: string) => {
+    setTypeState(next);
+    onTypeChange?.(next);
+  };
+
+  // `?need=` preselects the project type and says where the visitor started.
+  // Read once, on the client, so the static page stays cacheable.
+  const preselected = useRef(false);
+  const formRef = (form: HTMLFormElement | null) => {
+    if (!form || preselected.current) return;
+    preselected.current = true;
+    const selected = CHOICES[new URLSearchParams(window.location.search).get("need") ?? ""];
+    if (selected) {
+      requestAnimationFrame(() => {
+        setType(selected);
+        setContext(selected);
+      });
+    }
+  };
+
+  function handleInput(event: FormEvent<HTMLFormElement>) {
+    const next = readiness(event.currentTarget);
+    setReady((prev) =>
+      prev.name === next.name && prev.email === next.email && prev.challenge === next.challenge ? prev : next,
+    );
+    onProgress?.(Number(next.name) + Number(next.email) + Number(next.challenge));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -156,7 +255,9 @@ export function ContactForm() {
       setErrors(clientErrors);
       const firstInvalid = Object.keys(clientErrors)[0];
       window.requestAnimationFrame(() => {
-        const input = form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`);
+        const input =
+          form.querySelector<HTMLElement>(`[name="${firstInvalid}"]:checked`) ??
+          form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`);
         const extra = input?.closest("details");
         if (extra) extra.open = true;
         input?.focus();
@@ -205,6 +306,7 @@ export function ContactForm() {
       }
 
       form.reset();
+      setReady({ name: false, email: false, challenge: false });
       setStatus("success");
       window.requestAnimationFrame(() => successHeading.current?.focus());
     } catch {
@@ -217,26 +319,39 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <section className="receipt" data-material="paper" aria-live="polite">
-        <p className="tick-label">Enquiry received</p>
+      <section className="form receipt" aria-live="polite">
+        <svg className="receipt__seal" viewBox="0 0 64 64" aria-hidden="true">
+          <circle className="receipt__ring" cx="32" cy="32" r="29" pathLength={1} />
+          <path className="receipt__check" d="M20 33.5 28.5 42 45 24" pathLength={1} />
+        </svg>
+        <p className="eyebrow">Enquiry received</p>
         <h2
           ref={successHeading}
           tabIndex={-1}
-          className="t-title receipt__title"
+          className="h2 receipt__title"
         >
           Thank you. <em>We’ll take it from here.</em>
         </h2>
-        <p className="t-body">
+        <p className="body">
           We’ll read it properly and reply within two business days.
         </p>
+        <ol className="receipt__trail" aria-label="What happens now">
+          <li className="is-done"><span aria-hidden="true" />Sent</li>
+          <li><span aria-hidden="true" />Read by the people who’d do the work</li>
+          <li><span aria-hidden="true" />Reply within two business days</li>
+        </ol>
         <div className="receipt__actions">
-          <Link className="btn btn--ghost btn--small" href="/work">
-            See recent work
+          <Link className="link" href="/work">
+            See recent work<span aria-hidden="true">→</span>
           </Link>
           <button
             className="receipt__again"
             type="button"
-            onClick={() => setStatus("idle")}
+            onClick={() => {
+              setType("Not sure yet");
+              onProgress?.(0);
+              setStatus("idle");
+            }}
           >
             Send another enquiry
           </button>
@@ -251,24 +366,56 @@ export function ContactForm() {
   });
 
   const listed = fieldOrder.filter((f) => errors[f]);
-  return <form ref={formRef} className="v3-form" data-material="paper" onSubmit={handleSubmit} noValidate aria-busy={status === "sending"}>
-    <p className="v3-kicker">Tell us a little about the project</p>
-    <p className="v3-form__intro">Start with the problem. We’ll help with the plan.</p>
-    {(errors.form || listed.length > 0) && <div className="v3-form__alert" role="alert"><p>{errors.form ?? "A few details need attention."}</p>{listed.map(field => <a key={field} href={`#${field}`}>{errors[field]}</a>)}</div>}
-    <div className="v3-form__pair">
-      <div className="field"><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" maxLength={100} required {...describedBy("name")} /><FieldError id="name-error" message={errors.name} /></div>
-      <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" maxLength={254} required {...describedBy("email")} /><FieldError id="email-error" message={errors.email} /></div>
+  const filled = Number(ready.name) + Number(ready.email) + Number(ready.challenge);
+  return <form ref={formRef} className="form" onSubmit={handleSubmit} onInput={handleInput} noValidate aria-busy={status === "sending"}>
+    <div className="form__head">
+      <p className="eyebrow">Tell us a little about the project</p>
+      <p className="form__meter" data-filled={filled}>
+        <span className="form__pips" aria-hidden="true"><i data-on={ready.name || undefined} /><i data-on={ready.email || undefined} /><i data-on={ready.challenge || undefined} /></span>
+        <span className="mono">{filled === 3 ? "Ready to send" : `${filled} of 3 needed`}</span>
+      </p>
     </div>
-    <div className="field"><label htmlFor="projectType">What can we help with?</label><select id="projectType" name="projectType" defaultValue="Not sure yet" {...describedBy("projectType")}>{projectTypes.map(type => <option key={type}>{type}</option>)}</select><FieldError id="projectType-error" message={errors.projectType} /></div>
-    <div className="field"><label htmlFor="challenge">What would you like to change?</label><textarea id="challenge" name="challenge" rows={4} maxLength={1500} minLength={20} required placeholder="We need a website that brings enquiries. Our team spends too long copying data. We have an idea for a new tool…" {...describedBy("challenge")} /><p className="v3-form__hint">A sentence or two is enough to start.</p><FieldError id="challenge-error" message={errors.challenge} /></div>
-    <details className="v3-form__extras"><summary>Add company, budget or timing <span>Optional +</span></summary><div className="v3-form__extra-fields">
-      <div className="field"><label htmlFor="company">Company</label><input id="company" name="company" autoComplete="organization" maxLength={150} {...describedBy("company")} /><FieldError id="company-error" message={errors.company} /></div>
-      <div className="field"><label htmlFor="website">Current website</label><input id="website" name="website" type="url" placeholder="https://" maxLength={300} {...describedBy("website")} /><FieldError id="website-error" message={errors.website} /></div>
-      <div className="field"><label htmlFor="budget">Budget</label><select id="budget" name="budget" defaultValue="" {...describedBy("budget")}><option value="">Not decided</option>{budgetRanges.map(range => <option key={range}>{range}</option>)}</select><FieldError id="budget-error" message={errors.budget} /></div>
-      <div className="field"><label htmlFor="timeline">Timing</label><select id="timeline" name="timeline" defaultValue="" {...describedBy("timeline")}><option value="">Not decided</option>{timelines.map(timeline => <option key={timeline}>{timeline}</option>)}</select><FieldError id="timeline-error" message={errors.timeline} /></div>
+    <p className="form__intro">Start with the problem. We’ll help with the plan.</p>
+    {context ? <p className="form__context"><span className="mono">Starting from</span> {context}</p> : null}
+    {(errors.form || listed.length > 0) && <div className="form__alert" role="alert"><p>{errors.form ?? "A few details need attention."}</p>{listed.map(field => <a key={field} href={`#${field}`}>{errors[field]}</a>)}</div>}
+    <div className="form__pair">
+      <div className="field"><label htmlFor="name">Your name</label><span className="field__control"><input id="name" name="name" autoComplete="name" maxLength={100} required {...describedBy("name")} /><Ink ok={ready.name} /></span><FieldError id="name-error" message={errors.name} /></div>
+      <div className="field"><label htmlFor="email">Email address</label><span className="field__control"><input id="email" name="email" type="email" autoComplete="email" maxLength={254} required {...describedBy("email")} /><Ink ok={ready.email} /></span><FieldError id="email-error" message={errors.email} /></div>
+    </div>
+    <fieldset className="field chips" {...describedBy("projectType")}>
+      <legend>What can we help with?</legend>
+      {typeGroups.map((group) => (
+        <div key={group.label} className="chips__group" data-island={group.island ?? "none"} role="group" aria-label={group.label}>
+          <span className="chips__label mono" aria-hidden="true">{group.label}</span>
+          <div className="chips__row">
+            {group.types.map((t) => (
+              <label key={t} className="chip">
+                <input
+                  type="radio"
+                  name="projectType"
+                  value={t}
+                  id={t === "Website" ? "projectType" : undefined}
+                  checked={type === t}
+                  onChange={() => setType(t)}
+                  {...describedBy("projectType")}
+                />
+                <span>{t}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ))}
+      <FieldError id="projectType-error" message={errors.projectType} />
+    </fieldset>
+    <div className="field"><label htmlFor="challenge">What would you like to change?</label><span className="field__control"><textarea id="challenge" name="challenge" rows={4} maxLength={1500} minLength={20} required placeholder="We need a website that brings enquiries. Our team spends too long copying data. We have an idea for a new tool…" {...describedBy("challenge")} /><Ink ok={ready.challenge} /></span><p className="form__hint">A sentence or two is enough to start.</p><FieldError id="challenge-error" message={errors.challenge} /></div>
+    <details className="form__extras"><summary>Add company, budget or timing <span>Optional +</span></summary><div className="form__extra-fields">
+      <div className="field"><label htmlFor="company">Company</label><span className="field__control"><input id="company" name="company" autoComplete="organization" maxLength={150} {...describedBy("company")} /><Ink /></span><FieldError id="company-error" message={errors.company} /></div>
+      <div className="field"><label htmlFor="website">Current website</label><span className="field__control"><input id="website" name="website" type="url" placeholder="https://" maxLength={300} {...describedBy("website")} /><Ink /></span><FieldError id="website-error" message={errors.website} /></div>
+      <div className="field"><label htmlFor="budget">Budget</label><span className="field__control"><select id="budget" name="budget" defaultValue="" {...describedBy("budget")}><option value="">Not decided</option>{budgetRanges.map(range => <option key={range}>{range}</option>)}</select><Ink /></span><FieldError id="budget-error" message={errors.budget} /></div>
+      <div className="field"><label htmlFor="timeline">Timing</label><span className="field__control"><select id="timeline" name="timeline" defaultValue="" {...describedBy("timeline")}><option value="">Not decided</option>{timelines.map(timeline => <option key={timeline}>{timeline}</option>)}</select><Ink /></span><FieldError id="timeline-error" message={errors.timeline} /></div>
     </div></details>
     <div className="form__trap" aria-hidden="true"><label>Leave this empty<input name="address" type="text" tabIndex={-1} autoComplete="off" /></label></div>
-    <button className="v3-button v3-button--ink" type="submit" disabled={status === "sending"}><span>{status === "sending" ? "Sending…" : "Send my project enquiry"}</span><span aria-hidden="true">↗</span></button>
-    <p className="v3-form__privacy">Your details are used to answer your enquiry. <Link href="/privacy">Privacy notice</Link></p>
+    <button className="btn btn--block form__send" type="submit" disabled={status === "sending"}><span>{status === "sending" ? "Sending…" : "Send my project enquiry"}</span><span className="btn__dot" aria-hidden="true">→</span></button>
+    <p className="form__privacy">Your details are used to answer your enquiry. <Link href="/privacy">Privacy notice</Link></p>
   </form>;
 }

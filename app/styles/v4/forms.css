@@ -1,0 +1,588 @@
+/* =========================================================================
+   ARCTOS v4 — forms: contact page, project form, teardown form
+   ========================================================================= */
+
+/* ---- Contact page ---------------------------------------------------- */
+
+.contact {
+  position: relative;
+  padding: clamp(120px, 15vh, 168px) 0 clamp(72px, 9vw, 128px);
+  overflow: hidden;
+  background:
+    radial-gradient(50% 50% at 0% 100%, rgb(33 70 63 / 0.6), transparent 70%),
+    var(--ink);
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 56px clamp(40px, 6vw, 104px);
+  align-items: start;
+}
+
+.contact__side {
+  display: grid;
+  gap: 26px;
+  align-content: start;
+  justify-items: start;
+}
+
+.contact__next {
+  display: grid;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.contact__next li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.contact__step {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.contact__next p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.contact__next .contact__step-title {
+  margin-bottom: 2px;
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.contact__bridge {
+  width: min(380px, 80%);
+  margin: 8px 0 -8px;
+  opacity: 0.92;
+}
+
+.contact__aside {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 20px 22px;
+  border-radius: var(--radius-lg);
+  background: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.contact__aside .mono {
+  margin: 0;
+  color: var(--accent);
+}
+
+.contact__aside p:not(.mono) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.contact__form {
+  position: sticky;
+  top: 96px;
+  padding: clamp(24px, 3.4vw, 48px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+}
+
+@media (max-width: 960px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__form {
+    position: static;
+  }
+
+  .contact__bridge {
+    display: none;
+  }
+}
+
+/* ---- Project form ---------------------------------------------------- */
+
+.form {
+  display: grid;
+  gap: 22px;
+}
+
+.form__intro {
+  margin: -8px 0 0;
+  font-family: var(--serif);
+  font-size: var(--fs-3);
+  line-height: 1.2;
+}
+
+.form__context {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgb(196 83 28 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(159 63 14 / 0.3);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.form__context .mono {
+  color: var(--accent);
+}
+
+.form__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label,
+.tdn-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea,
+.tdn-field input,
+.tdn-field select,
+.tdn-field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 14px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--fg);
+  font: 400 1rem/1.4 var(--sans);
+  transition: box-shadow 0.25s, background 0.25s;
+  appearance: none;
+}
+
+.field select,
+.tdn-field select {
+  padding-right: 40px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.field textarea,
+.tdn-field textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover,
+.tdn-field input:hover,
+.tdn-field textarea:hover {
+  box-shadow: inset 0 0 0 1px var(--fg);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.tdn-field input:focus,
+.tdn-field select:focus,
+.tdn-field textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--rust-deep), 0 0 0 4px rgb(196 83 28 / 0.15);
+}
+
+.field [aria-invalid="true"],
+.tdn-field [aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px #a3261b;
+}
+
+.field__error,
+.tdn-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a3261b;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.field__error-mark,
+.tdn-error__mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.form__hint,
+.tdn-help,
+.tdn-micro {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.84rem;
+}
+
+.form__alert,
+.tdn-alert {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: rgb(163 38 27 / 0.07);
+  box-shadow: inset 3px 0 0 #a3261b;
+}
+
+.form__alert p,
+.tdn-alert__title,
+.tdn-alert__body {
+  margin: 0;
+  font-weight: 600;
+}
+
+.form__alert a,
+.tdn-alert__list a {
+  color: #a3261b;
+  font-size: 0.9rem;
+}
+
+.tdn-alert__list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.form__extras {
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.form__extras summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+.form__extras summary::-webkit-details-marker {
+  display: none;
+}
+
+.form__extras summary span {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.form__extra-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 0 18px 18px;
+}
+
+.form__trap,
+.tdn-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__privacy {
+  margin: -4px 0 0;
+  color: var(--faint);
+  font-size: 0.84rem;
+}
+
+.form__privacy a {
+  color: inherit;
+}
+
+.receipt {
+  justify-items: start;
+}
+
+.receipt__tick {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--pine);
+  animation: tick-in 0.6s var(--ease-out);
+}
+
+.receipt__tick::after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 15px;
+  width: 12px;
+  height: 22px;
+  border: solid var(--bone);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+@keyframes tick-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+.receipt__title:focus {
+  outline: none;
+}
+
+.receipt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+}
+
+.receipt__again {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .form__pair,
+  .form__extra-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Teardown form --------------------------------------------------- */
+
+.tdn-sheet {
+  display: grid;
+  gap: 20px;
+  padding: clamp(24px, 3.4vw, 44px);
+  border-radius: var(--radius-lg);
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow: var(--shadow-3);
+  --fg: var(--ink);
+  --muted: #4a5555;
+  --faint: #5d6664;
+  --line: rgb(13 27 30 / 0.12);
+  --line-strong: rgb(13 27 30 / 0.28);
+  --accent: var(--rust-deep);
+  --surface: #fffdf8;
+}
+
+.tdn-sheet__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tdn-sheet__head p {
+  margin: 0;
+}
+
+.tdn-sheet__req {
+  color: var(--faint);
+}
+
+.tdn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.tdn-field {
+  display: grid;
+  gap: 8px;
+}
+
+.tdn-opt {
+  margin-left: 6px;
+  color: var(--faint);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.tdn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 56px;
+  padding: 0 10px 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 600 0.98rem/1 var(--sans);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.tdn-submit:hover {
+  background: var(--rust-deep);
+}
+
+.tdn-submit__arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: var(--bone);
+}
+
+.tdn-act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+}
+
+.tdn-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.tdn-done__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: var(--fs-2);
+  line-height: 1.05;
+}
+
+.tdn-done__title:focus {
+  outline: none;
+}
+
+.tdn-done__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tdn-done__list li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+}
+
+.tdn-done__foot {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .tdn-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact__form-plain {
+  position: sticky;
+  top: 96px;
+}
+
+.tdn-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
+  margin: clamp(40px, 5vw, 72px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tdn-steps li {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding-top: 24px;
+  border-top: 2px solid var(--rust);
+}
+
+.tdn-steps p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.tdn-proof {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+  gap: 48px clamp(40px, 6vw, 104px);
+  align-items: center;
+}
+
+.tdn-proof__copy {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+
+.tdn-proof__stage {
+  display: block;
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 960px) {
+  .contact__form-plain {
+    position: static;
+  }
+
+  .tdn-steps,
+  .tdn-proof {
+    grid-template-columns: 1fr;
+  }
+}

@@ -12,3 +12,4 @@ export * from "./work";
 export * from "./industries";
 export * from "./process";
 export * from "./site";
+export * from "./islands";

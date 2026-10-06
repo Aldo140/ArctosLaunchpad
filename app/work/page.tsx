@@ -1,13 +1,36 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { CTASection } from "@/components/CTASection";
-import { ReportArtifact } from "@/components/figures/ReportArtifact";
-import { ProjectReel } from "@/components/figures/ProjectReel";
-import { workOrder } from "@/components/work/order";
-import { pageMetadata, breadcrumbSchema, graph, jsonLd, webPageSchema } from "@/lib/seo";
-export const metadata: Metadata = pageMetadata({title:"Work",description:"Explore websites, internal reporting tools, civic platforms and software built by Arctos Launchpad.",path:"/work"});
-export default function WorkPage(){return <div className="v3-page">
-<section className="v3-page-lead" data-material="paper" data-station="Work"><div className="v3-wrap"><p className="v3-kicker">Selected work</p><h1>Real businesses.<br /><em>Working systems.</em></h1><p>A reporting tool used behind the scenes. A specialised business brought online. Platforms that connect people and information. Here is what the work looks like in use.</p></div></section>
-{workOrder.map((project,i)=><section key={project.slug} className="v3-section v3-case" data-material={i%2===0?"instrument":"paper"} data-station={(project.client ?? project.title)}><div className="v3-wrap v3-case__grid"><div><p className="v3-kicker">{String(i+1).padStart(2,"0")} / {project.statusLabel}</p><h2>{(project.client ?? project.title)}</h2><p className="v3-case__summary">{project.summary}</p><div className="v3-case__tags">{project.services.map(service=><span key={service}>{service}</span>)}</div><Link className="v3-text-link" href={project.route}>Inside the project<span aria-hidden="true">↗</span></Link></div><div className="v3-case__visual">{project.slug==="fresh-prep-event-intelligence"?<ReportArtifact caption="Structure of the internal report. Client figures withheld." />:project.reel?.poster?<ProjectReel src={project.reel.src} poster={project.reel.poster} title={(project.client ?? project.title)}/>:project.featuredImage?<Image src={project.featuredImage} alt={project.title} width={1000} height={700} sizes="(max-width:760px) 100vw, 50vw"/>:<div className="v3-concept"><p className="v3-kicker">LeaseFlow / Working demo</p><ol><li>Listing enquiry</li><li>Lease-package request</li><li>Organised review</li></ol><p className="v3-small">A connected flow from first contact to a reviewable request.</p></div>}</div></div></section>)}
-<CTASection title="What could we build for your business?"/><script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(graph(webPageSchema({type:"CollectionPage",name:"Work",path:"/work",description:"Arctos project case files."}),breadcrumbSchema([{name:"Work",path:"/work"}])))} /></div>;}
+import { getProjectBySlug, portfolioOrder, type Project } from "@/lib/content";
+import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo";
+import { JsonLd, StartBand } from "@/components/site/Page";
+import { WorkIndex } from "@/components/site/WorkIndex";
+import { WorkHero } from "@/components/site/work/WorkHero";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Work",
+  description:
+    "Client websites, civic and nonprofit platforms, an events operations system, an internal reporting tool and the studio's own products, each labelled for exactly what it is.",
+  path: "/work",
+  cardTitle: "Proof, not promises.",
+});
+
+export default function WorkPage() {
+  const projects = portfolioOrder.map((slug) => getProjectBySlug(slug)).filter((p): p is Project => Boolean(p));
+
+  return (
+    <>
+      <WorkHero projects={projects} />
+      <section className="section work-index tone-ink" data-tone="ink" aria-label="All projects">
+        <div className="wrap">
+          <WorkIndex projects={projects} />
+        </div>
+      </section>
+      <StartBand title={["What could we", <em key="b">build for you?</em>]} />
+      <JsonLd
+        data={graph(
+          webPageSchema({ type: "CollectionPage", name: "Work", path: "/work", description: "Arctos project case files." }),
+          breadcrumbSchema([{ name: "Work", path: "/work" }]),
+        )}
+      />
+    </>
+  );
+}

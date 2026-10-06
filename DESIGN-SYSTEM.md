@@ -1,264 +1,96 @@
-# Arctos Launchpad — design system contract
+# Arctos Launchpad — design system contract (v4, "The bridge")
 
-**Read this fully before changing any UI. It is binding.** If a change would
-break a rule here, do not make the change; note it instead.
-
----
-
-## 1. The concept
-
-The site is built from **two materials that never blend**:
-
-| Material     | What it is                                | Where it appears                              |
-| ------------ | ----------------------------------------- | --------------------------------------------- |
-| `paper`      | The field guide. Warm, torn, printed.     | Chapter stages, studio, selected pull sections |
-| `instrument` | The screen. Black, precise, luminous.     | Hero, work, systems, data, most interiors      |
-
-The tension between them *is* the brand. Alternating them is the primary
-compositional tool. A page that is all one material is usually a page that has
-not been designed yet.
-
-Every section declares one:
-
-```tsx
-<section className="section" data-material="instrument" data-station="Work">
-```
-
-- `data-material` — `"paper"` | `"instrument"`. **Required on every section.**
-- `data-chapter` — `"attract"` | `"convert"` | `"operate"` | `"scale"`. Optional.
-  Sets `--accent` for that subtree.
-- `data-station` — short label. Feeds the survey rule in the left gutter.
-  Required on top-level sections.
-
-`components/ChromeSync.tsx` mirrors the material of whatever sits under the
-header onto `<body>`, so the fixed header and survey rule invert automatically.
-**Do not give the header or rule fixed colours.**
+**Read this before changing any UI.** If a change would break a rule here, don't make it; note it instead.
+The audit, references and reasoning behind v4 are in `docs/redesign/BRIEF.md`.
 
 ---
 
-## 2. Colour — never hard-code one
+## 1. The idea
 
-`app/tokens.css` is the only file allowed to contain a hex value.
+Every growing business lives on three islands: **winning customers**, **running the work**, and
+**seeing the numbers**. Arctos builds the bridge between them. The bridge illustration
+(`public/assets/art/bridge.webp`) is the brand's central image, and the bear is a builder, not a mascot.
 
-Everything else uses the neutral aliases, which resolve per material:
+| Island | Line in the hero | Stages (content model) | `/contact?need=` |
+| --- | --- | --- | --- |
+| 01 Win the customer | Win the customer. | attract, convert | `website` |
+| 02 Run the work | Run the work. | operate | `automation` |
+| 03 See the numbers | See the numbers. | scale | `reporting` |
 
-| Token             | Use                                        |
-| ----------------- | ------------------------------------------ |
-| `--bg`            | Section ground                             |
-| `--bg-raised`     | Cards, inset panels, media wells           |
-| `--fg`            | Primary text                               |
-| `--fg-dim`        | Body copy, secondary text                  |
-| `--fg-faint`      | Captions, folios, disabled                 |
-| `--rule`          | Hairlines                                  |
-| `--rule-strong`   | Emphasised hairlines, input borders        |
-| `--accent`        | Interactive + chapter accent               |
+The grouping lives in `lib/content/islands.ts`. Services, claims and copy still come from the other content files.
 
-Chapter accents were **sampled from the collage artwork itself**, so UI accent
-and printed canvas are the same colour. Do not "improve" them.
+## 2. Tokens
 
-`--fg-faint` resolves to about **2.8:1 on instrument**. That is correct for what
-it is — folios and marks that could be deleted without losing meaning. Anything
-a reader needs uses `--fg-dim` (~6:1), however small and quiet it is.
+All colour lives in `app/styles/v4/tokens.css`. Nothing else hard-codes a colour except the
+typeset figures, which sit on their own printed sheet.
 
-Documents (case studies, industry briefs, legal) stay ~75–80% neutral. **The
-four narrative routes do not** — on a held scene the artwork is full-bleed and
-the accent runs the seam, the folio, and the gauge. Restraint on those pages
-read as timidity, which is why they were rebuilt.
+* **Ink** `#0d1b1e`: the water the islands float in. Most hero and proof chapters.
+* **Paper** `#f1ebdf` / **Bone** `#f8f4ec`: reading chapters.
+* **Pine** `#21463f`: outcomes and "what changed" moments.
+* **Rust** `#c4531c`: the signal, meaning the path a customer or a task takes. Used for rules, dots, the hero deck trail and hover fills. Small rust text uses `--rust-hi` on dark and `--rust-deep` on light (both ≥ 4.5:1).
+* **Ink-deep** `#02131b`: only behind *the-work-moves* art, which was painted on that ground.
 
----
+A section declares one tone with `tone-ink | tone-paper | tone-bone | tone-pine` **and** `data-tone`.
+The header reads `data-tone` under it to stay legible.
 
-## 3. Type — three voices
+Every `--muted` and `--faint` value meets 4.5:1 on its own tone. Re-check with real numbers if you change one.
 
-| Variable          | Face          | Role                                              |
-| ----------------- | ------------- | ------------------------------------------------- |
-| `--font-ui`       | Archivo       | Instrument voice. Nav, body, buttons, UI, headlines |
-| `--font-display`  | Newsreader    | Paper voice. Chapter names, pull quotes, the italic turn |
-| `--font-mono`     | IBM Plex Mono | Annotation. Folios, coordinates, captions, eyebrows |
+## 3. Type
 
-Archivo carries a **width axis** — use `font-stretch` (88–96%) for hierarchy,
-not just size. That is a deliberate part of the system.
+* **Newsreader** (serif) for display and headings. Its italic, in the tone's accent, carries the human turn: *"not promises."*, *"One bridge."*
+* **Archivo** for interface and body.
+* **Plex Mono** for eyebrows, indices, status and captions only.
 
-Classes: `.t-hero .t-display .t-title .t-paper .t-quote .t-lead .t-body
-.t-label .t-folio`
+Scale tokens are `--fs-hero`, `--fs-1`, `--fs-2`, `--fs-3` and `--fs-lead`. Headlines are authored in lines
+(`<Lines lines={[...]}>`), so the break points are editorial decisions.
 
-**The signature type move:** one phrase per headline drops into Newsreader
-italic via `<em>`. Two typefaces, one line — the two halves of the studio said
-typographically.
+## 4. Composition
 
-```tsx
-<h2 className="t-display">More leads should not mean <em>more administrative work.</em></h2>
-```
+* **No two chapters share a layout on the same page.** If a section could be dropped into a generic agency site unchanged, rethink it.
+* `PageHero` has three layouts (`split`, `stack`, `center`), and pages choose by content, not by habit.
+* Tone alternates with purpose: ink for proof and arrival, paper and bone for reading, pine for outcomes.
 
-Use it once per headline. Never twice.
+## 5. Project media: honesty rules
 
----
+* Real recordings, real phone captures and the client's own photography only. **No drawn browser chrome** around real screenshots.
+* Every project shows its status label (`statusLabel`) and a status dot: live (green), internal (sage), studio or demo (rust).
+* Projects without public media get a **typeset figure** that says what it is (`components/site/Figures.tsx`). Redactions are widths only, never numbers.
+* Never invent results, clients, testimonials, awards, timelines or capabilities.
 
-## 4. Existing vocabulary — compose, don't invent
+## 6. Motion: it must explain something
 
-Before writing a new class, check whether one of these fits:
+| Primitive | Where | Explains |
+| --- | --- | --- |
+| Signal along the deck + headline rules | Hero | customer → work → numbers |
+| Islands settle + deck draws | Home, "three islands" | disconnected → connected |
+| Pinned sideways rail, phone on a nearer plane | Home work | depth of real artifacts |
+| Route line draws, stops light | Process (home + `/process`) | order of operations |
+| Problems struck through | Service and industry pages | problem → resolved |
+| Self-check checklist with a live count | Calgary pages | self-diagnosis |
+| `[data-reveal]`, `Lines` | Everywhere | entrance only, once |
 
-**Layout** `.shell` `.section` `.section--tight` `.section--flush`
-**Text** `.tick-label` `.rule` `.link` `.btn` `.btn--ghost` `.btn--small`
-**Document** `.masthead` `.crumbs` `.doc__head` `.doc__split` `.doc__cols`
-`.doc__aside` `.doc__outcomes`
-**Lists** `.ledger` `.archive` `.numbered` `.steps` `.chips` `.chips--large`
-`.register` `.faq`
-**Media** `.specimen` `.proof__gallery` `.plate` `.reel-figure`
+Rules:
+* Only `transform` and `opacity` animate. Scrubbed timelines use GSAP ScrollTrigger; entrances are CSS transitions toggled by `components/site/Motion.tsx`.
+* Content is hidden only under `html.js-motion`, which an inline script sets **only** when reduced motion isn't requested. A 4s CSS fallback makes it visible even if the script dies.
+* Reduced motion: no pinning, no scrubbing, no reel autoplay, nothing dimmed, and the hero's lines are fully lit.
+* No scroll hijacking on touch. The work rail pins only at `min-width: 1024px` with `pointer: fine`.
+* Reels are `preload="none"` and play only while on screen.
 
-Components: `PageHeader`, `CTASection`, `SpecimenStrip`, `ProjectFeature`,
-`ProjectReel`, `ArctosMark`, `ArctosLockup`, `LocalBrief`, `Register`.
+### Lessons from the v4.1 section pass
+* In scrubbed timelines, don't put `stagger` inside `fromTo`; create one tween per element. A ScrollTrigger refresh re-applies only the first target's start state.
+* `gsap.matchMedia().add({...conditions})` only runs when at least one condition matches, so include an always-true condition when you need a fallback.
+* A section that pins must set `refreshPriority` so pins lower on the page measure after it.
+* Never change a reveal element's `className` after mount. It wipes the `is-in` class that `Motion.tsx` adds. `Motion.tsx` also arms `[data-reveal]` elements that mount later.
 
-New CSS goes in the matching sheet: `app/home.css` (homepage) or
-`app/pages.css` (interiors). Never inline `<style>`. Never a new global reset.
+## 7. Conversion
 
----
+* Primary action: **Start a project** (`/contact`). Island links carry `?need=` and the form shows "Starting from …".
+* The form needs name, email and a sentence about the problem. Everything else is optional.
+* The free reporting teardown is the one smaller, secondary offer.
+* CTA copy names the action. "Learn more" is banned.
 
-## 5. Spacing and rhythm
+## 8. Accessibility
 
-Only `.section` sets vertical rhythm (`--section-y`). Do not add
-`padding-block` or `margin-top` to compete with it — that is exactly how the
-previous stylesheet became 3,240 lines of selectors cancelling each other out.
-
-Scale: `--s1` (4px) through `--s10` (128px). No arbitrary `rem` values.
-
----
-
-## 6. Motion
-
-GSAP + ScrollTrigger are available (`gsap`, `@gsap/react`). Use them for
-orchestrated, meaningful moments. Use CSS for everything simple.
-
-- `.reveal` — one-shot entrance, driven by the observer in `ChromeSync`.
-  It is gated behind `:root.js`, so content stays visible without JS.
-  **Never remove that gate.**
-- **Interiors are opt-in.** `.interior-document` arrives complete by default —
-  a case study or industry brief should be readable the instant it paints. The
-  four narrative routes (Services, Work, Process, Studio) set
-  `data-motion="staged"` on their wrapper to get the gestures back, because on
-  those pages the motion carries the argument. `ChromeSync` and `pages.css`
-  both read that attribute; **change them together or content will render
-  invisible.** The shared `CTASection` is excluded on every interior.
-- Scroll-linked geometry is driven through custom properties (`--run`,
-  `--lit`, `--fill`) whose CSS defaults are the *finished* state, so no JS means
-  a complete page rather than a blank one. Never default them to zero.
-- Motion must not cost legibility. Dimming un-reached content below 4.5:1 to
-  make a point is a bug, not a device — carry progress on rules and marks.
-- Motion must explain sequence or causality. No floating blobs, no
-  cursor-followers, no scroll hijacking, no animated gradient backgrounds.
-- Everything must be silent under `prefers-reduced-motion: reduce`. Test it.
-- Videos: play only while on screen, muted, `playsInline`, `preload="none"`.
-
-The hero's plotter-draw of the Arctos mark is the reference for tone —
-purposeful, technical, once.
-
-**Held scenes.** The narrative routes hold a full-bleed plate with
-`position: sticky` while the instrument panel rises over it in normal flow.
-Sticky, never a pinned ScrollTrigger: no DOM wrapping, no scroll hijacking, and
-it degrades to a plain stack below 900px and under reduced motion. Two rules
-learned the hard way:
-
-- The mark is a **sibling** of `.scene__hold`, never a child — inside it, the
-  negative margin that lifts it over the plate is clipped by `overflow: hidden`.
-- Mega scale (`--t-mega`) is for **one word**. A sentence at 14rem runs off the
-  bottom of the viewport; those use `.scene__title--phrase`.
-
-**Never let content depend on a tween to become visible.** `gsap.from({autoAlpha: 0})`
-hides its target the moment it is built, and a trigger that dies mid-flight
-strands it there — measured at `opacity: 0.85`, in production, on every scene
-after the first when scrolling quickly. Anything whose only job is to end up
-visible fades with a **CSS transition**, which cannot stop short of its end
-value. GSAP is for sequencing, not for revealing.
-
----
-
-## 7. Imagery — hard rules
-
-**Never use:** the photoreal polar bear (retired to `assets-source/retired/`),
-stock cartoon illustration, AI landscapes, aurora, mountains-as-decoration,
-fake browser chrome around real screenshots, text baked into a raster, glowing
-flowcharts, glassmorphism, neon gradients, 3D blobs.
-
-**The chapter collages are the interior system, not homepage-only.** They lead
-the Services scenes, open Process, and label the Studio disciplines. An earlier
-pass banned them from interiors after setting grey copy over torn edges; the
-artwork was never the problem, the placement was. Three rules make them work:
-
-1. Type goes **into the clear paper field**, never over the torn edges.
-2. The scrim under the type is **the artwork's own paper colour** (ink on the
-   Work scenes), so it reads as more paper rather than as a wash over the art.
-3. Each canvas sets its **own** `object-position` — the clear field sits
-   somewhere different in all four, and one shared value puts a headline on a
-   torn edge.
-
-The mark already contains a bear, abstracted. That is the only bear.
-
-`ArctosMark` at **64px and above** shows the bear head. Below that, and for any
-watermark or large decorative use, pass `detail="simple"` — at plate scale the
-head stops reading as a monogram and starts reading as a picture of an animal.
-
-**Asset tiers** (see `docs/ASSET_MAP.md`):
-
-- **Lead with:** the four `.webm` site recordings, `starlings-phone-in-hand`,
-  the four chapter collages, the four site hero captures.
-- **Use cropped, at specimen scale:** True North Kromes chrome macros, Rio Alto
-  food. These are honest phone photography — they read as evidence in a
-  measured strip and as amateur snapshots at full bleed. Use `SpecimenStrip`.
-- **Retired, do not resurrect:** anything in `assets-source/retired/`.
-
-Chapter collages are composed with a large clear paper field. Set type **into**
-that field, never over the torn edges.
-
----
-
-## 8. Accessibility — non-negotiable
-
-Target WCAG 2.2 AA.
-
-- Semantic landmarks. **Exactly one `<main>`**, in `app/layout.tsx`. Pages
-  return fragments, never their own `<main>`.
-- Heading order never skips. One `<h1>` per page.
-- Visible focus (`:focus-visible` is defined globally — do not override it away).
-- Body copy on paper must clear 4.5:1. `--fg-dim` on a busy collage often does
-  not — check it rather than assuming.
-- Decorative images: `alt=""`. Meaningful images need real alt text.
-- Interactive targets ≥ 44px on touch.
-- No hover-only affordances.
-
----
-
-## 9. Responsive
-
-Test 1440 / 1280 / 1024 / 768 / 430 / 390 / 320.
-
-Mobile is not the desktop layout compressed. Horizontal sequences become
-vertical. Decorative detail is dropped, not shrunk. Type stays readable. The
-survey rule is replaced by a hairline progress bar below 1024px. No horizontal
-scroll at any width — wide content scrolls inside its own container.
-
----
-
-## 10. Content
-
-Canadian spelling. Short, specific sentences. Sparse em dashes.
-
-**Never invent** metrics, testimonials, clients, awards, certifications,
-partnerships, review counts, or an office address. No `AggregateRating` schema.
-No "award-winning", "best-in-class", "cutting-edge", "unlock your potential".
-
-Project facts come from `lib/content.ts`. If a fact is not there, it does not
-go on the page.
-
-CTAs say what happens: "Start a project", not "Begin the journey".
-
----
-
-## 11. Definition of done
-
-- [ ] `npx tsc --noEmit` clean
-- [ ] `npx eslint .` clean
-- [ ] `npx next build` succeeds
-- [ ] No hard-coded colours outside `tokens.css`
-- [ ] Every section has `data-material` and `data-station`
-- [ ] Checked at 1440 and 390; no horizontal scroll
-- [ ] Checked with `prefers-reduced-motion: reduce`
-- [ ] Keyboard reachable, focus visible
+WCAG 2.2 AA: one H1 per page, skip link first in tab order, visible focus on every tone, a menu
+dialog with scroll lock, focus trap and Escape, labelled filters with `aria-pressed`, and an `aria-live`
+result count. Forms use an error summary plus per-field messages tied with `aria-describedby`.

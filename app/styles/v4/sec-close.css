@@ -1,0 +1,902 @@
+/* ARCTOS v4 — sec-close (owned by one section agent; overrides earlier sheets)
+   The closing band (.close) and the site footer (.ftr). */
+
+/* =====================================================================
+   CLOSE — "Start here"
+   ===================================================================== */
+
+.close {
+  overflow: clip;
+  isolation: isolate;
+}
+
+/* a soft horizon of light behind the doors: material, not decoration */
+.close::before {
+  content: "";
+  position: absolute;
+  inset: auto -10% -30% 30%;
+  height: 90%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(196 83 28 / 0.07), transparent 70%);
+}
+
+.close.tone-ink::before,
+.close.tone-pine::before {
+  background: radial-gradient(closest-side, rgb(229 122 66 / 0.12), transparent 70%);
+}
+
+.close .close__grid {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 56px clamp(56px, 7vw, 128px);
+}
+
+.close .close__ask {
+  display: grid;
+  gap: 0;
+  justify-items: start;
+}
+
+.close .close__title {
+  margin-top: 26px;
+  max-width: 13ch;
+}
+
+.close--h1 .close__title {
+  max-width: 15ch;
+}
+
+.close .close__lead {
+  margin-top: clamp(32px, 4vw, 52px);
+  max-width: 40ch;
+}
+
+.close .close__side {
+  padding-top: 0;
+  display: grid;
+  gap: 0;
+  justify-items: stretch;
+}
+
+.close .close__label {
+  margin: 0 0 18px;
+  color: var(--faint);
+  line-height: 1.6;
+}
+
+/* ---- Kinetic title ---------------------------------------------------- */
+
+/* once JS has split the words, the words animate; the line wrappers stand still */
+.js-motion .close.is-split .lines[data-reveal] > .ln > span {
+  transform: none;
+  transition: none;
+}
+
+.close.is-split .close__title .ln {
+  overflow: visible;
+}
+
+/* word masks: generous so italic overhang and descenders are never clipped */
+.close__title .cw-mask {
+  padding: 0.04em 0.1em 0.16em;
+  margin: -0.04em -0.1em -0.16em;
+  vertical-align: top;
+}
+
+.close__title .cw {
+  will-change: transform;
+}
+
+/* ---- The signal line --------------------------------------------------- */
+
+.close__wire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.close__line {
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tone-ink .close__line,
+.tone-pine .close__line {
+  stroke: var(--rust-hi);
+}
+
+.close__rail {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+}
+
+.close__node,
+.close__stop {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill 0.35s, stroke 0.35s, transform 0.5s var(--ease-out);
+}
+
+.close__node.is-on,
+.close__stop.is-on {
+  fill: var(--rust);
+  stroke: var(--rust);
+}
+
+.close__stop.is-hot {
+  stroke: var(--rust);
+  transform: scale(1.6);
+}
+
+.close__stop.is-on.is-hot {
+  fill: var(--bg);
+  stroke-width: 2.5;
+}
+
+/* ---- Doors ------------------------------------------------------------- */
+
+.close .close__needs {
+  border-top: 1px solid var(--line-strong);
+}
+
+.close .close__needs > li {
+  position: relative;
+}
+
+.close .door {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: 14px;
+  min-height: 104px;
+  padding: 18px 8px 18px 4px;
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--fg);
+  text-decoration: none;
+  isolation: isolate;
+  transition: color 0.3s;
+}
+
+/* the lifted card that rises behind a row on hover */
+.close .door::before {
+  content: "";
+  position: absolute;
+  inset: -1px -14px;
+  z-index: -1;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  transform: scale(0.97, 0.8);
+  transition: opacity 0.4s var(--ease-out), transform 0.6s var(--ease-out);
+}
+
+.close .door__index {
+  align-self: start;
+  padding-top: 0.55em;
+}
+
+.close .door__text {
+  display: grid;
+  gap: 6px;
+  padding-right: clamp(0px, 7vw, 116px);
+  transition: transform 0.6s var(--ease-out);
+}
+
+.close .door__say {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 1rem + 0.7vw, 1.62rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.close .door__name {
+  color: var(--faint);
+  font-size: 0.68rem;
+}
+
+.close .door__thumb {
+  position: absolute;
+  right: 72px;
+  top: 50%;
+  width: 116px;
+  height: 128px;
+  margin-top: -64px;
+  pointer-events: none;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.7s var(--ease-out);
+}
+
+.close .door__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: translateX(28px) scale(0.9);
+  transition: transform 0.8s var(--ease-out);
+  filter: drop-shadow(0 14px 18px rgb(6 14 16 / 0.22));
+}
+
+.close .door__arrow {
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--accent);
+  font-size: 1.1rem;
+  will-change: transform;
+}
+
+.close .door__arrow > span {
+  display: block;
+  transition: transform 0.5s var(--ease-out), color 0.3s;
+}
+
+.close .door__arrow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--rust);
+  transform: scale(0);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.close .door__arrow {
+  position: relative;
+}
+
+.close .door__arrow > span {
+  position: relative;
+}
+
+.close .door:hover,
+.close .door:focus-visible {
+  color: var(--fg);
+}
+
+.close .door:hover::before,
+.close .door:focus-visible::before {
+  opacity: 1;
+  transform: none;
+}
+
+.close .door:hover .door__text,
+.close .door:focus-visible .door__text {
+  transform: translateX(8px);
+}
+
+.close .door:hover .door__thumb,
+.close .door:focus-visible .door__thumb {
+  clip-path: inset(-40px -20px -10px 0);
+}
+
+.close .door:hover .door__thumb img,
+.close .door:focus-visible .door__thumb img {
+  transform: none;
+}
+
+.close .door:hover .door__arrow::before,
+.close .door:focus-visible .door__arrow::before {
+  transform: scale(1);
+}
+
+.close .door:hover .door__arrow > span,
+.close .door:focus-visible .door__arrow > span {
+  color: var(--bone);
+  transform: rotate(-45deg);
+}
+
+.close .door:focus-visible {
+  outline-offset: 6px;
+}
+
+/* ---- Go ------------------------------------------------------------------ */
+
+.close .close__go {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.close .close__magnet {
+  display: inline-block;
+  will-change: transform;
+}
+
+.close .close__btn {
+  --h: 64px;
+  padding-left: 30px;
+  font-size: 1.04rem;
+  box-shadow: var(--shadow-1);
+}
+
+.close .close__btn .btn__dot {
+  width: 46px;
+  height: 46px;
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .close .close__grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .close .close__title,
+  .close--h1 .close__title {
+    max-width: 16ch;
+  }
+}
+
+/* touch: no hover to reveal, so the islands simply sit in each row */
+@media (hover: none), (max-width: 640px) {
+  .close .door {
+    grid-template-columns: 30px minmax(0, 1fr) 64px;
+    gap: 12px;
+    min-height: 96px;
+    padding-right: 0;
+  }
+
+  .close .door__text {
+    padding-right: 0;
+  }
+
+  .close .door__thumb {
+    position: static;
+    grid-row: 1;
+    grid-column: 3;
+    width: 64px;
+    height: 72px;
+    margin: 0;
+    clip-path: none;
+  }
+
+  .close .door__thumb img {
+    transform: none;
+  }
+
+  .close .door__arrow {
+    display: none;
+  }
+
+  .close .door::after {
+    content: "→" / "";
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--rust);
+    color: var(--bone);
+    font-size: 0.8rem;
+  }
+
+  .close .door:hover .door__text {
+    transform: none;
+  }
+
+  .close .close__btn {
+    width: 100%;
+  }
+
+  .close .close__magnet {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .close .door__thumb {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .close .door:hover .door__thumb,
+  .close .door:focus-visible .door__thumb {
+    opacity: 1;
+  }
+
+  .close .door__thumb img {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and ((hover: none) or (max-width: 640px)) {
+  .close .door__thumb {
+    opacity: 1;
+  }
+}
+
+/* =====================================================================
+   FOOTER — the sign-off
+   ===================================================================== */
+
+.ftr {
+  padding: clamp(56px, 7vw, 104px) 0 0;
+  overflow: clip;
+  isolation: isolate;
+}
+
+/* a cold arctic sky with a warm horizon under the bridge */
+.ftr__sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 72% 34%, rgb(46 92 82 / 0.42), transparent 70%),
+    radial-gradient(40% 26% at 70% 58%, rgb(196 83 28 / 0.16), transparent 70%),
+    linear-gradient(180deg, var(--ink-deep) 0%, var(--ink) 46%, var(--ink) 100%);
+}
+
+.ftr .ftr__top {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 24px clamp(24px, 4vw, 64px);
+  padding-bottom: clamp(40px, 5vw, 72px);
+}
+
+.ftr .ftr__brand p {
+  font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
+  color: var(--muted);
+}
+
+.ftr .ftr__start {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+
+.ftr .ftr__big {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-size: clamp(2.2rem, 1.2rem + 3.2vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(var(--rust-hi), var(--rust-hi)) left 100% / 0% 2px no-repeat;
+  padding-bottom: 8px;
+  transition: background-size 0.7s var(--ease-out), color 0.3s;
+}
+
+.ftr .ftr__big:hover,
+.ftr .ftr__big:focus-visible {
+  background-size: 100% 2px;
+}
+
+.ftr .ftr__big-a {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.ftr .ftr__big:hover .ftr__big-a {
+  transform: translateX(12px);
+}
+
+.ftr .ftr__note {
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+/* ---- The bridge: rises into place with depth ---------------------------- */
+
+.ftr .ftr__bridge {
+  position: relative;
+  width: auto;
+  opacity: 1;
+  perspective: 1200px;
+  margin: clamp(-40px, -3vw, 0px) calc(var(--gutter) * -0.5) 0 0;
+}
+
+.ftr__bridge-tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ftr__bridge-rise {
+  transform-origin: 50% 90%;
+  will-change: transform;
+}
+
+.ftr__bridge-rise img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.35));
+}
+
+/* a cast shadow on the "sea" beneath the islands */
+.ftr__shadow {
+  position: absolute;
+  left: 14%;
+  right: 10%;
+  bottom: 2%;
+  height: 12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.5), transparent);
+  filter: blur(6px);
+}
+
+/* ---- Columns -------------------------------------------------------------- */
+
+.ftr .ftr__cols {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-block: clamp(36px, 4vw, 56px);
+  border-top: 1px solid var(--line);
+}
+
+.ftr .ftr__cols ul {
+  gap: 12px;
+}
+
+.ftr .ftr__cols ul a {
+  position: relative;
+  display: inline-block;
+  font-size: 1.02rem;
+  transition: color 0.3s, transform 0.5s var(--ease-out);
+}
+
+.ftr .ftr__cols ul a::before {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 50%;
+  width: 10px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.ftr .ftr__cols ul a:hover,
+.ftr .ftr__cols ul a:focus-visible {
+  color: var(--fg);
+  transform: translateX(14px);
+}
+
+.ftr .ftr__cols ul a:hover::before,
+.ftr .ftr__cols ul a:focus-visible::before {
+  transform: scaleX(1);
+}
+
+/* ---- Base row --------------------------------------------------------------- */
+
+.ftr .ftr__base {
+  align-items: center;
+  padding-block: 22px;
+}
+
+.ftr .ftr__base ul {
+  align-items: center;
+}
+
+.ftr .ftr__base a {
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.ftr .ftr__base a:hover {
+  color: var(--fg);
+}
+
+.ftr .ftr__top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--fg) !important;
+}
+
+.ftr .ftr__top-link span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--rust);
+  color: var(--bone);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.ftr .ftr__top-link:hover span {
+  transform: translateY(-4px);
+}
+
+/* ---- The wordmark ------------------------------------------------------------ */
+
+.ftr__mark {
+  position: relative;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  overflow: clip;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ftr__word {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: calc(min(100vw, var(--max)) * 0.335);
+  line-height: 0.78;
+  letter-spacing: -0.055em;
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: -0.12em;
+  background: linear-gradient(180deg, var(--paper) 18%, rgb(241 235 223 / 0.08) 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* SplitText chars: each needs its own clipped gradient */
+.ftr__word .fc {
+  background: inherit;
+  background: linear-gradient(180deg, var(--paper) 18%, rgb(241 235 223 / 0.08) 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ftr__word .fc-mask {
+  vertical-align: top;
+  padding-top: 0.08em;
+  margin-top: -0.08em;
+}
+
+.ftr__rule {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 0;
+  height: 3px;
+  background: var(--rust);
+  transform-origin: left;
+}
+
+@media (max-width: 900px) {
+  .ftr .ftr__top {
+    grid-template-columns: 1fr;
+  }
+
+  .ftr .ftr__bridge {
+    order: -1;
+    margin: 0 calc(var(--gutter) * -1);
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .ftr .ftr__bridge {
+    width: auto;
+  }
+
+  .ftr .ftr__cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+  }
+
+  .ftr .ftr__cols nav:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .ftr .ftr__base {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+}
+
+.ftr.is-fx .ftr__word {
+  background: none;
+}
+
+/* =====================================================================
+   CLOSE — phones and tablets
+   ===================================================================== */
+
+@media (max-width: 900px) {
+  /* the lead, doors and button hang off the rust spine drawn by CloseFx */
+  .close.has-rail .close__lead,
+  .close.has-rail .close__side {
+    padding-left: 30px;
+  }
+
+  .close .close__lead {
+    margin-top: 56px;
+  }
+
+  .close .close__grid {
+    gap: 56px;
+  }
+
+  /* the spine's stops sit on the rail; give each row a little more air */
+  .close .door {
+    min-height: 112px;
+  }
+
+  /* rows the line hasn't reached yet wait, quietly; reached rows come up to full */
+  .close.is-live.has-rail .door__thumb {
+    opacity: 0.35;
+    transform: scale(0.78) translateY(10px);
+    transition: opacity 0.6s var(--ease-out), transform 0.9s var(--ease-out);
+  }
+
+  .close.is-live.has-rail .door.is-reached .door__thumb {
+    opacity: 1;
+    transform: none;
+  }
+
+  .close.is-live.has-rail .door__index {
+    transition: color 0.4s;
+  }
+
+  .close.is-live.has-rail .door:not(.is-reached) .door__index {
+    color: var(--faint);
+  }
+
+  .close .door__thumb img {
+    will-change: transform;
+  }
+}
+
+/* a finale-sized question on phones */
+@media (max-width: 640px) {
+  .close .close__title.display {
+    font-size: clamp(2.8rem, 13.4vw, 4.2rem);
+    line-height: 0.92;
+  }
+
+  .close .close__title.h1 {
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+  }
+
+  .close .close__title,
+  .close--h1 .close__title {
+    max-width: none;
+  }
+
+  .close .door__say {
+    font-size: 1.3rem;
+  }
+
+  .close .door__name {
+    font-size: 0.7rem;
+  }
+
+  .close .door {
+    grid-template-columns: 28px minmax(0, 1fr) 76px;
+  }
+
+  .close .door__thumb {
+    width: 76px;
+    height: 84px;
+  }
+
+  .close .close__btn {
+    --h: 68px;
+  }
+}
+
+/* tablet portrait: room for bigger islands beside each problem */
+@media (min-width: 641px) and (max-width: 900px) {
+  .close .door {
+    grid-template-columns: 38px minmax(0, 1fr) 120px;
+    min-height: 132px;
+  }
+
+  .close .door__thumb {
+    position: static;
+    grid-row: 1;
+    grid-column: 3;
+    width: 120px;
+    height: 120px;
+    margin: 0;
+    clip-path: none;
+  }
+
+  .close .door__thumb img {
+    transform: none;
+  }
+
+  .close .door__arrow {
+    display: none;
+  }
+
+  .close .door::after {
+    content: "→" / "";
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--rust);
+    color: var(--bone);
+    font-size: 0.85rem;
+  }
+
+  .close .door__text {
+    padding-right: 0;
+  }
+}
+
+/* =====================================================================
+   FOOTER — wordmark sits on its rust horizon; phones
+   ===================================================================== */
+
+.ftr__mark {
+  display: flow-root;
+  overflow: visible;
+  padding-bottom: 6px;
+}
+
+.ftr .ftr__word {
+  margin-bottom: -0.05em;
+}
+
+.ftr__mark .ftr__rule {
+  bottom: 6px;
+}
+
+@media (max-width: 900px) {
+  .ftr .ftr__bridge {
+    perspective: 900px;
+  }
+
+  .ftr .ftr__big {
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .close .close__title.display {
+    font-size: clamp(3.6rem, 10vw, 5.4rem);
+  }
+
+  .close .close__title.h1 {
+    font-size: clamp(3rem, 8.4vw, 4.4rem);
+  }
+
+  .close .close__title {
+    max-width: 14ch;
+  }
+}
+
+.ftr.is-fx .ftr__word {
+  margin-bottom: -0.125em;
+}
+
+/* split wordmark: the char masks carry the font's full descent; trim the box to the baseline */
+.ftr__word:has(.fc-mask) {
+  height: 0.655em;
+  margin-bottom: 0 !important;
+}

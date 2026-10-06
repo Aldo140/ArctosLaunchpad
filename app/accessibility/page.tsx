@@ -30,11 +30,10 @@ export default function AccessibilityPage() {
   return (
     <>
       <section
-        className="masthead section policy-cover"
-        data-material="instrument"
-        data-station="Accessibility"
+        className="phero tone-ink policy-cover"
+        data-tone="ink"
       >
-        <div className="shell policy-cover__inner">
+        <div className="wrap policy-cover__inner">
           <nav className="crumbs" aria-label="Breadcrumb">
             <ol>
               <li>
@@ -47,11 +46,11 @@ export default function AccessibilityPage() {
           </nav>
 
           <div>
-            <p className="tick-label">Practice note</p>
-            <h1 className="t-display policy-cover__title">
+            <p className="eyebrow">Practice note</p>
+            <h1 className="h1 policy-cover__title">
               Access is part of <em>the work.</em>
             </h1>
-            <p className="t-lead policy-cover__intro">
+            <p className="lead policy-cover__intro">
               We design and maintain this website so more people can understand
               it, navigate it, and use it with confidence.
             </p>
@@ -59,30 +58,30 @@ export default function AccessibilityPage() {
 
           <dl className="policy-cover__meta">
             <div>
-              <dt className="t-label">Document</dt>
-              <dd className="t-folio">Accessibility statement</dd>
+              <dt className="mono">Document</dt>
+              <dd className="index">Accessibility statement</dd>
             </div>
             <div>
-              <dt className="t-label">Target</dt>
-              <dd className="t-folio">WCAG 2.2 Level AA</dd>
+              <dt className="mono">Target</dt>
+              <dd className="index">WCAG 2.2 Level AA</dd>
             </div>
             <div>
-              <dt className="t-label">Last reviewed</dt>
-              <dd className="t-folio">30 July 2026</dd>
+              <dt className="mono">Last reviewed</dt>
+              <dd className="index">30 July 2026</dd>
             </div>
           </dl>
         </div>
       </section>
 
-      <section className="section" data-material="paper" data-station="Record">
-        <div className="shell policy">
+      <section className="section tone-paper" data-tone="paper">
+        <div className="wrap policy">
           <nav className="policy__contents" aria-label="On this page">
-            <p className="t-label">Contents</p>
+            <p className="mono">Contents</p>
             <ol>
               {contents.map(([n, label, id]) => (
                 <li key={id}>
                   <a href={`#${id}`}>
-                    <span className="t-folio">{n}</span>
+                    <span className="index">{n}</span>
                     <span>{label}</span>
                   </a>
                 </li>
@@ -98,7 +97,7 @@ export default function AccessibilityPage() {
 
             <section id="standard" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">01</span>
+                <span className="index policy__n">01</span>
                 <h2 className="policy__h2">Our working standard</h2>
               </div>
               <p>
@@ -115,7 +114,7 @@ export default function AccessibilityPage() {
 
             <section id="features" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">02</span>
+                <span className="index policy__n">02</span>
                 <h2 className="policy__h2">Built into this site</h2>
               </div>
               <ul className="policy__checklist">
@@ -127,7 +126,7 @@ export default function AccessibilityPage() {
 
             <section id="limitations" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">03</span>
+                <span className="index policy__n">03</span>
                 <h2 className="policy__h2">Known limitations</h2>
               </div>
               <p>
@@ -149,7 +148,7 @@ export default function AccessibilityPage() {
 
             <section id="feedback" className="policy__section">
               <div className="policy__section-head">
-                <span className="t-folio policy__n">04</span>
+                <span className="index policy__n">04</span>
                 <h2 className="policy__h2">Report a barrier</h2>
               </div>
               <p>
@@ -164,11 +163,8 @@ export default function AccessibilityPage() {
                 provided where practical.
               </p>
               <p className="policy__action">
-                <Link className="btn btn--ghost btn--small" href="/contact">
-                  Report an accessibility issue
-                  <span className="btn__arrow" aria-hidden="true">
-                    →
-                  </span>
+                <Link className="link" href="/contact">
+                  Report an accessibility issue<span aria-hidden="true">→</span>
                 </Link>
               </p>
             </section>

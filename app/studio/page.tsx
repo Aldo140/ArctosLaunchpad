@@ -1,12 +1,58 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { CTASection } from "@/components/CTASection";
-import { whyArctos } from "@/lib/content";
-import { pageMetadata, breadcrumbSchema, graph, jsonLd, webPageSchema } from "@/lib/seo";
-export const metadata: Metadata = pageMetadata({title:"Studio",description:"Arctos Launchpad is a Calgary studio connecting websites, design, software, automation and reporting around how your business works.",path:"/studio"});
-export default function StudioPage(){return <div className="v3-page">
-<section className="v3-page-lead" data-material="paper" data-station="Studio"><div className="v3-wrap"><p className="v3-kicker">Arctos Launchpad / Calgary, Alberta</p><h1>Good thinking.<br /><em>Useful things.</em></h1><p>We connect the customer-facing work with the systems behind it. Strategy, design, development and automation, shaped around the same business.</p></div></section>
-<section className="v3-section" data-material="instrument" data-station="The practice"><div className="v3-wrap v3-editorial-split"><div><p className="v3-kicker">One connected practice</p><h2>From the first click<br /><span>to the finished job.</span></h2><p>Websites, campaigns, software and operations touch the same customer journey. We build across those boundaries so the enquiry has somewhere to go and the work leaves useful information behind.</p><Link className="v3-text-link" href="/work">See the practice in action<span aria-hidden="true">↗</span></Link></div><Image className="v3-studio-art" src="/assets/v3/the-work-moves.webp" alt="The Arctos bear turning scattered paperwork into an organised flow" width={1536} height={1024} sizes="(max-width:760px) 100vw, 50vw" /></div></section>
-<section className="v3-section" data-material="paper" data-station="Principles"><div className="v3-wrap"><p className="v3-kicker">What you can expect</p><h2>Practical decisions.<br /><span>Clear ownership.</span></h2><div className="v3-principles">{whyArctos.map((item,i)=><article key={item.title}><span className="v3-mono">{String(i+1).padStart(2,"0")}</span><h3>{item.title}</h3><p>{item.copy}</p></article>)}</div><Link className="v3-text-link" href="/process">How we work together<span aria-hidden="true">↗</span></Link></div></section>
-<CTASection title="What would make your business work better?" /><script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(graph(webPageSchema({type:"AboutPage",name:"Studio",path:"/studio",description:"A Calgary digital growth and technology studio."}),breadcrumbSchema([{name:"Studio",path:"/studio"}])))} /></div>;}
+import { projects } from "@/lib/content";
+import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo";
+import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
+import { statusTone } from "@/components/site/ui";
+import { StudioHero } from "@/components/site/studio/StudioHero";
+import { StudioPractice } from "@/components/site/studio/StudioPractice";
+import { StudioWall } from "@/components/site/studio/StudioWall";
+import { StudioPrinciples } from "@/components/site/studio/StudioPrinciples";
+import { StudioTogether, type TogetherItem } from "@/components/site/studio/StudioTogether";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Studio",
+  description:
+    "Arctos Launchpad is a Calgary studio connecting websites, design, software, automation and reporting around how a business actually works.",
+  path: "/studio",
+  cardTitle: "Busywork in. A working system out.",
+});
+
+/** Real projects for the "working together" strip, in the order they're shown. */
+const TOGETHER = ["nicsdelite", "so-social-collective", "calgary-watch", "starlings-support-map", "rio-alto"];
+
+export default function StudioPage() {
+  const together: TogetherItem[] = TOGETHER.flatMap((slug) => {
+    const p = projects.find((x) => x.slug === slug);
+    if (!p || !p.featuredImage) return [];
+    return [
+      {
+        slug: p.slug,
+        route: p.route,
+        title: p.title,
+        statusLabel: p.statusLabel,
+        tone: statusTone(p),
+        image: p.featuredImage,
+        asked: p.challenge,
+        did: p.services.slice(0, 3),
+      },
+    ];
+  });
+
+  return (
+    <div className="st-page">
+      <StudioHero crumbs={<Crumbs trail={[{ label: "Studio", href: "/studio" }]} />} />
+      <StudioPractice />
+      <StudioWall />
+      <StudioPrinciples />
+      <StudioTogether items={together} />
+
+      <StartBand title={["What would make", <>the business <em key="w">work better?</em></>]} size="h1" />
+      <JsonLd
+        data={graph(
+          webPageSchema({ type: "AboutPage", name: "Studio", path: "/studio", description: "A Calgary digital growth and technology studio." }),
+          breadcrumbSchema([{ name: "Studio", path: "/studio" }]),
+        )}
+      />
+    </div>
+  );
+}

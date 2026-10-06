@@ -1,110 +1,84 @@
-# Asset map
+# Asset map (v4)
 
-Every image that ships, what it is for, and why the rest do not ship.
-
-Nothing in `public/` is unused. Anything retired lives in `assets-source/`,
-which is gitignored and never deployed.
+Every image that ships, what it is for, and why the rest don't ship.
+Nothing in `public/` is unused. Retired files live in `assets-source/` (gitignored, never deployed).
+Research screenshots live in `docs/redesign/` and are never served.
 
 ---
 
 ## Brand
 
-The mark is **vector, not raster**. `components/brand/ArctosMark.tsx` holds
-three traced paths — the triangle frame with its sweep, the bear head in
-profile inside it, and the star above the apex — recovered from the brand
-master with a marching-squares trace.
-
-That means the mark is crisp at any size, recolours with the material, weighs
-about 5 KB, and can be animated as line art. The hero's plotter-draw and the
-CTA watermark are the same three paths at different scales.
-
-| Size            | Variant           | Why                                                              |
-| --------------- | ----------------- | ---------------------------------------------------------------- |
-| >= 64px         | `detail="full"`   | The bear head reads as a monogram                                  |
-| < 64px          | `detail="simple"` | Below this the head and sweep collide into a smudge                |
-| Watermark scale | `detail="simple"` | At plate scale the head stops reading as a monogram and starts reading as a picture of an animal |
-
-The wordmark is **live text** (`ArctosLockup`), not an image — sharp,
-selectable, translatable, and readable by search engines.
-
----
-
-## Chapter canvases
-
-`public/assets/chapters/{attract,convert,operate,scale}.webp` — 1536x1024.
-
-Torn-paper collage with topographic contours and technical marks, one accent
-per stage. The strongest owned asset in the repo, and the only place collage
-appears.
-
-Each is composed with a **large clear paper field**. Type is set into that
-field, never over the torn edges. The `--attract` / `--convert` / `--operate` /
-`--scale` tokens were sampled directly from these files, so the UI accent and
-the printed canvas are the same colour rather than an approximation.
-
-> **Fixed:** `operate.webp` and `scale.webp` were swapped on disk — the file
-> named `operate` was the green canvas and `scale` was the orange one, the
-> reverse of the colour spec. Renamed to match.
-
----
+* **Mark**: vector, in `components/brand/ArctosMark.tsx` (unchanged). The wordmark is live text.
+* **`art/bridge.webp`**, plus `bridge-900.webp` for small uses: the bear building a rust bridge across three floating islands. Supplied by the studio owner on October 5, 2026 as a 1536×1024 PNG with a true alpha channel and converted to WebP with alpha. It's the hero, footer, contact and 404 image. The hero overlays an SVG deck path in the art's own coordinate space, so if the art is replaced, `DECK` in `components/site/home/BridgeHero.tsx` must be retraced.
+* **`art/island-{win,run,see}.webp`**: the three islands cropped from the same master. The cut bridge edges are faded with CSS masks, never re-painted. They're used as the emblem for each part of the offer (home islands chapter, `/services`, service and Calgary heroes).
+* **`v3/the-work-moves.webp`**: the bear turning scattered paper into a stack. Painted on `#02131b`, which is why `--ink-deep` exists. Used for the home studio note and the `/studio` hero.
+* **`textures/contour-field.webp`**: a faint topographic layer behind the hero and inside project stages.
 
 ## Project media
 
-### Lead with these
+Each launched project has a **recorded scroll of the live site** (`work/*-site.webm`), a **poster**
+(`work/posters/*.webp`) and a **phone capture of the live site** (`work/*-phone.webp`).
+The stage shows them on two depth planes. There's no drawn browser chrome.
 
-| Asset                               | Role                                             |
-| ----------------------------------- | ------------------------------------------------ |
-| `work/*-site.webm` (x4)             | Recorded scroll through each live site. The strongest proof the studio owns, and previously unused. Plays only while on screen and only when motion is welcome. |
-| `work/starlings-phone-in-hand.webp` | A real photograph of the real build on a real desk. The most credible single image in the archive. |
-| `work/{calgary-watch,starlings,rio-alto,true-north-kromes}.webp` | Site hero captures. Poster frames for the recordings. |
+| Project | Reel | Phone | Other |
+| --- | --- | --- | --- |
+| Nics Delite | `nicsdelite-site.webm` (new) | `nicsdelite-phone.webp` (new) | |
+| True North Kromes | existing | `true-north-kromes-phone.webp` (new) | Lab photography: build tray and four framework close-ups |
+| Calgary Watch | existing | `calgary-watch-phone.webp` (new) | `calgary-watch-map.webp` |
+| Rio Alto | existing | `rio-alto-phone.webp` (new) | Two wide captures, two dish photos in the gallery, five dish photos in the specimen strip |
+| So Social Collective | `so-social-collective-site.webm` (new) | `so-social-collective-phone.webp` (new) | |
+| Starlings | existing | `starlings-mobile.webp` | `starlings-care-loop.webp`, `starlings-phone-in-hand.webp` |
+| Vow Motion | `vow-motion-site.webm` (new) | `vow-motion-phone.webp` (new) | |
+| Fresh Prep | none (internal) | none | Typeset report structure, all figures withheld |
+| LeaseFlow | none (demo) | none | Typeset flow figure |
 
-**No fake browser chrome.** A drawn window frame around a real screenshot adds
-a layer of pretend to something that is already true.
+**New recordings and captures were made on October 5, 2026** from the public live sites with
+Playwright: 1280×682 scroll recordings re-encoded to VP9, posters at 1280px, and phone captures at 390×844 @2.5× downscaled to 780px.
+Client photography is the client's own, used as it appears on their sites.
 
-### Use cropped, at specimen scale
+### Considered, not used
 
-These are honest phone photography from the client sites. Full-bleed they read
-as phone snapshots; cropped into a measured strip with a mono caption they read
-as evidence, and their colour and texture carry instead of their resolution.
-Rendered through `SpecimenStrip` and the work showcase plate rails.
-
-- `work/true-north-kromes/*.webp` — cobalt-chrome frameworks on dental models
-  and a build tray. Chrome on bone-white against a dark ground; genuinely
-  distinctive, almost jewellery.
-- `work/rio-alto/*.webp` — the restaurant's own dishes and bakery. Bold,
-  graphic colour that belongs to the client rather than to a stock palette.
-- `work/starlings-care-loop.webp`, `work/starlings-mobile.webp`,
-  `work/calgary-watch-map.webp`, `work/rio-alto-{menu,story}.webp` — interface
-  detail.
-
----
+* **Fresh Prep event photos (Google Drive)**: owned by Fresh Prep staff and not cleared for Arctos marketing.
+* **Drive reports and spreadsheets**: client data, not publishable.
+* **Rive**: no `.riv` files on disk or in Drive, and no Rive connector. Nothing depends on Rive.
 
 ## Studio
 
-`public/assets/studio/arctos-wall-materials.webp` — concrete, paper, fabric,
-plant shadow, and a pinned note reading *Systems / Clarity / Growth*. The only
-studio photograph, so it is used deliberately and never repeated.
+`studio/arctos-wall-materials.webp`: concrete, paper and fabric with a pinned note reading *Systems / Clarity / Growth*. Used once, on `/studio`.
 
----
-
-## Retired — do not resurrect
-
-Moved to `assets-source/retired/`. Each was removed for a stated reason, not
-for taste.
+## Retired in v4 (moved to `assets-source/retired/v3-public/`)
 
 | Asset | Why |
 | --- | --- |
-| `bear.webp`, `bear-cutout.png`, `bear-gold.{png,webp}` | Photoreal stock polar bear. The brief rules out "giant polar bears" and the outdoor-apparel read. The mark already contains a bear, abstracted — that is the only bear. |
-| `selected-work-bear.webp` | Stock cartoon vector with the headline **baked into the raster**. Unreadable to screen readers and search engines, unresponsive, and off-brand. |
-| `old-bear-lockup.png` | Superseded navy bear wordmark. Replaced by the triangle mark. |
-| `arctos-stationery.webp` | Good photograph, but it photographs the retired logo, so it went stale with the rebrand. |
-| `true-north-kromes-{lab,detail}.webp` and `true-north-kromes/{digital-design-workstation,finishing-benches,production-floor,resin-production-workbench,slm-production-station}.webp` | Fluorescent phone snapshots of an office and cluttered benches. Honest, but they cheapen a premium studio. The product macros from the same shoot are kept. |
-| `rio-alto/{dessert-pass,full-course,coffee-and-sweetbread}.webp` | Dark, cluttered, or soft. The stronger plates from the same set are kept. |
+| `illustrations/*` roundels | Badge-style circles at small scale. They read as clip art beside the bridge. The bridge and the work-moves piece carry the character now. |
+| `chapters/*` torn-paper canvases | The four-stage chapter story was replaced by the three-island structure. |
+| `figures/*`, other `textures/*` | Only used by v3 components that were removed. |
 
-## Unshipped masters
+v3 work-in-progress that was uncommitted when v4 started (`LaunchHero`, `StudioHome`, `launch-hero.css`)
+is kept at `assets-source/retired/v3-wip/` for reference.
 
-`assets-source/masters/` holds the four chapter PNGs, the True North Kromes
-PNG, and the logo master — about 20 MB that was previously sitting in `public/`
-and deploying on every build despite nothing referencing it.
+Earlier retirements (stock bears, the old lockup, stale stationery, cluttered lab snapshots) still stand.
 
-`public/` went from **28 MB to 8.3 MB**.
+---
+
+## v4.1 section pass (October 6, 2026)
+
+Fifteen section agents each pushed one section or page further. Assets they added:
+
+| Folder | Source | Used on |
+| --- | --- | --- |
+| `work/nicsdelite/*.webp` (12) | `nicsdelite/public/images/cakes/`: the client's own cake photography. Photos with people and character or brand cakes were left out. | Nics Delite case study filmstrip |
+| `work/so-social-collective/*.webp` (9) | `so-social-collective-web/public/photos/`: only images listed in that site's own media library, with alt text taken from it | So Social case study |
+| `work/calgary-watch/*.webp` (8) | `Calgary-Watch-main/public/images/{hero,illustration,quadrant}` | Calgary Watch case study |
+| `work/vow-motion/*.webp` (8) | `vow-motion/public/images/`: the product's six "worlds" plus two detail images | Vow Motion case study |
+| `art/studio-note/{gear,pulley}-*.webp`, `studio/{gear,pulley}-*.webp` | Circular cut-outs from `v3/the-work-moves.webp` | Gears and pulleys that turn, on home and /studio |
+| `studio/principles/*.webp` (6) | Retired roundel illustrations (`assets-source/retired/v3-public/illustrations/`) | /studio principle cards |
+| `process/survey-contours.webp` | Retired `figures/survey-contours.webp` | /process hero |
+
+Everything else new is hand-authored SVG or CSS: the bridge builds, Calgary line drawings, generated industry terrain, and the redacted report and flow figures.
+
+### Not referenced by any page (found, not created in this pass)
+
+`art/{bridge-keystone,growth-gateway,paper-fibres,reporting-observatory,software-builder,workflow-loop}.webp`,
+`art/{connection-mark,route-divider}.svg`, `v3/connected-workshop.webp`, `lib/brand-art.ts`.
+They were created around 20:15–20:22 on October 5 by another process. They are kept as found and need an owner decision: use them or retire them.

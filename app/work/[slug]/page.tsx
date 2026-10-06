@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CTASection } from "@/components/CTASection";
-import { ProjectReel } from "@/components/figures/ProjectReel";
-import { ReportArtifact } from "@/components/figures/ReportArtifact";
-import { FlowTrack } from "@/components/work/FlowTrack";
-import { hostOf, isDemoStatus, pad, workOrder } from "@/components/work/order";
-import { getProject, projects } from "@/lib/content";
+import { getProjectBySlug, portfolioOrder, projects } from "@/lib/content";
 import {
+  ORGANIZATION_ID,
   absoluteUrl,
   breadcrumbSchema,
   graph,
-  jsonLd,
-  ORGANIZATION_ID,
   pageMetadata,
   webPageSchema,
 } from "@/lib/seo";
+import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
+import { Lines, Status, TextLink, d } from "@/components/site/ui";
+import { CaseMotion } from "@/components/site/case/CaseMotion";
+import { Filmstrip } from "@/components/site/case/Filmstrip";
+import { NextProject } from "@/components/site/case/NextProject";
+import { LeaseFlowFigure, ReportFlowFigure } from "@/components/site/case/figures";
+import { FrameMedia, chapterFrames, framesUsed, projectShots, reelCaption } from "@/components/site/case/frames";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,44 +26,60 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const project = getProject((await params).slug);
+  const project = getProjectBySlug((await params).slug);
   if (!project) return {};
-
   return pageMetadata({
     title: project.title,
     description: project.summary,
     path: project.route,
     eyebrow: project.statusLabel,
+    cardTitle: project.proofTitle ?? project.title,
   });
 }
 
-const OPENING = [
-  ["Challenge", "What needed to change", "challenge"],
-  ["Approach", "How the problem was framed", "approach"],
-  ["Solution", "What took shape", "solution"],
-] as const;
+/** Words as separate spans so they can light up as they are read. */
+function Words({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/\s+/).map((word, i) => (
+        <span key={i} className="cx-w">
+          {word}{" "}
+        </span>
+      ))}
+    </>
+  );
+}
 
-export default async function ProjectPage({ params }: Props) {
-  const project = getProject((await params).slug);
+export default async function CaseStudy({ params }: Props) {
+  const project = getProjectBySlug((await params).slug);
   if (!project) notFound();
 
-  const index = workOrder.findIndex(({ slug }) => slug === project.slug);
-  const next = workOrder[(index + 1) % workOrder.length];
-  const caseNumber = pad(index + 1);
-  const total = pad(workOrder.length);
-  const host = hostOf(project.externalUrl);
-  const demo = isDemoStatus(project);
+  const order = portfolioOrder as readonly string[];
+  const next = getProjectBySlug(order[(order.indexOf(project.slug) + 1) % order.length]);
+  const demo = project.status !== "launched" && project.status !== "internal-tool";
+  const accent = project.accent ?? "var(--ink-3)";
 
-  const media = project.showcaseMedia ?? [];
-  const captures = media.filter((m) => (m.layout ?? "wide") === "wide");
-  const photographs = media.filter((m) => m.layout === "portrait");
+  const chapters = [
+    ["The challenge", project.challenge],
+    ["The constraint", project.constraint],
+    ["The approach", project.approach],
+    ["What we built", project.solution],
+  ] as const;
+
+  const frames = chapterFrames(project);
+  const { photos, screens } = projectShots(project);
+  const allShots = [...photos, ...screens];
+  const used = framesUsed(frames);
+  const unused = allShots.filter((s) => !used.has(s.src));
+  const film = unused.length >= 3 ? unused : allShots;
+  const filmCredit =
+    project.caseMediaCredit ??
+    (photos.length ? `From ${project.client ?? project.title}’s own photography` : `From the ${project.title} build`);
+  const poster = project.reel?.poster ?? project.featuredImage;
+  const figure = project.mockupType === "dashboard" ? "report" : "flow";
 
   const schema = graph(
-    webPageSchema({
-      name: `${project.title} — case file`,
-      description: project.summary,
-      path: project.route,
-    }),
+    webPageSchema({ name: `${project.title} — case study`, description: project.summary, path: project.route }),
     breadcrumbSchema([
       { name: "Work", path: "/work" },
       { name: project.title, path: project.route },
@@ -77,254 +94,216 @@ export default async function ProjectPage({ params }: Props) {
       mainEntityOfPage: absoluteUrl(project.route),
       keywords: [...project.services, ...project.industries].join(", "),
       inLanguage: "en-CA",
-      ...(project.client
-        ? { about: { "@type": "Organization", name: project.client } }
-        : {}),
-      ...(project.featuredImage
-        ? { image: absoluteUrl(project.featuredImage) }
-        : {}),
+      ...(project.client ? { about: { "@type": "Organization", name: project.client } } : {}),
+      ...(project.featuredImage ? { image: absoluteUrl(project.featuredImage) } : {}),
     },
   );
 
-  const fifthLabel = demo ? "Status and what it proves" : "What changed";
-  const fifthHeading = demo ? "What the demo proves" : "What changed";
-
-  const register: [string, string[]][] = [
-    ["Services", project.services],
-    ["Industries", project.industries],
-    ...(project.technologies?.length
-      ? ([["Technology", project.technologies]] as [string, string[]][])
-      : []),
-  ];
-
   return (
-    <>
-      <section
-        className="wrk-cf"
-        data-material="instrument"
-        data-station={project.title}
-      >
-        <div className="shell">
-          <nav className="wrk-crumbs t-folio" aria-label="Breadcrumb">
-            <Link href="/work">Work</Link>
-            <span aria-hidden="true">/</span>
-            <span>
-              Case file {caseNumber} of {total}
-            </span>
-          </nav>
+    <article key={project.slug} className="cx" style={{ "--plate": accent } as CSSProperties}>
+      <CaseMotion key={project.slug} />
 
-          <h1 className="wrk-cf__title">{project.title}</h1>
-
-          <div className="wrk-cf__lede">
-            <p className="wrk-cf__sum">{project.summary}</p>
-            <div className="wrk-cf__aside">
-              <p className="wrk-flag wrk-flag--lg">{project.statusLabel}</p>
-              {project.externalUrl && host ? (
-                <a
-                  className="wrk-live"
-                  href={project.externalUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <span className="t-folio">Live site</span>
-                  <span className="wrk-live__host">
-                    {host}
-                    <span aria-hidden="true"> ↗</span>
-                  </span>
-                </a>
-              ) : (
-                <p className="wrk-live wrk-live--none t-folio">
-                  {project.status === "working-demo"
-                    ? "Working demo. Not publicly deployed."
-                    : "Internal tool. Not public."}
+      {/* ---- Title card ------------------------------------------------ */}
+      <section className="cx-hero tone-ink" data-tone="ink">
+        <div className="wrap">
+          <Crumbs
+            trail={[
+              { label: "Work", href: "/work" },
+              { label: project.title, href: project.route },
+            ]}
+          />
+          <div className="cx-hero__grid">
+            <div className="cx-hero__main">
+              <div className="cx-hero__status" data-reveal>
+                <Status project={project} />
+                <span className="mono cx-hero__no">
+                  Case {String(order.indexOf(project.slug) + 1).padStart(2, "0")} / {String(order.length).padStart(2, "0")}
+                </span>
+              </div>
+              <Lines as="h1" className="display cx-hero__title" lines={[project.title]} />
+              {project.proofTitle ? (
+                <p className="cx-hero__kicker" data-reveal style={d(2)}>
+                  {project.proofTitle}
                 </p>
+              ) : null}
+            </div>
+            <div className="cx-hero__side">
+              <p className="lead cx-hero__lead" data-reveal style={d(3)}>
+                {project.summary}
+              </p>
+              <dl className="cx-facts" data-reveal="fade" style={d(4)}>
+                {project.client ? (
+                  <div>
+                    <dt>Client</dt>
+                    <dd>{project.client}</dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt>Status</dt>
+                  <dd>{project.statusLabel}</dd>
+                </div>
+                <div>
+                  <dt>What we did</dt>
+                  <dd>{project.services.join(", ")}</dd>
+                </div>
+                {project.technologies?.length ? (
+                  <div>
+                    <dt>Built with</dt>
+                    <dd>{project.technologies.join(" · ")}</dd>
+                  </div>
+                ) : null}
+                {project.externalUrl ? (
+                  <div>
+                    <dt>See it live</dt>
+                    <dd>
+                      <TextLink href={project.externalUrl}>
+                        {project.externalUrl.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                      </TextLink>
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- The reel: framed stage → full bleed ----------------------- */}
+      <section className="cx-reel tone-ink" data-tone="ink" aria-label={poster ? reelCaption(project) : "How it works"}>
+        <div className="cx-reel__wash" aria-hidden="true" />
+        <div className="cx-reel__stage" data-reveal="scale">
+          <div className={`cx-reel__frame${poster ? "" : " cx-reel__frame--figure"}`}>
+            <div className="cx-reel__inner">
+              {poster ? (
+                <>
+                  <Image className="cx-reel__poster" src={poster} alt="" width={1280} height={682} sizes="100vw" priority />
+                  {project.reel ? (
+                    <video data-reel muted loop playsInline preload="none" aria-hidden="true" tabIndex={-1}>
+                      <source src={project.reel.src} type="video/webm" />
+                    </video>
+                  ) : null}
+                </>
+              ) : figure === "report" ? (
+                <ReportFlowFigure step={3} caption={false} />
+              ) : (
+                <LeaseFlowFigure step={3} caption={false} />
               )}
             </div>
           </div>
+          <div className="cx-reel__shade" aria-hidden="true" />
+          {project.phone ? (
+            <div className="cx-reel__phone phone" aria-hidden="true">
+              <Image src={project.phone} alt="" width={390} height={844} sizes="260px" priority />
+            </div>
+          ) : null}
+          <p className="mono cx-reel__cap">
+            <span className="cx-reel__dot" aria-hidden="true" />
+            {poster
+              ? `${reelCaption(project)}${project.phone ? " · phone capture of the same build" : ""}`
+              : figure === "report"
+                ? "Diagram of the internal report’s structure · every figure withheld"
+                : "Diagram of the working demo’s flow · not a screenshot"}
+          </p>
+        </div>
+      </section>
 
-          <div className="wrk-cf__visual">
-            {project.slug === "fresh-prep-event-intelligence" ? (
-              <div className="wrk-cf__report">
-                <ReportArtifact caption="Structure of a live Fresh Prep report. Figures withheld; the layout is the real one." />
-              </div>
-            ) : project.reel ? (
-              <figure className="wrk-screen wrk-screen--hero">
-                <div className="wrk-screen__frame">
-                  <ProjectReel
-                    src={project.reel.src}
-                    poster={project.reel.poster}
-                    title={project.title}
-                  />
+      {/* ---- The story: four chapters, one sticky frame --------------- */}
+      <section className="cx-story tone-paper" data-tone="paper" aria-labelledby="cx-story-title">
+        <div className="wrap cx-story__grid">
+          <h2 id="cx-story-title" className="visually-hidden">
+            The story
+          </h2>
+          <div className="cx-story__media" data-active="0">
+            <div className="cx-story__frames">
+              {frames.map((f, i) => (
+                <div key={i} className="cx-story__frame" data-i={i}>
+                  <FrameMedia frame={f} sizes="(max-width: 1023px) 92vw, 52vw" />
                 </div>
-                <figcaption className="wrk-cap t-folio">
-                  Recorded from the live build{host ? `, ${host}` : ""}
-                </figcaption>
-              </figure>
-            ) : project.status === "working-demo" ? (
-              <FlowTrack />
-            ) : null}
+              ))}
+            </div>
+            <ol className="cx-story__ticks">
+              {chapters.map(([label], i) => (
+                <li key={label} data-i={i}>
+                  <span className="mono">{String(i + 1).padStart(2, "0")}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="cx-story__text">
+            <span className="cx-story__rail" aria-hidden="true">
+              <span className="cx-story__fill" />
+            </span>
+            {chapters.map(([label, text], i) => (
+              <div key={label} className="cx-ch">
+                <div className="cx-ch__media">
+                  <FrameMedia frame={frames[i]} sizes="92vw" />
+                </div>
+                <div className="cx-ch__card">
+                  <span className="cx-ch__num display" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="cx-ch__label">
+                    <span className="index">{String(i + 1).padStart(2, "0")}</span>
+                    {label}
+                  </p>
+                  <p className="cx-ch__text cx-kinetic">
+                    <Words text={text} />
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {captures.length || photographs.length ? (
-        <section
-          className="wrk-ev"
-          data-material="instrument"
-          data-station="Evidence"
-        >
-          <div className="shell">
-            <header className="wrk-ev__head">
-              <p className="t-label">Field evidence</p>
-              <h2 className="wrk-ev__title">
-                {project.proofTitle ?? "See the system in place."}
-              </h2>
-              {project.proofIntro ? (
-                <p className="wrk-ev__intro">{project.proofIntro}</p>
-              ) : null}
-            </header>
-
-            {captures.map((item, i) => (
-              <figure key={item.src} className="wrk-ev__plate">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  width={1600}
-                  height={1000}
-                  sizes="(max-width: 900px) 100vw, 1200px"
-                />
-                <figcaption className="wrk-cap t-folio">
-                  <span>Plate {pad(i + 1)}</span>
-                  <span>{item.caption}</span>
-                </figcaption>
-              </figure>
-            ))}
-
-            {photographs.length ? (
-              <ul
-                className="wrk-ev__photos"
-                style={{ "--n": photographs.length } as React.CSSProperties}
-              >
-                {photographs.map((item, i) => (
-                  <li key={item.src}>
-                    <div className="wrk-still wrk-still--tall">
-                      <Image
-                        src={item.src}
-                        alt={item.alt}
-                        fill
-                        sizes="(max-width: 700px) 80vw, 30vw"
-                        style={{ objectPosition: "78% 56%" }}
-                      />
-                    </div>
-                    <p className="wrk-cap t-folio">
-                      <span>{pad(i + 1)}</span>
-                      <span>{item.caption}</span>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+      {/* ---- What changed ---------------------------------------------- */}
+      <section className="cx-changed tone-pine" data-tone="pine" aria-labelledby="cx-changed-title">
+        <span className="cx-changed__big display" aria-hidden="true">
+          {demo ? "So far" : "After"}
+        </span>
+        <div className="wrap cx-changed__grid">
+          <div className="cx-changed__head">
+            <p className="eyebrow">
+              <span className="index">05</span> {demo ? "Where it stands" : "What changed"}
+            </p>
+            <h2 id="cx-changed-title" className="visually-hidden">
+              {demo ? "Where it stands" : "What changed"}
+            </h2>
+            <span className="cx-changed__rule" aria-hidden="true" />
           </div>
-        </section>
+          <p className="cx-changed__text cx-kinetic">
+            <Words text={project.whatChanged} />
+          </p>
+          <div className="cx-changed__foot" data-reveal>
+            <Status project={project} />
+            <ul className="tagcloud">
+              {project.industries.map((i) => (
+                <li key={i}>{i}</li>
+              ))}
+            </ul>
+            {project.externalUrl ? <TextLink href={project.externalUrl}>Visit the {demo ? "preview" : "live site"}</TextLink> : null}
+          </div>
+        </div>
+      </section>
+
+      {/* ---- The project's own media, on film -------------------------- */}
+      {film.length >= 2 ? (
+        <Filmstrip shots={film} credit={filmCredit} title={photos.length ? "The work, frame by frame" : "Frames from the build"} />
       ) : null}
 
-      <section
-        className="wrk-arg"
-        data-material="paper"
-        data-station="Reasoning"
-      >
-        <div className="shell">
-          <p className="t-label wrk-arg__eyebrow">The argument, in order</p>
-          <ol className="wrk-arg__list">
-            {OPENING.map(([label, heading, key], i) => (
-              <li key={key} className="wrk-arg__row">
-                <span className="wrk-arg__n" aria-hidden="true">
-                  {pad(i + 1)}
-                </span>
-                <div className="wrk-arg__label">
-                  <p className="t-label">{label}</p>
-                  <h2 className="wrk-arg__h">{heading}</h2>
-                </div>
-                <p className="wrk-arg__copy">{project[key]}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      {next ? (
+        <NextProject
+          href={next.route}
+          title={next.title}
+          summary={next.summary}
+          status={next.statusLabel}
+          accent={next.accent ?? "#1c3438"}
+          image={next.reel?.poster ?? next.featuredImage}
+        />
+      ) : null}
 
-      <section
-        className="wrk-pull wrk-pull--constraint"
-        data-material="instrument"
-        data-station="Constraint"
-      >
-        <div className="shell">
-          <p className="wrk-pull__label t-label">
-            <span aria-hidden="true">04</span> Constraint
-          </p>
-          <h2 className="wrk-pull__h">What made it hard</h2>
-          <blockquote className="wrk-pull__q">{project.constraint}</blockquote>
-        </div>
-      </section>
-
-      <section
-        className="wrk-pull wrk-pull--changed"
-        data-material="paper"
-        data-station={fifthHeading}
-      >
-        <div className="shell">
-          <p className="wrk-pull__label t-label">
-            <span aria-hidden="true">05</span> {fifthLabel}
-          </p>
-          <h2 className="wrk-pull__h">{fifthHeading}</h2>
-          <blockquote className="wrk-pull__q">{project.whatChanged}</blockquote>
-
-          <dl className="wrk-reg">
-            {register.map(([name, items]) => (
-              <div key={name} className="wrk-reg__col">
-                <dt className="t-label">{name}</dt>
-                <dd>
-                  <ul>
-                    {items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-
-      <section
-        className="wrk-next"
-        data-material="instrument"
-        data-station="Next case file"
-      >
-        <div className="shell">
-          <Link className="wrk-next__link" href={next.route}>
-            <span className="t-label">
-              Next case file · {pad(workOrder.indexOf(next) + 1)} of {total}
-            </span>
-            <span className="wrk-next__title">{next.title}</span>
-            <span className="wrk-next__foot">
-              <span className="t-folio">{next.statusLabel}</span>
-              <span className="wrk-next__go" aria-hidden="true">
-                →
-              </span>
-            </span>
-          </Link>
-          <Link className="wrk-next__all t-folio" href="/work">
-            All case files
-          </Link>
-        </div>
-      </section>
-
-      <CTASection />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLd(schema)}
-      />
-    </>
+      <StartBand title={["Have something", <>like <em key="t">this</em> in mind?</>]} />
+      <JsonLd data={schema} />
+    </article>
   );
 }
