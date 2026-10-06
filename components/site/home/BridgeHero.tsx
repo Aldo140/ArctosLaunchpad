@@ -349,7 +349,9 @@ export function BridgeHero() {
         const H = () => pin.clientHeight;
         const frame = (id: IslandId) => () => {
           const f = FRAMES[id];
-          return cam(f.ax, f.ay, f.s, W() / 2, H() * 0.66);
+          // Island a little above centre: close under the act copy, with the
+          // rock and its label below it still inside the frame.
+          return cam(f.ax, f.ay, f.s, W() / 2, H() * 0.6);
         };
         // The whole bridge between the headline and the lead: the first frame
         // and the last. Sized to the height between them and, on narrow
@@ -405,7 +407,13 @@ export function BridgeHero() {
           else st.to(dolly, to, at);
           // Depth: far planes drift a little, near planes a lot, in the same direction.
           const rel = (k: number) => () => f().x * k * 0.12;
-          st.to(".hero__sky", { x: rel(0.25), duration: dur }, at)
+          // The sky overhangs the stage by only 6% a side; the far-right "see"
+          // frame drifted it to within a pixel of showing its edge.
+          const sky = () => {
+            const max = W() * 0.06 - 2;
+            return gsap.utils.clamp(-max, max, rel(0.25)());
+          };
+          st.to(".hero__sky", { x: sky, duration: dur }, at)
             .to(".hero__survey", { x: rel(0.6), duration: dur }, at)
             .to(".hero__glow", { x: rel(1), duration: dur }, at)
             .to(".hero__motes", { x: rel(2.2), y: () => (f().scale - 1) * -40, duration: dur }, at)
@@ -437,12 +445,12 @@ export function BridgeHero() {
         moveTo(frame("run"), 2.8, 1.6);
         st.to(sig, { p: pRun, duration: 1.6, onUpdate: place }, 2.8)
           .fromTo(".hero__plumb", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 4.2);
-        actIn(1, 3.6);
+        actIn(1, 3.3);
         // Act 3 — see
         actOut(1, 5.2);
         moveTo(frame("see"), 5.2, 1.6);
         st.to(sig, { p: 1, duration: 1.6, onUpdate: place }, 5.2);
-        actIn(2, 6.0);
+        actIn(2, 5.7);
         // Finale — the whole connected bridge, then the way forward
         actOut(2, 7.6);
         moveTo(finale, 7.6, 1.4);

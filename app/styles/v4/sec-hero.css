@@ -235,6 +235,10 @@ html.js-motion .hero:not([data-intro="done"]) .hero__line:not(.is-lit) .hero__wo
   width: 100%;
   height: 100%;
   pointer-events: none;
+  /* The beam follows the signal to the far islands and is wider than the
+     margin they leave; clipped to the art box it ended in a hard vertical
+     edge whenever the camera framed past it (the phone "see" act). */
+  overflow: visible;
   mix-blend-mode: screen;
   opacity: 0;
 }

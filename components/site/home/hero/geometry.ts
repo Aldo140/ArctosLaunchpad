@@ -52,5 +52,7 @@ export const GLOSS: Record<IslandId, string> = {
 export const FRAMES: Record<IslandId, { ax: number; ay: number; s: number }> = {
   win: { ax: 0.15, ay: 0.6, s: 2.05 },
   run: { ax: 0.56, ay: 0.53, s: 1.4 },
-  see: { ax: 0.87, ay: 0.62, s: 2.1 },
+  // Pushed right of the island and in a little closer, so the bear's back
+  // (which ends about 0.755 across) is a sliver at the edge, not half a bear.
+  see: { ax: 0.9, ay: 0.62, s: 2.3 },
 };
