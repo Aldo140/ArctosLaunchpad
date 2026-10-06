@@ -1,11 +1,11 @@
 name: Arctos outreach
 
 # Sends queued outreach (outreach/batch-*.json) from aldo@arctoslaunchpad.com
-# through Brevo, one email per run, weekdays 9:00-16:30 Calgary time, at most
-# 15 a day. The send window is enforced in scripts/send-outreach.mjs.
+# through Brevo, two emails per run (every 15 minutes), weekdays 9:00-16:30
+# Calgary time, at most 50 a day. The send window is enforced in scripts/send-outreach.mjs.
 on:
   schedule:
-    - cron: "11,41 14-23 * * 1-5"
+    - cron: "11,26,41,56 14-23 * * 1-5"
   workflow_dispatch:
 
 permissions:
