@@ -4,17 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { gsap } from "gsap";
+import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { islands, type IslandId } from "@/lib/content";
 import { Btn, TextLink } from "../ui";
 import { Atmosphere } from "./hero/Atmosphere";
 import { Snow } from "./hero/Snow";
-import {
-  ART_H, ART_W, DECK, ISLES, LABELS, LIVE, PIECE_LABELS, PIECES, PLUMB, ROUTE, SCENE, STOPS,
-} from "./hero/geometry";
+import { ART_H, ART_W, DECK, ISLES, LABELS, LIVE, PLUMB } from "./hero/geometry";
+import { DEMO_SITES, DEMO_START_COUNT, SystemDemo } from "./hero/SystemDemo";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
 
 const ORDER: IslandId[] = ["win", "run", "see"];
 const COMET = 150;
@@ -29,11 +29,12 @@ type Follow = { to: (x: number, y: number) => void; home: () => void };
  * island, its label and its headline line. Pointer tilt, hover links lines
  * and islands both ways, and scrolling away dollies the camera into the art.
  *
- * Phones and tablets (≤ 900px): the bridge is recomposed for a portrait
- * screen from its three island cut-outs. They rise in at their own depths,
- * then a rust route climbs win → run → see and each arrival lights its
- * headline line. Scrolling is never captured: the islands only drift apart
- * in parallax as the page moves.
+ * Phones and tablets (≤ 900px): the metaphor gives way to the real thing. A
+ * live demo plays what Arctos builds: a visitor taps the call to action on a
+ * real client site (win), the enquiry lands on an automated leads board and
+ * follows itself up (run), and the weekly dashboard counts it (see). Each
+ * step lights its headline line, then the loop moves to the next client.
+ * Scrolling is never captured.
  *
  * Reduced motion: none of the above. Everything is lit and static.
  */
@@ -342,32 +343,32 @@ export function BridgeHero() {
       };
     };
 
-    /** Phones and tablets: the portrait scene. */
-    const setupIsles = () => {
-      const scene = el.querySelector<HTMLElement>(".hero__isles");
-      const route = el.querySelector<SVGPathElement>(".hero__route");
-      const rider = el.querySelector<SVGCircleElement>(".hero__rider");
-      if (!scene || !route || !rider) return;
-      const rlen = route.getTotalLength();
+    /** Phones and tablets: the live demo. */
+    const setupDemo = () => {
+      const stage = el.querySelector<HTMLElement>(".hero__demo-stage");
+      if (!stage) return;
+      const $ = <T extends Element = HTMLElement>(sel: string) => stage.querySelector<T>(sel)!;
+      const phone = $(".demo-phone");
+      const screen = $(".demo-phone__screen");
+      const sites = gsap.utils.toArray<HTMLElement>(".demo-site", stage);
+      const tap = $(".demo-tap");
+      const toast = $(".demo-toast");
+      const toastWhat = $(".demo-toast__what");
+      const signal = $(".demo-signal");
+      const newRow = $(".demo-row--new");
+      const rowName = $(".demo-name");
+      const rowWhat = $(".demo-what");
+      const rowAv = $(".demo-row--new .demo-av");
+      const pillA = $(".demo-pill__a");
+      const pillB = $(".demo-pill__b");
+      const count = $(".demo-count");
+      const today = $(".demo-bars .is-today");
+      const routeA = $<SVGPathElement>(".demo-route__path--a");
+      const routeB = $<SVGPathElement>(".demo-route__path--b");
+      const svg = $<SVGSVGElement>(".demo-route");
       el.dataset.intro = "running";
       setLit([]);
       setActive(null);
-
-      // Fraction of the route at which it passes each island's stop.
-      const at = (id: IslandId) => {
-        let best = 0;
-        let dist = Infinity;
-        for (let i = 0; i <= 200; i++) {
-          const pt = route.getPointAtLength((rlen * i) / 200);
-          const d = Math.hypot(pt.x - STOPS[id].x, pt.y - STOPS[id].y);
-          if (d < dist) {
-            dist = d;
-            best = i / 200;
-          }
-        }
-        return best;
-      };
-      const pRun = at("run");
 
       const splits = lines.map((line) =>
         SplitText.create(line.querySelector(".hero__text"), {
@@ -378,94 +379,151 @@ export function BridgeHero() {
         }),
       );
 
-      const ride = { p: 0 };
-      const place = () => {
-        const pt = route.getPointAtLength(ride.p * rlen);
-        rider.setAttribute("cx", pt.x.toFixed(1));
-        rider.setAttribute("cy", pt.y.toFixed(1));
-        route.style.strokeDashoffset = String(rlen * (1 - ride.p));
+      // ---- geometry: where things are, in stage pixels ---------------------
+      const rel = (node: Element, fx = 0.5, fy = 0.5) => {
+        const s0 = stage.getBoundingClientRect();
+        const r = node.getBoundingClientRect();
+        return { x: r.left - s0.left + r.width * fx, y: r.top - s0.top + r.height * fy };
       };
-      gsap.set(route, { strokeDasharray: rlen, strokeDashoffset: rlen });
+      let site = 0;
+      const points = () => {
+        const sr = screen.getBoundingClientRect();
+        const s0 = stage.getBoundingClientRect();
+        const t = DEMO_SITES[site].tap;
+        return {
+          tap: { x: sr.left - s0.left + sr.width * t.x, y: sr.top - s0.top + sr.height * t.y },
+          row: rel(newRow, 0.12, 0.5),
+          count: rel(count, 0.5, 0.55),
+        };
+      };
+      const drawRoutes = () => {
+        const p = points();
+        const w = stage.clientWidth;
+        const h = stage.clientHeight;
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+        const mid = (a: { x: number; y: number }, b: { x: number; y: number }, bend: number) =>
+          `${(a.x + b.x) / 2 + bend} ${(a.y + b.y) / 2}`;
+        routeA.setAttribute("d", `M ${p.tap.x} ${p.tap.y} Q ${mid(p.tap, p.row, -w * 0.12)} ${p.row.x} ${p.row.y}`);
+        routeB.setAttribute("d", `M ${p.row.x} ${p.row.y} Q ${mid(p.row, p.count, w * 0.22)} ${p.count.x} ${p.count.y}`);
+        gsap.set(tap, { left: `${DEMO_SITES[site].tap.x * 100}%`, top: `${DEMO_SITES[site].tap.y * 100}%` });
+      };
 
-      const ring = (id: IslandId, strength = 1) =>
-        gsap.fromTo(
-          `.hero__stop--${id}`,
-          { scale: 0.4, opacity: 0.9 * strength },
-          { scale: 2.4, opacity: 0, duration: 1.6, ease: "expo.out", svgOrigin: `${STOPS[id].x} ${STOPS[id].y}` },
-        );
-
-      const arrive = (id: IslandId) => {
+      // ---- lighting the headline ------------------------------------------
+      const light = (id: IslandId) => {
         setLit((current) => (current.includes(id) ? current : [...current, id]));
-        ring(id);
-        gsap.fromTo(`.hero__isle-piece--${id}`, { y: 0 }, { y: -10, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 });
+        stage.querySelector(`[data-step="${id}"]`)?.classList.add("is-lit");
         const i = ORDER.indexOf(id);
         const words = splits[i].words as HTMLElement[];
         const base = getComputedStyle(words[0]).color;
         gsap.to(words, {
           keyframes: [
-            { color: id === "see" ? "#fff4ea" : "#ffb48a", duration: 0.16, ease: "none" },
-            { color: base, duration: 0.8, ease: "power2.out" },
+            { color: id === "see" ? "#fff4ea" : "#ffb48a", duration: 0.14, ease: "none" },
+            { color: base, duration: 0.7, ease: "power2.out" },
           ],
-          stagger: 0.06,
+          stagger: 0.05,
           onComplete: () => void gsap.set(words, { clearProps: "color" }),
         });
         const spark = lines[i].querySelector(".hero__spark");
         const width = lines[i].querySelector<HTMLElement>(".hero__words")?.offsetWidth ?? 0;
-        gsap.fromTo(
-          spark,
-          { x: 0, opacity: 1 },
-          { x: width, duration: 1, ease: "expo.out", onComplete: () => void gsap.to(spark, { opacity: 0, duration: 0.4 }) },
-        );
+        gsap.fromTo(spark, { x: 0, opacity: 1 }, { x: width, duration: 0.9, ease: "expo.out", onComplete: () => void gsap.to(spark, { opacity: 0, duration: 0.3 }) });
       };
+      const pop = (card: Element) =>
+        gsap.fromTo(card, { scale: 1 }, { scale: 1.035, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 });
 
-      // ---- intro: night falls in, the islands rack into focus at their own
-      // depths, light sweeps the paper, then the route ignites the bridge.
+      // ---- intro: the screens arrive in depth -----------------------------
       const tl = gsap.timeline({ delay: 0.05 });
-      tl.from(".hero__sky", { opacity: 0, duration: 1.8, ease: "power2.out" }, 0)
-        .from(".hero__glow", { opacity: 0, scale: 0.6, duration: 2.2, ease: "power2.out" }, 0.2)
-        .from(".hero__survey", { opacity: 0, duration: 1.8 }, 0.3)
-        .from(".hero__aurora i", { opacity: 0, scaleY: 0.4, duration: 2.4, ease: "power2.out", stagger: 0.25 }, 0.2)
+      tl.from(".hero__sky", { opacity: 0, duration: 1.6, ease: "power2.out" }, 0)
+        .from(".hero__glow", { opacity: 0, scale: 0.6, duration: 2, ease: "power2.out" }, 0.2)
+        .from(".hero__survey", { opacity: 0, duration: 1.6 }, 0.3)
+        .from(".hero__aurora i", { opacity: 0, scaleY: 0.4, duration: 2.2, ease: "power2.out", stagger: 0.25 }, 0.2)
         .from(".hero__eyebrow-in", { opacity: 0, y: 12, duration: 0.9, ease: "expo.out" }, 0.15)
-        .from(".hero__sub", { opacity: 0, y: 14, duration: 1, ease: "expo.out" }, 0.55);
+        .from(".hero__sub", { opacity: 0, y: 14, duration: 1, ease: "expo.out" }, 0.5);
       splits.forEach((split, i) => {
-        tl.from(split.words, { yPercent: 118, rotation: 5, duration: 1.15, ease: "expo.out", stagger: 0.07, transformOrigin: "0% 100%" }, 0.1 + i * 0.14);
+        tl.from(split.words, { yPercent: 118, rotation: 5, duration: 1.1, ease: "expo.out", stagger: 0.06, transformOrigin: "0% 100%" }, 0.1 + i * 0.12);
       });
-      // Rack focus: far islands resolve first and travel least; the near one
-      // starts closest to the lens, largest and softest.
-      (["see", "run", "win"] as IslandId[]).forEach((id, i) => {
-        const d = PIECES[id].depth;
-        tl.fromTo(
-          `.hero__isle-piece--${id}`,
-          { opacity: 0, y: 30 + d * 80, scale: 1.12 + d * 0.12, filter: `blur(${6 + d * 10}px)` },
-          {
-            opacity: 1, y: 0, scale: 1, filter: "blur(0px)",
-            duration: 1.7 + d * 0.3, ease: "expo.out",
-            clearProps: "filter",
-          },
-          0.3 + i * 0.18,
-        );
-      });
-      // One sweep of light across the paper, near to far.
-      tl.fromTo(
-        ".hero__sheen",
-        { backgroundPosition: "130% 0" },
-        { backgroundPosition: "-30% 0", duration: 1.3, ease: "power2.inOut", stagger: 0.12 },
-        1.25,
-      )
-        .from(".hero__copy .actions", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.1)
-        .from(".hero__lead", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.2)
-        .fromTo(rider, { opacity: 0, scale: 0.3, svgOrigin: `${STOPS.win.x} ${STOPS.win.y}` }, { opacity: 1, scale: 1, duration: 0.35 }, 1.6)
-        .call(() => arrive("win"), [], 1.65)
-        .to(ride, { p: pRun, duration: 1.05, ease: "power2.inOut", onUpdate: place }, 1.7)
-        .call(() => arrive("run"), [], 2.75)
-        // The keystone takes the load: the halo behind the bear blooms.
-        .fromTo(".hero__halo", { opacity: 0.25, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.4, ease: "expo.out" }, 2.75)
-        .to(ride, { p: 1, duration: 0.95, ease: "power2.inOut", onUpdate: place }, 2.85)
-        .call(() => arrive("see"), [], 3.8)
-        .from(".hero__tag", { opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.55 }, 1.7)
-        .to(rider, { opacity: 0, duration: 0.6 }, 3.95);
+      tl.from(".demo-phone", { opacity: 0, x: -50, rotationY: 50, z: -200, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.45)
+        .from(".demo-leads", { opacity: 0, x: 50, rotationY: -40, z: -160, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.6)
+        .from(".demo-dash", { opacity: 0, y: 60, rotationX: 40, z: -120, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.75)
+        .from(".hero__copy .actions", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1)
+        .from(".hero__lead", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.1)
+        .call(() => {
+          el.dataset.intro = "done";
+          drawRoutes();
+          story.play(0);
+        }, [], 1.7);
 
-      // ---- the aurora never quite holds still
+      // ---- one enquiry, end to end ----------------------------------------
+      let n = DEMO_START_COUNT;
+      const counter = { v: n };
+      const story = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 0.6, onRepeat: () => nextSite() });
+      const nextSite = () => {
+        const prev = site;
+        site = (site + 1) % DEMO_SITES.length;
+        gsap.to(sites[prev], { opacity: 0, duration: 0.6 });
+        gsap.to(sites[site], { opacity: 1, duration: 0.6 });
+        drawRoutes();
+      };
+      story
+        // 01 — the tap on the client's own call to action
+        .fromTo(tap, { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }, 0.5)
+        .to(tap, { scale: 0.7, duration: 0.12, ease: "power2.in" }, 0.85)
+        .to(tap, { scale: 2.2, opacity: 0, duration: 0.5, ease: "expo.out" }, 0.97)
+        .call(() => { light("win"); pop(phone); }, [], 0.95)
+        // the enquiry leaves the site
+        .call(() => {
+          const lead = DEMO_SITES[site].lead;
+          toastWhat.textContent = lead.what;
+          rowName.textContent = lead.who;
+          rowWhat.textContent = lead.what;
+          rowAv.textContent = lead.who[0];
+        }, [], 0.96)
+        .fromTo(
+          toast,
+          { opacity: 0, scale: 0.6, x: () => points().tap.x - 20, y: () => points().tap.y - 40 },
+          { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" },
+          1,
+        )
+        .to(toast, {
+          motionPath: { path: routeA, align: routeA, alignOrigin: [0.1, 0.5] },
+          duration: 0.8,
+          ease: "power2.inOut",
+        }, 1.25)
+        .to(toast, { opacity: 0, scale: 0.7, duration: 0.25 }, 2)
+        // 02 — it lands on the board and follows itself up
+        .fromTo(newRow, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.45, ease: "power3.out" }, 2)
+        .call(() => { light("run"); }, [], 2.1)
+        .set(pillB, { opacity: 0 }, 2)
+        .set(pillA, { opacity: 1 }, 2)
+        .to(pillA, { opacity: 0, duration: 0.25 }, 2.9)
+        .fromTo(pillB, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(2)" }, 3)
+        .call(() => {
+          const pill = pillB.parentElement!;
+          pill.classList.add("is-done");
+          pop($(".demo-leads"));
+        }, [], 3)
+        // 03 — the dashboard counts it
+        .fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.3)
+        .to(signal, { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 3.3)
+        .to(signal, { opacity: 0, duration: 0.2 }, 4)
+        .call(() => {
+          n += 1;
+          gsap.to(counter, { v: n, duration: 0.5, ease: "power2.out", onUpdate: () => { count.textContent = String(Math.round(counter.v)); } });
+          gsap.to(today, { height: `${Math.min(96, 30 + (n - DEMO_START_COUNT) * 14)}%`, duration: 0.6, ease: "back.out(1.6)" });
+          light("see");
+          pop($(".demo-dash"));
+        }, [], 4)
+        // reset for the next client
+        .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 5.8)
+        .call(() => {
+          pillB.parentElement!.classList.remove("is-done");
+          gsap.set(pillA, { opacity: 1 });
+          gsap.set(pillB, { opacity: 0 });
+        }, [], 6.25);
+
+      gsap.set(newRow, { height: 0, opacity: 0 });
+
+      // ---- the aurora never quite holds still ------------------------------
       gsap.utils.toArray<HTMLElement>(".hero__aurora i", el).forEach((band, i) => {
         gsap.to(band, {
           xPercent: i % 2 ? -14 : 12,
@@ -480,130 +538,30 @@ export function BridgeHero() {
         });
       });
 
-      // ---- touch: drag the scene and it tilts in depth; tap an island to light it
-      const box = scene.querySelector<HTMLElement>(".hero__isles-box");
-      const tiltY = gsap.quickTo(box, "rotationY", { duration: 0.5, ease: "power3.out" });
-      const tiltX = gsap.quickTo(box, "rotationX", { duration: 0.5, ease: "power3.out" });
-      const shift = (Object.keys(PIECES) as IslandId[]).map((id) => {
-        const target = scene.querySelector(`.hero__isle-float--${id}`);
-        return [
-          gsap.quickTo(target, "x", { duration: 0.6, ease: "power3.out" }),
-          PIECES[id].depth,
-        ] as const;
-      });
-      let origin: { x: number; y: number; id: number } | null = null;
-      let moved = false;
-      const lean = (dx: number, dy: number) => {
-        const nx = gsap.utils.clamp(-1, 1, dx / 160);
-        const ny = gsap.utils.clamp(-1, 1, dy / 200);
-        tiltY(nx * 16);
-        tiltX(ny * -8);
-        for (const [x, depth] of shift) x(nx * (8 + depth * 26));
-      };
-      const release = () => {
-        origin = null;
-        gsap.to(box, { rotationY: 0, rotationX: 0, duration: 1.4, ease: "elastic.out(1, 0.45)", overwrite: true });
-        for (const [x] of shift) x(0);
-      };
-      const down = (e: PointerEvent) => {
-        origin = { x: e.clientX, y: e.clientY, id: e.pointerId };
-        moved = false;
-      };
-      const move = (e: PointerEvent) => {
-        if (!origin || e.pointerId !== origin.id) return;
-        const dx = e.clientX - origin.x;
-        const dy = e.clientY - origin.y;
-        if (Math.abs(dx) > 6) moved = true;
-        lean(dx, dy);
-      };
-      const up = (e: PointerEvent) => {
-        if (!origin || e.pointerId !== origin.id) return;
-        // A tap on an island lights it, the same way the route does.
-        if (!moved) {
-          const hit = (e.target as HTMLElement).closest<HTMLElement>("[data-isle]");
-          if (hit?.dataset.isle) arrive(hit.dataset.isle as IslandId);
-        }
-        release();
-      };
-      box?.addEventListener("pointerdown", down);
-      box?.addEventListener("pointermove", move);
-      box?.addEventListener("pointerup", up);
-      box?.addEventListener("pointercancel", release);
-      box?.addEventListener("pointerleave", release);
-
-      // ---- idle: each island breathes on its own rhythm
-      (Object.keys(PIECES) as IslandId[]).forEach((id, i) => {
-        gsap.to(`.hero__isle-float--${id}`, {
-          y: -(4 + PIECES[id].depth * 6),
-          duration: 3.4 + i * 0.7,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: 1.8 + i * 0.4,
-        });
+      // ---- the screens float, each on its own rhythm ------------------------
+      gsap.utils.toArray<HTMLElement>(".demo-card", stage).forEach((card, i) => {
+        gsap.to(card, { y: -5 - i * 2, duration: 3.2 + i * 0.6, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 2 + i * 0.3 });
       });
 
-      // ---- a quiet signal climbs the route now and then
-      const loop = gsap.timeline({ repeat: -1, repeatDelay: 3.2, delay: 6, paused: true });
-      loop
-        .set(ride, { p: 0 })
-        .to(rider, { opacity: 1, duration: 0.3 })
-        .to(ride, {
-          p: 1,
-          duration: 2.6,
-          ease: "sine.inOut",
-          onUpdate: () => {
-            const pt = route.getPointAtLength(ride.p * rlen);
-            rider.setAttribute("cx", pt.x.toFixed(1));
-            rider.setAttribute("cy", pt.y.toFixed(1));
-          },
-        })
-        .call(() => ring("win", 0.5), [], 0.3)
-        .call(() => ring("run", 0.5), [], 0.3 + 2.6 * pRun)
-        .call(() => ring("see", 0.5), [], 2.9)
-        .to(rider, { opacity: 0, duration: 0.5 }, 2.9);
-      tl.eventCallback("onComplete", () => {
-        el.dataset.intro = "done";
-        loop.play();
-      });
-
-      // ---- scroll: no pinning, the islands just part in depth as the page moves
-      const parallax = gsap.timeline({
-        defaults: { ease: "none" },
-        scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.4 },
-      });
-      (Object.keys(PIECES) as IslandId[]).forEach((id) => {
-        parallax.to(`.hero__isle-piece--${id}`, { yPercent: -10 - PIECES[id].depth * 22 }, 0);
-      });
-      parallax.to(".hero__sky", { yPercent: 14 }, 0).to(".hero__glow", { yPercent: -10 }, 0);
+      const onResize = () => drawRoutes();
+      window.addEventListener("resize", onResize);
 
       ScrollTrigger.create({
         trigger: el,
         start: "top bottom",
         end: "bottom top",
         onToggle: (self) => {
-          const tweens = gsap
-            .getTweensOf(el.querySelectorAll(".hero__isle-float, .hero__mote, .hero__bokeh"))
-            .filter((t) => t.repeat() === -1);
-          tweens.forEach((t) => (self.isActive ? t.resume() : t.pause()));
-          if (el.dataset.intro === "done") {
-            if (self.isActive) loop.play();
-            else loop.pause();
-          }
+          if (el.dataset.intro !== "done") return;
+          if (self.isActive) story.play();
+          else story.pause();
         },
       });
 
-      return () => {
-        box?.removeEventListener("pointerdown", down);
-        box?.removeEventListener("pointermove", move);
-        box?.removeEventListener("pointerup", up);
-        box?.removeEventListener("pointercancel", release);
-        box?.removeEventListener("pointerleave", release);
-      };
+      return () => window.removeEventListener("resize", onResize);
     };
 
     const mm = gsap.matchMedia(el);
-    mm.add("(max-width: 900px)", () => setupIsles());
+    mm.add("(max-width: 900px)", () => setupDemo());
     mm.add("(min-width: 901px)", () => setup());
 
     return () => {
@@ -662,72 +620,8 @@ export function BridgeHero() {
                 Websites, custom software and automation that bring in customers and cut the busywork.
               </p>
 
-              {/* Phones and tablets: the bridge recomposed for a portrait screen. */}
-              <div className="hero__isles">
-                <div className="hero__isles-box">
-                  {/* The northern sky behind the bear: aurora ribbons and a warm halo. */}
-                  <div className="hero__aurora" aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
-                  </div>
-                  <div className="hero__halo" aria-hidden="true" />
-                  {(["see", "run", "win"] as IslandId[]).map((id) => {
-                    const piece = PIECES[id];
-                    return (
-                      <div
-                        key={id}
-                        className={`hero__isle-piece hero__isle-piece--${id}${lit.includes(id) ? " is-lit" : ""}`}
-                        style={
-                          {
-                            "--x": `${(piece.x / SCENE) * 100}%`,
-                            "--y": `${(piece.y / SCENE) * 100}%`,
-                            "--w": `${(piece.width / SCENE) * 100}%`,
-                          } as CSSProperties
-                        }
-                      >
-                        <div className={`hero__isle-float hero__isle-float--${id}`} data-isle={id}>
-                          <Image
-                            src={piece.src}
-                            alt=""
-                            width={piece.w}
-                            height={piece.h}
-                            loading={id === "run" ? "eager" : undefined}
-                            sizes={`${Math.round((piece.width / SCENE) * 112)}vw`}
-                          />
-                          {/* light passing over the paper, clipped to the island's own shape */}
-                          <span className="hero__sheen" style={{ "--src": `url(${piece.src})` } as CSSProperties} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <svg className="hero__route-svg" viewBox={`0 0 ${SCENE} ${SCENE}`} aria-hidden="true">
-                    <path className="hero__route-ghost" d={ROUTE} />
-                    <path className="hero__route" d={ROUTE} />
-                    {ORDER.map((id) => (
-                      <g key={id}>
-                        <circle className={`hero__stop hero__stop--${id}`} cx={STOPS[id].x} cy={STOPS[id].y} r="22" />
-                        <circle className={`hero__stop-dot${lit.includes(id) ? " is-lit" : ""}`} cx={STOPS[id].x} cy={STOPS[id].y} r="7" />
-                      </g>
-                    ))}
-                    <circle className="hero__rider" r="11" cx={STOPS.win.x} cy={STOPS.win.y} />
-                  </svg>
-                  {islands.map((island) => (
-                    <Link
-                      key={island.id}
-                      href={`/services#${island.id}`}
-                      className={`hero__tag hero__tag--${PIECE_LABELS[island.id].align}${lit.includes(island.id) ? " is-lit" : ""}`}
-                      style={{ "--x": `${PIECE_LABELS[island.id].x}%`, "--y": `${PIECE_LABELS[island.id].y}%` } as CSSProperties}
-                    >
-                      <span className="index">{island.index}</span>
-                      <span>{island.offer}</span>
-                    </Link>
-                  ))}
-                </div>
-                <p className="visually-hidden">
-                  A polar bear setting the keystone of a rust-coloured bridge between three floating islands.
-                </p>
-              </div>
+              {/* Phones and tablets: what Arctos builds, shown working. */}
+              <SystemDemo />
 
               <p className="lead hero__lead">
                 Arctos designs and builds the websites, software, automation and reporting that

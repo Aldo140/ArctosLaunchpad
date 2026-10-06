@@ -18,10 +18,8 @@ html.js-motion .hero[data-intro="pending"] :is(
     .hero__motes,
     .hero__scraps,
     .hero__survey,
-    .hero__isle-piece,
-    .hero__tag,
-    .hero__sub,
-    .hero__route
+    .demo-card,
+    .hero__sub
   ) {
   opacity: 0;
   animation: hero-failsafe 0.6s 3.2s forwards;
@@ -53,9 +51,9 @@ html.js-motion .hero[data-intro="pending"] :is(
   display: contents;
 }
 
-/* The portrait island scene, its snow and the plain subline exist for phones
-   and tablets only (desktop shows the full lead beside the art). */
-.hero__isles,
+/* The live demo, its snow and the plain subline exist for phones and tablets
+   only (desktop shows the full lead beside the bridge). */
+.hero__demo,
 .hero__snow,
 .hero__sub {
   display: none;
@@ -831,7 +829,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   }
 }
 
-/* ---- Phones & tablets: the island scene ------------------------------------ */
+/* ---- Phones & tablets: the live demo -------------------------------------- */
 
 @media (max-width: 900px) {
   .hero .hero__sub {
@@ -847,36 +845,25 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     text-wrap: pretty;
   }
 
-  .hero .hero__isles {
+  .hero .hero__demo {
     display: block;
     order: 3;
-    /* its children are all positioned, so it must be told to take the width */
     align-self: stretch;
     position: relative;
     z-index: 1;
-    /* full bleed: the scene is wider than the screen and runs off both edges,
-       like a still from a film rather than a picture placed on a page */
-    --box: min(114vw, 51svh, 640px);
-    margin: -8px calc(var(--gutter) * -1) 36px;
-    perspective: 1000px;
-    perspective-origin: 50% 40%;
+    margin: 10px calc(var(--gutter) * -0.4) 34px;
   }
 
-  .hero__isles-box {
+  /* All positions are % of the stage; type scales with it (cqi). */
+  .hero__demo-stage {
     position: relative;
-    left: 50%;
-    width: var(--box);
-    margin-left: calc(var(--box) / -2);
-    aspect-ratio: 1;
+    width: 100%;
+    max-width: 520px;
+    margin-inline: auto;
+    aspect-ratio: 1 / 0.98;
     container-type: inline-size;
-    /* horizontal drags tilt the scene; vertical ones still scroll the page */
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .hero__isle-float {
-    position: relative;
-    cursor: pointer;
+    perspective: 1100px;
+    perspective-origin: 40% 30%;
   }
 
   /* ---- the northern sky: aurora curtains and the bear's halo ---- */
@@ -947,20 +934,6 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     background: radial-gradient(circle at 50% 46%, rgb(255 178 120 / 0.42), rgb(229 122 66 / 0.14) 40%, transparent 66%);
   }
 
-  /* ---- light passing over the paper, clipped to each island's shape ---- */
-
-  .hero__sheen {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    -webkit-mask: var(--src) center / 100% 100% no-repeat;
-    mask: var(--src) center / 100% 100% no-repeat;
-    background: linear-gradient(100deg, transparent 38%, rgb(255 238 216 / 0.75) 50%, transparent 62%);
-    background-size: 260% 100%;
-    background-position: 130% 0;
-    mix-blend-mode: soft-light;
-  }
-
   /* ---- snow across the whole hero, in front of the art ---- */
 
   .hero__snow {
@@ -973,144 +946,320 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     pointer-events: none;
   }
 
-  .hero__isle-piece {
+  /* ---- the three screens ---- */
+
+  .demo-card {
     position: absolute;
-    left: var(--x);
-    top: var(--y);
-    width: var(--w);
+    z-index: 2;
+    transform-style: preserve-3d;
     will-change: transform;
   }
 
-  .hero__isle-piece img {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 22px 26px rgb(2 12 16 / 0.55));
+  .demo-k {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 0 0 1.6cqi;
+    font-family: var(--mono);
+    font-size: max(10px, 2.7cqi);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.5s;
   }
 
-  /* Depth: the far island sits back in the haze, the near one is crisp. */
-  .hero__isle-piece--see {
-    z-index: 1;
-    opacity: 0.92;
+  .demo-k span {
+    color: var(--rust-hi);
   }
 
-  .hero__isle-piece--see img {
-    filter: saturate(0.85) brightness(0.92) drop-shadow(0 16px 18px rgb(2 12 16 / 0.5));
+  .demo-card.is-lit .demo-k {
+    color: var(--fg);
   }
 
-  .hero__isle-piece--run {
-    z-index: 2;
+  /* 01 — phone */
+  .demo-phone {
+    left: 1%;
+    top: 3%;
+    width: 38%;
+    transform: rotateY(18deg) rotateZ(-2deg);
+    transform-origin: 0 50%;
   }
 
-  .hero__isle-piece--win {
-    z-index: 4;
+  .demo-phone__frame {
+    padding: 1.4cqi;
+    border-radius: 7cqi;
+    background: linear-gradient(160deg, #2a3236, #0d1416 60%);
+    box-shadow:
+      inset 0 0 0 1px rgb(241 235 223 / 0.18),
+      0 30px 50px -10px rgb(0 0 0 / 0.7),
+      0 0 0 1px rgb(0 0 0 / 0.6);
   }
 
-  .hero__route-svg {
+  .demo-phone__screen {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 780 / 1688;
+    border-radius: 5.6cqi;
+    background: #111;
+  }
+
+  .demo-site {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+
+  .demo-site.is-on {
+    opacity: 1;
+  }
+
+  .demo-tap {
+    position: absolute;
+    left: 60%;
+    top: 89%;
+    width: 9cqi;
+    height: 9cqi;
+    margin: -4.5cqi 0 0 -4.5cqi;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.55);
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.85), 0 0 18px rgb(255 200 160 / 0.9);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* shared card surface for the two app screens */
+  .demo-leads,
+  .demo-dash {
+    padding: 3cqi 3.2cqi 3.2cqi;
+    border-radius: 3.6cqi;
+    background: linear-gradient(180deg, rgb(26 40 44 / 0.92), rgb(13 24 27 / 0.94));
+    box-shadow:
+      inset 0 0 0 1px rgb(241 235 223 / 0.14),
+      0 24px 50px -12px rgb(0 0 0 / 0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* 02 — leads board */
+  .demo-leads {
+    left: 42%;
+    top: 4%;
+    width: 57%;
+    transform: rotateY(-10deg) translateZ(20px);
+    transform-origin: 100% 50%;
+  }
+
+  .demo-rows {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .demo-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2cqi;
+    padding: 1.8cqi 0;
+    border-top: 1px solid rgb(241 235 223 / 0.08);
+    overflow: hidden;
+  }
+
+  .demo-row:first-child {
+    border-top: 0;
+  }
+
+  .demo-av {
+    display: grid;
+    place-items: center;
+    width: 6.4cqi;
+    height: 6.4cqi;
+    border-radius: 50%;
+    background: #2f4c4a;
+    font-size: 2.8cqi;
+    font-weight: 700;
+    color: var(--paper);
+  }
+
+  .demo-row--new .demo-av {
+    background: var(--rust);
+  }
+
+  .demo-who {
+    display: grid;
+    min-width: 0;
+    line-height: 1.2;
+  }
+
+  .demo-who b {
+    overflow: hidden;
+    font-size: 3cqi;
+    font-weight: 600;
+    color: var(--fg);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .demo-who small {
+    overflow: hidden;
+    font-size: 2.5cqi;
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .demo-pill {
+    position: relative;
+    display: inline-grid;
+    padding: 0.8cqi 1.8cqi;
+    border-radius: 999px;
+    background: rgb(229 122 66 / 0.18);
+    font-size: 2.3cqi;
+    font-weight: 600;
+    color: #ffb48a;
+    white-space: nowrap;
+  }
+
+  .demo-pill.is-done {
+    background: rgb(94 190 160 / 0.14);
+    color: #8fd9bf;
+  }
+
+  /* New → Follow-up sent: two labels stacked in one cell, one shown */
+  .demo-pill__a,
+  .demo-pill__b {
+    grid-area: 1 / 1;
+  }
+
+  .demo-pill__b {
+    opacity: 0;
+  }
+
+  .demo-note {
+    margin: 1.2cqi 0 0;
+    font-family: var(--mono);
+    font-size: max(9px, 2cqi);
+    color: var(--faint);
+    text-align: right;
+  }
+
+  /* 03 — dashboard */
+  .demo-dash {
+    left: 34%;
+    top: 55%;
+    width: 62%;
     z-index: 3;
+    transform: rotateY(-6deg) rotateX(6deg) translateZ(40px);
+    transform-origin: 50% 100%;
+  }
+
+  .demo-dash__body {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3cqi;
+  }
+
+  .demo-num {
+    display: grid;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .demo-num b {
+    font-family: var(--serif);
+    font-size: 11cqi;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .demo-num small {
+    margin-top: 1cqi;
+    font-size: 2.6cqi;
+    color: var(--muted);
+  }
+
+  .demo-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.2cqi;
+    height: 13cqi;
+  }
+
+  .demo-bars i {
+    width: 2.6cqi;
+    border-radius: 1cqi 1cqi 0 0;
+    background: #2f4c4a;
+  }
+
+  .demo-bars i.is-today {
+    background: linear-gradient(180deg, #ffb48a, var(--rust));
+    box-shadow: 0 0 12px rgb(229 122 66 / 0.6);
+  }
+
+  /* ---- the signal between screens ---- */
+
+  .demo-route {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
     width: 100%;
     height: 100%;
     overflow: visible;
     pointer-events: none;
   }
 
-  .hero__route-ghost {
+  /* Motion guides only: the toast and the signal show the movement, so the
+     paths themselves stay invisible and never cross the screens' content. */
+  .demo-route__path {
     fill: none;
-    stroke: rgb(241 235 223 / 0.16);
-    stroke-width: 2.5;
-    stroke-dasharray: 3 9;
-    stroke-linecap: round;
+    stroke: none;
   }
 
-  .hero__route {
-    fill: none;
-    stroke: var(--rust-hi);
-    stroke-width: 4;
-    stroke-linecap: round;
-    filter: drop-shadow(0 0 6px rgb(229 122 66 / 0.7));
-  }
-
-  .hero__stop {
-    fill: none;
-    stroke: var(--rust-hi);
-    stroke-width: 3;
-    opacity: 0;
-  }
-
-  .hero__stop-dot {
-    fill: var(--paper);
-    stroke: rgb(2 19 27 / 0.6);
-    stroke-width: 3;
-    transition: fill 0.4s;
-  }
-
-  .hero__stop-dot.is-lit {
-    fill: var(--rust-hi);
-  }
-
-  .hero__rider {
-    fill: #fff1e4;
-    opacity: 0;
-    filter: drop-shadow(0 0 8px rgb(255 176 122 / 0.95));
-  }
-
-  /* Scene labels: their own class, so none of the desktop label rules (pill,
-     leader line, centring) reach them. The stop dot marks the island. */
-  .hero__tag {
+  .demo-signal {
     position: absolute;
+    left: 0;
+    top: 0;
     z-index: 5;
-    left: var(--x);
-    top: var(--y);
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    min-height: 44px;
-    padding: 0 4px;
-    /* scales with the scene, so the labels never collide on narrow phones */
-    font-size: clamp(0.66rem, 3.6cqi, 0.82rem);
-    font-weight: 600;
-    color: var(--muted);
-    white-space: nowrap;
-    text-decoration: none;
-    text-shadow: 0 1px 10px rgb(2 19 27 / 0.95);
-    transition: color 0.5s;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: #fff1e4;
+    box-shadow: 0 0 10px 3px rgb(255 170 120 / 0.95), 0 0 26px 8px rgb(229 122 66 / 0.5);
+    opacity: 0;
+    pointer-events: none;
   }
 
-  .hero__tag .index {
-    font-family: var(--mono);
-    font-size: 0.88em;
-    font-weight: 500;
-    color: var(--rust-hi);
-  }
-
-  .hero__tag.is-lit,
-  .hero__tag:hover,
-  .hero__tag:focus-visible {
-    color: var(--fg);
-  }
-
-  /* The two lower labels sit side by side: let them wrap to two short lines
-     (index above, service below) so neither crowds the other. */
-  .hero__tag--start,
-  .hero__tag--center {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    max-width: 9.5em;
-    white-space: normal;
+  .demo-toast {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 6;
+    display: grid;
+    padding: 1.6cqi 2.6cqi;
+    border-radius: 2.4cqi;
+    background: var(--paper);
+    box-shadow: 0 14px 30px -6px rgb(0 0 0 / 0.6);
+    color: var(--ink-deep, #0d1b1e);
     line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
   }
 
-  .hero__tag--center {
-    align-items: center;
-    text-align: center;
-    transform: translateX(-50%);
+  .demo-toast b {
+    font-size: 2.8cqi;
   }
 
-  .hero__tag--end {
-    transform: translateX(-100%);
+  .demo-toast small {
+    font-size: 2.4cqi;
+    opacity: 0.75;
   }
 
   /* Phones: no big blurs */
@@ -1120,7 +1269,16 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__isle-piece {
+  .demo-card {
     will-change: auto;
+  }
+
+  /* the finished state: the lead is in and followed up */
+  .demo-pill__a {
+    opacity: 0;
+  }
+
+  .demo-pill__b {
+    opacity: 1;
   }
 }
