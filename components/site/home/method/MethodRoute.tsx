@@ -61,6 +61,10 @@ export function MethodRoute() {
         </div>
 
         <ol className="mroute__stops">
+          {/* The drawn part of the route line. A real element (not ::after) so
+              scrolling can move it with a transform instead of a cascading
+              custom property that restyles every card each frame. */}
+          <li className="mroute__line" aria-hidden="true" />
           {processDetails.map((step, i) => {
             const next = processDetails[i + 1];
             return (
@@ -284,8 +288,21 @@ function scrubbed(el: HTMLElement) {
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power2.out" } });
     for (let i = 0; i < n; i++) buildStep(tl, b, i, i);
 
+    const line = el.querySelector<HTMLElement>(".mroute__line");
+    // One reusable tween chases the scroll position, instead of a new tween
+    // allocated on every scroll event.
+    const seek = { time: 0 };
+    const toTime = gsap.quickTo(seek, "time", {
+      duration: 0.55,
+      ease: "power2.out",
+      onUpdate: () => void tl.time(Math.min(seek.time, tl.duration())),
+    });
+    const setLine = line ? gsap.quickSetter(line, "scaleY") : () => {};
+    let lastRoute = -1;
+
     // Where each stop starts, measured on refresh rather than every frame.
     let listTop = 0;
+    let listHeight = 1;
     let tops: number[] = [];
     let spans: number[] = [];
     const measure = () => {
@@ -293,6 +310,7 @@ function scrubbed(el: HTMLElement) {
       listTop = list.getBoundingClientRect().top + y;
       tops = stops.map((s) => s.getBoundingClientRect().top + y - listTop);
       spans = stops.map((s) => Math.max(160, Math.min(s.offsetHeight * 0.55, window.innerHeight * 0.42)));
+      listHeight = list.offsetHeight;
     };
 
     let current = -2;
@@ -305,8 +323,13 @@ function scrubbed(el: HTMLElement) {
         idx = i;
         time = i + Math.min(1, (probe - tops[i]) / spans[i]);
       }
-      gsap.to(tl, { time: Math.min(time, tl.duration()), duration: 0.55, ease: "power2.out", overwrite: true });
-      list.style.setProperty("--route", String(Math.max(0, Math.min(1, probe / list.offsetHeight))));
+      toTime(Math.min(time, tl.duration()));
+      // list height is measured on refresh, not read here every frame
+      const route = Math.round(Math.max(0, Math.min(1, probe / listHeight)) * 1000) / 1000;
+      if (route !== lastRoute) {
+        lastRoute = route;
+        setLine(route);
+      }
       if (idx === current) return;
       current = idx;
       stops.forEach((s, i) => s.classList.toggle("is-lit", i <= idx));
@@ -345,7 +368,7 @@ function scrubbed(el: HTMLElement) {
     ctx.revert();
     el.classList.remove("is-scrub", "is-started");
     el.style.removeProperty("--active");
-    list.style.removeProperty("--route");
+    el.querySelector<HTMLElement>(".mroute__line")?.style.removeProperty("transform");
     stops.forEach((s) => s.classList.remove("is-lit"));
   };
 }

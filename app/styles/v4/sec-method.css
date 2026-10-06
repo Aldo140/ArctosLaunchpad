@@ -53,7 +53,7 @@
 
 /* the route line */
 .mroute__stops::before,
-.mroute__stops::after {
+.mroute__line {
   content: "";
   position: absolute;
   top: 10px;
@@ -67,7 +67,7 @@
   background: repeating-linear-gradient(var(--line-strong) 0 6px, transparent 6px 12px);
 }
 
-.mroute__stops::after {
+.mroute__line {
   background: var(--rust);
   transform: scaleY(var(--route));
   transform-origin: center top;
@@ -278,7 +278,7 @@
   }
 
   .mroute__stops::before,
-  .mroute__stops::after {
+  .mroute__line {
     top: 26px;
   }
 }
@@ -516,7 +516,7 @@
 }
 
 .mroute.is-pinned .mroute__stops::before,
-.mroute.is-pinned .mroute__stops::after,
+.mroute.is-pinned .mroute__line,
 .mroute.is-pinned .mstop__plank,
 .mroute.is-pinned .mstop__num {
   display: none;
@@ -812,7 +812,7 @@
   }
 
   .mroute__stops::before,
-  .mroute__stops::after {
+  .mroute__line {
     top: 26px;
   }
 
