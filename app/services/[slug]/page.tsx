@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
+  calgaryLandingPages,
   getIslandForStage,
   getRelatedProjects,
   getRelatedServices,
@@ -96,7 +97,11 @@ export default async function ServicePage({ params }: Props) {
       <Bridge sheet={sheet} />
       <WrongFit sheet={sheet} need={island.need} />
       {proof.length ? <Proof projects={proof} /> : null}
-      <Faq sheet={sheet} related={related} />
+      <Faq
+        sheet={sheet}
+        related={related}
+        local={calgaryLandingPages.find((page) => page.serviceSlug === sheet.slug)}
+      />
       <StartBand title={[sheet.cta]} need={island.need} size="h1" />
       <JsonLd data={schema} />
     </ServiceMotion>

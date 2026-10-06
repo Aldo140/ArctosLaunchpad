@@ -17,7 +17,6 @@ const routes = [
   ["/industries", 0.8, "monthly"],
   ["/privacy", 0.3, "yearly"],
   ["/accessibility", 0.3, "yearly"],
-  ["/guides/alberta-digital-funding", 0.5, "monthly"],
 ] as const satisfies ReadonlyArray<
   readonly [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]]
 >;
@@ -54,5 +53,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ];
 
-  return [...staticEntries, ...contentEntries];
+  // The guide carries a real "last checked" date, so it can report one honestly.
+  const guides: MetadataRoute.Sitemap = [
+    {
+      url: `${siteUrl}/guides/alberta-digital-funding`,
+      lastModified: "2026-10-06",
+      priority: 0.5,
+      changeFrequency: "monthly",
+    },
+  ];
+
+  return [...staticEntries, ...contentEntries, ...guides];
 }

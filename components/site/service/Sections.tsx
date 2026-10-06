@@ -326,9 +326,12 @@ export function Proof({ projects }: { projects: Project[] }) {
 export function Faq({
   sheet,
   related,
+  local,
 }: {
   sheet: ServicePage;
   related: ServicePage[];
+  /** The matching Calgary landing page, linked so local search relevance flows both ways. */
+  local?: { route: string; title: string };
 }) {
   return (
     <section
@@ -379,6 +382,18 @@ export function Faq({
                 </Link>
               </li>
             ))}
+          </ul>
+        </div>
+      ) : null}
+      {local ? (
+        <div className="wrap svx-pair">
+          <p className="mono">Working in Calgary</p>
+          <ul>
+            <li>
+              <Link href={local.route}>
+                {local.title} <span aria-hidden="true">→</span>
+              </Link>
+            </li>
           </ul>
         </div>
       ) : null}
