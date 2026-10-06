@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { calgaryLandingPages, islands } from "@/lib/content";
+import { calgaryLandingPages, guides, islands } from "@/lib/content";
 import { ArctosLockup } from "../brand/ArctosLockup";
 import { FooterFx } from "./close/FooterFx";
 
@@ -73,12 +73,11 @@ export function Footer() {
               <li>
                 <Link href="/industries">Industries</Link>
               </li>
-              <li>
-                <Link href="/guides/alberta-digital-funding">Funding guide</Link>
-              </li>
-              <li>
-                <Link href="/guides/canadian-website-privacy">Privacy guide</Link>
-              </li>
+              {guides.map((guide) => (
+                <li key={guide.route}>
+                  <Link href={guide.route}>{guide.label}</Link>
+                </li>
+              ))}
             </ul>
           </nav>
           <nav aria-label="Where we work">

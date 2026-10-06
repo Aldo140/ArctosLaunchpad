@@ -112,7 +112,13 @@ export default function AccessibilityPage() {
                 Accessible Canada Act. Alberta has no provincial web
                 accessibility law for private businesses, so for most Calgary
                 organizations it is good practice rather than a legal
-                requirement, and the practice this site follows anyway.
+                requirement, and the practice this site follows anyway. In the
+                United States, courts use the same standard in ADA cases; see
+                the{" "}
+                <Link className="link" href="/guides/ada-website-compliance">
+                  ADA website compliance guide
+                </Link>
+                .
               </p>
               <p>
                 Standards are a foundation. Real experiences across devices and

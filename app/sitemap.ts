@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { calgaryLandingPages, industries, projects, services, type Project } from "@/lib/content";
+import { calgaryLandingPages, guides, industries, projects, services, type Project } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -72,20 +72,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   // Guides carry a real "last checked" date, so they can report one honestly.
-  const guides: MetadataRoute.Sitemap = [
-    {
-      url: `${siteUrl}/guides/alberta-digital-funding`,
-      lastModified: "2026-10-06",
-      priority: 0.5,
-      changeFrequency: "monthly",
-    },
-    {
-      url: `${siteUrl}/guides/canadian-website-privacy`,
-      lastModified: "2026-10-06",
-      priority: 0.5,
-      changeFrequency: "monthly",
-    },
-  ];
+  const guideEntries: MetadataRoute.Sitemap = guides.map((guide) => ({
+    url: `${siteUrl}${guide.route}`,
+    lastModified: guide.checked,
+    priority: 0.5,
+    changeFrequency: "monthly" as const,
+  }));
 
-  return [...staticEntries, ...contentEntries, ...guides];
+  return [...staticEntries, ...contentEntries, ...guideEntries];
 }

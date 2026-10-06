@@ -53,7 +53,7 @@ Positioned as nearshore, not cheapest: shared hours, language and culture.
 | Search phrasing / trend | Where it lives |
 |---|---|
 | Nearshore software development, Canadian developers for US companies | `/united-states` |
-| ADA website compliance (about 8,700 suits in 2025, no small-business exemption; DOJ Title II deadlines moved to 2027/2028) | `/united-states` section 03 |
+| ADA website compliance (5,000+ digital accessibility suits in 2025, no small-business exemption; DOJ Title II deadlines moved to 2027/2028; FTC fined overlay vendor accessiBe $1M) | `/guides/ada-website-compliance`, summary in `/united-states` section 03 |
 | US state privacy laws (20 states in effect), Global Privacy Control | `/united-states` section 04 |
 
 Service and industry descriptions name "across Canada and the US" when it fits

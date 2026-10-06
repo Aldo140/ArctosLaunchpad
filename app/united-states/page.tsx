@@ -142,9 +142,10 @@ export default function UnitedStatesPage() {
 
         <GuideSection n="03" id="ada" title="ADA and website accessibility">
           <p>
-            Website accessibility suits under the Americans with Disabilities Act keep rising: roughly 8,700 were filed
-            in 2025, and Title III has no small-business exemption. There is no federal rule naming a standard for
-            private businesses, but courts consistently treat WCAG 2.1 Level AA as the benchmark.
+            More than 5,000 digital accessibility lawsuits were filed in US federal and state courts in 2025, most of
+            them against e-commerce and restaurant sites, and Title III of the Americans with Disabilities Act has no
+            small-business exemption. There is no federal rule naming a standard for private businesses, but courts
+            treat WCAG Level AA as the benchmark.
           </p>
           <p>
             For public entities, the Department of Justice&apos;s Title II rule sets WCAG 2.1 AA, with deadlines
@@ -153,8 +154,8 @@ export default function UnitedStatesPage() {
           <p>
             Arctos builds to WCAG Level AA from the first design, which is far cheaper than an audit and retrofit after
             a demand letter.{" "}
-            <Link className="link" href="/accessibility">
-              How this site approaches it
+            <Link className="link" href="/guides/ada-website-compliance">
+              The full ADA website compliance guide
             </Link>
             .
           </p>

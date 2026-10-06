@@ -133,6 +133,34 @@ export const calgaryLandingPages = [
   },
 ] as const;
 
+/**
+ * Reference guides. Linked from the footer, never the main navigation; each
+ * carries the date its facts were last checked, which the sitemap reports.
+ */
+export const guides = [
+  {
+    route: "/guides/alberta-digital-funding" as const,
+    title: "Funding for software and AI in Calgary and Alberta (2026)",
+    label: "Funding guide",
+    summary: "BDC LIFT, Alberta Innovates, NRC IRAP, SR&ED, and what replaced the closed Canada Digital Adoption Program.",
+    checked: "2026-10-06",
+  },
+  {
+    route: "/guides/canadian-website-privacy" as const,
+    title: "Website privacy rules in Canada (2026)",
+    label: "Privacy guide",
+    summary: "PIPEDA, Alberta and BC PIPA, Quebec Law 25, cookie consent, CASL, and Bill C-36.",
+    checked: "2026-10-06",
+  },
+  {
+    route: "/guides/ada-website-compliance" as const,
+    title: "ADA website compliance (2026)",
+    label: "ADA guide",
+    summary: "Who gets sued, why courts use WCAG AA, DOJ Title II deadlines, why overlays fail, and a practical checklist.",
+    checked: "2026-10-06",
+  },
+] as const;
+
 export const siteRoutes = [
   "/",
   "/services",

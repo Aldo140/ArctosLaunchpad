@@ -1,4 +1,4 @@
-import { calgaryLandingPages, industries, projects, servicePages } from "@/lib/content";
+import { calgaryLandingPages, guides, industries, projects, servicePages } from "@/lib/content";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
@@ -40,9 +40,7 @@ export function GET() {
     "",
     "## Guides",
     "",
-    `- [Funding for software and AI in Calgary and Alberta (2026)](${url("/guides/alberta-digital-funding")}): BDC LIFT, Alberta Innovates, NRC IRAP, SR&ED, and what replaced the closed Canada Digital Adoption Program.`,
-    "",
-    `- [Website privacy rules in Canada (2026)](${url("/guides/canadian-website-privacy")}): PIPEDA, Alberta and BC PIPA, Quebec Law 25, cookie consent, CASL, and Bill C-36.`,
+    ...guides.map((g) => `- [${g.title}](${url(g.route)}): ${g.summary}`),
     "",
     "## Frequently asked questions",
     "",
