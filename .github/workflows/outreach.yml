@@ -1,0 +1,38 @@
+name: Arctos outreach
+
+# Sends queued outreach (outreach/batch-*.json) from aldo@arctoslaunchpad.com
+# through Brevo, one email per run, weekdays 9:00-16:30 Calgary time, at most
+# 15 a day. The send window is enforced in scripts/send-outreach.mjs.
+on:
+  schedule:
+    - cron: "11,41 14-23 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: outreach
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Send the next queued email
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: node scripts/send-outreach.mjs
+      - name: Record what was sent
+        if: always()
+        run: |
+          git config user.name "arctos-outreach"
+          git config user.email "aldo@arctoslaunchpad.com"
+          git add outreach/sent.json 2>/dev/null || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "Record outreach sends [skip ci]"
+          git push

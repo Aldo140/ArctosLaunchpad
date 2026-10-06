@@ -6,9 +6,12 @@ custom bakeries).
 
 ## Rules
 
-- Send only from `aldo@arctoslaunchpad.com`. Never from the Vow Motion address
-  or jorti104@mtroyal.ca. Until that address exists as a Gmail "Send mail as"
-  alias in mrotiz14@gmail.com, nothing here is sent.
+- Send only from `aldo@arctoslaunchpad.com`, never from the Vow Motion address
+  or jorti104@mtroyal.ca. `.github/workflows/outreach.yml` sends the queue
+  through Brevo (`BREVO_API_KEY` repository secret), one email per run,
+  weekdays 9:00–16:30 Calgary time, at most 15 a day; `sent.json` records each
+  send. Replies reach mrotiz14@gmail.com through ForwardEmail (MX + TXT records
+  on Vercel DNS).
 - Up to 15 new businesses a day, weekdays, spaced through the day. No link in
   the first email; the ask is a reply.
 - Every email names one true detail about that business and cites only real
@@ -19,5 +22,4 @@ custom bakeries).
 
 ## Batches
 
-- `batch-2026-10-06.json` — 15 businesses, drafted, not yet sent (waiting on
-  the Arctos sending address).
+- `batch-2026-10-06.json` — 15 businesses, queued for the workflow.
