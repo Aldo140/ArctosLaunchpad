@@ -528,7 +528,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 
 /* ---- Tablet / phone --------------------------------------------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   /* Portrait composition: headline → bridge → lead → actions. The copy
      column dissolves so the art can sit between the headline and the lead. */
   .hero {
@@ -663,7 +663,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   }
 }
 
-@media (min-width: 601px) and (max-width: 900px) {
+@media (min-width: 601px) and (max-width: 900px) and (min-height: 501px) {
   .hero {
     --hero-fs: calc((100vw - 2 * var(--gutter)) / 7.75);
   }
@@ -740,7 +740,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 
 /* ---- Phones & tablets: refined island labels (leader lines) --------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   .hero .hero__label {
     flex-direction: row;
     gap: 6px;
@@ -836,7 +836,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 
 /* ---- Phones & tablets: the scroll story (motion only) ---------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   html.js-motion .hero {
     display: block;
     min-height: 0;
@@ -1047,7 +1047,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   }
 }
 
-@media (min-width: 601px) and (max-width: 900px) {
+@media (min-width: 601px) and (max-width: 900px) and (min-height: 501px) {
   html.js-motion .hero {
     --art-w: 104vw;
   }
@@ -1055,7 +1055,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 
 /* ---- Phones & tablets: framing ---------------------------------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   /* The outer labels hang inward from their island instead of centring on it.
      Centred, "01 Win the customer" and "03 See the numbers" ran off the screen
      edges; anchored at the island they always read toward the middle. */
@@ -1131,5 +1131,51 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 @media (max-width: 600px) and (max-height: 700px) {
   html.js-motion .hero:not([data-act]) .hero__label {
     visibility: hidden;
+  }
+}
+
+/* ---- Phones on their side: the desktop composition, fitted ----------------- */
+
+/* Short, wide screens take the desktop hero (the scroll story needs height).
+   Below 1180px desktop overlaps the bridge onto the copy column, which on a
+   390px-tall screen put the art over the lead and "See the work". Here the two
+   sit side by side and the headline is sized to the half it has. */
+@media (max-width: 1180px) and (max-height: 500px) {
+  .hero {
+    padding-top: 84px;
+  }
+
+  .hero .hero__copy {
+    grid-column: 1 / span 6;
+    gap: 18px;
+  }
+
+  .hero .hero__title {
+    font-size: clamp(2rem, 5.4vw, 3.4rem);
+  }
+
+  .hero .hero__lead {
+    font-size: 0.95rem;
+  }
+
+  .hero .hero__stage {
+    grid-column: 7 / -1;
+    margin-top: clamp(24px, 10vh, 64px);
+    margin-right: 0;
+  }
+
+  .hero .hero__eyebrow {
+    white-space: nowrap;
+    font-size: 0.68rem;
+  }
+
+  /* At this size the three pills crowd each other and the lead. The headline
+     already names all three islands. */
+  .hero .hero__labels {
+    display: none;
+  }
+
+  .hero__cue {
+    display: none;
   }
 }

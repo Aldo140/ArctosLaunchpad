@@ -477,8 +477,11 @@ export function BridgeHero() {
     };
 
     const mm = gsap.matchMedia(el);
-    mm.add("(max-width: 900px)", () => setup(true));
-    mm.add("(min-width: 901px)", () => setup(false));
+    // The scroll story needs a tall screen. A phone on its side is short and
+    // wide, so it gets the desktop composition rather than a pinned stage the
+    // headline alone would overfill.
+    mm.add("(max-width: 900px) and (min-height: 501px)", () => setup(true));
+    mm.add("(min-width: 901px), (max-height: 500px)", () => setup(false));
 
     return () => {
       mm.revert();

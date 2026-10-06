@@ -70,7 +70,7 @@
   display: block;
 }
 
-@media (min-width: 901px) {
+@media (min-width: 901px), (max-height: 500px) {
   .hero__line {
     white-space: nowrap;
   }
@@ -289,7 +289,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   .hero {
     padding-top: 96px;
   }
@@ -329,7 +329,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-height: 501px) {
   /* The art is wider than the screen; keep every label on it. */
   .hero__label {
     left: clamp(calc(12.5% + 56px), var(--x), calc(87.5% - 56px));
