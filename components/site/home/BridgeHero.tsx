@@ -512,6 +512,11 @@ export function BridgeHero() {
           gsap.to(today, { height: `${Math.min(96, 30 + (n - DEMO_START_COUNT) * 14)}%`, duration: 0.6, ease: "back.out(1.6)" });
           light("see");
           pop($(".demo-dash"));
+          // The first time the numbers move, the bear comes up to look.
+          if (!bearUp) {
+            bearUp = true;
+            gsap.to(".demo-bear", { yPercent: 0, opacity: 1, duration: 0.9, ease: "back.out(1.7)", delay: 0.15 });
+          }
         }, [], 4)
         // reset for the next client
         .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 5.8)
@@ -522,6 +527,9 @@ export function BridgeHero() {
         }, [], 6.25);
 
       gsap.set(newRow, { height: 0, opacity: 0 });
+      // Hidden behind the dashboard until the numbers first move.
+      let bearUp = false;
+      gsap.set(".demo-bear", { yPercent: 70, opacity: 0 });
 
       // ---- the aurora never quite holds still ------------------------------
       gsap.utils.toArray<HTMLElement>(".hero__aurora i", el).forEach((band, i) => {

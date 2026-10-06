@@ -54,6 +54,21 @@ const BARS = [38, 52, 44, 63, 58, 72, 30];
 
 export const DEMO_START_COUNT = 23;
 
+/** The brand's island for each step, as a small mark beside the card label. */
+function DemoIsle({ id }: { id: "win" | "run" | "see" }) {
+  const size = { win: [90, 96], run: [69, 96], see: [85, 96] }[id];
+  return (
+    <Image
+      className="demo-isle"
+      src={`/assets/art/island-${id}-icon.webp`}
+      alt=""
+      width={size[0]}
+      height={size[1]}
+      sizes="24px"
+    />
+  );
+}
+
 export function SystemDemo() {
   return (
     <div className="hero__demo">
@@ -69,6 +84,7 @@ export function SystemDemo() {
         {/* 01 — the website */}
         <div className="demo-card demo-phone" data-step="win">
           <p className="demo-k">
+            <DemoIsle id="win" />
             <span>01</span> Website
           </p>
           <div className="demo-phone__frame">
@@ -93,6 +109,7 @@ export function SystemDemo() {
         {/* 02 — the automation */}
         <div className="demo-card demo-leads" data-step="run">
           <p className="demo-k">
+            <DemoIsle id="run" />
             <span>02</span> Leads · automated
           </p>
           <ul className="demo-rows">
@@ -121,9 +138,20 @@ export function SystemDemo() {
           <p className="demo-note">Sample enquiry</p>
         </div>
 
+        {/* the studio's bear, peeking over the dashboard to read the numbers */}
+        <Image
+          className="demo-bear"
+          src="/assets/art/bear-peek.webp"
+          alt=""
+          width={420}
+          height={280}
+          sizes="26vw"
+        />
+
         {/* 03 — the reporting */}
         <div className="demo-card demo-dash" data-step="see">
           <p className="demo-k">
+            <DemoIsle id="see" />
             <span>03</span> This week
           </p>
           <div className="demo-dash__body">
