@@ -7,7 +7,7 @@ import {
   getServicePageBySlug,
   projects,
 } from "@/lib/content";
-import { breadcrumbSchema, graph, serviceSchema, webPageSchema } from "@/lib/seo";
+import { breadcrumbSchema, faqPageSchema, graph, serviceSchema, webPageSchema } from "@/lib/seo";
 import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
 import { ProjectPlate } from "@/components/site/ProjectPlate";
 import { Btn, Lines, Status, TextLink, d } from "@/components/site/ui";
@@ -51,6 +51,7 @@ export function LocalBrief({
   canonical,
   ctaTitle,
   ctaBody,
+  faq = [],
 }: {
   title: string;
   intro: string;
@@ -62,6 +63,8 @@ export function LocalBrief({
   canonical: string;
   ctaTitle: string;
   ctaBody: string;
+  /** Rendered on the page and mirrored in FAQPage schema, never one without the other. */
+  faq?: { question: string; answer: string }[];
 }) {
   const service = getServicePageBySlug(serviceSlug);
   const proof = getProjectBySlug(proofSlug) ?? projects[0];
@@ -318,6 +321,36 @@ export function LocalBrief({
         ) : null}
       </section>
 
+      {faq.length ? (
+        /* `.svx` scopes the service-page FAQ styles, so both pages share one look. */
+        <div className="svx">
+          <section className="section tone-bone svx-faq" data-tone="bone" aria-labelledby="local-faq">
+            <div className="wrap svx-faq__grid">
+              <div className="svx-faq__head">
+                <p className="eyebrow" data-reveal>
+                  Questions
+                </p>
+                <Lines as="h2" id="local-faq" className="h2" lines={["Asked", <em key="o">often.</em>]} />
+              </div>
+              <div className="svx-faq__list">
+                {faq.map((item, i) => (
+                  <details key={item.question} className="svx-faq__item" data-reveal style={d(i)}>
+                    <summary>
+                      <span className="index">Q{String(i + 1).padStart(2, "0")}</span>
+                      <span className="svx-faq__q">{item.question}</span>
+                      <span className="svx-faq__icon" aria-hidden="true" />
+                    </summary>
+                    <div className="svx-faq__body">
+                      <p>{item.answer}</p>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
       <StartBand title={[ctaTitle]} body={ctaBody} need={need} size="h1" />
       <LocalMotion variant={local.variant} />
       <JsonLd
@@ -325,6 +358,7 @@ export function LocalBrief({
           webPageSchema({ name: title, description: intro, path: canonical }),
           ...(service ? [serviceSchema({ name: `${service.title} in Calgary`, description: intro, path: canonical })] : []),
           breadcrumbSchema([{ name: title, path: canonical }]),
+          ...(faq.length ? [faqPageSchema(faq)] : []),
         )}
       />
     </div>

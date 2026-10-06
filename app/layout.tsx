@@ -29,11 +29,11 @@ const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Arctos Launchpad | Digital Growth and Technology Studio",
+    default: "Arctos Launchpad | Calgary Web Design, Custom Software and Automation",
     template: "%s | Arctos Launchpad",
   },
   description:
-    "Calgary studio building conversion-focused websites, lead-generation systems, custom software, workflow automation, and reporting.",
+    "Calgary web design, custom software, and business automation studio. Conversion-focused websites, lead generation, workflow automation, and reporting.",
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   robots: {
