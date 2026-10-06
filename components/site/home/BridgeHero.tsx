@@ -12,7 +12,7 @@ import { Btn, TextLink } from "../ui";
 import { Atmosphere } from "./hero/Atmosphere";
 import { Snow } from "./hero/Snow";
 import { ART_H, ART_W, DECK, ISLES, LABELS, LIVE, PLUMB } from "./hero/geometry";
-import { DEMO_SITES, DEMO_START_COUNT, SystemDemo } from "./hero/SystemDemo";
+import { DEMO_SITES, DEMO_START_COUNT, DEMO_YOUR_REPLY, SystemDemo } from "./hero/SystemDemo";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
 
@@ -366,6 +366,11 @@ export function BridgeHero() {
       const routeA = $<SVGPathElement>(".demo-route__path--a");
       const routeB = $<SVGPathElement>(".demo-route__path--b");
       const svg = $<SVGSVGElement>(".demo-route");
+      const mail = $(".demo-mail");
+      const mailText = $(".demo-mail__t");
+      const mailState = $(".demo-mail__state");
+      const glare = $(".demo-glare");
+      const reply = { n: 0, text: "" };
       el.dataset.intro = "running";
       setLit([]);
       setActive(null);
@@ -476,6 +481,7 @@ export function BridgeHero() {
         site = (site + 1) % DEMO_SITES.length;
         gsap.to(sites[prev], { opacity: 0, duration: 0.6 });
         gsap.to(sites[site], { opacity: 1, duration: 0.6 });
+        gsap.fromTo(glare, { xPercent: -120 }, { xPercent: 120, duration: 1.1, ease: "power2.inOut" });
         drawRoutes();
         // GSAP records function-based starts and motion paths on first play;
         // the routes just moved, so have it measure again.
@@ -508,22 +514,42 @@ export function BridgeHero() {
           ease: "power2.inOut",
         }, 1.25)
         .to(toast, { opacity: 0, scale: 0.7, duration: 0.25 }, 2)
-        // 02 — it lands on the board and follows itself up
+        // 02 — it lands on the board, and the automation writes back
         .fromTo(newRow, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.45, ease: "power3.out" }, 2)
         .call(() => { light("run"); }, [], 2.1)
         .set(pillB, { opacity: 0 }, 2)
         .set(pillA, { opacity: 1 }, 2)
-        .to(pillA, { opacity: 0, duration: 0.25 }, 2.9)
-        .fromTo(pillB, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(2)" }, 3)
+        .call(() => {
+          reply.text = userTurn ? DEMO_YOUR_REPLY : DEMO_SITES[site].reply;
+          mailText.textContent = "";
+          mailState.textContent = "Auto-reply · writing";
+          mail.classList.remove("is-sent");
+          const at = rel(newRow, 0.04, 1);
+          gsap.set(mail, { x: at.x, y: at.y + 6 });
+        }, [], 2.3)
+        .fromTo(mail, { autoAlpha: 0, scale: 0.85, transformOrigin: "10% 0%" }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 2.35)
+        .fromTo(reply, { n: 0 }, {
+          n: 1,
+          duration: 1,
+          ease: "none",
+          onUpdate: () => { mailText.textContent = reply.text.slice(0, Math.round(reply.n * reply.text.length)); },
+        }, 2.5)
+        .call(() => {
+          mailState.textContent = "Auto-reply · sent in 4s";
+          mail.classList.add("is-sent");
+        }, [], 3.5)
+        .to(pillA, { opacity: 0, duration: 0.25 }, 3.5)
+        .fromTo(pillB, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(2)" }, 3.6)
         .call(() => {
           const pill = pillB.parentElement!;
           pill.classList.add("is-done");
           pop($(".demo-leads"));
-        }, [], 3)
+        }, [], 3.6)
+        .to(mail, { autoAlpha: 0, y: "-=10", scale: 0.92, duration: 0.4, ease: "power2.in" }, 4.15)
         // 03 — the dashboard counts it
-        .fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.3)
-        .to(signal, { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 3.3)
-        .to(signal, { opacity: 0, duration: 0.2 }, 4)
+        .fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.15 }, 4.4)
+        .to(signal, { motionPath: { path: routeB, align: routeB, alignOrigin: [0.5, 0.5] }, duration: 0.7, ease: "power2.inOut" }, 4.4)
+        .to(signal, { opacity: 0, duration: 0.2 }, 5.1)
         .call(() => {
           n += 1;
           gsap.to(counter, { v: n, duration: 0.5, ease: "power2.out", onUpdate: () => { count.textContent = String(Math.round(counter.v)); } });
@@ -539,20 +565,20 @@ export function BridgeHero() {
           } else {
             gsap.fromTo(".demo-bear", { y: 0, rotation: 0 }, { keyframes: [{ y: -7, rotation: -3, duration: 0.18 }, { y: 0, rotation: 0, duration: 0.5, ease: "bounce.out" }], transformOrigin: "50% 100%" });
           }
-        }, [], 4)
+        }, [], 5.1)
         // the visitor's own enquiry made it all the way: say so
         .call(() => {
           if (!userTurn || userDone) return;
           userDone = true;
           gsap.fromTo(".demo-nudge", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "expo.out", delay: 0.3 });
-        }, [], 4.3)
+        }, [], 5.4)
         // reset for the next client
-        .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 5.8)
+        .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 6.9)
         .call(() => {
           pillB.parentElement!.classList.remove("is-done");
           gsap.set(pillA, { opacity: 1 });
           gsap.set(pillB, { opacity: 0 });
-        }, [], 6.25);
+        }, [], 7.35);
 
       // ---- celebration: a +1 chip and a burst of paper in brand colours ------
       const confetti = $(".demo-confetti");
@@ -595,6 +621,7 @@ export function BridgeHero() {
         gsap.set(pillA, { opacity: 1 });
         gsap.set(pillB, { opacity: 0 });
         gsap.set([toast, signal], { opacity: 0 });
+        gsap.set(mail, { autoAlpha: 0 });
         userTurn = true;
         tapAt = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
         drawRoutes();
@@ -635,7 +662,7 @@ export function BridgeHero() {
       stage.addEventListener("pointerleave", settle);
 
       gsap.set(newRow, { height: 0, opacity: 0 });
-      gsap.set([".demo-hint", ".demo-nudge", plus], { autoAlpha: 0 });
+      gsap.set([".demo-hint", ".demo-nudge", plus, mail], { autoAlpha: 0 });
       // Hidden behind the dashboard until the numbers first move.
       let bearUp = false;
       gsap.set(".demo-bear", { yPercent: 70, opacity: 0 });

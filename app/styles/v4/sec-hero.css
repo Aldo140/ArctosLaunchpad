@@ -1361,6 +1361,95 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     text-underline-offset: 4px;
   }
 
+  /* ---- the automation's reply, written live ---- */
+
+  .demo-mail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 6;
+    width: 55%;
+    padding: 2cqi 2.6cqi 2.2cqi;
+    border-radius: 0.8cqi 3cqi 3cqi 3cqi;
+    background: var(--paper);
+    box-shadow: 0 16px 30px -8px rgb(0 0 0 / 0.65);
+    color: var(--ink-deep, #0d1b1e);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .demo-mail__k {
+    display: flex;
+    align-items: center;
+    gap: 1.2cqi;
+    margin: 0 0 1cqi;
+    font-family: var(--mono);
+    font-size: max(9px, 2.2cqi);
+    letter-spacing: 0.04em;
+    color: #5b6766;
+  }
+
+  .demo-mail__dot {
+    width: 1.5cqi;
+    height: 1.5cqi;
+    border-radius: 50%;
+    background: var(--rust);
+    animation: demo-ping-soft 0.9s ease-in-out infinite alternate;
+  }
+
+  .demo-mail.is-sent .demo-mail__dot {
+    background: #2f9a7a;
+    animation: none;
+  }
+
+  .demo-mail.is-sent .demo-mail__k {
+    color: #2f7d66;
+  }
+
+  @keyframes demo-ping-soft {
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  /* fixed height for two lines, so the bubble never jumps while typing */
+  .demo-mail__t {
+    min-height: 2.6em;
+    margin: 0;
+    font-size: max(10px, 2.7cqi);
+    line-height: 1.3;
+  }
+
+  .demo-mail:not(.is-sent) .demo-mail__t::after {
+    content: "";
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-left: 1px;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: demo-caret 0.7s steps(1) infinite;
+  }
+
+  @keyframes demo-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ---- light on glass ---- */
+
+  .demo-glare {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.32) 48%, rgb(255 255 255 / 0.08) 54%, transparent 66%);
+    mix-blend-mode: screen;
+    transform: translateX(-120%);
+  }
+
   /* ---- the signal between screens ---- */
 
   .demo-route {

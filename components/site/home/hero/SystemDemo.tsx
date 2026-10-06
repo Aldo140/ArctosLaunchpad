@@ -21,7 +21,12 @@ export type DemoSite = {
   tap: { x: number; y: number };
   /** The illustrative enquiry that tap produces. */
   lead: { who: string; what: string };
+  /** The automated reply it gets, written the way the client would. */
+  reply: string;
 };
+
+/** The reply a visitor's own enquiry gets. */
+export const DEMO_YOUR_REPLY = "Hi there, thanks for reaching out! Here's what happens next…";
 
 export const DEMO_SITES: DemoSite[] = [
   {
@@ -29,18 +34,21 @@ export const DEMO_SITES: DemoSite[] = [
     name: "Nics Delite",
     tap: { x: 0.6, y: 0.89 },
     lead: { who: "Maya R.", what: "Custom cake order" },
+    reply: "Hi Maya, thanks for your order! Here's our design form…",
   },
   {
     src: "/assets/work/rio-alto-phone.webp",
     name: "Rio Alto",
     tap: { x: 0.36, y: 0.945 },
     lead: { who: "Daniel P.", what: "Catering enquiry" },
+    reply: "Hi Daniel, thanks! Our catering menu and pricing…",
   },
   {
     src: "/assets/work/true-north-kromes-phone.webp",
     name: "True North Kromes",
     tap: { x: 0.16, y: 0.78 },
     lead: { who: "Ridge Dental Lab", what: "Framework order" },
+    reply: "Thanks, Ridge! Your order is in today's design queue…",
   },
 ];
 
@@ -103,6 +111,8 @@ export function SystemDemo() {
                 />
               ))}
               <span className="demo-tap" />
+              {/* light on glass, swept across when the site changes */}
+              <span className="demo-glare" />
             </div>
           </div>
           {/* after the first loop: an invitation to be the customer */}
@@ -181,6 +191,14 @@ export function SystemDemo() {
           <path className="demo-route__path demo-route__path--b" d="M 80 42 C 84 54 78 64 70 72" pathLength={1} />
         </svg>
         <span className="demo-signal" />
+        {/* the automation's reply, written live */}
+        <div className="demo-mail">
+          <p className="demo-mail__k">
+            <span className="demo-mail__dot" />
+            <span className="demo-mail__state">Auto-reply · writing</span>
+          </p>
+          <p className="demo-mail__t" />
+        </div>
         <span className="demo-toast">
           <b>New enquiry</b>
           <small className="demo-toast__what">Custom cake order</small>
