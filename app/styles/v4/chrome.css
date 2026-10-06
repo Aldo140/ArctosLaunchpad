@@ -204,13 +204,48 @@
 }
 
 @media (max-width: 520px) {
+  /* Phones keep the way in, compact: "Start" visibly, the full name for
+     screen readers. */
   .hdr__cta {
-    display: none;
+    gap: 8px;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 0.86rem;
+  }
+
+  .hdr__cta-more {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .hdr__end {
+    gap: 4px;
   }
 
   .lockup__name {
     font-size: 1.28rem;
   }
+}
+
+@media (max-width: 359px) {
+  /* The narrowest phones: the bars alone, "Menu" kept for screen readers. */
+  .hdr__menu-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .hdr__menu {
+    padding: 0 8px;
+  }
+
 }
 
 /* ---- Menu ------------------------------------------------------------ */

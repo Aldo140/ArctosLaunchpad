@@ -158,3 +158,18 @@ export const portfolioOrder = [
   "fresh-prep-event-intelligence",
   "leaseflow",
 ] as const;
+
+/**
+ * The `/contact?need=` preset for a project, read from its free-text service
+ * list. The first service that clearly belongs to one island wins.
+ */
+export function needForServices(services: string[]): Island["need"] {
+  for (const raw of services) {
+    const s = raw.toLowerCase();
+    if (/report|dashboard|analytic|intelligence/.test(s)) return "reporting";
+    if (/automation|workflow|integration|crm|intake|operations/.test(s)) return "automation";
+    if (/software|platform|product|mapping|moderation|app\b|tool/.test(s)) return "software";
+    if (/website|web design|seo|brand|redesign|hosting|landing|content/.test(s)) return "website";
+  }
+  return "website";
+}

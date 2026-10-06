@@ -1556,3 +1556,34 @@ html:not(.js-motion) .audit__box::after {
     display: none;
   }
 }
+
+/* ---- Nudge: a mid-page way into the form -------------------------------- */
+
+.nudge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px 32px;
+  margin-top: clamp(40px, 5vw, 72px);
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.nudge__ask {
+  max-width: 34ch;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: var(--fs-3);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.nudge__link {
+  min-height: 44px;
+}
+
+.nudge-wrap {
+  padding-bottom: clamp(56px, 7vw, 112px);
+}

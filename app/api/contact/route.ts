@@ -97,6 +97,8 @@ const contactSchema = z
       ])
       .default(""),
     message: z.string().trim().max(3000).default(""),
+    /** Which pages led here, recorded by the browser (no personal data). */
+    source: z.string().trim().max(300).default(""),
     /* Spam trap. A filled trap no longer rejects the enquiry: autofill can
        fill hidden fields for real visitors, and a lost lead costs more than
        a spam email. It only marks the email as likely spam. */
@@ -160,6 +162,10 @@ export async function POST(request: Request) {
   const webhookUrl = process.env.CONTACT_WEBHOOK_URL;
   const resendApiKey = process.env.RESEND_API_KEY;
   const notifyEmail = process.env.CONTACT_NOTIFY_EMAIL;
+  /* A sender on a domain verified in Resend, e.g. "Arctos <hello@arctoslaunchpad.com>".
+     Resend's shared test sender can only deliver to the account owner, so the
+     visitor confirmation below only runs once this is set. */
+  const fromEmail = process.env.CONTACT_FROM_EMAIL;
 
   /* Direct email delivery takes priority over the webhook pattern — no
      third-party automation tool required, just an email inbox. Falls
@@ -168,7 +174,7 @@ export async function POST(request: Request) {
     try {
       const resend = new Resend(resendApiKey);
       const { error } = await resend.emails.send({
-        from: "Arctos enquiries <onboarding@resend.dev>",
+        from: fromEmail || "Arctos enquiries <onboarding@resend.dev>",
         to: notifyEmail,
         replyTo: submission.email,
         subject: `${likelySpam ? "[Likely spam] " : ""}New enquiry — ${submission.company || submission.name} (${submission.projectType})`,
@@ -178,6 +184,7 @@ export async function POST(request: Request) {
           submission.company ? `Company: ${submission.company}` : null,
           submission.website ? `Website: ${submission.website}` : null,
           `Project type: ${submission.projectType}`,
+          submission.source ? `Lead source: ${submission.source}` : null,
           submission.budget ? `Budget: ${submission.budget}` : null,
           submission.timeline ? `Timeline: ${submission.timeline}` : null,
           "",
@@ -196,6 +203,33 @@ export async function POST(request: Request) {
       });
 
       if (error) throw new Error(error.message);
+
+      /* Speed-to-lead: the visitor gets an immediate, honest receipt. A failure
+         here never fails the enquiry, which has already been delivered. */
+      if (fromEmail && !likelySpam) {
+        const { error: ackError } = await resend.emails.send({
+          from: fromEmail,
+          to: submission.email,
+          replyTo: notifyEmail,
+          subject: "We have your enquiry: Arctos Launchpad",
+          text: [
+            `Hi ${submission.name.split(" ")[0]},`,
+            "",
+            "Thanks for getting in touch. Your enquiry reached us, and the people who would do the work will read it properly and reply within two business days.",
+            "",
+            "What you sent:",
+            `Project type: ${submission.projectType}`,
+            submission.challenge,
+            "",
+            "If anything changes in the meantime, just reply to this email.",
+            "",
+            "Arctos Launchpad, Calgary",
+            `Reference: ${requestId.slice(0, 8)}`,
+          ].join("\n"),
+        });
+        if (ackError)
+          logError("[contact] Confirmation email failed", { requestId, reason: ackError.message });
+      }
 
       return NextResponse.json({ ok: true, requestId });
     } catch (error) {

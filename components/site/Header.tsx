@@ -147,10 +147,15 @@ export function Header() {
         </nav>
 
         <div className="hdr__end">
-          <Link className="hdr__cta" href="/contact">
-            <span>Start a project</span>
-            <span aria-hidden="true">→</span>
-          </Link>
+          {/* Always in reach, phones included; pointless on the form itself. */}
+          {isActive("/contact") ? null : (
+            <Link className="hdr__cta" href="/contact" data-cta="header">
+              <span>
+                Start<span className="hdr__cta-more"> a project</span>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          )}
           <button
             ref={trigger}
             type="button"
@@ -164,7 +169,7 @@ export function Header() {
               <i />
               <i />
             </span>
-            Menu
+            <span className="hdr__menu-word">Menu</span>
           </button>
         </div>
       </div>

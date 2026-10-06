@@ -10,6 +10,7 @@ import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo"
 import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
 import { ProjectPlate } from "@/components/site/ProjectPlate";
 import { Lines, d } from "@/components/site/ui";
+import { Nudge } from "@/components/site/Nudge";
 import { DepthField } from "@/components/site/industries/DepthField";
 import { NextIndustry } from "@/components/site/industries/NextIndustry";
 import { ResolveMap } from "@/components/site/industries/ResolveMap";
@@ -106,6 +107,12 @@ export default async function IndustryPage({ params }: Props) {
                 island: { id: isle.id, index: isle.index, name: isle.name },
               };
             })}
+          />
+          <Nudge
+            ask="Is one of these slowing your team down?"
+            label="Talk about where it breaks"
+            href={`/contact?need=${services[0] ? getIslandForStage(services[0].stage).need : "website"}`}
+            from="industry"
           />
         </div>
       </section>

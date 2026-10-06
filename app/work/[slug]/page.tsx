@@ -12,6 +12,8 @@ import {
   webPageSchema,
 } from "@/lib/seo";
 import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
+import { Nudge } from "@/components/site/Nudge";
+import { needForServices } from "@/lib/content";
 import { Lines, Status, TextLink, d } from "@/components/site/ui";
 import { CaseMotion } from "@/components/site/case/CaseMotion";
 import { Filmstrip } from "@/components/site/case/Filmstrip";
@@ -57,6 +59,7 @@ export default async function CaseStudy({ params }: Props) {
   const order = portfolioOrder as readonly string[];
   const next = getProjectBySlug(order[(order.indexOf(project.slug) + 1) % order.length]);
   const demo = project.status !== "launched" && project.status !== "internal-tool";
+  const need = needForServices(project.services);
   const accent = project.accent ?? "var(--ink-3)";
 
   const chapters = [
@@ -284,6 +287,14 @@ export default async function CaseStudy({ params }: Props) {
             {project.externalUrl ? <TextLink href={project.externalUrl}>Visit the {demo ? "preview" : "live site"}</TextLink> : null}
           </div>
         </div>
+        <div className="wrap">
+          <Nudge
+            ask="Is something like this slowing your business down?"
+            label="Talk about your project"
+            href={`/contact?need=${need}`}
+            from="case-study"
+          />
+        </div>
       </section>
 
       {/* ---- The project's own media, on film -------------------------- */}
@@ -302,7 +313,7 @@ export default async function CaseStudy({ params }: Props) {
         />
       ) : null}
 
-      <StartBand title={["Have something", <>like <em key="t">this</em> in mind?</>]} />
+      <StartBand title={["Have something", <>like <em key="t">this</em> in mind?</>]} need={need} />
       <JsonLd data={schema} />
     </article>
   );

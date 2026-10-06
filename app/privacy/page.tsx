@@ -57,7 +57,7 @@ export default function PrivacyPage() {
             </div>
             <div>
               <dt className="mono">Last reviewed</dt>
-              <dd className="index">30 July 2026</dd>
+              <dd className="index">6 October 2026</dd>
             </div>
           </dl>
         </div>
@@ -101,6 +101,14 @@ export default function PrivacyPage() {
                 The website may also receive ordinary technical request
                 information, such as browser type, device type, and IP address,
                 through hosting and security infrastructure.
+              </p>
+              <p>
+                We count visits and a few anonymous events (such as a click on
+                &ldquo;Start a project&rdquo; or a sent enquiry) with Vercel Web
+                Analytics. It sets no cookies and does not identify you. Your
+                browser keeps an unsent enquiry draft, and which pages you
+                visited before the form, on your device only; the page list is
+                sent with your enquiry so we know what you read.
               </p>
             </section>
 

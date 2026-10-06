@@ -682,6 +682,20 @@
 }
 
 @media (max-width: 560px) {
+  /* Phones: the form comes straight after the headline. The bridge follows
+     it, where it still lights up for the chosen island and the "Delivered"
+     stamp. */
+  .cx__grid {
+    grid-template-areas: "head" "card" "map" "foot";
+  }
+
+  .cx__card {
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 560px) {
   .cx__sheet {
     padding: 22px 18px;
   }

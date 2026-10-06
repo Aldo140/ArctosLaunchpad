@@ -3,6 +3,8 @@ import "./globals.css";
 import { fontClass } from "./fonts";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { ConversionTracking } from "@/components/site/ConversionTracking";
+import { Analytics } from "@vercel/analytics/next";
 import { Motion } from "@/components/site/Motion";
 import {
   SITE_NAME,
@@ -103,6 +105,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <ConversionTracking />
+        {/* Only Vercel serves the analytics endpoint; elsewhere it would 404. */}
+        {process.env.VERCEL ? <Analytics /> : null}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLd(schema)}

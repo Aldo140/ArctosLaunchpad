@@ -7,6 +7,7 @@ import { ProcessHero } from "@/components/site/process/ProcessHero";
 import { Journey } from "@/components/site/process/Journey";
 import { Shapes } from "@/components/site/process/Shapes";
 import { Lines, TextLink, d } from "@/components/site/ui";
+import { Nudge } from "@/components/site/Nudge";
 
 export const metadata: Metadata = pageMetadata({
   title: "Process",
@@ -33,6 +34,13 @@ export default function ProcessPage() {
           </p>
         </div>
         <Journey />
+        <div className="wrap nudge-wrap">
+          <Nudge
+            ask="Not sure which stop your project starts at?"
+            label="Describe it and we’ll tell you"
+            from="process-route"
+          />
+        </div>
       </section>
 
       <section className="pjs-section section tone-ink" data-tone="ink" aria-labelledby="shapes">

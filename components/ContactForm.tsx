@@ -1,7 +1,9 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
+import { LANDING_KEY, PREV_KEY } from "@/components/site/ConversionTracking";
 
 type FieldName =
   | "name"
@@ -190,6 +192,50 @@ function Ink({ ok }: { ok?: boolean }) {
   );
 }
 
+/** An unsent enquiry survives a closed tab: kept in this browser only. */
+const DRAFT_KEY = "arctos:enquiry-draft";
+const DRAFT_FIELDS = ["name", "email", "challenge", "company", "website", "budget", "timeline", "projectType"] as const;
+
+function saveDraft(form: HTMLFormElement) {
+  try {
+    const data = new FormData(form);
+    const draft = Object.fromEntries(DRAFT_FIELDS.map((f) => [f, String(data.get(f) ?? "")]));
+    if (draft.name || draft.email || draft.challenge) localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    else localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* storage blocked: drafts are a convenience */
+  }
+}
+
+function readDraft(): Partial<Record<(typeof DRAFT_FIELDS)[number], string>> | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** "Landed on /work/x (from google.com) → last page /services" for the email. */
+function leadSource() {
+  try {
+    const landing = sessionStorage.getItem(LANDING_KEY);
+    const prev = sessionStorage.getItem(PREV_KEY);
+    const samePage = landing && prev && landing.split(/[?\s]/)[0] === prev;
+    return [landing && `landed on ${landing}`, prev && !samePage && `came from ${prev}`].filter(Boolean).join(", ").slice(0, 300);
+  } catch {
+    return "";
+  }
+}
+
 const CHOICES: Record<string, string> = {
   website: "Website",
   automation: "Business automation",
@@ -212,6 +258,8 @@ export function ContactForm({
   const [ready, setReady] = useState({ name: false, email: false, challenge: false });
   const successHeading = useRef<HTMLHeadingElement>(null);
   const [context, setContext] = useState<string | null>(null);
+  const [restored, setRestored] = useState(false);
+  const started = useRef(false);
 
   const setStatus = (next: ContactStatus) => {
     setStatusState(next);
@@ -229,15 +277,38 @@ export function ContactForm({
     if (!form || preselected.current) return;
     preselected.current = true;
     const selected = CHOICES[new URLSearchParams(window.location.search).get("need") ?? ""];
-    if (selected) {
-      requestAnimationFrame(() => {
+    const draft = readDraft();
+    requestAnimationFrame(() => {
+      if (draft) {
+        for (const f of DRAFT_FIELDS) {
+          const el = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${f}"]`);
+          if (f !== "projectType" && el && draft[f]) el.value = draft[f]!;
+        }
+        if (!selected && draft.projectType && projectTypes.includes(draft.projectType as (typeof projectTypes)[number])) {
+          setType(draft.projectType);
+        }
+        const next = readiness(form);
+        setReady(next);
+        onProgress?.(Number(next.name) + Number(next.email) + Number(next.challenge));
+        setRestored(Boolean(draft.name || draft.email || draft.challenge));
+        if (draft.company || draft.website || draft.budget || draft.timeline) {
+          const extras = form.querySelector("details");
+          if (extras) extras.open = true;
+        }
+      }
+      if (selected) {
         setType(selected);
         setContext(selected);
-      });
-    }
+      }
+    });
   };
 
   function handleInput(event: FormEvent<HTMLFormElement>) {
+    if (!started.current) {
+      started.current = true;
+      track("enquiry_start");
+    }
+    saveDraft(event.currentTarget);
     const next = readiness(event.currentTarget);
     setReady((prev) =>
       prev.name === next.name && prev.email === next.email && prev.challenge === next.challenge ? prev : next,
@@ -267,6 +338,8 @@ export function ContactForm({
 
     setErrors({});
     setStatus("sending");
+    const source = leadSource();
+    if (source) formData.set("source", source);
 
     if (
       process.env.NEXT_PUBLIC_STATIC_EXPORT === "true" &&
@@ -295,6 +368,7 @@ export function ContactForm({
       } | null;
 
       if (!response.ok || !result?.ok) {
+        track("enquiry_error", { status: response.status });
         const fields = result?.fields ?? {};
         // Only fields the visitor can see can be "highlighted".
         const visible = fieldOrder.some((f) => fields[f]);
@@ -308,13 +382,16 @@ export function ContactForm({
         return;
       }
 
+      track("enquiry_sent", { type: String(formData.get("projectType") ?? "") });
+      clearDraft();
       form.reset();
       setReady({ name: false, email: false, challenge: false });
       setStatus("success");
       window.requestAnimationFrame(() => successHeading.current?.focus());
     } catch {
+      track("enquiry_error", { status: 0 });
       setErrors({
-        form: "We could not reach the server. Check your connection and try again.",
+        form: "We could not reach the server. Check your connection and try again. Your draft is saved in this browser.",
       });
       setStatus("idle");
     }
@@ -379,6 +456,7 @@ export function ContactForm({
       </p>
     </div>
     <p className="form__intro">Start with the problem. We’ll help with the plan.</p>
+    {restored ? <p className="form__context"><span className="mono">Draft restored</span> Your unsent enquiry is back where you left it.</p> : null}
     {context ? <p className="form__context"><span className="mono">Starting from</span> {context}</p> : null}
     {(errors.form || listed.length > 0) && <div className="form__alert" role="alert"><p>{errors.form ?? "A few details need attention."}</p>{listed.map(field => <a key={field} href={`#${field}`}>{errors[field]}</a>)}</div>}
     <div className="form__pair">
@@ -420,6 +498,7 @@ export function ContactForm({
     {/* Spam trap. Its name must not look like anything browsers autofill
        (it was "address", and Chrome filled it with a street address). */}
     <div className="form__trap" aria-hidden="true"><label>Leave this empty<input name="hp_confirm" type="text" tabIndex={-1} autoComplete="off" data-1p-ignore data-lpignore="true" /></label></div>
+    <p className="form__promise"><span className="form__promise-dot" aria-hidden="true" />A reply within two business days, from the people who would do the work. No obligation.</p>
     <button className="btn btn--block form__send" type="submit" disabled={status === "sending"}><span>{status === "sending" ? "Sending…" : "Send my project enquiry"}</span><span className="btn__dot" aria-hidden="true">→</span></button>
     <p className="form__privacy">Your details are used to answer your enquiry. <Link href="/privacy">Privacy notice</Link></p>
   </form>;
