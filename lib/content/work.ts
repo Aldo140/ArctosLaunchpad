@@ -214,6 +214,12 @@ export const projects: Project[] = [
         caption: "The live map brings community reports and official data into one operating view.",
         layout: "wide",
       },
+      {
+        src: "/assets/work/calgary-watch-guide.webp",
+        alt: "Calgary Watch homepage section titled One city, five ways in, with cards for markets, events, Community Watch, neighbourhoods, and the Monday digest",
+        caption: "Five ways into the city, each one backed by real, current listings.",
+        layout: "wide",
+      },
     ],
     mockupType: "map",
     externalUrl: "https://calgarywatch.ca",
@@ -475,7 +481,7 @@ export const projects: Project[] = [
       },
       {
         src: "/assets/work/rio-alto-story.webp",
-        alt: "Rio Alto story section with a hacienda-shaped illustration and restaurant history",
+        alt: "Rio Alto story section with an arch-framed illustration of a Mexican town and fresh bread beside the restaurant history",
         caption: "The visual language connects High River with the restaurant's Mexico City roots.",
         layout: "wide",
       },
