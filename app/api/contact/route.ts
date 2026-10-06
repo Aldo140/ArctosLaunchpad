@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 
-function logDevelopmentError(
-  message: string,
-  details: Record<string, unknown>,
-) {
-  if (process.env.NODE_ENV === "development") console.error(message, details);
+/** Logged in production too (request id and reason only, never the
+ *  visitor's details) so a failed delivery shows up in the host's logs. */
+function logError(message: string, details: Record<string, unknown>) {
+  console.error(message, details);
 }
 
 const projectTypes = [
@@ -98,7 +97,13 @@ const contactSchema = z
       ])
       .default(""),
     message: z.string().trim().max(3000).default(""),
-    address: z.string().max(0).optional(),
+    /* Spam trap. A filled trap no longer rejects the enquiry: autofill can
+       fill hidden fields for real visitors, and a lost lead costs more than
+       a spam email. It only marks the email as likely spam. */
+    hp_confirm: z.string().max(500).optional(),
+    /* The old trap name. Browsers autofilled it with a street address, which
+       blocked real enquiries; accepted and ignored so cached pages still work. */
+    address: z.string().max(500).optional(),
   })
   .strict();
 
@@ -137,6 +142,7 @@ export async function POST(request: Request) {
       const field = String(issue.path[0] ?? "form");
       fields[field] ??= issue.message;
     }
+    console.info("[contact] Enquiry rejected", { requestId, fields: Object.keys(fields) });
     return NextResponse.json(
       {
         ok: false,
@@ -147,8 +153,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const { address: _address, ...submission } = result.data;
+  const { address: _address, hp_confirm: trap, ...submission } = result.data;
   void _address;
+  const likelySpam = Boolean(trap?.trim());
   const receivedAt = new Date().toISOString();
   const webhookUrl = process.env.CONTACT_WEBHOOK_URL;
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -164,7 +171,7 @@ export async function POST(request: Request) {
         from: "Arctos enquiries <onboarding@resend.dev>",
         to: notifyEmail,
         replyTo: submission.email,
-        subject: `New enquiry — ${submission.company || submission.name} (${submission.projectType})`,
+        subject: `${likelySpam ? "[Likely spam] " : ""}New enquiry — ${submission.company || submission.name} (${submission.projectType})`,
         text: [
           `Name: ${submission.name}`,
           `Email: ${submission.email}`,
@@ -192,7 +199,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ ok: true, requestId });
     } catch (error) {
-      logDevelopmentError("[contact] Resend delivery failed", {
+      logError("[contact] Resend delivery failed", {
         requestId,
         reason: error instanceof Error ? error.message : "Unknown error",
       });
@@ -216,7 +223,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, requestId });
     }
 
-    logDevelopmentError("[contact] CONTACT_WEBHOOK_URL is not configured", {
+    logError("[contact] CONTACT_WEBHOOK_URL is not configured", {
       requestId,
     });
     return NextResponse.json(
@@ -232,7 +239,7 @@ export async function POST(request: Request) {
   try {
     parsedWebhook = new URL(webhookUrl);
   } catch {
-    logDevelopmentError("[contact] CONTACT_WEBHOOK_URL is invalid", {
+    logError("[contact] CONTACT_WEBHOOK_URL is invalid", {
       requestId,
     });
     return NextResponse.json(
@@ -248,7 +255,7 @@ export async function POST(request: Request) {
     process.env.NODE_ENV === "production" &&
     parsedWebhook.protocol !== "https:"
   ) {
-    logDevelopmentError(
+    logError(
       "[contact] CONTACT_WEBHOOK_URL must use HTTPS in production",
       { requestId },
     );
@@ -267,6 +274,7 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...submission,
+        likelySpam,
         requestId,
         receivedAt,
         source: "arctoslaunchpad.com/contact",
@@ -278,7 +286,7 @@ export async function POST(request: Request) {
     if (!webhookResponse.ok)
       throw new Error(`Webhook returned ${webhookResponse.status}`);
   } catch (error) {
-    logDevelopmentError("[contact] Webhook delivery failed", {
+    logError("[contact] Webhook delivery failed", {
       requestId,
       reason: error instanceof Error ? error.message : "Unknown error",
     });

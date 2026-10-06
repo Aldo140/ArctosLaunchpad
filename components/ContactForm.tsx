@@ -295,11 +295,14 @@ export function ContactForm({
       } | null;
 
       if (!response.ok || !result?.ok) {
+        const fields = result?.fields ?? {};
+        // Only fields the visitor can see can be "highlighted".
+        const visible = fieldOrder.some((f) => fields[f]);
         setErrors({
-          ...result?.fields,
-          form:
-            result?.error ??
-            "We could not send your enquiry. Please try again.",
+          ...fields,
+          form: visible
+            ? (result?.error ?? "We could not send your enquiry. Please try again.")
+            : "We could not send your enquiry. Please try again in a moment.",
         });
         setStatus("idle");
         return;
@@ -414,7 +417,9 @@ export function ContactForm({
       <div className="field"><label htmlFor="budget">Budget</label><span className="field__control"><select id="budget" name="budget" defaultValue="" {...describedBy("budget")}><option value="">Not decided</option>{budgetRanges.map(range => <option key={range}>{range}</option>)}</select><Ink /></span><FieldError id="budget-error" message={errors.budget} /></div>
       <div className="field"><label htmlFor="timeline">Timing</label><span className="field__control"><select id="timeline" name="timeline" defaultValue="" {...describedBy("timeline")}><option value="">Not decided</option>{timelines.map(timeline => <option key={timeline}>{timeline}</option>)}</select><Ink /></span><FieldError id="timeline-error" message={errors.timeline} /></div>
     </div></details>
-    <div className="form__trap" aria-hidden="true"><label>Leave this empty<input name="address" type="text" tabIndex={-1} autoComplete="off" /></label></div>
+    {/* Spam trap. Its name must not look like anything browsers autofill
+       (it was "address", and Chrome filled it with a street address). */}
+    <div className="form__trap" aria-hidden="true"><label>Leave this empty<input name="hp_confirm" type="text" tabIndex={-1} autoComplete="off" data-1p-ignore data-lpignore="true" /></label></div>
     <button className="btn btn--block form__send" type="submit" disabled={status === "sending"}><span>{status === "sending" ? "Sending…" : "Send my project enquiry"}</span><span className="btn__dot" aria-hidden="true">→</span></button>
     <p className="form__privacy">Your details are used to answer your enquiry. <Link href="/privacy">Privacy notice</Link></p>
   </form>;
