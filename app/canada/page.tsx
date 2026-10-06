@@ -38,7 +38,7 @@ const faq = [
   {
     question: "Do you work with businesses outside Calgary?",
     answer:
-      "Yes. Arctos is based in Calgary, Alberta, and works with organizations anywhere in Canada. Recent work spans Calgary, Edmonton and Toronto.",
+      "Yes. Arctos is based in Calgary, Alberta, and works with organizations across Canada and the United States. Recent work spans Calgary, Edmonton and Toronto.",
   },
   {
     question: "Is Arctos Launchpad a Canadian company?",

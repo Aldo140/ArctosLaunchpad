@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | Arctos Launchpad",
   },
   description:
-    "Calgary web design, custom software, and automation studio working across Canada: conversion-focused websites, lead generation, workflows, and reporting.",
+    "Calgary web design, custom software, and automation studio for organizations across Canada and the US: websites, lead generation, workflows, and reporting.",
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   robots: {

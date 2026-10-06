@@ -32,7 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMetadata({
     title: industry.seoTitle,
     absoluteTitle: true,
-    description: `${industry.summary} From a Calgary studio working across Canada.`,
+    // The widest market that still fits Google's snippet length.
+    description: [" across Canada and the US.", " across Canada.", "."]
+      .map((market) => `${industry.summary} From a Calgary studio working${market}`)
+      .find((d) => d.length <= 160) ?? industry.summary,
     path: `/industries/${industry.slug}`,
     eyebrow: "Industries",
     cardTitle: industry.headline,

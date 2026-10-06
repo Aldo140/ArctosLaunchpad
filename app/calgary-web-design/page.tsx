@@ -41,7 +41,7 @@ const faq = [
   {
     question: "Do you only work with Calgary businesses?",
     answer:
-      "Arctos is based in Calgary, Alberta, and works with organizations anywhere in Canada.",
+      "Arctos is based in Calgary, Alberta, and works with organizations across Canada and the United States.",
   },
 ];
 

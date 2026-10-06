@@ -45,3 +45,17 @@ Calgary stays the home market. These pages carry the rest of the country.
 No pages for other cities: thin city pages without a real presence there read
 as doorway pages and can hurt the whole site. Add one only when there is real
 work and a reason to be there.
+
+## United States
+
+Positioned as nearshore, not cheapest: shared hours, language and culture.
+
+| Search phrasing / trend | Where it lives |
+|---|---|
+| Nearshore software development, Canadian developers for US companies | `/united-states` |
+| ADA website compliance (about 8,700 suits in 2025, no small-business exemption; DOJ Title II deadlines moved to 2027/2028) | `/united-states` section 03 |
+| US state privacy laws (20 states in effect), Global Privacy Control | `/united-states` section 04 |
+
+Service and industry descriptions name "across Canada and the US" when it fits
+in 160 characters, otherwise "across Canada". Service-level schema keeps the
+Calgary/Canada area; only the Organization node lists the United States.

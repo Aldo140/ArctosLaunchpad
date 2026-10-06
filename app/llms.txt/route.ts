@@ -15,7 +15,7 @@ export function GET() {
   const body = [
     `# ${SITE_NAME}`,
     "",
-    "> Arctos Launchpad is a digital growth and technology studio based in Calgary, Alberta, working with organizations anywhere in Canada. It designs and builds conversion-focused websites, lead-generation systems, custom software, workflow automation, and reporting, connected into one system.",
+    "> Arctos Launchpad is a digital growth and technology studio based in Calgary, Alberta, working with organizations across Canada and the United States. It designs and builds conversion-focused websites, lead-generation systems, custom software, workflow automation, and reporting, connected into one system.",
     "",
     "Arctos works best with growing businesses and organizations whose website, tools, and manual processes have become disconnected. It does not guarantee search rankings.",
     "",
@@ -24,6 +24,7 @@ export function GET() {
     ...calgaryLandingPages.map((p) => `- [${p.title}](${url(p.route)}): ${p.summary}`),
     "",
     `- [Across Canada](${url("/canada")}): The same studio for organizations anywhere in Canada, with Canadian privacy law and hosting in mind.`,
+    `- [For US companies](${url("/united-states")}): A nearshore Canadian studio on Mountain Time, with the full US workday in reach; builds to WCAG AA for ADA expectations.`,
     "",
     "## Services",
     "",

@@ -81,8 +81,8 @@ export function Footer() {
               </li>
             </ul>
           </nav>
-          <nav aria-label="Calgary">
-            <p className="mono">In Calgary</p>
+          <nav aria-label="Where we work">
+            <p className="mono">Where we work</p>
             <ul>
               {calgaryLandingPages.map((page) => (
                 <li key={page.route}>
@@ -91,6 +91,9 @@ export function Footer() {
               ))}
               <li>
                 <Link href="/canada">Across Canada</Link>
+              </li>
+              <li>
+                <Link href="/united-states">United States</Link>
               </li>
             </ul>
           </nav>

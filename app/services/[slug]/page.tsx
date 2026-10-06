@@ -32,11 +32,14 @@ import {
 
 type Props = { params: Promise<{ slug: string }> };
 
-/** Names the market when a description has room and does not already say it. */
+/** Names the market when a description has room: Canada and the US, else Canada. */
 function withCountry(description: string) {
   if (/Canad/.test(description)) return description;
-  const extended = `${description} For organizations across Canada.`;
-  return extended.length <= 160 ? extended : description;
+  for (const market of ["across Canada and the US", "across Canada"]) {
+    const extended = `${description} For organizations ${market}.`;
+    if (extended.length <= 160) return extended;
+  }
+  return description;
 }
 
 export function generateStaticParams() {

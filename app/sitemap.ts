@@ -16,6 +16,7 @@ const routes = [
   ["/contact", 0.9, "monthly"],
   ["/industries", 0.8, "monthly"],
   ["/canada", 0.85, "monthly"],
+  ["/united-states", 0.85, "monthly"],
   ["/privacy", 0.3, "yearly"],
   ["/accessibility", 0.3, "yearly"],
 ] as const satisfies ReadonlyArray<

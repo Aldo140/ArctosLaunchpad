@@ -10,7 +10,7 @@ import { servicePages } from "./content";
  *   1. Nothing here may assert a fact the site cannot back up. No street
  *      address, no phone number, no ratings, no review counts, no founding
  *      date, no vendor partnerships, no service areas beyond the two the
- *      studio actually states (Calgary, and Canada generally).
+ *      studio actually states (Calgary, Canada generally, and the United States).
  *   2. Every page gets its own title, description, canonical, and share card.
  *      Metadata in Next.js is shallow-merged, so a page that declares
  *      `openGraph` replaces the parent's `openGraph` outright — which is why
@@ -152,7 +152,7 @@ export function organizationSchema() {
     logo: `${SITE_URL}/icon.png`,
     image: `${SITE_URL}/icon.png`,
     address: ADDRESS,
-    areaServed: AREA_SERVED,
+    areaServed: [...AREA_SERVED, { "@type": "Country", name: "United States" }],
     knowsAbout: servicePages.map((service) => service.title),
     hasOfferCatalog: {
       "@type": "OfferCatalog",
