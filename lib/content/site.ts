@@ -95,6 +95,42 @@ export const calgaryLandingPages = [
     summary:
       "Custom applications, portals, internal tools, and workflow systems from a Calgary-based studio.",
   },
+  {
+    slug: "calgary-seo",
+    route: "/calgary-seo" as const,
+    title: "Calgary SEO",
+    headline: "Be found when Calgary is already looking.",
+    serviceSlug: "seo-ai-search",
+    summary:
+      "Local SEO, technical foundations, and service pages structured for Google and AI answers.",
+  },
+  {
+    slug: "calgary-digital-marketing",
+    route: "/calgary-digital-marketing" as const,
+    title: "Calgary Digital Marketing",
+    headline: "Campaigns that end in conversations, not just clicks.",
+    serviceSlug: "paid-media-lead-generation",
+    summary:
+      "Google Ads, paid social, landing pages, lead routing, and reporting tied to real enquiries.",
+  },
+  {
+    slug: "calgary-app-development",
+    route: "/calgary-app-development" as const,
+    title: "Calgary App Development",
+    headline: "Build the app the off-the-shelf tools cannot.",
+    serviceSlug: "app-software-development",
+    summary:
+      "Web apps, progressive web apps, and cross-platform mobile apps from first release onward.",
+  },
+  {
+    slug: "calgary-ai-development",
+    route: "/calgary-ai-development" as const,
+    title: "Calgary AI Development",
+    headline: "Put AI where the manual work is.",
+    serviceSlug: "ai-product-development",
+    summary:
+      "Enquiry routing, document classification, summarisation, and AI workflows with human review.",
+  },
 ] as const;
 
 export const siteRoutes = [

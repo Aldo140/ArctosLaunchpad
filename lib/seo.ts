@@ -145,6 +145,19 @@ export function organizationSchema() {
     address: ADDRESS,
     areaServed: AREA_SERVED,
     knowsAbout: servicePages.map((service) => service.title),
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Services",
+      itemListElement: servicePages.map((service) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: service.title,
+          description: service.summary,
+          url: absoluteUrl(service.route),
+        },
+      })),
+    },
     sameAs: ["https://www.instagram.com/arctoslaunchpad/"],
   };
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { islands } from "@/lib/content";
+import { calgaryLandingPages, islands } from "@/lib/content";
 import { ArctosLockup } from "../brand/ArctosLockup";
 import { FooterFx } from "./close/FooterFx";
 
@@ -78,15 +78,11 @@ export function Footer() {
           <nav aria-label="Calgary">
             <p className="mono">In Calgary</p>
             <ul>
-              <li>
-                <Link href="/calgary-web-design">Web design</Link>
-              </li>
-              <li>
-                <Link href="/calgary-business-automation">Business automation</Link>
-              </li>
-              <li>
-                <Link href="/calgary-custom-software">Custom software</Link>
-              </li>
+              {calgaryLandingPages.map((page) => (
+                <li key={page.route}>
+                  <Link href={page.route}>{page.title.replace(/^Calgary /, "")}</Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>

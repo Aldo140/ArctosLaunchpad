@@ -1,4 +1,4 @@
-import { industries, projects, servicePages } from "@/lib/content";
+import { calgaryLandingPages, industries, projects, servicePages } from "@/lib/content";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
@@ -21,9 +21,7 @@ export function GET() {
     "",
     "## Calgary services",
     "",
-    `- [Web design Calgary](${url("/calgary-web-design")}): Website design and development for Calgary businesses, connected to lead capture, CRM workflows, and analytics.`,
-    `- [Custom software development Calgary](${url("/calgary-custom-software")}): Web applications, client portals, internal tools, and workflow systems.`,
-    `- [Business automation Calgary](${url("/calgary-business-automation")}): Workflow review, forms, approvals, follow-up, and integrations that remove manual work.`,
+    ...calgaryLandingPages.map((p) => `- [${p.title}](${url(p.route)}): ${p.summary}`),
     "",
     "## Services",
     "",

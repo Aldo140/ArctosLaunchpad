@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { industries, projects, services } from "@/lib/content";
+import { calgaryLandingPages, industries, projects, services } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -15,9 +15,6 @@ const routes = [
   ["/studio", 0.8, "monthly"],
   ["/contact", 0.9, "monthly"],
   ["/industries", 0.8, "monthly"],
-  ["/calgary-web-design", 0.85, "monthly"],
-  ["/calgary-business-automation", 0.85, "monthly"],
-  ["/calgary-custom-software", 0.85, "monthly"],
   ["/privacy", 0.3, "yearly"],
   ["/accessibility", 0.3, "yearly"],
 ] as const satisfies ReadonlyArray<
@@ -42,6 +39,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...projects.map(({ slug }) => ({
       url: `${siteUrl}/work/${slug}`,
       priority: 0.7,
+      changeFrequency: "monthly" as const,
+    })),
+    ...calgaryLandingPages.map(({ route }) => ({
+      url: `${siteUrl}${route}`,
+      priority: 0.85,
       changeFrequency: "monthly" as const,
     })),
     ...industries.map(({ slug }) => ({

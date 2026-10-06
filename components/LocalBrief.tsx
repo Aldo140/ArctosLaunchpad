@@ -29,6 +29,10 @@ const VARIANTS: Record<string, { variant: LocalVariant; need: string; plate: str
   "web-design-development": { variant: "skyline", need: "website", plate: "Sheet 01 · Elevation" },
   "business-automation": { variant: "river", need: "automation", plate: "Sheet 02 · Plan" },
   "custom-software": { variant: "grid", need: "software", plate: "Sheet 03 · Grid" },
+  "seo-ai-search": { variant: "skyline", need: "website", plate: "Sheet 04 · Elevation" },
+  "paid-media-lead-generation": { variant: "river", need: "website", plate: "Sheet 05 · Plan" },
+  "app-software-development": { variant: "grid", need: "software", plate: "Sheet 06 · Grid" },
+  "ai-product-development": { variant: "river", need: "automation", plate: "Sheet 07 · Plan" },
 };
 
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
@@ -85,7 +89,7 @@ export function LocalBrief({
           <div className="loc-hero__head">
             <Crumbs trail={[{ label: title, href: canonical }]} />
             <p className="eyebrow" data-reveal>
-              Calgary, Alberta
+              {service ? `${service.title} · ` : ""}Calgary, Alberta
             </p>
             <Lines as="h1" className="h1 loc-hero__title" lines={[title]} />
           </div>
