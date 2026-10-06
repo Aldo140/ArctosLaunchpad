@@ -425,7 +425,8 @@ export function BridgeHero() {
         .from(".hero__glow", { opacity: 0, scale: 0.6, duration: 2.2, ease: "power2.out" }, 0.2)
         .from(".hero__survey", { opacity: 0, duration: 1.8 }, 0.3)
         .from(".hero__aurora i", { opacity: 0, scaleY: 0.4, duration: 2.4, ease: "power2.out", stagger: 0.25 }, 0.2)
-        .from(".hero__eyebrow-in", { opacity: 0, y: 12, duration: 0.9, ease: "expo.out" }, 0.15);
+        .from(".hero__eyebrow-in", { opacity: 0, y: 12, duration: 0.9, ease: "expo.out" }, 0.15)
+        .from(".hero__sub", { opacity: 0, y: 14, duration: 1, ease: "expo.out" }, 0.55);
       splits.forEach((split, i) => {
         tl.from(split.words, { yPercent: 118, rotation: 5, duration: 1.15, ease: "expo.out", stagger: 0.07, transformOrigin: "0% 100%" }, 0.1 + i * 0.14);
       });
@@ -634,7 +635,7 @@ export function BridgeHero() {
           <div className="wrap hero__grid">
             <div className="hero__copy">
               <p className="eyebrow hero__eyebrow">
-                <span className="hero__eyebrow-in">A Calgary studio for growing businesses</span>
+                <span className="hero__eyebrow-in">Calgary web design &amp; software studio</span>
               </p>
               <h1 id="hero-title" className="display hero__title">
                 <span className="visually-hidden">Win the customer. Run the work. See the numbers.</span>
@@ -655,6 +656,11 @@ export function BridgeHero() {
                   </span>
                 ))}
               </h1>
+
+              {/* Phones: the plain-English answer to "what do they do?", right under the line. */}
+              <p className="hero__sub">
+                Websites, custom software and automation that bring in customers and cut the busywork.
+              </p>
 
               {/* Phones and tablets: the bridge recomposed for a portrait screen. */}
               <div className="hero__isles">
@@ -714,7 +720,7 @@ export function BridgeHero() {
                       style={{ "--x": `${PIECE_LABELS[island.id].x}%`, "--y": `${PIECE_LABELS[island.id].y}%` } as CSSProperties}
                     >
                       <span className="index">{island.index}</span>
-                      <span>{island.name}</span>
+                      <span>{island.offer}</span>
                     </Link>
                   ))}
                 </div>
@@ -801,7 +807,7 @@ export function BridgeHero() {
                           onBlur={() => setActive(null)}
                         >
                           <span className="index">{island.index}</span>
-                          <span>{island.name}</span>
+                          <span>{island.offer}</span>
                         </Link>
                       ))}
                     </div>

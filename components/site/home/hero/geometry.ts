@@ -83,7 +83,7 @@ export const ROUTE =
 
 /** Label anchors, % of the scene box, and which side of the anchor they sit on. */
 export const PIECE_LABELS: Record<IslandId, { x: number; y: number; align: "start" | "center" | "end" }> = {
-  win: { x: 9, y: 89, align: "start" },
-  run: { x: 66, y: 89, align: "center" },
+  win: { x: 5, y: 88, align: "start" },
+  run: { x: 70, y: 88, align: "center" },
   see: { x: 93, y: -3, align: "end" },
 };

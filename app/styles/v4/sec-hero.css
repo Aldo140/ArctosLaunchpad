@@ -20,6 +20,7 @@ html.js-motion .hero[data-intro="pending"] :is(
     .hero__survey,
     .hero__isle-piece,
     .hero__tag,
+    .hero__sub,
     .hero__route
   ) {
   opacity: 0;
@@ -52,9 +53,11 @@ html.js-motion .hero[data-intro="pending"] :is(
   display: contents;
 }
 
-/* The portrait island scene and its snow exist for phones and tablets only. */
+/* The portrait island scene, its snow and the plain subline exist for phones
+   and tablets only (desktop shows the full lead beside the art). */
 .hero__isles,
-.hero__snow {
+.hero__snow,
+.hero__sub {
   display: none;
 }
 
@@ -831,6 +834,19 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 /* ---- Phones & tablets: the island scene ------------------------------------ */
 
 @media (max-width: 900px) {
+  .hero .hero__sub {
+    display: block;
+    order: 2;
+    position: relative;
+    z-index: 3;
+    max-width: 34ch;
+    margin: 4px 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.42;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
   .hero .hero__isles {
     display: block;
     order: 3;
@@ -840,7 +856,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     z-index: 1;
     /* full bleed: the scene is wider than the screen and runs off both edges,
        like a still from a film rather than a picture placed on a page */
-    --box: min(114vw, 57svh, 660px);
+    --box: min(114vw, 51svh, 640px);
     margin: -8px calc(var(--gutter) * -1) 36px;
     perspective: 1000px;
     perspective-origin: 50% 40%;
@@ -1075,7 +1091,21 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     color: var(--fg);
   }
 
+  /* The two lower labels sit side by side: let them wrap to two short lines
+     (index above, service below) so neither crowds the other. */
+  .hero__tag--start,
   .hero__tag--center {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    max-width: 9.5em;
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .hero__tag--center {
+    align-items: center;
+    text-align: center;
     transform: translateX(-50%);
   }
 

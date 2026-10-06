@@ -19,6 +19,8 @@ export type Island = {
   name: string;
   /** The headline line this island owns in the hero. */
   line: string;
+  /** What the studio actually builds here, in plain words: the hero's island labels. */
+  offer: string;
   stages: GrowthStage[];
   art: { src: string; width: number; height: number; alt: string };
   /** How an owner describes the problem, before they know the solution. */
@@ -38,6 +40,7 @@ export const islands: Island[] = [
     index: "01",
     name: "Win the customer",
     line: "Win the customer.",
+    offer: "Websites & lead generation",
     stages: ["attract", "convert"],
     art: {
       src: "/assets/art/island-win.webp",
@@ -75,6 +78,7 @@ export const islands: Island[] = [
     index: "02",
     name: "Run the work",
     line: "Run the work.",
+    offer: "Software & automation",
     stages: ["operate"],
     art: {
       src: "/assets/art/island-run.webp",
@@ -111,6 +115,7 @@ export const islands: Island[] = [
     index: "03",
     name: "See the numbers",
     line: "See the numbers.",
+    offer: "Dashboards & reporting",
     stages: ["scale"],
     art: {
       src: "/assets/art/island-see.webp",
