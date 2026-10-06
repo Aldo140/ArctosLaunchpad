@@ -15,6 +15,7 @@ const routes = [
   ["/studio", 0.8, "monthly"],
   ["/contact", 0.9, "monthly"],
   ["/industries", 0.8, "monthly"],
+  ["/canada", 0.85, "monthly"],
   ["/privacy", 0.3, "yearly"],
   ["/accessibility", 0.3, "yearly"],
 ] as const satisfies ReadonlyArray<
@@ -69,10 +70,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ];
 
-  // The guide carries a real "last checked" date, so it can report one honestly.
+  // Guides carry a real "last checked" date, so they can report one honestly.
   const guides: MetadataRoute.Sitemap = [
     {
       url: `${siteUrl}/guides/alberta-digital-funding`,
+      lastModified: "2026-10-06",
+      priority: 0.5,
+      changeFrequency: "monthly",
+    },
+    {
+      url: `${siteUrl}/guides/canadian-website-privacy`,
       lastModified: "2026-10-06",
       priority: 0.5,
       changeFrequency: "monthly",

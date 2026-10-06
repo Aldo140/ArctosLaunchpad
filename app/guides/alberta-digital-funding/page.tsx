@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/site/Page";
+import { GuideFaq, GuideLayout, GuideSection as Section, Source } from "@/components/site/guide/Guide";
 import {
   ORGANIZATION_ID,
   breadcrumbSchema,
@@ -90,92 +91,30 @@ const schema = graph(
   breadcrumbSchema([{ name: "Funding guide", path: PATH }]),
 );
 
-function Source({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a className="link" href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-      <span aria-hidden="true">↗</span>
-    </a>
-  );
-}
 
-function Section({ n, id, title, children }: { n: string; id: string; title: string; children: React.ReactNode }) {
-  return (
-    <section id={id} className="policy__section">
-      <div className="policy__section-head">
-        <span className="index policy__n">{n}</span>
-        <h2 className="policy__h2">{title}</h2>
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export default function FundingGuidePage() {
   return (
     <>
-      <section className="phero tone-ink policy-cover" data-tone="ink">
-        <div className="wrap policy-cover__inner">
-          <nav className="crumbs" aria-label="Breadcrumb">
-            <ol>
-              <li>
-                <Link href="/">Home</Link>
-              </li>
-              <li>
-                <Link href={PATH}>Funding guide</Link>
-              </li>
-            </ol>
-          </nav>
-
-          <div>
-            <p className="eyebrow">Guide · Calgary, Alberta</p>
-            <h1 className="h1 policy-cover__title">
-              Funding for software and AI <em>in Alberta, 2026.</em>
-            </h1>
-            <p className="lead policy-cover__intro">
-              What can actually help a Calgary business pay for a software, AI, or digital project this year, what has
-              closed, and what most programs will not cover.
-            </p>
-          </div>
-
-          <dl className="policy-cover__meta">
-            <div>
-              <dt className="mono">Document</dt>
-              <dd className="index">Reference guide</dd>
-            </div>
-            <div>
-              <dt className="mono">Covers</dt>
-              <dd className="index">Alberta and federal programs</dd>
-            </div>
-            <div>
-              <dt className="mono">Last checked</dt>
-              <dd className="index">{CHECKED}</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
-
-      <section className="section tone-paper" data-tone="paper">
-        <div className="wrap policy">
-          <nav className="policy__contents" aria-label="On this page">
-            <p className="mono">Contents</p>
-            <ol>
-              {contents.map(([n, label, id]) => (
-                <li key={id}>
-                  <a href={`#${id}`}>
-                    <span className="index">{n}</span>
-                    <span>{label}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-
-          <article className="policy__body">
-            <p className="policy__lead">
-              Arctos is a studio, not a funding agency or grant writer. This guide exists because clients ask the same
-              question before almost every build, and the answers are scattered.
-            </p>
+      <GuideLayout
+        path={PATH}
+        crumb="Funding guide"
+        eyebrow="Guide · Calgary, Alberta"
+        title={
+          <>
+            Funding for software and AI <em>in Alberta, 2026.</em>
+          </>
+        }
+        intro="What can actually help a Calgary business pay for a software, AI, or digital project this year, what has closed, and what most programs will not cover."
+        meta={[
+          ["Document", "Reference guide"],
+          ["Covers", "Alberta and federal programs"],
+          ["Last checked", CHECKED],
+        ]}
+        contents={contents}
+        lead={<>Arctos is a studio, not a funding agency or grant writer. This guide exists because clients ask the same
+              question before almost every build, and the answers are scattered.</>}
+      >
 
             <Section n="01" id="short-answer" title="The short answer">
               <ul className="policy__checklist">
@@ -273,12 +212,7 @@ export default function FundingGuidePage() {
             </Section>
 
             <Section n="08" id="faq" title="Questions">
-              {faq.map((item) => (
-                <div key={item.question}>
-                  <h3 className="policy__note-title">{item.question}</h3>
-                  <p>{item.answer}</p>
-                </div>
-              ))}
+              <GuideFaq items={faq} />
               <aside className="policy__note">
                 <p className="policy__note-title">Check before you rely on this</p>
                 <p>
@@ -287,9 +221,7 @@ export default function FundingGuidePage() {
                 </p>
               </aside>
             </Section>
-          </article>
-        </div>
-      </section>
+      </GuideLayout>
       <JsonLd data={schema} />
     </>
   );

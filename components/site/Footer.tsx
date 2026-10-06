@@ -76,6 +76,9 @@ export function Footer() {
               <li>
                 <Link href="/guides/alberta-digital-funding">Funding guide</Link>
               </li>
+              <li>
+                <Link href="/guides/canadian-website-privacy">Privacy guide</Link>
+              </li>
             </ul>
           </nav>
           <nav aria-label="Calgary">
@@ -86,6 +89,9 @@ export function Footer() {
                   <Link href={page.route}>{page.title.replace(/^Calgary /, "")}</Link>
                 </li>
               ))}
+              <li>
+                <Link href="/canada">Across Canada</Link>
+              </li>
             </ul>
           </nav>
         </div>

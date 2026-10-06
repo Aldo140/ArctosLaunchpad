@@ -32,6 +32,13 @@ import {
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Names the market when a description has room and does not already say it. */
+function withCountry(description: string) {
+  if (/Canad/.test(description)) return description;
+  const extended = `${description} For organizations across Canada.`;
+  return extended.length <= 160 ? extended : description;
+}
+
 export function generateStaticParams() {
   return servicePages.map(({ slug }) => ({ slug }));
 }
@@ -44,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const searchTitle = /Consulting$/.test(sheet.title) ? sheet.title : `${sheet.title} Services`;
   return pageMetadata({
     title: searchTitle,
-    description: sheet.metaDescription || sheet.summary,
+    description: withCountry(sheet.metaDescription || sheet.summary),
     path: sheet.route,
     eyebrow: getIslandForStage(sheet.stage).name,
     cardTitle: sheet.headline,
