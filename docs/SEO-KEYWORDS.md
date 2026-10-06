@@ -31,3 +31,17 @@ actually sells. Replace guesses with real queries from Search Console
 The funding guide is linked from the footer only, never the main navigation.
 Its facts carry a "last checked" date; re-check each program before changing
 that date.
+
+## National (Canada-wide)
+
+Calgary stays the home market. These pages carry the rest of the country.
+
+| Search phrasing / trend | Where it lives |
+|---|---|
+| Canadian web design company, Canadian software studio, Buy Canadian (federal policy since December 2025), data hosted in Canada | `/canada` |
+| Cookie consent Canada, PIPEDA website, Quebec Law 25, Alberta PIPA, CASL, Bill C-36 (first reading 15 June 2026) | `/guides/canadian-website-privacy` |
+| "<Service> services" with "across Canada" in the description | `/services/*` (no city, so they never compete with the Calgary pages) |
+
+No pages for other cities: thin city pages without a real presence there read
+as doorway pages and can hurt the whole site. Add one only when there is real
+work and a reason to be there.
