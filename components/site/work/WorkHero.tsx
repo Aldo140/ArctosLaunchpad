@@ -4,14 +4,13 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { gsap } from "gsap";
-import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import type { Project } from "@/lib/content";
 import Link from "next/link";
 import { statusTone } from "../ui";
 
-gsap.registerPlugin(Flip, ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 type Tone = "live" | "internal" | "studio";
 
@@ -101,6 +100,9 @@ export function WorkHero({ projects }: { projects: Project[] }) {
         // 1. Captures fly in from deep space, far ones first.
         const order = [...inners].sort((a, b) => depth(a.parentElement!) - depth(b.parentElement!));
         const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+        // The CSS pre-hide (no flash of the finished page before hydration)
+        // hands over to the timeline's own from-states here.
+        root.dataset.intro = "running";
         intro.from(order, {
           opacity: 0,
           scale: 0.55,
@@ -138,11 +140,22 @@ export function WorkHero({ projects }: { projects: Project[] }) {
         if (cells.length) {
           cells.forEach((c) => (c.style.order = c.dataset.p ?? "0"));
           gsap.set(nums, { opacity: 0 });
-          intro.from(cells, { scaleY: 0, transformOrigin: "50% 100%", duration: 0.7, stagger: 0.06, ease: "back.out(2)" }, 0.7);
+          // No overshoot: back.out pushed each bar taller than its resting
+          // height before it settled, which read as a stretch.
+          intro.from(cells, { scaleY: 0, transformOrigin: "50% 100%", duration: 0.7, stagger: 0.06, ease: "power3.out" }, 0.7);
           intro.add(() => {
-            const state = Flip.getState(cells);
+            // Sort into status groups. Cells moving left hop over, cells moving
+            // right dip under, so two cells trading places pass each other
+            // instead of sliding through one another in the same row.
+            const before = cells.map((c) => c.getBoundingClientRect().left);
             cells.forEach((c) => (c.style.order = c.dataset.g ?? "0"));
-            Flip.from(state, { duration: 1, ease: "power3.inOut", stagger: 0.03 });
+            cells.forEach((c, i) => {
+              const dx = before[i] - c.getBoundingClientRect().left;
+              if (Math.abs(dx) < 1) return;
+              const hop = (dx > 0 ? -1 : 1) * c.offsetHeight * 0.6;
+              gsap.fromTo(c, { x: dx }, { x: 0, duration: 0.9, ease: "power3.inOut" });
+              gsap.to(c, { keyframes: { y: [0, hop, 0], easeEach: "sine.inOut" }, duration: 0.9 });
+            });
             gsap.to(nums, { opacity: 1, duration: 0.6, delay: 0.7, stagger: 0.12 });
             root.classList.add("is-sorted");
           }, "+=0.35");

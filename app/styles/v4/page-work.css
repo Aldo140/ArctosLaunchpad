@@ -991,3 +991,17 @@
 .work-index:has(.wx) {
   overflow-x: clip;
 }
+
+/* Before the intro runs, hide what it animates in. Server-rendered, the
+   finished hero painted for a beat, vanished when the timeline started, then
+   animated back in. The failsafe shows it anyway if the script never runs. */
+html.js-motion .whero:not([data-intro]) :is(.whero__inner, .whero__title, .whero__fade) {
+  opacity: 0;
+  animation: whero-failsafe 0.6s 3s forwards;
+}
+
+@keyframes whero-failsafe {
+  to {
+    opacity: 1;
+  }
+}
