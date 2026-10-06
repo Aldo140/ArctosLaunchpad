@@ -73,6 +73,9 @@ export function Footer() {
               <li>
                 <Link href="/industries">Industries</Link>
               </li>
+              <li>
+                <Link href="/guides/alberta-digital-funding">Funding guide</Link>
+              </li>
             </ul>
           </nav>
           <nav aria-label="Calgary">

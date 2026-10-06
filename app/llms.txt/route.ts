@@ -35,6 +35,10 @@ export function GET() {
     "",
     ...industries.map((i) => `- [${i.title}](${url(`/industries/${i.slug}`)}): ${i.summary}`),
     "",
+    "## Guides",
+    "",
+    `- [Funding for software and AI in Calgary and Alberta (2026)](${url("/guides/alberta-digital-funding")}): BDC LIFT, Alberta Innovates, NRC IRAP, SR&ED, and what replaced the closed Canada Digital Adoption Program.`,
+    "",
     "## Frequently asked questions",
     "",
     ...servicePages.flatMap((s) =>

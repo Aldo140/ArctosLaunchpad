@@ -17,6 +17,7 @@ const routes = [
   ["/industries", 0.8, "monthly"],
   ["/privacy", 0.3, "yearly"],
   ["/accessibility", 0.3, "yearly"],
+  ["/guides/alberta-digital-funding", 0.5, "monthly"],
 ] as const satisfies ReadonlyArray<
   readonly [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]]
 >;

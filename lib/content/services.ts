@@ -292,6 +292,11 @@ export const servicePages: ServicePage[] = [
         answer:
           "Yes. Local relevance is part of the service for organizations serving Calgary or other defined markets.",
       },
+      {
+        question: "Will Google AI Overviews reduce traffic to our website?",
+        answer:
+          "They can for general information searches, which increasingly end without a click. Local and buying-intent searches still send visitors reliably, so the work focuses on being cited inside AI answers and on the pages that win those high-intent searches.",
+      },
     ],
     cta: "Make your expertise easier to find and understand.",
     metaDescription:

@@ -107,6 +107,14 @@ export default function AccessibilityPage() {
                 layouts.
               </p>
               <p>
+                WCAG Level AA is also the benchmark Canadian accessibility laws
+                point to, including Ontario&apos;s AODA and the federal
+                Accessible Canada Act. Alberta has no provincial web
+                accessibility law for private businesses, so for most Calgary
+                organizations it is good practice rather than a legal
+                requirement, and the practice this site follows anyway.
+              </p>
+              <p>
                 Standards are a foundation. Real experiences across devices and
                 assistive technologies also inform improvements.
               </p>

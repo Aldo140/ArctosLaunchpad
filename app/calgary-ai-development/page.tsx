@@ -33,6 +33,11 @@ const faq = [
       "Anything with real consequences keeps a human approval step, and the system is built to escalate cases it is not confident about rather than guess.",
   },
   {
+    question: "Is there funding for AI projects in Alberta?",
+    answer:
+      "Mostly as financing rather than grants. BDC's LIFT initiative, launched in April 2026, pairs small and medium-sized businesses with advisors and then offers loans to implement AI, and Alberta Innovates and NRC IRAP can support AI work that develops new technology. Arctos keeps a plain-language funding guide on this site.",
+  },
+  {
     question: "Do you work with organizations outside Calgary?",
     answer:
       "Yes. Arctos is based in Calgary, Alberta, and works with organizations anywhere in Canada.",

@@ -33,6 +33,11 @@ const faq = [
       "Ownership terms are set out in the project agreement before work begins, so you know exactly what you are getting.",
   },
   {
+    question: "Can custom software qualify for grants or SR&ED tax credits?",
+    answer:
+      "Sometimes. SR&ED tax credits and Alberta Innovates programs support genuinely new technical work, not routine builds with established methods. Arctos keeps a plain-language guide to Alberta and federal funding on this site.",
+  },
+  {
     question: "Do you work with organizations outside Calgary?",
     answer:
       "Yes. Arctos is based in Calgary, Alberta, and works with organizations anywhere in Canada.",
