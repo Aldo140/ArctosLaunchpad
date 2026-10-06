@@ -592,9 +592,11 @@ export function BridgeHero() {
           kept.querySelector<HTMLElement>(".demo-pill__a")?.setAttribute("style", "opacity:0");
           kept.querySelector<HTMLElement>(".demo-pill__b")?.setAttribute("style", "opacity:1");
           newRow.after(kept);
-          // keep the board at three rows: the oldest one makes room
-          const rows = newRow.parentElement!.querySelectorAll(".demo-row:not(.demo-row--new)");
-          if (rows.length > 2) rows[rows.length - 1].remove();
+          // keep the board at three rows: the oldest one makes room. It is
+          // hidden, not removed, because React owns it and will unmount it.
+          const rows = [...newRow.parentElement!.querySelectorAll<HTMLElement>(".demo-row:not(.demo-row--new)")]
+            .filter((row) => row.style.display !== "none");
+          if (rows.length > 2) rows[rows.length - 1].style.display = "none";
           gsap.from(kept, { backgroundColor: "rgba(229,122,66,0.25)", duration: 1.2, ease: "power2.out" });
         }, [], 6.85)
         // reset for the next client
@@ -651,7 +653,11 @@ export function BridgeHero() {
         tapAt = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
         drawRoutes();
         story.invalidate();
-        story.play(0.8);
+        // Their tap shows at once, where they touched (the timeline's own
+        // ripple fade-in sits before the point we jump to).
+        gsap.set(tap, { opacity: 1, scale: 1 });
+        if (held) onPause();
+        story.play(0.84);
       };
 
       // ---- touch: drag sideways to tilt the screens; a still tap is a turn --
@@ -757,7 +763,12 @@ export function BridgeHero() {
       const onVisibility = () => (document.hidden ? story.pause() : resume());
       document.addEventListener("visibilitychange", onVisibility);
 
+      // iOS fires resize as the address bar shows and hides while scrolling;
+      // only a real width change moves the screens.
+      let lastWidth = stage.clientWidth;
       const onResize = () => {
+        if (Math.abs(stage.clientWidth - lastWidth) < 2) return;
+        lastWidth = stage.clientWidth;
         drawRoutes();
         story.invalidate();
       };

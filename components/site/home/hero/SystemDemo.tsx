@@ -116,7 +116,7 @@ export function SystemDemo() {
                     alt=""
                     width={780}
                     height={1688}
-                    sizes="44vw"
+                    sizes="(max-width: 900px) 44vw, 1px"
                     loading={i === 0 ? "eager" : "lazy"}
                     className={`demo-site${i === 0 ? " is-on" : ""}`}
                   />
@@ -173,7 +173,7 @@ export function SystemDemo() {
             alt=""
             width={420}
             height={280}
-            sizes="26vw"
+            sizes="(max-width: 900px) 26vw, 1px"
           />
 
           {/* 03 — the reporting */}
