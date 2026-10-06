@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 /**
  * The phone hero's live demo: what Arctos builds, shown working rather than
@@ -104,6 +105,11 @@ export function SystemDemo() {
               <span className="demo-tap" />
             </div>
           </div>
+          {/* after the first loop: an invitation to be the customer */}
+          <span className="demo-hint">
+            <span className="demo-hint__dot" />
+            Tap the site to try it
+          </span>
         </div>
 
         {/* 02 — the automation */}
@@ -158,7 +164,9 @@ export function SystemDemo() {
             <p className="demo-num">
               <b className="demo-count">{DEMO_START_COUNT}</b>
               <small>enquiries</small>
+              <span className="demo-plus">+1</span>
             </p>
+            <span className="demo-confetti" />
             <div className="demo-bars">
               {BARS.map((h, i) => (
                 <i key={i} style={{ height: `${h}%` }} className={i === BARS.length - 1 ? "is-today" : undefined} />
@@ -178,6 +186,13 @@ export function SystemDemo() {
           <small className="demo-toast__what">Custom cake order</small>
         </span>
       </div>
+      {/* revealed once the visitor has sent their own enquiry through */}
+      <p className="demo-nudge">
+        <span>That was you, start to finish.</span>{" "}
+        <Link href="/contact?need=website">
+          Want this for your business? <span aria-hidden="true">→</span>
+        </Link>
+      </p>
       <p className="visually-hidden">
         A short demo: a visitor taps the call to action on a client website, the enquiry lands on an
         automated leads board and is followed up, and the weekly dashboard counts it.

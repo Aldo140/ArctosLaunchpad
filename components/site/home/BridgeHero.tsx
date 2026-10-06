@@ -386,10 +386,15 @@ export function BridgeHero() {
         return { x: r.left - s0.left + r.width * fx, y: r.top - s0.top + r.height * fy };
       };
       let site = 0;
+      // The visitor's turn: where they tapped (fractions of the screen), and state.
+      let tapAt: { x: number; y: number } | null = null;
+      let userTurn = false;
+      let userDone = false;
       const points = () => {
         const sr = screen.getBoundingClientRect();
         const s0 = stage.getBoundingClientRect();
-        const t = DEMO_SITES[site].tap;
+        // A visitor's own tap overrides the site's call to action.
+        const t = tapAt ?? DEMO_SITES[site].tap;
         return {
           tap: { x: sr.left - s0.left + sr.width * t.x, y: sr.top - s0.top + sr.height * t.y },
           row: rel(newRow, 0.12, 0.5),
@@ -406,7 +411,8 @@ export function BridgeHero() {
           `${(a.x + b.x) / 2 + bend} ${(a.y + b.y) / 2}`;
         routeA.setAttribute("d", `M ${p.tap.x} ${p.tap.y} Q ${mid(p.tap, p.row, -w * 0.12)} ${p.row.x} ${p.row.y}`);
         routeB.setAttribute("d", `M ${p.row.x} ${p.row.y} Q ${mid(p.row, p.count, w * 0.22)} ${p.count.x} ${p.count.y}`);
-        gsap.set(tap, { left: `${DEMO_SITES[site].tap.x * 100}%`, top: `${DEMO_SITES[site].tap.y * 100}%` });
+        const t = tapAt ?? DEMO_SITES[site].tap;
+        gsap.set(tap, { left: `${t.x * 100}%`, top: `${t.y * 100}%` });
       };
 
       // ---- lighting the headline ------------------------------------------
@@ -458,11 +464,22 @@ export function BridgeHero() {
       const counter = { v: n };
       const story = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 0.6, onRepeat: () => nextSite() });
       const nextSite = () => {
+        // The first full loop has played: invite the visitor to take a turn.
+        if (!userDone && !hinted) {
+          hinted = true;
+          gsap.fromTo(".demo-hint", { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "back.out(2)" });
+        }
+        userTurn = false;
+        tapAt = null;
+        newRow.classList.remove("is-you");
         const prev = site;
         site = (site + 1) % DEMO_SITES.length;
         gsap.to(sites[prev], { opacity: 0, duration: 0.6 });
         gsap.to(sites[site], { opacity: 1, duration: 0.6 });
         drawRoutes();
+        // GSAP records function-based starts and motion paths on first play;
+        // the routes just moved, so have it measure again.
+        story.invalidate();
       };
       story
         // 01 — the tap on the client's own call to action
@@ -472,7 +489,8 @@ export function BridgeHero() {
         .call(() => { light("win"); pop(phone); }, [], 0.95)
         // the enquiry leaves the site
         .call(() => {
-          const lead = DEMO_SITES[site].lead;
+          const lead = userTurn ? { who: "You", what: "Your enquiry" } : DEMO_SITES[site].lead;
+          newRow.classList.toggle("is-you", userTurn);
           toastWhat.textContent = lead.what;
           rowName.textContent = lead.who;
           rowWhat.textContent = lead.what;
@@ -512,12 +530,22 @@ export function BridgeHero() {
           gsap.to(today, { height: `${Math.min(96, 30 + (n - DEMO_START_COUNT) * 14)}%`, duration: 0.6, ease: "back.out(1.6)" });
           light("see");
           pop($(".demo-dash"));
-          // The first time the numbers move, the bear comes up to look.
+          celebrate();
+          // The first time the numbers move, the bear comes up to look; after
+          // that it gives a happy little bob each time.
           if (!bearUp) {
             bearUp = true;
             gsap.to(".demo-bear", { yPercent: 0, opacity: 1, duration: 0.9, ease: "back.out(1.7)", delay: 0.15 });
+          } else {
+            gsap.fromTo(".demo-bear", { y: 0, rotation: 0 }, { keyframes: [{ y: -7, rotation: -3, duration: 0.18 }, { y: 0, rotation: 0, duration: 0.5, ease: "bounce.out" }], transformOrigin: "50% 100%" });
           }
         }, [], 4)
+        // the visitor's own enquiry made it all the way: say so
+        .call(() => {
+          if (!userTurn || userDone) return;
+          userDone = true;
+          gsap.fromTo(".demo-nudge", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "expo.out", delay: 0.3 });
+        }, [], 4.3)
         // reset for the next client
         .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 5.8)
         .call(() => {
@@ -526,7 +554,88 @@ export function BridgeHero() {
           gsap.set(pillB, { opacity: 0 });
         }, [], 6.25);
 
+      // ---- celebration: a +1 chip and a burst of paper in brand colours ------
+      const confetti = $(".demo-confetti");
+      const plus = $(".demo-plus");
+      const PAPER = ["#e57a42", "#f1ebdf", "#ffb48a", "#5ebea0", "#c4531c"];
+      const celebrate = () => {
+        gsap.fromTo(plus, { autoAlpha: 0, y: 6, scale: 0.6 }, { keyframes: [
+          { autoAlpha: 1, y: -10, scale: 1, duration: 0.3, ease: "back.out(2)" },
+          { autoAlpha: 0, y: -26, duration: 0.6, delay: 0.5, ease: "power1.in" },
+        ] });
+        for (let i = 0; i < 14; i++) {
+          const bit = document.createElement("i");
+          bit.style.background = PAPER[i % PAPER.length];
+          confetti.appendChild(bit);
+          const angle = (-160 + Math.random() * 140) * (Math.PI / 180);
+          const speed = 40 + Math.random() * 50;
+          gsap.fromTo(bit,
+            { x: 0, y: 0, rotation: Math.random() * 180, opacity: 1, scale: 0.6 + Math.random() * 0.6 },
+            {
+              keyframes: [
+                { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed, rotation: "+=220", duration: 0.55, ease: "power2.out" },
+                { y: `+=${30 + Math.random() * 30}`, opacity: 0, rotation: "+=120", duration: 0.7, ease: "power1.in" },
+              ],
+              onComplete: () => bit.remove(),
+            });
+        }
+      };
+
+      // ---- your turn: tap the site and your enquiry runs the system --------
+      let hinted = false;
+      const takeTurn = (e: PointerEvent) => {
+        const r = screen.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+        if (userTurn) return;
+        navigator.vibrate?.(12);
+        gsap.to(".demo-hint", { autoAlpha: 0, duration: 0.3 });
+        story.pause();
+        gsap.set(newRow, { height: 0, opacity: 0 });
+        pillB.parentElement!.classList.remove("is-done");
+        gsap.set(pillA, { opacity: 1 });
+        gsap.set(pillB, { opacity: 0 });
+        gsap.set([toast, signal], { opacity: 0 });
+        userTurn = true;
+        tapAt = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+        drawRoutes();
+        story.invalidate();
+        story.play(0.8);
+      };
+
+      // ---- touch: drag sideways to tilt the screens; a still tap is a turn --
+      const tiltY = gsap.quickTo(stage, "rotationY", { duration: 0.5, ease: "power3.out" });
+      const tiltX = gsap.quickTo(stage, "rotationX", { duration: 0.5, ease: "power3.out" });
+      let origin: { x: number; y: number; id: number } | null = null;
+      let moved = false;
+      const down = (e: PointerEvent) => {
+        origin = { x: e.clientX, y: e.clientY, id: e.pointerId };
+        moved = false;
+      };
+      const move = (e: PointerEvent) => {
+        if (!origin || e.pointerId !== origin.id) return;
+        const dx = e.clientX - origin.x;
+        const dy = e.clientY - origin.y;
+        if (Math.hypot(dx, dy) > 8) moved = true;
+        tiltY(gsap.utils.clamp(-1, 1, dx / 160) * 14);
+        tiltX(gsap.utils.clamp(-1, 1, dy / 220) * -7);
+      };
+      const settle = () => {
+        origin = null;
+        gsap.to(stage, { rotationY: 0, rotationX: 0, duration: 1.3, ease: "elastic.out(1, 0.45)", overwrite: true });
+      };
+      const up = (e: PointerEvent) => {
+        if (!origin || e.pointerId !== origin.id) return;
+        if (!moved && el.dataset.intro === "done") takeTurn(e);
+        settle();
+      };
+      stage.addEventListener("pointerdown", down);
+      stage.addEventListener("pointermove", move);
+      stage.addEventListener("pointerup", up);
+      stage.addEventListener("pointercancel", settle);
+      stage.addEventListener("pointerleave", settle);
+
       gsap.set(newRow, { height: 0, opacity: 0 });
+      gsap.set([".demo-hint", ".demo-nudge", plus], { autoAlpha: 0 });
       // Hidden behind the dashboard until the numbers first move.
       let bearUp = false;
       gsap.set(".demo-bear", { yPercent: 70, opacity: 0 });
@@ -551,7 +660,10 @@ export function BridgeHero() {
         gsap.to(card, { y: -5 - i * 2, duration: 3.2 + i * 0.6, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 2 + i * 0.3 });
       });
 
-      const onResize = () => drawRoutes();
+      const onResize = () => {
+        drawRoutes();
+        story.invalidate();
+      };
       window.addEventListener("resize", onResize);
 
       ScrollTrigger.create({
@@ -565,7 +677,14 @@ export function BridgeHero() {
         },
       });
 
-      return () => window.removeEventListener("resize", onResize);
+      return () => {
+        window.removeEventListener("resize", onResize);
+        stage.removeEventListener("pointerdown", down);
+        stage.removeEventListener("pointermove", move);
+        stage.removeEventListener("pointerup", up);
+        stage.removeEventListener("pointercancel", settle);
+        stage.removeEventListener("pointerleave", settle);
+      };
     };
 
     const mm = gsap.matchMedia(el);
