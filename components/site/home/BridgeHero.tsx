@@ -9,6 +9,7 @@ import { SplitText } from "gsap/SplitText";
 import { islands, type IslandId } from "@/lib/content";
 import { Btn, TextLink } from "../ui";
 import { Atmosphere } from "./hero/Atmosphere";
+import { Snow } from "./hero/Snow";
 import {
   ART_H, ART_W, DECK, ISLES, LABELS, LIVE, PIECE_LABELS, PIECES, PLUMB, ROUTE, SCENE, STOPS,
 } from "./hero/geometry";
@@ -417,34 +418,117 @@ export function BridgeHero() {
         );
       };
 
-      // ---- intro: the islands surface at their own depths, then the route climbs
-      const tl = gsap.timeline({ delay: 0.05, onComplete: () => { el.dataset.intro = "done"; } });
+      // ---- intro: night falls in, the islands rack into focus at their own
+      // depths, light sweeps the paper, then the route ignites the bridge.
+      const tl = gsap.timeline({ delay: 0.05 });
       tl.from(".hero__sky", { opacity: 0, duration: 1.8, ease: "power2.out" }, 0)
         .from(".hero__glow", { opacity: 0, scale: 0.6, duration: 2.2, ease: "power2.out" }, 0.2)
         .from(".hero__survey", { opacity: 0, duration: 1.8 }, 0.3)
+        .from(".hero__aurora i", { opacity: 0, scaleY: 0.4, duration: 2.4, ease: "power2.out", stagger: 0.25 }, 0.2)
         .from(".hero__eyebrow-in", { opacity: 0, y: 12, duration: 0.9, ease: "expo.out" }, 0.15);
       splits.forEach((split, i) => {
         tl.from(split.words, { yPercent: 118, rotation: 5, duration: 1.15, ease: "expo.out", stagger: 0.07, transformOrigin: "0% 100%" }, 0.1 + i * 0.14);
       });
-      // Far islands surface first and travel least; the near one rises furthest.
+      // Rack focus: far islands resolve first and travel least; the near one
+      // starts closest to the lens, largest and softest.
       (["see", "run", "win"] as IslandId[]).forEach((id, i) => {
         const d = PIECES[id].depth;
-        tl.from(
+        tl.fromTo(
           `.hero__isle-piece--${id}`,
-          { opacity: 0, y: 40 + d * 90, scale: 0.92 - d * 0.06, duration: 1.6 + d * 0.3, ease: "expo.out" },
-          0.35 + i * 0.16,
+          { opacity: 0, y: 30 + d * 80, scale: 1.12 + d * 0.12, filter: `blur(${6 + d * 10}px)` },
+          {
+            opacity: 1, y: 0, scale: 1, filter: "blur(0px)",
+            duration: 1.7 + d * 0.3, ease: "expo.out",
+            clearProps: "filter",
+          },
+          0.3 + i * 0.18,
         );
       });
-      tl.from(".hero__copy .actions", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 0.9)
-        .from(".hero__lead", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.05)
-        .fromTo(rider, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.45)
-        .call(() => arrive("win"), [], 1.5)
-        .to(ride, { p: pRun, duration: 1.1, ease: "power2.inOut", onUpdate: place }, 1.55)
-        .call(() => arrive("run"), [], 2.65)
-        .to(ride, { p: 1, duration: 1, ease: "power2.inOut", onUpdate: place }, 2.75)
-        .call(() => arrive("see"), [], 3.75)
-        .from(".hero__tag", { opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.45 }, 1.55)
-        .to(rider, { opacity: 0, duration: 0.6 }, 3.9);
+      // One sweep of light across the paper, near to far.
+      tl.fromTo(
+        ".hero__sheen",
+        { backgroundPosition: "130% 0" },
+        { backgroundPosition: "-30% 0", duration: 1.3, ease: "power2.inOut", stagger: 0.12 },
+        1.25,
+      )
+        .from(".hero__copy .actions", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.1)
+        .from(".hero__lead", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.2)
+        .fromTo(rider, { opacity: 0, scale: 0.3, svgOrigin: `${STOPS.win.x} ${STOPS.win.y}` }, { opacity: 1, scale: 1, duration: 0.35 }, 1.6)
+        .call(() => arrive("win"), [], 1.65)
+        .to(ride, { p: pRun, duration: 1.05, ease: "power2.inOut", onUpdate: place }, 1.7)
+        .call(() => arrive("run"), [], 2.75)
+        // The keystone takes the load: the halo behind the bear blooms.
+        .fromTo(".hero__halo", { opacity: 0.25, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.4, ease: "expo.out" }, 2.75)
+        .to(ride, { p: 1, duration: 0.95, ease: "power2.inOut", onUpdate: place }, 2.85)
+        .call(() => arrive("see"), [], 3.8)
+        .from(".hero__tag", { opacity: 0, duration: 0.7, ease: "power2.out", stagger: 0.55 }, 1.7)
+        .to(rider, { opacity: 0, duration: 0.6 }, 3.95);
+
+      // ---- the aurora never quite holds still
+      gsap.utils.toArray<HTMLElement>(".hero__aurora i", el).forEach((band, i) => {
+        gsap.to(band, {
+          xPercent: i % 2 ? -14 : 12,
+          skewX: i % 2 ? 8 : -10,
+          scaleY: 1.18,
+          opacity: 0.85 + i * 0.05,
+          duration: 7 + i * 2.2,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: 2 + i * 0.6,
+        });
+      });
+
+      // ---- touch: drag the scene and it tilts in depth; tap an island to light it
+      const box = scene.querySelector<HTMLElement>(".hero__isles-box");
+      const tiltY = gsap.quickTo(box, "rotationY", { duration: 0.5, ease: "power3.out" });
+      const tiltX = gsap.quickTo(box, "rotationX", { duration: 0.5, ease: "power3.out" });
+      const shift = (Object.keys(PIECES) as IslandId[]).map((id) => {
+        const target = scene.querySelector(`.hero__isle-float--${id}`);
+        return [
+          gsap.quickTo(target, "x", { duration: 0.6, ease: "power3.out" }),
+          PIECES[id].depth,
+        ] as const;
+      });
+      let origin: { x: number; y: number; id: number } | null = null;
+      let moved = false;
+      const lean = (dx: number, dy: number) => {
+        const nx = gsap.utils.clamp(-1, 1, dx / 160);
+        const ny = gsap.utils.clamp(-1, 1, dy / 200);
+        tiltY(nx * 16);
+        tiltX(ny * -8);
+        for (const [x, depth] of shift) x(nx * (8 + depth * 26));
+      };
+      const release = () => {
+        origin = null;
+        gsap.to(box, { rotationY: 0, rotationX: 0, duration: 1.4, ease: "elastic.out(1, 0.45)", overwrite: true });
+        for (const [x] of shift) x(0);
+      };
+      const down = (e: PointerEvent) => {
+        origin = { x: e.clientX, y: e.clientY, id: e.pointerId };
+        moved = false;
+      };
+      const move = (e: PointerEvent) => {
+        if (!origin || e.pointerId !== origin.id) return;
+        const dx = e.clientX - origin.x;
+        const dy = e.clientY - origin.y;
+        if (Math.abs(dx) > 6) moved = true;
+        lean(dx, dy);
+      };
+      const up = (e: PointerEvent) => {
+        if (!origin || e.pointerId !== origin.id) return;
+        // A tap on an island lights it, the same way the route does.
+        if (!moved) {
+          const hit = (e.target as HTMLElement).closest<HTMLElement>("[data-isle]");
+          if (hit?.dataset.isle) arrive(hit.dataset.isle as IslandId);
+        }
+        release();
+      };
+      box?.addEventListener("pointerdown", down);
+      box?.addEventListener("pointermove", move);
+      box?.addEventListener("pointerup", up);
+      box?.addEventListener("pointercancel", release);
+      box?.addEventListener("pointerleave", release);
 
       // ---- idle: each island breathes on its own rhythm
       (Object.keys(PIECES) as IslandId[]).forEach((id, i) => {
@@ -507,6 +591,14 @@ export function BridgeHero() {
           }
         },
       });
+
+      return () => {
+        box?.removeEventListener("pointerdown", down);
+        box?.removeEventListener("pointermove", move);
+        box?.removeEventListener("pointerup", up);
+        box?.removeEventListener("pointercancel", release);
+        box?.removeEventListener("pointerleave", release);
+      };
     };
 
     const mm = gsap.matchMedia(el);
@@ -537,6 +629,7 @@ export function BridgeHero() {
       <div className="hero__track">
         <div className="hero__pin">
           <Atmosphere />
+          <Snow />
 
           <div className="wrap hero__grid">
             <div className="hero__copy">
@@ -566,6 +659,13 @@ export function BridgeHero() {
               {/* Phones and tablets: the bridge recomposed for a portrait screen. */}
               <div className="hero__isles">
                 <div className="hero__isles-box">
+                  {/* The northern sky behind the bear: aurora ribbons and a warm halo. */}
+                  <div className="hero__aurora" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </div>
+                  <div className="hero__halo" aria-hidden="true" />
                   {(["see", "run", "win"] as IslandId[]).map((id) => {
                     const piece = PIECES[id];
                     return (
@@ -580,15 +680,17 @@ export function BridgeHero() {
                           } as CSSProperties
                         }
                       >
-                        <div className={`hero__isle-float hero__isle-float--${id}`}>
+                        <div className={`hero__isle-float hero__isle-float--${id}`} data-isle={id}>
                           <Image
                             src={piece.src}
                             alt=""
                             width={piece.w}
                             height={piece.h}
                             loading={id === "run" ? "eager" : undefined}
-                            sizes={`${Math.round((piece.width / SCENE) * 100)}vw`}
+                            sizes={`${Math.round((piece.width / SCENE) * 112)}vw`}
                           />
+                          {/* light passing over the paper, clipped to the island's own shape */}
+                          <span className="hero__sheen" style={{ "--src": `url(${piece.src})` } as CSSProperties} />
                         </div>
                       </div>
                     );
