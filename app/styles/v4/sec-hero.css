@@ -923,7 +923,8 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     display: inline-flex;
     position: absolute;
     top: auto;
-    bottom: max(22px, 3svh);
+    /* above the CTA row, which shares the bottom edge on the first frame */
+    bottom: calc(max(20px, 3svh) + 56px + 14px);
     left: 50%;
     translate: -50% 0;
     flex-direction: column;
@@ -966,12 +967,22 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     display: inline-block;
     margin: 0;
     font-family: var(--serif);
-    font-size: calc(var(--hero-fs) * 1.08);
+    /* --hero-fs fills the full measure; the act also leaves room for the rail */
+    font-size: calc(var(--hero-fs) * 0.9);
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.03em;
     white-space: nowrap;
     color: var(--fg);
+  }
+
+  /* The camera can park the white bear behind an act: an ink halo keeps
+     cream text readable over it. */
+  .hero__act-t,
+  .hero__act-g {
+    text-shadow:
+      0 1px 14px color-mix(in srgb, var(--ink-deep) 95%, transparent),
+      0 0 3px color-mix(in srgb, var(--ink-deep) 90%, transparent);
   }
 
   .hero__act-t em {

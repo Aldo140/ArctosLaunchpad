@@ -41,20 +41,24 @@ export function FooterFx() {
     // ---- Bridge rises with the scroll -----------------------------------
     let raf = 0;
     const setY = rise ? gsap.quickSetter(rise, "y", "px") : null;
-    const setS = rise ? gsap.quickSetter(rise, "scale") : null;
+    // quickSetter can't take the "scale" shorthand (it resolves to the alias
+    // "scaleX,scaleY" and throws), so set both axes.
+    const setSX = rise ? gsap.quickSetter(rise, "scaleX") : null;
+    const setSY = rise ? gsap.quickSetter(rise, "scaleY") : null;
     const setSh = shadow ? gsap.quickSetter(shadow, "opacity") : null;
     // touch: no pointer to tilt with, so the scroll tips the bridge up out of the page instead
     const setRX = !fine && tilt ? gsap.quickSetter(tilt, "rotationX", "deg") : null;
     const update = () => {
       raf = 0;
-      if (!rise || !setY || !setS) return;
+      if (!rise || !setY || !setSX || !setSY) return;
       const r = footer.getBoundingClientRect();
       const vh = window.innerHeight;
       // 0 when the footer's top meets the viewport bottom, 1 once it's 20% from the top
       const p = clamp((vh - r.top) / (vh * 0.8), 0, 1);
       const e = 1 - Math.pow(1 - p, 3);
       setY((1 - e) * 180);
-      setS(0.84 + 0.16 * e);
+      setSX(0.84 + 0.16 * e);
+      setSY(0.84 + 0.16 * e);
       setSh?.(0.25 + 0.75 * e);
       setRX?.((1 - e) * 28);
     };
