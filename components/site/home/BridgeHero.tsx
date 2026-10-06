@@ -406,7 +406,10 @@ export function BridgeHero() {
         st.set({}, {}, 0)
           // Act 1 — win
           .to([".hero__eyebrow", title], { autoAlpha: 0, y: -36, duration: 0.6, ease: "power2.in", stagger: 0.05 }, 0.6)
-          .to(".hero__cue", { autoAlpha: 0, duration: 0.3 }, 0.6);
+          .to(".hero__cue", { autoAlpha: 0, duration: 0.3 }, 0.6)
+          // The CTAs step aside while the camera works (island labels pass
+          // through that strip) and come back with the whole bridge.
+          .to(".hero__copy .actions", { autoAlpha: 0, y: 20, duration: 0.5, ease: "power2.in" }, 0.6);
         moveTo(frame("win"), 0.6, 1.4);
         actIn(0, 1.3);
         st.fromTo(signal, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "none" }, 1.5)
@@ -427,12 +430,8 @@ export function BridgeHero() {
         moveTo(finale, 7.6, 1.4);
         st.to(signal, { opacity: 0, duration: 0.4 }, 8.4)
           .to([".hero__eyebrow", title], { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.05 }, 8.3)
-          .fromTo(
-            [lead, ".hero__copy .actions"],
-            { autoAlpha: 0, y: 30 },
-            { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.12, immediateRender: true },
-            8.5,
-          )
+          .fromTo(lead, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", immediateRender: true }, 8.5)
+          .to(".hero__copy .actions", { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 8.62)
           .to({}, { duration: 0.8 }, 9.2);
       }
 

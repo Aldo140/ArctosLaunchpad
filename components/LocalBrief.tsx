@@ -33,6 +33,13 @@ const VARIANTS: Record<string, { variant: LocalVariant; need: string; plate: str
 
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 
+/** Column counts that leave no empty cell: desktop tries 4, 3, then 5; tablet 3, then 2. */
+function capCols(n: number) {
+  const desktop = [4, 3, 5].find((c) => n % c === 0) ?? 4;
+  const tablet = n % 3 === 0 ? 3 : 2;
+  return { "--cols": desktop, "--cols-t": tablet } as CSSProperties;
+}
+
 export function LocalBrief({
   title,
   intro,
@@ -229,7 +236,7 @@ export function LocalBrief({
                 {service.summary}
               </p>
             </div>
-            <ol className="loc-caps__grid">
+            <ol className="loc-caps__grid" style={capCols(service.capabilities.length)}>
               {service.capabilities.map((cap, i) => (
                 <li key={cap} className="loc-cap">
                   <div className="loc-cap__face">

@@ -425,8 +425,17 @@ html:not(.js-motion) .loc-label--station::before {
     gap: 18px;
   }
 
+  /* min-width 0 + a bounded column, or the nowrap crumb trail sizes the
+     column past the screen and its ellipsis never triggers */
   .loc-hero__head {
     gap: 16px;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .loc-hero .crumbs {
+    width: 100%;
+    min-width: 0;
   }
 
   .loc-hero .crumbs ol {
@@ -961,6 +970,19 @@ html:not(.js-motion) .loc-label--station::before {
   margin: 36px 0 0;
 }
 
+/* explicit columns (set from the tile count) so no row ends in an empty cell */
+@media (min-width: 1101px) {
+  .loc-caps__grid {
+    grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) {
+  .loc-caps__grid {
+    grid-template-columns: repeat(var(--cols-t, 2), minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .loc-caps__head {
     grid-template-columns: 1fr;
@@ -981,6 +1003,10 @@ html:not(.js-motion) .loc-label--station::before {
   .loc-cap__name {
     font-size: 1.08rem;
     overflow-wrap: anywhere;
+  }
+
+  .loc-cap:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 

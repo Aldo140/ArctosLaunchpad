@@ -1,9 +1,10 @@
 name: Deploy to GitHub Pages
 
+# The site lives on main. Publishing is a deliberate step: run this workflow
+# from the Actions tab (Run workflow → main). To publish on every push to main
+# instead, add:  push: { branches: [main] }
 on:
-  push:
-    branches:
-      - arctos-launchpad
+  workflow_dispatch:
 
 permissions:
   contents: read

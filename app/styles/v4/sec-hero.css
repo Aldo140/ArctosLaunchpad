@@ -847,7 +847,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   html.js-motion .hero__track {
     display: block;
     position: relative;
-    height: 340svh;
+    height: 290svh;
   }
 
   html.js-motion .hero__pin {
@@ -1002,6 +1002,7 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 
   .hero__act-g {
     max-width: 30ch;
+    text-wrap: pretty;
     margin: 18px 0 0;
     font-size: 1.0625rem;
     line-height: 1.45;
