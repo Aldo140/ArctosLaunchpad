@@ -17,7 +17,10 @@ html.js-motion .hero[data-intro="pending"] :is(
     .hero__glow,
     .hero__motes,
     .hero__scraps,
-    .hero__survey
+    .hero__survey,
+    .hero__isle-piece,
+    .hero__tag,
+    .hero__route
   ) {
   opacity: 0;
   animation: hero-failsafe 0.6s 3.2s forwards;
@@ -43,13 +46,14 @@ html.js-motion .hero[data-intro="pending"] :is(
   overflow: clip;
 }
 
-/* Wrappers only matter for the phone/tablet scroll story. */
+/* Layout-neutral wrappers. */
 .hero__track,
 .hero__pin {
   display: contents;
 }
 
-.hero__acts {
+/* The portrait island scene exists for phones and tablets only. */
+.hero__isles {
   display: none;
 }
 
@@ -563,24 +567,18 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     white-space: nowrap;
   }
 
+  /* The wide painting gives way to the portrait scene below. */
   .hero .hero__stage {
-    order: 3;
-    position: relative;
-    z-index: 1;
-    width: 122vw;
-    /* the art's top tenth is open sky: tuck it under the headline */
-    margin: -9vw 0 26px -11vw;
-    perspective: 900px;
-    perspective-origin: 50% 30%;
+    display: none;
   }
 
   .hero .hero__lead {
-    order: 4;
+    order: 5;
     max-width: 40ch;
   }
 
   .hero .hero__copy .actions {
-    order: 5;
+    order: 4;
     flex-wrap: nowrap;
     gap: 22px;
     position: relative;
@@ -666,11 +664,6 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 @media (min-width: 601px) and (max-width: 900px) {
   .hero {
     --hero-fs: calc((100vw - 2 * var(--gutter)) / 7.75);
-  }
-
-  .hero .hero__stage {
-    width: 100vw;
-    margin: -13vw 0 24px calc(var(--gutter) * -1);
   }
 
   .hero .hero__label {
@@ -834,211 +827,154 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   }
 }
 
-/* ---- Phones & tablets: the scroll story (motion only) ---------------------- */
+/* ---- Phones & tablets: the island scene ------------------------------------ */
 
 @media (max-width: 900px) {
-  html.js-motion .hero {
+  .hero .hero__isles {
     display: block;
-    min-height: 0;
-    padding-top: 0;
-    --art-w: 132vw;
-  }
-
-  html.js-motion .hero__track {
-    display: block;
+    order: 3;
+    /* its children are all positioned, so it must be told to take the width */
+    align-self: stretch;
     position: relative;
-    height: 290svh;
+    z-index: 1;
+    /* the scene reaches a little past the gutters so the islands feel unboxed */
+    margin: 0 calc(var(--gutter) * -0.5) 40px;
   }
 
-  html.js-motion .hero__pin {
-    display: block;
-    position: sticky;
-    top: 0;
-    height: 100svh;
-    overflow: hidden;
+  .hero__isles-box {
+    position: relative;
+    width: 100%;
+    /* short phones: shrink the scene so the actions stay on the first screen */
+    max-width: min(560px, 46svh);
+    margin-inline: auto;
+    aspect-ratio: 1;
+    container-type: inline-size;
   }
 
-  html.js-motion .hero .hero__grid {
+  .hero__isle-piece {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    will-change: transform;
+  }
+
+  .hero__isle-piece img {
     display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 22px 26px rgb(2 12 16 / 0.55));
+  }
+
+  /* Depth: the far island sits back in the haze, the near one is crisp. */
+  .hero__isle-piece--see {
+    z-index: 1;
+    opacity: 0.92;
+  }
+
+  .hero__isle-piece--see img {
+    filter: saturate(0.85) brightness(0.92) drop-shadow(0 16px 18px rgb(2 12 16 / 0.5));
+  }
+
+  .hero__isle-piece--run {
+    z-index: 2;
+  }
+
+  .hero__isle-piece--win {
+    z-index: 4;
+  }
+
+  .hero__route-svg {
     position: absolute;
     inset: 0;
-    max-width: none;
-    padding: 0;
-  }
-
-  html.js-motion .hero .hero__eyebrow {
-    position: absolute;
-    top: max(88px, 11svh);
-    left: var(--gutter);
-    right: var(--gutter);
     z-index: 3;
-  }
-
-  html.js-motion .hero .hero__title {
-    position: absolute;
-    top: calc(max(88px, 11svh) + 30px);
-    left: var(--gutter);
-    right: var(--gutter);
-    z-index: 3;
-  }
-
-  html.js-motion .hero .hero__stage {
-    position: absolute;
-    z-index: 1;
-    width: var(--art-w);
-    left: calc(50% - var(--art-w) / 2);
-    top: calc(max(88px, 11svh) + 30px + 3.1 * var(--hero-fs) - 2vw);
-    margin: 0;
-    perspective: none;
-  }
-
-  html.js-motion .hero__dolly,
-  html.js-motion .hero__lift,
-  html.js-motion .hero .hero__tilt {
-    transform-style: flat;
-  }
-
-  html.js-motion .hero__labels {
-    transform: none;
-  }
-
-  html.js-motion .hero .hero__lead {
-    position: absolute;
-    left: var(--gutter);
-    right: var(--gutter);
-    bottom: calc(max(20px, 3svh) + 56px + 20px);
-    z-index: 3;
-    margin: 0;
-  }
-
-  html.js-motion .hero .hero__copy .actions {
-    position: absolute;
-    left: var(--gutter);
-    right: var(--gutter);
-    bottom: max(20px, 3svh);
-    z-index: 3;
-  }
-
-  html.js-motion .hero .hero__cue {
-    display: inline-flex;
-    position: absolute;
-    top: auto;
-    /* above the CTA row, which shares the bottom edge on the first frame */
-    bottom: calc(max(20px, 3svh) + 56px + 14px);
-    left: 50%;
-    translate: -50% 0;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  html.js-motion .hero__acts {
-    display: block;
-    position: absolute;
-    z-index: 3;
-    top: max(84px, 10.5svh);
-    left: var(--gutter);
-    right: var(--gutter);
+    width: 100%;
+    height: 100%;
+    overflow: visible;
     pointer-events: none;
   }
 
-  html.js-motion .hero__act {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 28px;
-    visibility: hidden;
+  .hero__route-ghost {
+    fill: none;
+    stroke: rgb(241 235 223 / 0.16);
+    stroke-width: 2.5;
+    stroke-dasharray: 3 9;
+    stroke-linecap: round;
+  }
+
+  .hero__route {
+    fill: none;
+    stroke: var(--rust-hi);
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgb(229 122 66 / 0.7));
+  }
+
+  .hero__stop {
+    fill: none;
+    stroke: var(--rust-hi);
+    stroke-width: 3;
     opacity: 0;
   }
 
-  .hero__act-k {
-    margin: 0 0 10px;
-    font-family: var(--mono);
-    font-size: 0.74rem;
-    letter-spacing: 0.12em;
-    color: var(--faint);
+  .hero__stop-dot {
+    fill: var(--paper);
+    stroke: rgb(2 19 27 / 0.6);
+    stroke-width: 3;
+    transition: fill 0.4s;
   }
 
-  .hero__act-k span {
-    color: var(--accent);
+  .hero__stop-dot.is-lit {
+    fill: var(--rust-hi);
   }
 
-  .hero__act-t {
-    position: relative;
-    display: inline-block;
-    margin: 0;
-    font-family: var(--serif);
-    /* --hero-fs fills the full measure; the act also leaves room for the rail */
-    font-size: calc(var(--hero-fs) * 0.9);
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: -0.03em;
+  .hero__rider {
+    fill: #fff1e4;
+    opacity: 0;
+    filter: drop-shadow(0 0 8px rgb(255 176 122 / 0.95));
+  }
+
+  /* Scene labels: their own class, so none of the desktop label rules (pill,
+     leader line, centring) reach them. The stop dot marks the island. */
+  .hero__tag {
+    position: absolute;
+    z-index: 5;
+    left: var(--x);
+    top: var(--y);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    padding: 0 4px;
+    /* scales with the scene, so the labels never collide on narrow phones */
+    font-size: clamp(0.66rem, 3.6cqi, 0.82rem);
+    font-weight: 600;
+    color: var(--muted);
     white-space: nowrap;
+    text-decoration: none;
+    text-shadow: 0 1px 10px rgb(2 19 27 / 0.95);
+    transition: color 0.5s;
+  }
+
+  .hero__tag .index {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    font-weight: 500;
+    color: var(--rust-hi);
+  }
+
+  .hero__tag.is-lit,
+  .hero__tag:hover,
+  .hero__tag:focus-visible {
     color: var(--fg);
   }
 
-  /* The camera can park the white bear behind an act: an ink halo keeps
-     cream text readable over it. */
-  .hero__act-t,
-  .hero__act-g {
-    text-shadow:
-      0 1px 14px color-mix(in srgb, var(--ink-deep) 95%, transparent),
-      0 0 3px color-mix(in srgb, var(--ink-deep) 90%, transparent);
+  .hero__tag--center {
+    transform: translateX(-50%);
   }
 
-  .hero__act-t em {
-    color: var(--accent);
-  }
-
-  .hero__act-u {
-    position: absolute;
-    left: 0.02em;
-    right: 0.04em;
-    bottom: -0.08em;
-    height: max(2px, 0.03em);
-    background: var(--rust);
-    transform-origin: left center;
-    box-shadow: 0 0 12px rgb(229 122 66 / 0.6);
-  }
-
-  .hero__act-g {
-    max-width: 30ch;
-    text-wrap: pretty;
-    margin: 18px 0 0;
-    font-size: 1.0625rem;
-    line-height: 1.45;
-    color: var(--muted);
-  }
-
-  .hero__rail {
-    position: absolute;
-    top: 6px;
-    right: 0;
-    display: grid;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .hero__rail li {
-    width: 2px;
-    height: 22px;
-    border-radius: 2px;
-    background: var(--line-strong);
-    transition: background 0.4s, box-shadow 0.4s;
-  }
-
-  .hero__rail li.is-on {
-    background: var(--rust-hi);
-    box-shadow: 0 0 8px rgb(229 122 66 / 0.8);
-  }
-
-  html.js-motion .hero__foot {
-    margin-top: 0;
-  }
-
-  html.js-motion .hero__edge {
-    transform: none;
+  .hero__tag--end {
+    transform: translateX(-100%);
   }
 
   /* Phones: no big blurs */
@@ -1047,8 +983,8 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
   }
 }
 
-@media (min-width: 601px) and (max-width: 900px) {
-  html.js-motion .hero {
-    --art-w: 104vw;
+@media (prefers-reduced-motion: reduce) {
+  .hero__isle-piece {
+    will-change: auto;
   }
 }

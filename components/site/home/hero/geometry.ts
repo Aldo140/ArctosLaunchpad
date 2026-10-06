@@ -36,21 +36,54 @@ export const LIVE = [
 ] as const;
 
 /**
- * One-line glosses for the mobile scroll story, shortened from each island's
- * `promise` in lib/content/islands.ts (same claims, fewer words).
+ * Phones and tablets: the bridge, recomposed for a portrait screen.
+ *
+ * Instead of panning a camera across a landscape painting, the three island
+ * cut-outs sit in one square scene (a 1000×1000 box): the bear's island in the
+ * middle, Win in front at lower left with its ramp reaching for the bridge,
+ * See small and far at upper right. The route climbs from one to the next.
+ * Positions are in box units; `depth` drives parallax (0 far, 1 near).
  */
-export const GLOSS: Record<IslandId, string> = {
-  win: "A website with one clear path from first visit to an enquiry your team can act on.",
-  run: "Software shaped around how you already work, so a task is entered once and moves itself.",
-  see: "Dashboards that assemble themselves from the systems you already run.",
+export const SCENE = 1000;
+
+export const PIECES: Record<
+  IslandId,
+  { src: string; w: number; h: number; x: number; y: number; width: number; depth: number; alt: string }
+> = {
+  see: {
+    src: "/assets/art/island-see.webp", w: 356, h: 400,
+    x: 690, y: 30, width: 290, depth: 0.15,
+    alt: "A small far island with a dashboard mast, where the numbers are read.",
+  },
+  run: {
+    src: "/assets/art/island-run.webp", w: 600, h: 840,
+    x: 250, y: 140, width: 560, depth: 0.5,
+    alt: "A polar bear setting the keystone of a rust-coloured bridge on the middle island.",
+  },
+  win: {
+    src: "/assets/art/island-win.webp", w: 440, h: 470,
+    x: 0, y: 545, width: 410, depth: 1,
+    alt: "The near island, with a ramp rising toward the bridge.",
+  },
+};
+
+/** Where each island's surface sits, in box units: the route's stops. */
+export const STOPS: Record<IslandId, { x: number; y: number }> = {
+  win: { x: 175, y: 800 },
+  run: { x: 560, y: 452 },
+  see: { x: 875, y: 205 },
 };
 
 /**
- * Mobile camera frames: which point of the art (fractions of 1536×1024) sits
- * at the frame's focus, and how far the camera zooms in.
+ * The climbing route, win → run → see: up Win's ramp to the keystone under the
+ * bear's paws, along the deck, then up past the bear's back to See.
  */
-export const FRAMES: Record<IslandId, { ax: number; ay: number; s: number }> = {
-  win: { ax: 0.15, ay: 0.6, s: 2.05 },
-  run: { ax: 0.56, ay: 0.53, s: 1.4 },
-  see: { ax: 0.87, ay: 0.62, s: 2.1 },
+export const ROUTE =
+  "M 175 800 C 250 770 320 640 400 560 C 450 510 500 468 560 452 C 640 440 770 478 838 466 C 884 420 892 290 875 205";
+
+/** Label anchors, % of the scene box, and which side of the anchor they sit on. */
+export const PIECE_LABELS: Record<IslandId, { x: number; y: number; align: "start" | "center" | "end" }> = {
+  win: { x: 5, y: 93, align: "start" },
+  run: { x: 67, y: 93, align: "center" },
+  see: { x: 99, y: -3, align: "end" },
 };
