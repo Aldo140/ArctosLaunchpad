@@ -1361,6 +1361,74 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
     text-underline-offset: 4px;
   }
 
+  /* ---- pause: a quiet control, a full-size target ---- */
+
+  .hero__demo-frame {
+    position: relative;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+
+  /* bottom-right of the stage, in the open corner under the dashboard */
+  .demo-pause {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 7;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .demo-pause::before {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition: box-shadow 0.3s;
+  }
+
+  .demo-pause:hover::before,
+  .demo-pause:focus-visible::before {
+    box-shadow: inset 0 0 0 1px var(--fg);
+  }
+
+  /* two bars while playing; a triangle once held */
+  .demo-pause__icon {
+    width: 9px;
+    height: 10px;
+    border-inline: 3px solid currentColor;
+  }
+
+  .demo-pause.is-held .demo-pause__icon {
+    width: 0;
+    height: 0;
+    margin-left: 3px;
+    border-block: 5.5px solid transparent;
+    border-inline: 9px solid currentColor;
+    border-inline-end: 0;
+  }
+
+  /* one line always: the label never wraps, the clock takes what is left */
+  .demo-leads .demo-k {
+    white-space: nowrap;
+  }
+
+  .demo-clock {
+    margin-left: auto;
+    color: var(--faint);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
   /* ---- the automation's reply, written live ---- */
 
   .demo-mail {
@@ -1519,6 +1587,11 @@ html.js-motion .hero:not([data-intro="pending"]) .hero__comet {
 @media (prefers-reduced-motion: reduce) {
   .demo-card {
     will-change: auto;
+  }
+
+  /* nothing moves on its own, so there is nothing to pause */
+  .demo-pause {
+    display: none;
   }
 
   /* the finished state: the lead is in and followed up */

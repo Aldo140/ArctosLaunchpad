@@ -456,12 +456,23 @@ export function BridgeHero() {
       tl.from(".demo-phone", { opacity: 0, x: -50, rotationY: 50, z: -200, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.45)
         .from(".demo-leads", { opacity: 0, x: 50, rotationY: -40, z: -160, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.6)
         .from(".demo-dash", { opacity: 0, y: 60, rotationX: 40, z: -120, filter: "blur(10px)", duration: 1.5, ease: "expo.out", clearProps: "filter" }, 0.75)
+        // the dashboard arrives already counting: the week rolls up to today
+        .from(".demo-bars i", { height: 0, duration: 0.7, ease: "back.out(1.6)", stagger: 0.06 }, 1)
+        .fromTo({ v: 0 }, { v: 0 }, {
+          v: DEMO_START_COUNT,
+          duration: 1,
+          ease: "power2.out",
+          onUpdate() {
+            count.textContent = String(Math.round(this.targets()[0].v));
+          },
+        }, 0.95)
         .from(".hero__copy .actions", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1)
         .from(".hero__lead", { opacity: 0, y: 18, duration: 1, ease: "expo.out" }, 1.1)
         .call(() => {
           el.dataset.intro = "done";
           drawRoutes();
-          story.play(0);
+          if (held) story.pause(0);
+          else story.play(0);
         }, [], 1.7);
 
       // ---- one enquiry, end to end ----------------------------------------
@@ -572,6 +583,20 @@ export function BridgeHero() {
           userDone = true;
           gsap.fromTo(".demo-nudge", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "expo.out", delay: 0.3 });
         }, [], 5.4)
+        // the visitor's own row stays on the board for the rest of the visit
+        .call(() => {
+          if (!userTurn) return;
+          const kept = newRow.cloneNode(true) as HTMLElement;
+          kept.classList.remove("demo-row--new");
+          kept.removeAttribute("style");
+          kept.querySelector<HTMLElement>(".demo-pill__a")?.setAttribute("style", "opacity:0");
+          kept.querySelector<HTMLElement>(".demo-pill__b")?.setAttribute("style", "opacity:1");
+          newRow.after(kept);
+          // keep the board at three rows: the oldest one makes room
+          const rows = newRow.parentElement!.querySelectorAll(".demo-row:not(.demo-row--new)");
+          if (rows.length > 2) rows[rows.length - 1].remove();
+          gsap.from(kept, { backgroundColor: "rgba(229,122,66,0.25)", duration: 1.2, ease: "power2.out" });
+        }, [], 6.85)
         // reset for the next client
         .to(newRow, { height: 0, opacity: 0, duration: 0.4, ease: "power2.in" }, 6.9)
         .call(() => {
@@ -668,8 +693,9 @@ export function BridgeHero() {
       gsap.set(".demo-bear", { yPercent: 70, opacity: 0 });
 
       // ---- the aurora never quite holds still ------------------------------
+      const loops: gsap.core.Tween[] = [];
       gsap.utils.toArray<HTMLElement>(".hero__aurora i", el).forEach((band, i) => {
-        gsap.to(band, {
+        loops.push(gsap.to(band, {
           xPercent: i % 2 ? -14 : 12,
           skewX: i % 2 ? 8 : -10,
           scaleY: 1.18,
@@ -679,13 +705,57 @@ export function BridgeHero() {
           yoyo: true,
           repeat: -1,
           delay: 2 + i * 0.6,
-        });
+        }));
       });
 
       // ---- the screens float, each on its own rhythm ------------------------
       gsap.utils.toArray<HTMLElement>(".demo-card", stage).forEach((card, i) => {
-        gsap.to(card, { y: -5 - i * 2, duration: 3.2 + i * 0.6, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 2 + i * 0.3 });
+        loops.push(gsap.to(card, { y: -5 - i * 2, duration: 3.2 + i * 0.6, ease: "sine.inOut", yoyo: true, repeat: -1, delay: 2 + i * 0.3 }));
       });
+
+      // ---- scrolling away: the screens drift apart, like a camera pulling back
+      gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 0.5 },
+      })
+        .to(".demo-phone", { xPercent: -14, rotationZ: -4 }, 0)
+        .to(".demo-leads", { xPercent: 10, yPercent: -12, rotationZ: 3 }, 0)
+        .to(".demo-dash", { yPercent: 22 }, 0)
+        .to(".hero__aurora", { yPercent: 12, opacity: 0.4 }, 0);
+
+      // ---- the clock on the leads board is the visitor's own ----------------
+      const clock = $(".demo-clock");
+      const tick = () => {
+        const now = new Date();
+        clock.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        clock.setAttribute("datetime", now.toISOString());
+      };
+      tick();
+      const clockTimer = window.setInterval(tick, 30_000);
+
+      // ---- pause: one control holds everything that moves on its own --------
+      let held = false;
+      let inView = true;
+      const pauseBtn = el.querySelector<HTMLButtonElement>(".demo-pause");
+      const resume = () => {
+        if (held || !inView || document.hidden || el.dataset.intro !== "done") return;
+        story.play();
+      };
+      const onPause = () => {
+        held = !held;
+        pauseBtn?.setAttribute("aria-pressed", String(held));
+        pauseBtn?.setAttribute("aria-label", held ? "Play the animation" : "Pause the animation");
+        pauseBtn?.classList.toggle("is-held", held);
+        loops.forEach((t) => (held ? t.pause() : t.resume()));
+        window.dispatchEvent(new CustomEvent("arctos:hero-hold", { detail: held }));
+        if (held) story.pause();
+        else resume();
+      };
+      pauseBtn?.addEventListener("click", onPause);
+
+      // ---- a background tab costs nothing ------------------------------------
+      const onVisibility = () => (document.hidden ? story.pause() : resume());
+      document.addEventListener("visibilitychange", onVisibility);
 
       const onResize = () => {
         drawRoutes();
@@ -698,13 +768,17 @@ export function BridgeHero() {
         start: "top bottom",
         end: "bottom top",
         onToggle: (self) => {
+          inView = self.isActive;
           if (el.dataset.intro !== "done") return;
-          if (self.isActive) story.play();
+          if (self.isActive) resume();
           else story.pause();
         },
       });
 
       return () => {
+        window.clearInterval(clockTimer);
+        pauseBtn?.removeEventListener("click", onPause);
+        document.removeEventListener("visibilitychange", onVisibility);
         window.removeEventListener("resize", onResize);
         stage.removeEventListener("pointerdown", down);
         stage.removeEventListener("pointermove", move);

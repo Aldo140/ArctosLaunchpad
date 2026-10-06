@@ -67,8 +67,9 @@ export function Snow() {
       frame = requestAnimationFrame(tick);
     };
 
+    let held = false;
     const start = () => {
-      if (running || !small.matches || still.matches) return;
+      if (running || held || !small.matches || still.matches) return;
       running = true;
       last = 0;
       frame = requestAnimationFrame(tick);
@@ -77,6 +78,14 @@ export function Snow() {
       running = false;
       cancelAnimationFrame(frame);
     };
+
+    // The hero's pause button holds the snow too.
+    const onHold = (e: Event) => {
+      held = (e as CustomEvent<boolean>).detail;
+      if (held) stop();
+      else start();
+    };
+    window.addEventListener("arctos:hero-hold", onHold);
 
     const seen = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()));
     const onResize = () => {
@@ -91,6 +100,7 @@ export function Snow() {
     return () => {
       stop();
       seen.disconnect();
+      window.removeEventListener("arctos:hero-hold", onHold);
       window.removeEventListener("resize", onResize);
       small.removeEventListener("change", onResize);
     };
