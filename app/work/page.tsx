@@ -6,7 +6,8 @@ import { WorkIndex } from "@/components/site/WorkIndex";
 import { WorkHero } from "@/components/site/work/WorkHero";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Work",
+  title: "Our Work: Website & Software Case Studies | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Calgary web design and software case studies: client websites, nonprofit platforms, an events operations system, and the studio's own products.",
   path: "/work",

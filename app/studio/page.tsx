@@ -10,7 +10,8 @@ import { StudioPrinciples } from "@/components/site/studio/StudioPrinciples";
 import { StudioTogether, type TogetherItem } from "@/components/site/studio/StudioTogether";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Studio",
+  title: "About Arctos Launchpad | Calgary Digital Studio",
+  absoluteTitle: true,
   description:
     "Arctos Launchpad is a Calgary studio connecting websites, design, software, automation and reporting around how a business actually works.",
   path: "/studio",

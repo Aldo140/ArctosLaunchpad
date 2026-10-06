@@ -9,10 +9,12 @@ import { TerrainSvg } from "@/components/site/industries/TerrainSvg";
 import { workIn } from "@/components/site/industries/data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Industries",
+  title: "Websites & Software by Industry | Arctos Launchpad",
+  absoluteTitle: true,
   description:
-    "Websites, software and automation shaped around the operating realities of healthcare, manufacturing, nonprofits, trades, real estate, hospitality, events and more.",
+    "Websites, software and automation shaped around how healthcare, manufacturing, nonprofits, trades, real estate, hospitality and events teams work.",
   path: "/industries",
+  cardTitle: "Industries",
 });
 
 export default function IndustriesPage() {

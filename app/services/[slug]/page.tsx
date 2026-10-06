@@ -39,8 +39,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sheet = getServicePageBySlug((await params).slug);
   if (!sheet) return {};
+  // "Custom Software Services" matches how buyers search; a name that already
+  // ends in a service noun ("... Consulting") is left as it is.
+  const searchTitle = /Consulting$/.test(sheet.title) ? sheet.title : `${sheet.title} Services`;
   return pageMetadata({
-    title: sheet.title,
+    title: searchTitle,
     description: sheet.metaDescription || sheet.summary,
     path: sheet.route,
     eyebrow: getIslandForStage(sheet.stage).name,

@@ -30,8 +30,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = getProjectBySlug((await params).slug);
   if (!project) return {};
+  const kind = { "client-site": "Website", platform: "Platform", studio: "Studio Product" }[project.category];
+  const searchTitle = `${project.title}: ${kind} Case Study`;
   return pageMetadata({
-    title: project.title,
+    // Long project names drop the studio suffix rather than get truncated.
+    title: searchTitle.length > 41 ? `${searchTitle} | Arctos` : searchTitle,
+    absoluteTitle: searchTitle.length > 41,
     description: project.summary,
     path: project.route,
     eyebrow: project.statusLabel,

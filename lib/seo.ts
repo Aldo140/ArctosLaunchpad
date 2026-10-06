@@ -149,6 +149,8 @@ export function organizationSchema() {
     description:
       "A Calgary digital growth and technology studio connecting marketing, websites, software, automation, and reporting into one system.",
     slogan: "The system behind the work you repeat.",
+    logo: `${SITE_URL}/icon.png`,
+    image: `${SITE_URL}/icon.png`,
     address: ADDRESS,
     areaServed: AREA_SERVED,
     knowsAbout: servicePages.map((service) => service.title),

@@ -37,7 +37,8 @@ import {
 import { ServicesFx } from "@/components/site/services/ServicesFx";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Services",
+  title: "Web Design, Software & Automation Services | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Websites, search and paid media to win customers; automation, integrations and custom software to run the work; dashboards and reporting to see the numbers.",
   path: "/services",

@@ -10,7 +10,8 @@ import { Lines, TextLink, d } from "@/components/site/ui";
 import { Nudge } from "@/components/site/Nudge";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Process",
+  title: "Our Website & Software Project Process | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Understand the business, map where the work gets stuck, design the right system, build and launch it, then improve it in daily use.",
   path: "/process",

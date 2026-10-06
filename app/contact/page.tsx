@@ -5,7 +5,8 @@ import { Crumbs, JsonLd } from "@/components/site/Page";
 import { Lines, TextLink, d } from "@/components/site/ui";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Start a project",
+  title: "Contact Arctos Launchpad | Start a Project",
+  absoluteTitle: true,
   description:
     "Start a project with a Calgary web design and software studio. Tell Arctos what you need: more enquiries, less manual work, or software that fits.",
   path: "/contact",
