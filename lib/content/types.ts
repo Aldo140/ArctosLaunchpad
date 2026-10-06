@@ -132,6 +132,8 @@ export type IndustryPage = {
   slug: string;
   route?: `/industries/${string}`;
   title: string;
+  /** Full `<title>` phrased the way owners in this industry search; keep it under ~60 characters. */
+  seoTitle: string;
   headline: string;
   summary: string;
   challenges: string[];

@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Custom Software Development Calgary | Apps and Portals",
+  title: "Custom Software Development Calgary | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Custom software development in Calgary: web apps, client portals, internal tools, and workflow systems built around how your business operates.",
   path: "/calgary-custom-software",

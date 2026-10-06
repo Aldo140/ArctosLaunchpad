@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI Development Calgary | AI Automation and Consulting",
+  title: "AI Development & Consulting Calgary | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "AI development and consulting in Calgary: enquiry routing, document classification, summarisation, and AI workflows with a person approving what matters.",
   path: "/calgary-ai-development",

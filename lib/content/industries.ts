@@ -13,6 +13,7 @@ export const industryPages: IndustryPage[] = [
     slug: "healthcare-dental",
     route: "/industries/healthcare-dental",
     title: "Healthcare and dental",
+    seoTitle: "Dental & Healthcare Intake and Websites | Arctos Launchpad",
     headline:
       "Clearer patient and client journeys, with better systems behind them.",
     summary:
@@ -35,6 +36,7 @@ export const industryPages: IndustryPage[] = [
     slug: "manufacturing",
     route: "/industries/manufacturing",
     title: "Manufacturing",
+    seoTitle: "Manufacturing Websites, Quoting & Reporting | Arctos Launchpad",
     headline:
       "Connect a specialized offering to the workflow that delivers it.",
     summary:
@@ -57,6 +59,7 @@ export const industryPages: IndustryPage[] = [
     slug: "nonprofits",
     route: "/industries/nonprofits",
     title: "Nonprofits",
+    seoTitle: "Nonprofit Websites, Intake & Reporting | Arctos Launchpad",
     headline:
       "Useful digital services for the people and communities you support.",
     summary:
@@ -79,6 +82,7 @@ export const industryPages: IndustryPage[] = [
     slug: "construction-trades",
     route: "/industries/construction-trades",
     title: "Construction and trades",
+    seoTitle: "Contractor Websites & Quote Automation | Arctos Launchpad",
     headline:
       "Move enquiries, quotes, approvals, and project information with less friction.",
     summary:
@@ -101,6 +105,7 @@ export const industryPages: IndustryPage[] = [
     slug: "real-estate",
     route: "/industries/real-estate",
     title: "Real estate",
+    seoTitle: "Real Estate Lead Follow-Up & Websites | Arctos Launchpad",
     headline: "Turn property interest into an organized customer workflow.",
     summary:
       "Listing enquiries, applications and follow-up in one tracked workflow, instead of scattered inboxes.",
@@ -122,6 +127,7 @@ export const industryPages: IndustryPage[] = [
     slug: "professional-services",
     route: "/industries/professional-services",
     title: "Professional services",
+    seoTitle: "Professional Services Websites & Intake | Arctos Launchpad",
     headline: "Make expertise easier to find, understand, and engage.",
     summary:
       "Clear positioning, search pages and an intake process that carry a prospect from research to a first conversation.",
@@ -142,6 +148,7 @@ export const industryPages: IndustryPage[] = [
   {
     slug: "saas",
     title: "SaaS",
+    seoTitle: "SaaS Websites & Acquisition Reporting | Arctos Launchpad",
     headline:
       "Connect product communication, acquisition, and operating insight.",
     summary:
@@ -163,6 +170,7 @@ export const industryPages: IndustryPage[] = [
   {
     slug: "hospitality",
     title: "Hospitality",
+    seoTitle: "Restaurant & Hospitality Websites | Arctos Launchpad",
     headline:
       "Create a digital experience with enough character to be remembered.",
     summary:
@@ -183,6 +191,7 @@ export const industryPages: IndustryPage[] = [
   {
     slug: "events-experiential-marketing",
     title: "Events and experiential marketing",
+    seoTitle: "Event Marketing Reporting & Signups | Arctos Launchpad",
     headline: "See what happens after the event interaction.",
     summary:
       "Signups, event codes and team results pulled into one report, instead of one spreadsheet per activation.",
@@ -202,6 +211,7 @@ export const industryPages: IndustryPage[] = [
   {
     slug: "financial-insurance-services",
     title: "Financial and insurance services",
+    seoTitle: "Financial & Insurance Websites and CRM | Arctos Launchpad",
     headline: "Make complex services and customer workflows clearer.",
     summary:
       "Plain-language service pages, structured intake and CRM follow-up for services with a lot of fine print.",

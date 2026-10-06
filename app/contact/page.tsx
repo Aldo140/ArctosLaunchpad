@@ -7,7 +7,7 @@ import { Lines, TextLink, d } from "@/components/site/ui";
 export const metadata: Metadata = pageMetadata({
   title: "Start a project",
   description:
-    "Tell Arctos what your business needs: more enquiries, less manual work, software that fits, or reporting you can trust. Start with the problem, not a technical brief.",
+    "Start a project with a Calgary web design and software studio. Tell Arctos what you need: more enquiries, less manual work, or software that fits.",
   path: "/contact",
   cardTitle: "What needs to connect?",
 });

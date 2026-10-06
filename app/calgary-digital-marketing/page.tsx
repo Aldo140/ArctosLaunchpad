@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Digital Marketing Calgary | Google Ads and Lead Generation",
+  title: "Calgary Digital Marketing & Google Ads | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Digital marketing and lead generation in Calgary: Google Ads, paid social, landing pages, CRM lead routing, and reporting tied to real enquiries.",
   path: "/calgary-digital-marketing",

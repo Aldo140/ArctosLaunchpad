@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "How Arctos Launchpad handles project enquiry and website information.",
+    "How Arctos Launchpad, a Calgary web design and software studio, collects, uses, and protects project enquiry and website information.",
   alternates: { canonical: "/privacy" },
 };
 

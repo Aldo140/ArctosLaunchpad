@@ -8,7 +8,7 @@ import { WorkHero } from "@/components/site/work/WorkHero";
 export const metadata: Metadata = pageMetadata({
   title: "Work",
   description:
-    "Client websites, civic and nonprofit platforms, an events operations system, an internal reporting tool and the studio's own products, each labelled for exactly what it is.",
+    "Calgary web design and software case studies: client websites, nonprofit platforms, an events operations system, and the studio's own products.",
   path: "/work",
   cardTitle: "Proof, not promises.",
 });

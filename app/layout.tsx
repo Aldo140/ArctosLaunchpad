@@ -29,7 +29,7 @@ const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Arctos Launchpad | Calgary Web Design, Custom Software and Automation",
+    default: "Arctos Launchpad | Calgary Web Design, Software & Automation",
     template: "%s | Arctos Launchpad",
   },
   description:

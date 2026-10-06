@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "App Development Calgary | Web and Mobile Apps",
+  title: "App Development Calgary: Web & Mobile | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "App development in Calgary: web apps, progressive web apps, and cross-platform mobile apps, from first release to the version real users depend on.",
   path: "/calgary-app-development",

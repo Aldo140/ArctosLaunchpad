@@ -52,6 +52,12 @@ export function ogImageUrl(title: string, eyebrow?: string) {
 type PageMetaInput = {
   /** Feeds `<title>`; the root template appends the studio name. */
   title: string;
+  /**
+   * Use `title` as the whole `<title>`, skipping the template. For keyword
+   * titles that already name the studio and would pass ~60 characters (where
+   * Google truncates) once the suffix was added.
+   */
+  absoluteTitle?: boolean;
   /** Under 160 characters, specific to this page. */
   description: string;
   /** Canonical path, e.g. `/services/custom-software`. */
@@ -66,6 +72,7 @@ type PageMetaInput = {
 
 export function pageMetadata({
   title,
+  absoluteTitle,
   description,
   path,
   eyebrow,
@@ -78,7 +85,7 @@ export function pageMetadata({
   const image = ogImageUrl(headline, eyebrow);
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical: path },
     openGraph: {

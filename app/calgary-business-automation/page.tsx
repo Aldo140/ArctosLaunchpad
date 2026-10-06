@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Business Automation Calgary | Workflow Automation",
+  title: "Business Automation Calgary | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Business process automation in Calgary: workflows, forms, approvals, follow-up, and integrations that remove manual admin and spreadsheet work.",
   path: "/calgary-business-automation",

@@ -24,10 +24,11 @@ const CHECKED_ISO = "2026-10-06";
 
 const TITLE = "Funding for Websites, Software and AI in Calgary and Alberta (2026)";
 const DESCRIPTION =
-  "Which grants and loans can help a Calgary business pay for software, AI, or digital projects in 2026: BDC LIFT, Alberta Innovates, IRAP, SR&ED, and what replaced CDAP.";
+  "Grants and loans that help Calgary businesses pay for software, AI, and digital projects in 2026: BDC LIFT, Alberta Innovates, IRAP, SR&ED, and CDAP.";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Calgary and Alberta Funding for Software and AI (2026 Guide)",
+  title: "Alberta Funding for Software & AI (2026) | Arctos Launchpad",
+  absoluteTitle: true,
   description: DESCRIPTION,
   path: PATH,
   eyebrow: "Guide",

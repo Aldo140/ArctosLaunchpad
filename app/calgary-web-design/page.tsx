@@ -3,7 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import { LocalBrief } from "@/components/LocalBrief";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Web Design Calgary | Website Design and Development",
+  title: "Calgary Web Design & Development | Arctos Launchpad",
+  absoluteTitle: true,
   description:
     "Calgary web design and development: conversion-focused websites for growing businesses, connected to lead capture, CRM workflows, and analytics.",
   path: "/calgary-web-design",
