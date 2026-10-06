@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { calgaryLandingPages, industries, projects, services } from "@/lib/content";
+import { calgaryLandingPages, industries, projects, services, type Project } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -21,6 +21,21 @@ const routes = [
   readonly [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]]
 >;
 
+/**
+ * Every real image a case study shows, so Google Images can index the work
+ * with the alt text already written for it. De-duplicated, absolute URLs.
+ */
+function caseStudyImages(project: Project): string[] {
+  const srcs = [
+    project.featuredImage,
+    project.phone,
+    ...(project.showcaseMedia ?? []).map((m) => m.src),
+    ...(project.caseMedia ?? []).map((m) => m.src),
+    ...(project.specimens ?? []).map((m) => m.src),
+  ].filter((src): src is string => Boolean(src) && !/\.(mp4|webm)$/i.test(src!));
+  return [...new Set(srcs)].map((src) => `${siteUrl}${src}`);
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticEntries: MetadataRoute.Sitemap = routes.map(
     ([path, priority, changeFrequency]) => ({
@@ -36,10 +51,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       changeFrequency: "monthly" as const,
     })),
-    ...projects.map(({ slug }) => ({
-      url: `${siteUrl}/work/${slug}`,
+    ...projects.map((project) => ({
+      url: `${siteUrl}/work/${project.slug}`,
       priority: 0.7,
       changeFrequency: "monthly" as const,
+      images: caseStudyImages(project),
     })),
     ...calgaryLandingPages.map(({ route }) => ({
       url: `${siteUrl}${route}`,
