@@ -34,6 +34,8 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr);
   gap: 20px clamp(32px, 5vw, 80px);
   align-items: end;
+  /* The title sizes against this (see below). */
+  container-type: inline-size;
 }
 
 .st-hero__copy > .crumbs,
@@ -42,7 +44,10 @@
 }
 
 .st-hero__title {
-  font-size: clamp(3rem, 0.9rem + 6.6vw, 8.4rem);
+  /* Two lines by design. The title only has ~62% of the copy row, and on wide
+     screens the vw size outgrew it: "Good thinking." and "Useful things."
+     each broke in two. 9.2cqi keeps the longer line inside its column. */
+  font-size: min(clamp(3rem, 0.9rem + 6.6vw, 8.4rem), 9.2cqi);
   line-height: 0.9;
 }
 

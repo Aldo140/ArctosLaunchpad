@@ -60,8 +60,12 @@ export function StudioHero({ crumbs }: { crumbs: ReactNode }) {
       // "Useful things." lands in order, the way the machine stacks them.
       if (title) {
         const [l1, l2] = Array.from(title.querySelectorAll<HTMLElement>(".st-hero__ln"));
-        const s1 = new SplitText(l1, { type: "chars", charsClass: "st-ch" });
-        const s2 = new SplitText(l2, { type: "chars", charsClass: "st-ch" });
+        // Words first, then chars: chars alone are loose inline-blocks, so
+        // the browser broke lines mid-word ("Good t / hinking.") and the
+        // space between words collapsed ("Usefulthings.").
+        const split = { type: "words,chars", wordsClass: "st-w", charsClass: "st-ch" };
+        const s1 = new SplitText(l1, split);
+        const s2 = new SplitText(l2, split);
         gsap.set(title, { autoAlpha: 1 });
         const tl = gsap.timeline({ delay: 0.15 });
         tl.from(s1.chars, {
