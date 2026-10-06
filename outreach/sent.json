@@ -1,0 +1,16 @@
+[
+  {
+    "email": "info@flexcabinet.ca",
+    "business": "Flex Cabinets & Millwork",
+    "subject": "Quotes and job tracking at Flex",
+    "at": "2026-10-06T20:44:34.292Z",
+    "messageId": "<202610062044.47067848561@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@crowncabinets.ca",
+    "business": "Crown Custom Cabinetry",
+    "subject": "Tracking custom cabinet jobs at Crown",
+    "at": "2026-10-06T20:44:34.292Z",
+    "messageId": "<202610062044.26258565511@smtp-relay.mailin.fr>"
+  }
+]
