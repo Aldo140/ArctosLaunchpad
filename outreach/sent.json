@@ -516,5 +516,75 @@
     "subject": "Cakes, finger foods and dietary notes",
     "at": "2026-10-07T18:30:46.163Z",
     "messageId": "<202610071830.90417262573@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@flyershop.com",
+    "business": "Flyer Shop",
+    "subject": "Forty years of print orders",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.84398443594@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "catering.yumyum@gmail.com",
+    "business": "Yum Yum Catering",
+    "subject": "Catering orders at Yum Yum",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.82755993235@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@summitsigns.ca",
+    "business": "Summit Signs",
+    "subject": "Sign jobs since 1972",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.48403859575@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "corinna@personalthyme.ca",
+    "business": "Personal Thyme",
+    "subject": "Catering and private chef requests",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.32865563253@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@totalsignworks.ca",
+    "business": "Total SignWorks",
+    "subject": "From sign quote to install",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.98455505628@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@greateventscatering.ca",
+    "business": "Great Events Catering",
+    "subject": "Event orders since 1982",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.98442549327@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@neonyyc.ca",
+    "business": "Neon YYC",
+    "subject": "How custom neon orders reach you",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.86573337957@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@southproauto.ca",
+    "business": "South Pro Automotive",
+    "subject": "Work orders at South Pro",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.54433648987@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@mobilesignscalgary.com",
+    "business": "Mobile Signs Calgary",
+    "subject": "Rentals, messages and dates",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.33571388375@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "performanceautocalgaryinc@gmail.com",
+    "business": "Performance Auto Calgary",
+    "subject": "Quick question about repair bookings",
+    "at": "2026-10-07T19:58:34.335Z",
+    "messageId": "<202610071958.88889451791@smtp-relay.mailin.fr>"
   }
 ]
