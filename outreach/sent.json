@@ -306,5 +306,75 @@
     "subject": "How detailing bookings reach you",
     "at": "2026-10-06T21:03:42.846Z",
     "messageId": "<202610062103.85857872175@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@kingsglass.com",
+    "business": "King's Glass",
+    "subject": "Shower glass jobs from measure to install",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.38567085780@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@17thavenueframing.com",
+    "business": "17th Avenue Framing",
+    "subject": "Framing orders on 17th Avenue",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.63914666956@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@cascadeglass.ca",
+    "business": "Cascade Glass",
+    "subject": "A question about tracking glass jobs",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.43991546425@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@framesource.ca",
+    "business": "FrameSource",
+    "subject": "From memorabilia to hotel contracts",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.25482548076@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@bigrigglass.ca",
+    "business": "Big Rig Glass",
+    "subject": "Glazing quotes at Big Rig",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.79293311933@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "getframed@calgarypictureframing.ca",
+    "business": "FrameWorks Custom Framing",
+    "subject": "Shadow boxes, medals and order tracking",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.22157286979@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgarycustomclosets.com",
+    "business": "Calgary Custom Closets",
+    "subject": "Closet designs from consult to install",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.64994324340@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@yycwraps.com",
+    "business": "YYC Wraps",
+    "subject": "PPF and wrap bookings at YYC Wraps",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.97992207036@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@bulltough.ca",
+    "business": "Bull Tough Flooring",
+    "subject": "Hardwood quotes and scheduling",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.73767860816@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "yolacustoms@gmail.com",
+    "business": "Yola Customs",
+    "subject": "Wraps, tint and fleet jobs at Yola",
+    "at": "2026-10-07T15:31:25.636Z",
+    "messageId": "<202610071531.87367871475@smtp-relay.mailin.fr>"
   }
 ]
