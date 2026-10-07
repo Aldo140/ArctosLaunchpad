@@ -586,5 +586,75 @@
     "subject": "Quick question about repair bookings",
     "at": "2026-10-07T19:58:34.335Z",
     "messageId": "<202610071958.88889451791@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@rustykdesign.ca",
+    "business": "Rustyk Design",
+    "subject": "Custom furniture orders at Rustyk",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.46099929332@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@raybernmotors.ca",
+    "business": "Raybern Motors",
+    "subject": "German and Japanese repairs since 1974",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.55109065273@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@fallentimberfurniture.ca",
+    "business": "Fallen Timber Furniture",
+    "subject": "Dining table commissions",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.38172941159@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@glenmorealterations.com",
+    "business": "Glenmore Alterations",
+    "subject": "Bridal fittings and alteration tickets",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.20498181056@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "outofthewoodworkyyc@gmail.com",
+    "business": "Out Of The Woodwork",
+    "subject": "Custom pieces since 2015",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.55530780055@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "contact@annasalterations.ca",
+    "business": "Anna's Alterations",
+    "subject": "Alteration orders since 1982",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.40088527682@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "len@refinedrusticfurniture.com",
+    "business": "Refined Rustic Furniture",
+    "subject": "Furniture orders and lumber sales",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.25409052986@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgarytailor.ca",
+    "business": "Dave's Custom Tailoring",
+    "subject": "Tracking suit alterations",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.19364286765@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgarywoodworks.ca",
+    "business": "Calgary Wood Works",
+    "subject": "Quick question about table orders",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.33907122858@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@urbansquaredevelopments.com",
+    "business": "Urban Square Developments",
+    "subject": "Basement projects from estimate to handover",
+    "at": "2026-10-07T20:01:19.003Z",
+    "messageId": "<202610072001.34591341865@smtp-relay.mailin.fr>"
   }
 ]
