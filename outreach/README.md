@@ -22,4 +22,5 @@ custom bakeries).
 
 ## Batches
 
-- `batch-2026-10-06.json` — 15 businesses, queued for the workflow.
+- `batch-2026-10-06.json`, `batch-2026-10-06b.json` — 44 businesses, sent 2026-10-06.
+- `batch-2026-10-07.json` — 50 businesses (glass, closets, flooring, millwork, welding, print, signs, furniture, framing, wraps, landscaping, cakes, catering, auto repair, tailoring).
