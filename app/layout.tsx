@@ -3,6 +3,7 @@ import "./globals.css";
 import { fontClass } from "./fonts";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SiteChrome } from "@/components/site/SiteChrome";
 import { ConversionTracking } from "@/components/site/ConversionTracking";
 import { Analytics } from "@vercel/analytics/next";
 import { Motion } from "@/components/site/Motion";
@@ -99,12 +100,16 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Header />
+        <SiteChrome>
+          <Header />
+        </SiteChrome>
         <main id="main">
           <Motion />
           {children}
         </main>
-        <Footer />
+        <SiteChrome>
+          <Footer />
+        </SiteChrome>
         <ConversionTracking />
         {/* Only Vercel serves the analytics endpoint; elsewhere it would 404. */}
         {process.env.VERCEL ? <Analytics /> : null}

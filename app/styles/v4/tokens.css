@@ -111,3 +111,14 @@
   --btn-bg: var(--ink);
   --btn-fg: var(--paper);
 }
+
+/* HQ (/hq, the private operations dashboard). Status colours are reserved for
+   state (ok / needs a look / blocked) and always ship with a label; checked
+   at 6.8:1 or better on --ink-2. */
+.hq {
+  --hq-ok: #8fb3a4;
+  --hq-warn: #f0b456;
+  --hq-bad: #ff8a7a;
+  --hq-bar: var(--rust-hi);
+  --hq-grid: rgb(241 235 223 / 0.08);
+}
