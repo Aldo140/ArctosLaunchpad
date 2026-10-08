@@ -1,0 +1,56 @@
+name: Operations clock
+
+# GitHub runs scheduled workflows late or not at all when it is busy: in one
+# day the four-times-an-hour ops schedule fired 4 times out of 96. This clock
+# keeps time instead. One run stays awake for just under six hours, starts
+# Operations hourly at :07 and :37 and Operations daily at 3, 6, 7 and 8 am
+# Calgary (09, 12, 13, 14 UTC), then starts the next clock before it ends.
+# Its own schedule only restarts the chain if it ever breaks. A dispatch made
+# with the workflow's token is one of the few events GitHub lets start a run.
+# Public repository: runner minutes are free.
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+# Exactly one clock at a time; a second one waits until the first hands over.
+concurrency:
+  group: ops-clock
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - name: Keep time
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          READY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.IG_TOKEN_CALGARYDAILY != '' }}
+        run: |
+          if [ "$READY" != true ]; then
+            echo "::notice title=Clock idle::The ops secrets aren't in this repository yet."
+            exit 0
+          fi
+          start() { gh workflow run "$1" && echo "$(date -u +%H:%M) started $1" || echo "::warning::couldn't start $1"; }
+          end=$((SECONDS + 5 * 3600 + 45 * 60))
+          last_hourly=""; last_daily=""
+          while [ "$SECONDS" -lt "$end" ]; do
+            h=$(date -u +%H); m=$((10#$(date -u +%M)))
+            if [ $((m % 30)) -ge 7 ]; then
+              key="$(date -u +%Y%m%d)$h-$((m / 30))"
+              [ "$key" != "$last_hourly" ] && { start ops-hourly.yml; last_hourly=$key; }
+            fi
+            case "$h" in 09|12|13|14)
+              if [ "$m" -ge 5 ]; then
+                key="$(date -u +%Y%m%d)$h"
+                [ "$key" != "$last_daily" ] && { start ops-daily.yml; last_daily=$key; }
+              fi;;
+            esac
+            sleep 60
+          done
+          start ops-clock.yml

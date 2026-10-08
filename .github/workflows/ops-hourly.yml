@@ -1,0 +1,101 @@
+name: Operations hourly
+
+# The ops agents (ops/hourly.ts): apply HQ actions, publish approved Instagram
+# posts that are due, draft briefs and redrafts, read partner replies (opt-outs
+# are honoured at once) and send approved partner email inside the weekday
+# send window. ops-clock.yml starts this every 30 minutes; the schedule below
+# is the backup when the clock is down. Every step is safe to repeat.
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+    inputs:
+      publish_now:
+        description: 'Publish approved posts now instead of waiting for their slot'
+        type: boolean
+        default: false
+
+permissions:
+  # Rendered images and the CalgaryDaily feed go to the ops-media branch.
+  contents: write
+  # Keyless sign-in to arctos-hq.
+  id-token: write
+
+# Two overlapping runs could publish the same post twice; never allow it.
+concurrency:
+  group: ops-hourly
+  cancel-in-progress: false
+
+jobs:
+  ready:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+    steps:
+      - id: check
+        env:
+          HAVE: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.IG_TOKEN_CALGARYDAILY != '' }}
+        run: |
+          echo "ok=$HAVE" >> "$GITHUB_OUTPUT"
+          [ "$HAVE" = true ] || echo "::notice title=Ops not set up yet::Add the ops secrets to this repository (see docs/OPS.md); until then the agents keep running from CalgaryWatch."
+
+  hourly:
+    needs: ready
+    if: needs.ready.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      # The agents' code lives on main; this file also sits on the default branch
+      # (arctos-launchpad), which is where GitHub runs schedules and dispatches.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Make sure ffmpeg is available (Reels)
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      # GitHub's OIDC token is exchanged for short-lived Google credentials; no key is stored.
+      - name: Sign in to arctos-hq
+        id: hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+      # One time only: copies the agents' state from CalgaryWatch and makes CalgaryWatch's agents stand down.
+      - name: Take over from CalgaryWatch
+        run: npm run ops:handoff
+      - name: Apply HQ actions
+        continue-on-error: true
+        run: npm run ops:hq-commands
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+      - name: Publish, draft briefs, sync replies, send approved email
+        run: npm run ops:hourly
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          IG_TOKEN_CALGARYWATCH: ${{ secrets.IG_TOKEN_CALGARYWATCH }}
+          IG_TOKEN_CALGARYDAILY: ${{ secrets.IG_TOKEN_CALGARYDAILY }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          OPS_PUBLISH_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_now && '1' || '' }}
+      - name: Publish the CalgaryDaily feed for calgarywatch.ca
+        continue-on-error: true
+        run: npm run ops:feed
+      - name: Publish the HQ snapshot
+        if: always()
+        continue-on-error: true
+        run: npm run ops:hq
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
