@@ -25,7 +25,8 @@ directly; the database has no client rules.
 `GCP_PROJECT_ID`, `GCP_PROJECT_NUMBER`, `GCP_WORKLOAD_IDENTITY_POOL_ID`,
 `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID`, `GCP_SERVICE_ACCOUNT_EMAIL`,
 `NEXT_PUBLIC_FIREBASE_*` (public identifiers), `HQ_ALLOWED_EMAILS`, `HQ_GMAIL_KEY` and,
-optionally, `ANTHROPIC_API_KEY` (the reply check, below).
+optionally, `ANTHROPIC_API_KEY` (the reply check and the Telegram bot's
+questions, below). The Telegram bot adds `HQ_TELEGRAM_*`.
 
 ## Tabs
 
@@ -104,3 +105,25 @@ the brief and the sign-off.
   The goal (`GYM_GOAL`, 3 a week) and the membership cost (`GYM_MONTHLY`, used
   for cost per visit) live in persona.ts. The card suggests the first free
   90 minutes on today's calendar.
+
+## On your phone (Telegram)
+
+A private Telegram bot answers from the same report. `/today` is the
+briefing, `/inbox` sends each post, pitch and drafted reply as a card with the
+dashboard's buttons (they queue the same `hq_commands`, signed with your email,
+with an Undo until the agents run), and any other text is a question Claude
+answers from the report and the Gmail summary. It can read but not act:
+nothing is approved except by a button. The webhook is
+`app/api/hq/telegram/route.ts`; the messages are `lib/hq/telegramBot.ts`.
+
+Setup, once:
+
+1. In Telegram, message @BotFather, send `/newbot`, and copy the token.
+2. On Vercel (production), add `HQ_TELEGRAM_BOT_TOKEN` (that token),
+   `HQ_TELEGRAM_WEBHOOK_SECRET` (any long random string of letters, digits,
+   `_` or `-`, e.g. `openssl rand -hex 32`) and `ANTHROPIC_API_KEY` (for
+   questions; `ANTHROPIC_WORKSPACE_ID` too if the key needs one). Redeploy.
+3. Run `HQ_TELEGRAM_BOT_TOKEN=… HQ_TELEGRAM_WEBHOOK_SECRET=… node scripts/hq-telegram-webhook.mjs`.
+4. Message the bot. It replies with your Telegram id; add
+   `HQ_TELEGRAM_USERS` = `thatId=you@gmail.com` on Vercel (comma-separate more
+   people) and redeploy. Everyone else only ever sees "This bot is private".
