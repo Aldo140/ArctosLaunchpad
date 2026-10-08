@@ -8,7 +8,7 @@ dashboard. They moved here from the CalgaryWatch repository in October 2026.
 | Workflow | When | What |
 |---|---|---|
 | `ops-clock.yml` | Always on | Keeps time. Starts hourly at :07 and :37 and daily at 3, 6, 7 and 8 am Calgary. GitHub's own schedules run late or not at all, so they are only a backup. |
-| `ops-hourly.yml` | Every 30 min | Applies HQ actions, publishes due posts, reads partner replies, sends approved email, publishes the CalgaryDaily feed and the HQ snapshot. |
+| `ops-hourly.yml` | Every 30 min | Applies HQ actions, publishes due posts, reads partner replies, sends approved email, checks Gmail replies for HQ (`ops/reply-check.ts`), publishes the CalgaryDaily feed and the HQ snapshot. |
 | `ops-daily.yml` | Mornings | Drafts posts, runs the Scout and inspiration analysis, finds leads, drafts pitches, checks health, emails the summary. |
 
 The three workflow files also sit on `arctos-launchpad`, this repository's

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
 import { workflowSummaries } from "@/lib/hq/github";
 import { queryRecent, readStringField } from "@/lib/hq/google";
-import { readDecisions, readTriage } from "@/lib/hq/triageAgent";
+import { readDecisions, readTriage } from "@/lib/hq/triageStore";
 import type { ArctosOutreach, CommandType, GmailSummary, HqCommandRecord, HqResponse, HqSnapshot } from "@/lib/hq/types";
 
 /**
