@@ -726,5 +726,75 @@
     "subject": "Custom arrangements since 1979",
     "at": "2026-10-08T17:00:44.896Z",
     "messageId": "<202610081700.53399759952@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "justine@creativeedgeflowers.com",
+    "business": "Creative Edge Flowers",
+    "subject": "Event orders at Creative Edge",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.37440900829@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@withtheseasons.ca",
+    "business": "With the Seasons",
+    "subject": "Garden-inspired wedding bookings",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.30001801883@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@yvonnesdelightfulcakes.com",
+    "business": "Yvonne's Delightful Cakes",
+    "subject": "Custom cake orders at The District",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.32519739212@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "etienne@etzmownplow.com",
+    "business": "ETZ Mow N Plow",
+    "subject": "Snow season clients at ETZ",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.73348374895@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@rflandscapes.ca",
+    "business": "Rainfall Landscapes",
+    "subject": "Landscape quotes at Rainfall",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.87301366807@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@bannoautorepair.com",
+    "business": "Banno Auto Repair",
+    "subject": "Repair bookings at Banno",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.11359037746@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "tirestarcalgary@gmail.com",
+    "business": "Tire Star",
+    "subject": "Tire bookings at Tire Star",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.19416820723@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "croluxtailoring@outlook.com",
+    "business": "CroLux Tailoring",
+    "subject": "Alterations orders at CroLux",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.68187374751@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "iwf@telus.net",
+    "business": "It's Worth Framing",
+    "subject": "Framing orders on Macleod Trail",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.28963991673@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "designers@allaboutframing.ca",
+    "business": "All About Framing",
+    "subject": "Mobile framing consultations",
+    "at": "2026-10-08T19:56:32.208Z",
+    "messageId": "<202610081956.15981909140@smtp-relay.mailin.fr>"
   }
 ]
