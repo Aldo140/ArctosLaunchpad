@@ -214,8 +214,8 @@ export interface WorkflowSummary {
 /**
  * What the Gmail sync (ops/gmail/hq-sync.gs, an Apps Script inside
  * mrotiz14@gmail.com) reports every 15 minutes: sends from each send-as
- * address and the replies to them, last 30 days. Bodies never leave Gmail;
- * replies carry a short snippet.
+ * address and the replies to them, last 30 days. Replies carry a short
+ * snippet; unanswered real replies also carry their conversation (see thread).
  */
 export type MailBusiness = Business | "other";
 export type ReplyKind = "reply" | "auto" | "optout" | "bounce";

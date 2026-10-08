@@ -54,7 +54,7 @@ export function ReplyCheck({ item }: { item: BoardItem }) {
     return (
       <div className="hq-state" data-sev={error ? "bad" : undefined} role="status">
         <span className="hq-pill">Not checked yet</span>
-        <span>{error ?? "The reply check reads it with the next Gmail sync, within 15 minutes."}</span>
+        <span>{error ?? "The reply check reads it on the agents' next run, within about 15 minutes."}</span>
       </div>
     );
   }

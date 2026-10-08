@@ -19,6 +19,7 @@
     "ops:hourly": "tsx ops/hourly.ts",
     "ops:hq": "tsx ops/hq-snapshot.ts",
     "ops:hq-commands": "tsx ops/hq-commands.ts",
+    "ops:reply-check": "tsx ops/reply-check.ts",
     "ops:feed": "tsx ops/export-feed.ts",
     "ops:index": "tsx ops/fetch-index.ts",
     "ops:preview": "tsx ops/preview.ts",
