@@ -24,9 +24,9 @@ directly; the database has no client rules.
 
 `GCP_PROJECT_ID`, `GCP_PROJECT_NUMBER`, `GCP_WORKLOAD_IDENTITY_POOL_ID`,
 `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID`, `GCP_SERVICE_ACCOUNT_EMAIL`,
-`NEXT_PUBLIC_FIREBASE_*` (public identifiers), `HQ_ALLOWED_EMAILS`, `HQ_GMAIL_KEY` and
-`ANTHROPIC_API_KEY` (the reply check and the Telegram bot, below). The
-Telegram bot adds `HQ_TELEGRAM_*`.
+`NEXT_PUBLIC_FIREBASE_*` (public identifiers), `HQ_ALLOWED_EMAILS`, `HQ_GMAIL_KEY` and,
+optionally, `ANTHROPIC_API_KEY` (the reply check and the Telegram bot's
+questions, below). The Telegram bot adds `HQ_TELEGRAM_*`.
 
 ## Tabs
 
@@ -78,9 +78,11 @@ all" puts one back. Decisions are saved straight away in
 `hq_reply_decisions`; nothing is ever sent. A new reply in the thread, or new
 mail with that person, gets a fresh check.
 
-It needs `ANTHROPIC_API_KEY` (and `ANTHROPIC_WORKSPACE_ID` if the key needs a
-workspace) on Vercel. Without it, every reply shows as before, marked "Not
-checked yet". For the thread context, paste the updated
+It runs in the ops agents' hourly run (`npm run ops:reply-check`, from
+CalgaryWatch's `ops-hourly` until the agents move here), which already has
+`ANTHROPIC_API_KEY`, so there is nothing to set up. If that key is also added
+on Vercel, the check runs straight after each Gmail sync instead of waiting
+for the next run. For the thread context, paste the updated
 `ops/gmail/hq-sync.gs` into the Apps Script project; until then the check
 works from the 240-character snippet.
 

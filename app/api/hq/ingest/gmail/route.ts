@@ -2,15 +2,17 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { writeStringField } from "@/lib/hq/google";
-import { runTriage } from "@/lib/hq/triageAgent";
+import { runTriage, triageConfigured } from "@/lib/hq/triageAgent";
+import { vercelTriageStore } from "@/lib/hq/triageStore";
 import type { GmailSummary } from "@/lib/hq/types";
 
 /**
  * The Gmail sync (ops/gmail/hq-sync.gs) posts here every 15 minutes with the
  * key in HQ_GMAIL_KEY. The summary is stored in arctos-hq (hq/gmail) and read
- * by /api/hq/snapshot; nothing here is public. Once it's saved, the reply
- * check (lib/hq/triageAgent.ts) looks at any reply that is new or whose
- * surroundings changed.
+ * by /api/hq/snapshot; nothing here is public. When ANTHROPIC_API_KEY is set
+ * here, the reply check (lib/hq/triageAgent.ts) then looks at any reply that
+ * is new or whose surroundings changed; without it, the ops agents' hourly
+ * run does (ops/reply-check.ts).
  */
 
 // The reply check runs after the response, inside this function's time.
@@ -70,6 +72,7 @@ export async function POST(request: Request) {
     replies: parsed.data.replies.sort((a, b) => b.at - a.at).slice(0, 400),
   };
   await writeStringField("hq/gmail", "payload", JSON.stringify(summary));
-  after(() => runTriage(summary).catch((e) => console.error(`[reply-check] ${e instanceof Error ? e.message : e}`)));
+  // With a key on Vercel the check runs right away; otherwise the ops agents' hourly run does it.
+  if (triageConfigured()) after(() => runTriage(summary, vercelTriageStore).catch((e) => console.error(`[reply-check] ${e instanceof Error ? e.message : e}`)));
   return NextResponse.json({ ok: true, sends: summary.sends.length, replies: summary.replies.length });
 }

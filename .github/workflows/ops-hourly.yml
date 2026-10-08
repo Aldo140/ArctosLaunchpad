@@ -90,6 +90,14 @@ jobs:
           OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           OPS_PUBLISH_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_now && '1' || '' }}
+      # HQ's reply check: which Gmail replies need you (lib/hq/triage.ts).
+      - name: Check Gmail replies for HQ
+        continue-on-error: true
+        run: npm run ops:reply-check
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
       - name: Publish the CalgaryDaily feed for calgarywatch.ca
         continue-on-error: true
         run: npm run ops:feed
