@@ -9,7 +9,7 @@ const PATHS: Record<string, string> = {
   instagram: "M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM17.3 6.7h.01",
   inspiration: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z",
   pipelines: "M3 5h18l-7 8v6l-4 2v-8z",
-  agents: "M8 8h8v8H8zM5 10H3M5 14H3M21 10h-2M21 14h-2M10 5V3M14 5V3M10 21v-2M14 21v-2M5 5h14v14H5z",
+  tasks: "M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M11 6h9M11 12h9M11 18h9",
   performance: "M4 20V10M10 20V4M16 20v-7M22 20H2",
   health: "M3 12h4l2-6 4 12 2-6h6",
   glossary: "M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11",

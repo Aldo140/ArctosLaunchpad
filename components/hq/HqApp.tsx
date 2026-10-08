@@ -12,12 +12,13 @@ import { InboxView } from "./views/Inbox";
 import { InstagramView } from "./views/Instagram";
 import { InspirationView } from "./views/Inspiration";
 import { PipelinesView } from "./views/Pipelines";
-import { AgentsView } from "./views/Agents";
+import { TasksView } from "./views/Tasks";
+import { evaluateAll } from "./tasks";
 import { PerformanceView } from "./views/Performance";
 import { HealthView } from "./views/Health";
 import { GlossaryView } from "./views/Glossary";
 
-type ViewId = "overview" | "inbox" | "instagram" | "inspiration" | "pipelines" | "agents" | "performance" | "health" | "glossary";
+type ViewId = "overview" | "inbox" | "instagram" | "inspiration" | "pipelines" | "tasks" | "performance" | "health" | "glossary";
 
 const VIEWS: Record<ViewId, { label: string; icon: string; render: () => React.ReactNode }> = {
   overview: { label: "Overview", icon: "overview", render: () => <OverviewView /> },
@@ -25,7 +26,7 @@ const VIEWS: Record<ViewId, { label: string; icon: string; render: () => React.R
   inspiration: { label: "Inspiration", icon: "inspiration", render: () => <InspirationView /> },
   pipelines: { label: "Pipelines", icon: "pipelines", render: () => <PipelinesView /> },
   inbox: { label: "Inbox", icon: "inbox", render: () => <InboxView /> },
-  agents: { label: "Agents", icon: "agents", render: () => <AgentsView /> },
+  tasks: { label: "Tasks", icon: "tasks", render: () => <TasksView /> },
   performance: { label: "Performance", icon: "performance", render: () => <PerformanceView /> },
   health: { label: "Health", icon: "health", render: () => <HealthView /> },
   glossary: { label: "Glossary", icon: "glossary", render: () => <GlossaryView /> },
@@ -34,7 +35,7 @@ const VIEWS: Record<ViewId, { label: string; icon: string; render: () => React.R
 /** The rail follows the Arctos islands. */
 const GROUPS: Array<{ n: string; label: string; views: ViewId[] }> = [
   { n: "01", label: "Win the customer", views: ["instagram", "inspiration", "pipelines"] },
-  { n: "02", label: "Run the work", views: ["inbox", "agents"] },
+  { n: "02", label: "Run the work", views: ["inbox", "tasks"] },
   { n: "03", label: "See the numbers", views: ["performance", "health"] },
 ];
 const TABBAR: ViewId[] = ["overview", "inbox", "instagram", "pipelines"];
@@ -46,7 +47,8 @@ const subscribeHash = (cb: () => void) => {
 
 function useView(): ViewId {
   const h = useSyncExternalStore(subscribeHash, () => window.location.hash.slice(1), () => "");
-  return (h in VIEWS ? h : "overview") as ViewId;
+  const id = h === "agents" ? "tasks" : h;
+  return (id in VIEWS ? id : "overview") as ViewId;
 }
 
 type Toast = { id: number; text: string; undo?: () => void };
@@ -197,10 +199,10 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
       (s?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length +
       (s?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business)).length +
       (s?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand)).length;
-    const agents = (data?.workflows ?? []).filter((w) => w.lastStatus === "failure").length;
+    const tasks = data ? evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length : 0;
     const health = (s?.bottlenecks ?? []).filter((b) => b.severity === "bad").length;
-    return { inbox, agents, health } as Partial<Record<ViewId, number>>;
-  }, [data, filter]);
+    return { inbox, tasks, health } as Partial<Record<ViewId, number>>;
+  }, [data, filter, now]);
 
   const snap = data?.snapshot;
   const age = snap ? now - snap.generatedAt : null;

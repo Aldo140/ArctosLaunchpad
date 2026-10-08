@@ -3,6 +3,7 @@
 import { inFilter, useHq } from "../context";
 import { BUSINESS_LABEL, ago, calgaryParts, cdn, num, plural, short, slot, when } from "../format";
 import { Spark, Stat, Thumb } from "../ui";
+import { evaluateAll } from "../tasks";
 
 export function OverviewView() {
   const { data, now, filter, go } = useHq();
@@ -27,8 +28,10 @@ export function OverviewView() {
   const cw = snap?.pipelines.find((p) => p.business === "calgarywatch");
   const sent30 = (inFilter(filter, "calgarywatch") ? cw?.sent30 ?? 0 : 0) + (inFilter(filter, "arctos") ? data.arctos?.last30 ?? 0 : 0);
   const scheduled = (snap?.posts ?? []).filter((p) => p.status === "approved" && inFilter(filter, p.brand)).sort((a, b) => (a.scheduledFor ?? 0) - (b.scheduledFor ?? 0));
-  const runs = data.workflows ?? [];
-  const failing = runs.filter((r) => r.lastStatus === "failure").length;
+  const tasks = evaluateAll(data, now).filter((t) => inFilter(filter, t.routine.owner) || t.routine.owner === "shared");
+  const tasksDone = tasks.filter((t) => t.state === "confirmed" || t.state === "done").length;
+  const tasksDue = tasks.filter((t) => !["later", "setup", "unknown"].includes(t.state)).length;
+  const failing = tasks.filter((t) => t.state === "failed" || t.state === "missed").length;
   const healthItems = snap?.health?.items ?? [];
   const healthy = healthItems.filter((h) => h.ok).length;
   const activity = (snap?.activity ?? []).filter((a) => inFilter(filter, a.business)).slice(0, 7);
@@ -52,11 +55,11 @@ export function OverviewView() {
           <Spark values={cdTrend} label="CalgaryDaily followers, recent days" />
         </section>
         <section className="hq-card hq-island">
-          <div className="hq-card__head"><p className="hq-eyebrow"><span>02</span> Run the work</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("inbox")}>Inbox</button></div>
+          <div className="hq-card__head"><p className="hq-eyebrow"><span>02</span> Run the work</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("tasks")}>Tasks</button></div>
           <div className="hq-stats">
             <Stat value={waiting} label="waiting on you" delta={needs[0] ? `oldest ${ago(needs[0].at, now)}` : undefined} />
             <Stat value={scheduled.length} label="posts scheduled" />
-            <Stat value={runs.length ? `${runs.length - failing}/${runs.length}` : "—"} label="agents running clean" delta={failing ? `${failing} failing` : undefined} dir={failing ? "down" : undefined} />
+            <Stat value={tasksDue ? `${tasksDone}/${tasksDue}` : "—"} label="jobs done today" delta={failing ? `${failing} need a look` : undefined} dir={failing ? "down" : undefined} />
           </div>
         </section>
         <section className="hq-card hq-island">
@@ -86,7 +89,7 @@ export function OverviewView() {
           {needs.length > 6 ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("inbox")}>And {needs.length - 6} more</button> : null}
         </section>
         <section className="hq-card">
-          <div className="hq-card__head"><h2 className="hq-h2">Latest from the agents</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("agents")}>All</button></div>
+          <div className="hq-card__head"><h2 className="hq-h2">Latest from the agents</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("tasks")}>All</button></div>
           {activity.length ? (
             <ol className="hq-feed">
               {activity.map((a, i) => (

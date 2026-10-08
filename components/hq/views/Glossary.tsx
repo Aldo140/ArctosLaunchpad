@@ -1,5 +1,9 @@
 const GLOSSARY: Array<[string, string]> = [
   ["Inbox", "Everything waiting for a decision: posts to approve, replies to answer, pitches to send. Your action is applied by the agents on their next run, about every 15 minutes."],
+  ["Tasks", "Every recurring job the agents own, grouped by business, with a midnight-to-midnight track of today's runs."],
+  ["Confirmed", "The job ran and its result shows up in the data: the email is in the send log, the post is live on Instagram, the Scout read landed."],
+  ["Ran clean", "The job finished without errors but had nothing to prove today, such as no approved emails waiting to send."],
+  ["Missed", "GitHub skipped a scheduled run. Its scheduler drops runs when busy; the next one usually catches up."],
   ["Queued / Undo", "An action you took that the agents haven't applied yet. Undo cancels it until they do."],
   ["Median views", "The middle value when posts are sorted by views. One viral post can't drag it up, so it shows what a typical post does."],
   ["Credited repost", "Another creator's Reel posted with their permission and their @handle in the caption. Historically CalgaryDaily's best format."],

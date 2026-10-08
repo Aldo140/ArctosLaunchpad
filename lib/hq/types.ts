@@ -200,11 +200,15 @@ export interface WorkflowSummary {
   file: string;
   name: string;
   job: string;
+  /** The workflow's schedule, UTC, as written in the workflow file. */
+  cron: string;
   lastRunAt: number | null;
-  lastStatus: "success" | "failure" | "running" | "cancelled" | "skipped" | "unknown";
+  lastStatus: "success" | "failure" | "running" | "queued" | "cancelled" | "skipped" | "unknown";
   lastDurationSec: number | null;
   lastUrl: string | null;
-  recent: Array<"success" | "failure" | "running" | "cancelled" | "skipped" | "unknown">;
+  recent: Array<WorkflowSummary["lastStatus"]>;
+  /** Newest first. */
+  runs: Array<{ at: number; end: number | null; status: WorkflowSummary["lastStatus"]; url: string; event: string }>;
 }
 
 export interface HqResponse {
