@@ -26,6 +26,7 @@
     "ops:import-leads": "tsx ops/import-leads.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "@gsap/react": "^2.1.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/oidc": "^4.0.0",
@@ -39,7 +40,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.128.0",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^24.0.0",
