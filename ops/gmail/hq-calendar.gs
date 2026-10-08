@@ -1,18 +1,21 @@
 /**
  * Arctos HQ · Calendar sync
  *
- * Runs inside mrotiz14@gmail.com every 15 minutes, beside the Gmail sync.
+ * Runs inside mrotiz14@gmail.com every 15 minutes, on its own or beside the Gmail sync.
  * Posts today's and the next six days' events from every calendar you have
  * switched on (title, start, end, location) to arctoslaunchpad.com/hq, where
  * the Overview shows your day, finds a free gym slot and works it into the
  * morning brief. Descriptions and guests never leave Google.
  *
- * Setup (once): in the same Apps Script project as hq-sync.gs, add a file
- * (+ → Script), paste this in, choose `setupCalendar` in the toolbar, press
- * Run and Allow. It uses the same HQ_KEY. `syncCalendar` runs it once by hand.
+ * Setup (once): paste this into a new project at script.google.com (or as a
+ * second file beside hq-sync.gs), put the key from Vercel's HQ_CALENDAR_KEY in
+ * HQ_CALENDAR_KEY below (or in Project Settings → Script properties), choose
+ * `setupCalendar` in the toolbar, press Run and Allow. Beside hq-sync.gs it can
+ * use that file's HQ_KEY instead. `syncCalendar` runs it once by hand.
  */
 
 var HQ_CALENDAR_URL = 'https://arctoslaunchpad.com/api/hq/ingest/calendar';
+var HQ_CALENDAR_KEY = ''; // or Script properties → HQ_CALENDAR_KEY
 var CALENDAR_DAYS = 7;
 
 function setupCalendar() {
@@ -24,8 +27,9 @@ function setupCalendar() {
 }
 
 function syncCalendar() {
-  var key = (typeof HQ_KEY !== 'undefined' && HQ_KEY) || PropertiesService.getScriptProperties().getProperty('HQ_KEY');
-  if (!key) throw new Error('Put the HQ key in HQ_KEY (hq-sync.gs) or in Script properties.');
+  var props = PropertiesService.getScriptProperties();
+  var key = HQ_CALENDAR_KEY || props.getProperty('HQ_CALENDAR_KEY') || (typeof HQ_KEY !== 'undefined' && HQ_KEY) || props.getProperty('HQ_KEY');
+  if (!key) throw new Error('Put the key in HQ_CALENDAR_KEY at the top of this file.');
 
   var start = new Date();
   start.setHours(0, 0, 0, 0);

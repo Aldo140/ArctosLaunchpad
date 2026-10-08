@@ -5,9 +5,10 @@ import { writeStringField } from "@/lib/hq/google";
 import type { CalendarSummary } from "@/lib/hq/types";
 
 /**
- * The calendar sync (ops/gmail/hq-calendar.gs, beside the Gmail sync) posts
- * the next week of Aldo's Google Calendar here every 15 minutes, with the same
- * key as the Gmail sync (HQ_GMAIL_KEY). Stored in arctos-hq (hq/calendar).
+ * The calendar sync (ops/gmail/hq-calendar.gs) posts the next week of Aldo's
+ * Google Calendar here every 15 minutes with HQ_CALENDAR_KEY (or the Gmail
+ * sync's HQ_GMAIL_KEY when it shares that project). Stored in arctos-hq
+ * (hq/calendar).
  */
 
 const text = (max: number) => z.string().transform((s) => s.slice(0, max));
@@ -24,11 +25,13 @@ const Summary = z.object({
 });
 
 function keyMatches(given: string | null): boolean {
-  const expected = process.env.HQ_GMAIL_KEY;
-  if (!expected || !given) return false;
+  if (!given) return false;
   const a = Buffer.from(given);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
+  return [process.env.HQ_CALENDAR_KEY, process.env.HQ_GMAIL_KEY].some((expected) => {
+    if (!expected) return false;
+    const b = Buffer.from(expected);
+    return a.length === b.length && timingSafeEqual(a, b);
+  });
 }
 
 export async function POST(request: Request) {
