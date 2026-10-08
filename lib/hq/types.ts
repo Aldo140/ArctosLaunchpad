@@ -247,6 +247,19 @@ export interface GmailReply {
   toPitch: boolean;
   answered: boolean;
   url: string;
+  /**
+   * The conversation around a real reply nobody has answered yet: our first
+   * message and the latest few, each cut to its new text. Only the newest
+   * unanswered reply in a thread carries it; the reply check reads it.
+   */
+  thread?: ThreadMessage[];
+}
+export interface ThreadMessage {
+  at: number;
+  /** Sent by us (any of our addresses). */
+  ours: boolean;
+  from: string;
+  text: string;
 }
 export interface GmailSummary {
   generatedAt: number;
@@ -256,6 +269,50 @@ export interface GmailSummary {
   replies: GmailReply[];
 }
 
+/**
+ * The reply check: before a Gmail reply reaches the board, an agent reads the
+ * thread and what else is going on with that sender and decides whether it
+ * needs Aldo. Replies that do get a proposed subtask he approves or waves off;
+ * the rest stay off the board (listed under "Filtered out" with the reason).
+ * Written to arctos-hq hq/gmail-triage by /api/hq/ingest/gmail.
+ */
+export type TriageCategory = "question" | "request" | "problem" | "interested" | "scheduling" | "already-handled" | "informational" | "not-interested" | "other";
+export interface ReplyTriage {
+  /** The thread and its newest reply: a new reply in the thread is a new key, and a fresh check. */
+  key: string;
+  url: string;
+  replyAt: number;
+  from: string;
+  /** When the agent decided. */
+  at: number;
+  /** A digest of what it decided on; when that changes (new mail with them), it checks again. */
+  fingerprint: string;
+  needsAction: boolean;
+  category: TriageCategory;
+  /** Why, in a sentence or two. */
+  reason: string;
+  /** What it verified and what it found (e.g. "aldo@… link answers 200"). */
+  checks: string[];
+  /** Other mail that shaped the call: an earlier thread, a later follow-up, an auto-reply. */
+  related: string[];
+  subtask: { title: string; detail: string; draftReply: string | null } | null;
+}
+export interface GmailTriage {
+  at: number;
+  items: ReplyTriage[];
+  /** The last run's problem, if it had one (e.g. no API key). */
+  error: string | null;
+}
+export type TriageDecisionKind = "approved" | "dismissed" | "reopened" | "done";
+export interface TriageDecision {
+  key: string;
+  decision: TriageDecisionKind;
+  /** The subtask as approved (Aldo can reword it). */
+  title: string | null;
+  by: string;
+  at: number;
+}
+
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
@@ -263,5 +320,7 @@ export interface HqResponse {
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
   gmail: GmailSummary | null;
+  triage: GmailTriage | null;
+  decisions: TriageDecision[];
   errors: string[];
 }

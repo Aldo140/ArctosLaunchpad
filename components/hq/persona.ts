@@ -1,7 +1,7 @@
 import type { HqResponse } from "@/lib/hq/types";
 import { inFilter, type Filter } from "./context";
 import { calgaryDayStart, evaluateAll } from "./tasks";
-import { gmailWaiting } from "./views/GmailPipeline";
+import { replyBoard } from "@/lib/hq/triage";
 import { BUSINESS_LABEL, num, plural, slot } from "./format";
 
 /**
@@ -57,7 +57,7 @@ export function brief(data: HqResponse, now: number, filter: Filter): string[] {
   const done = [...postBits, arctosBit].filter(Boolean) as string[];
   if (done.length) out.push(`${joinList(done)} today.`);
 
-  const replies = gmailWaiting(data.gmail, (b) => inFilter(filter, b)).length + (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length;
+  const replies = replyBoard(data, (r) => inFilter(filter, r.business)).board.length + (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length;
   const failing = evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length;
   const asks: string[] = [];
   if (replies) asks.push(`${plural(replies, "person", "people")} wrote back and ${replies === 1 ? "is" : "are"} waiting on you`);

@@ -241,6 +241,15 @@ a.hq-tile:hover .hq-thumb { border-color: var(--line-strong); }
 details.hq-more summary { cursor: pointer; color: var(--muted); font-size: 0.84rem; }
 details.hq-more[open] summary { margin-bottom: 8px; }
 
+/* The reply check's proposed subtask, under a Gmail reply. */
+.hq-subtask { display: grid; gap: 10px; padding: 12px 14px; border: 1px dashed var(--hq-warn-line); border-radius: var(--radius); background: var(--bg); }
+.hq-subtask[data-state="approved"] { border-style: solid; border-color: var(--hq-ok-line); }
+.hq-subtask__title { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.hq-checklist { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.84rem; color: var(--muted); }
+.hq-linkbtn { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.hq-linkbtn:hover { text-decoration: underline; }
+details.hq-card > summary { font-weight: 500; color: var(--fg); }
+
 /* ---- Tables ----------------------------------------------------------- */
 .hq-tablewrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); max-height: 560px; }
 .hq-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 760px; }
