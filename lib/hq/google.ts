@@ -73,3 +73,55 @@ export async function writeStringField(path: string, field: string, value: strin
   });
   if (!r.ok) throw new Error(`Writing ${path}: HTTP ${r.status}`);
 }
+
+type Value = { stringValue?: string; integerValue?: string; nullValue?: null };
+
+/** Creates a document with a generated id; returns the id. */
+export async function createDoc(collection: string, fields: Record<string, string | number | null>): Promise<string> {
+  const body: Record<string, Value> = {};
+  for (const [k, v] of Object.entries(fields)) body[k] = v === null ? { nullValue: null } : typeof v === "number" ? { integerValue: String(Math.round(v)) } : { stringValue: v };
+  const r = await fetch(`${FIRESTORE()}/${collection}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await googleAccessToken()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: body }),
+  });
+  if (!r.ok) throw new Error(`Saving to ${collection}: HTTP ${r.status}`);
+  const doc = (await r.json()) as { name: string };
+  return doc.name.split("/").pop()!;
+}
+
+/** Plain values of every document in a collection whose integer `field` is at least `min`. */
+export async function queryRecent(collection: string, field: string, min: number, limit = 200): Promise<Array<{ id: string; fields: Record<string, string | number | null> }>> {
+  const base = FIRESTORE().replace(/\/documents$/, "");
+  const r = await fetch(`${base}/documents:runQuery`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await googleAccessToken()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: collection }],
+        where: { fieldFilter: { field: { fieldPath: field }, op: "GREATER_THAN_OR_EQUAL", value: { integerValue: String(min) } } },
+        limit,
+      },
+    }),
+    cache: "no-store",
+  });
+  if (!r.ok) throw new Error(`Reading ${collection}: HTTP ${r.status}`);
+  const rows = (await r.json()) as Array<{ document?: { name: string; fields: Record<string, Value> } }>;
+  return rows.filter((x) => x.document).map((x) => ({
+    id: x.document!.name.split("/").pop()!,
+    fields: Object.fromEntries(Object.entries(x.document!.fields).map(([k, v]) => [k, v.integerValue !== undefined ? Number(v.integerValue) : v.stringValue ?? null])),
+  }));
+}
+
+export async function deleteDoc(path: string): Promise<void> {
+  const r = await fetch(`${FIRESTORE()}/${path}`, { method: "DELETE", headers: { Authorization: `Bearer ${await googleAccessToken()}` } });
+  if (!r.ok && r.status !== 404) throw new Error(`Deleting ${path}: HTTP ${r.status}`);
+}
+
+export async function readFields(path: string): Promise<Record<string, string | number | null> | null> {
+  const r = await fetch(`${FIRESTORE()}/${path}`, { headers: { Authorization: `Bearer ${await googleAccessToken()}` }, cache: "no-store" });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`Reading ${path}: HTTP ${r.status}`);
+  const doc = (await r.json()) as { fields?: Record<string, Value> };
+  return Object.fromEntries(Object.entries(doc.fields ?? {}).map(([k, v]) => [k, v.integerValue !== undefined ? Number(v.integerValue) : v.stringValue ?? null]));
+}

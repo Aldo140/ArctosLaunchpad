@@ -121,4 +121,12 @@
   --hq-bad: #ff8a7a;
   --hq-bar: var(--rust-hi);
   --hq-grid: rgb(241 235 223 / 0.08);
+  --hq-hover: rgb(241 235 223 / 0.04);
+  --hq-hover-soft: rgb(241 235 223 / 0.025);
+  --hq-shimmer: rgb(241 235 223 / 0.05);
+  --hq-ok-line: rgb(143 179 164 / 0.45);
+  --hq-warn-line: rgb(240 180 86 / 0.4);
+  --hq-bad-line: rgb(255 138 122 / 0.45);
+  --hq-tag-bg: rgb(13 27 30 / 0.78);
+  --hq-scrim: rgb(2 19 27 / 0.6);
 }

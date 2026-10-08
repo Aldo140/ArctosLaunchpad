@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
-import { readStringField } from "@/lib/hq/google";
-import type { ArctosOutreach, HqResponse, HqSettings, HqSnapshot } from "@/lib/hq/types";
+import { workflowSummaries } from "@/lib/hq/github";
+import { queryRecent, readStringField } from "@/lib/hq/google";
+import type { ArctosOutreach, CommandType, HqCommandRecord, HqResponse, HqSnapshot } from "@/lib/hq/types";
 
 /**
  * Everything the /hq page shows, for a signed-in HQ account. POST so the
@@ -11,23 +12,45 @@ import type { ArctosOutreach, HqResponse, HqSettings, HqSnapshot } from "@/lib/h
 
 const SENT_URL = "https://raw.githubusercontent.com/Aldo140/ArctosLaunchpad/arctos-launchpad/outreach/sent.json";
 const DAY = 86_400_000;
-const NO_SETTINGS: HqSettings = { balanceUsd: null, balanceAt: null, dailyCapUsd: null };
+const calgaryDay = (t: number) => new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" });
 
 async function arctosOutreach(now: number): Promise<ArctosOutreach> {
   const r = await fetch(SENT_URL, { next: { revalidate: 600 } });
   if (!r.ok) throw new Error(`Arctos sends: HTTP ${r.status}`);
-  const rows = ((await r.json()) as Array<{ business?: string; subject?: string; at?: string }>)
+  const sends = ((await r.json()) as Array<{ business?: string; subject?: string; at?: string }>)
     .map((s) => ({ business: s.business ?? "", subject: s.subject ?? "", at: Date.parse(s.at ?? "") }))
     .filter((s) => Number.isFinite(s.at))
     .sort((a, b) => b.at - a.at);
-  const calgaryDay = (t: number) => new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" });
+  const days = new Map<string, number>();
+  for (let i = 29; i >= 0; i--) days.set(calgaryDay(now - i * DAY), 0);
+  for (const s of sends) {
+    const d = calgaryDay(s.at);
+    if (days.has(d)) days.set(d, (days.get(d) ?? 0) + 1);
+  }
   return {
-    total: rows.length,
-    last30: rows.filter((s) => s.at >= now - 30 * DAY).length,
-    today: rows.filter((s) => calgaryDay(s.at) === calgaryDay(now)).length,
-    lastSentAt: rows[0]?.at ?? null,
-    recent: rows.slice(0, 8),
+    total: sends.length,
+    last30: sends.filter((s) => s.at >= now - 30 * DAY).length,
+    today: sends.filter((s) => calgaryDay(s.at) === calgaryDay(now)).length,
+    lastSentAt: sends[0]?.at ?? null,
+    sendsByDay: [...days.entries()].map(([date, sent]) => ({ date, sent })),
+    sends: sends.slice(0, 300),
   };
+}
+
+async function commands(now: number): Promise<HqCommandRecord[]> {
+  const rows = await queryRecent("hq_commands", "at", now - 2 * DAY);
+  return rows
+    .map((r) => ({
+      id: r.id,
+      type: r.fields.type as CommandType,
+      targetId: String(r.fields.targetId ?? ""),
+      by: String(r.fields.by ?? ""),
+      at: Number(r.fields.at ?? 0),
+      status: (r.fields.status as HqCommandRecord["status"]) ?? "pending",
+      result: (r.fields.result as string | null) ?? null,
+      appliedAt: (r.fields.appliedAt as number | null) ?? null,
+    }))
+    .sort((a, b) => b.at - a.at);
 }
 
 export async function POST(request: Request) {
@@ -41,16 +64,17 @@ export async function POST(request: Request) {
 
   const now = Date.now();
   const errors: string[] = [];
-  const [snapshot, settings, arctos] = await Promise.all([
-    readStringField("hq/snapshot", "payload")
-      .then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null))
-      .catch((e: unknown) => { errors.push(e instanceof Error ? e.message : String(e)); return null; }),
-    readStringField("hq/settings", "payload")
-      .then((s) => (s ? { ...NO_SETTINGS, ...(JSON.parse(s) as Partial<HqSettings>) } : NO_SETTINGS))
-      .catch(() => NO_SETTINGS),
-    arctosOutreach(now).catch((e: unknown) => { errors.push(e instanceof Error ? e.message : String(e)); return null; }),
+  const note = (label: string) => (e: unknown) => {
+    errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  };
+  const [snapshot, arctos, cmds, workflows] = await Promise.all([
+    readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
+    arctosOutreach(now).catch(note("Arctos sends")),
+    commands(now).catch(note("HQ actions")),
+    workflowSummaries().catch(note("Agent runs")),
   ]);
 
-  const body: HqResponse = { viewer, snapshot, settings, arctos, errors };
+  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, errors };
   return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
 }

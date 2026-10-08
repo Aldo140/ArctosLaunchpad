@@ -28,7 +28,17 @@ directly; the database has no client rules.
 
 ## Tabs
 
-Today (waiting on you), Creators (the Instagram Scout), CalgaryDaily, Pipelines,
-Money (Claude spend, balance and runway), Bottlenecks (plus every health
-check) and Glossary. The snapshot shape is `lib/hq/types.ts`; the writer is
+Grouped by island. 01 Win the customer: Overview, Inbox (posts, pitches and
+replies to approve, edit, redraft or reject), Instagram (all four accounts),
+Inspiration (what outperforms on other Calgary accounts, and the agents'
+ideas), Pipelines (CalgaryWatch, Arctos, Vow Motion). 02 Run the work: Tasks
+(every recurring job with today's proof, run history and GitHub schedule reliability; routines are defined in `components/hq/tasks.ts`). 03 See the numbers: Performance,
+Health and Glossary. The snapshot shape is `lib/hq/types.ts`; the writer is
 `scripts/ops/lib/hqSnapshot.ts` in the CalgaryWatch repository.
+
+## Actions
+
+Buttons write to `hq_commands` through `POST /api/hq/command`. The ops agents
+apply pending commands at the start of every run (`npm run ops:hq-commands`),
+so an action lands within about 15 minutes. A pending command can be undone
+until then.

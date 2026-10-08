@@ -4,7 +4,7 @@
  * keep these types in step with it and check `version`.
  */
 
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 
 export type Business = "calgarywatch" | "calgarydaily" | "vowmotion" | "arctos";
 export type Severity = "ok" | "warn" | "bad";
@@ -30,22 +30,117 @@ export interface Pipeline {
   interested30: number;
 }
 
-export interface ScoutEntry {
+export interface HqPost {
+  id: string;
+  brand: Business;
+  status: string;
+  template: string;
+  format: "image" | "carousel" | "reel";
+  headline: string;
+  caption: string;
+  altText: string;
+  imageUrl: string | null;
+  imageUrls: string[];
+  videoUrl: string | null;
+  warnings: string[];
+  facts: string;
+  note: string;
+  suggestedFor: number | null;
+  scheduledFor: number | null;
+  publishedAt: number | null;
+  permalink: string | null;
+  error: string | null;
+  insights: { reach: number; views: number | null; likes: number; comments: number; saves: number; shares: number } | null;
+  updatedAt: number;
+}
+
+export interface InboxReply {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  from: string;
+  subject: string;
+  text: string;
+  classification: string;
+  suggestedSubject: string;
+  suggestedBody: string;
+  approved: boolean;
+  at: number;
+}
+
+export interface InboxPitch {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  contactEmail: string | null;
+  category: string;
+  neighbourhood: string;
+  reasonRelevant: string;
+  subject: string;
+  body: string;
+  followUp: boolean;
+  at: number;
+}
+
+export interface ActivityItem { at: number; business: Business; type: string; text: string }
+
+export interface LeadRow {
+  id: string;
+  businessName: string;
+  category: string;
+  neighbourhood: string;
+  website: string | null;
+  contactEmail: string | null;
+  status: string;
+  followUps: number;
+  lastContactAt: number | null;
+  nextFollowUpAt: number | null;
+  replyClass: string | null;
+  replyAt: number | null;
+  createdAt: number;
+}
+
+export interface PipelineDetail {
+  leads: LeadRow[];
+  sendsByDay: Array<{ date: string; sent: number; replies: number }>;
+  byCategory: Array<{ category: string; total: number; contacted: number; replied: number; interested: number }>;
+  followUpsDue: number;
+  replyRate: number | null;
+  medianHoursToReply: number | null;
+}
+
+export interface OwnAccount {
   handle: string;
-  kind: string;
+  business: string;
   followers: number;
+  mediaCount: number;
   posts30: number;
   daysSinceLastPost: number | null;
   medianEngagement: number;
   engagementRate: number;
   reelShare: number;
-  active: boolean;
-  top: { permalink: string; caption: string; engagement: number; reel: boolean; at: number } | null;
+  recent: Array<{ permalink: string; caption: string; mediaUrl: string | null; reel: boolean; likes: number; comments: number; at: number }>;
+  trend: Array<{ date: string; followers: number }>;
+}
+
+export interface Outperformer {
+  handle: string;
+  permalink: string;
+  caption: string;
+  mediaUrl: string | null;
+  reel: boolean;
+  engagement: number;
+  lift: number;
+  at: number;
+}
+
+export interface InspirationAnalysis {
+  at: number;
+  patterns: Array<{ title: string; why: string; examples: string[] }>;
+  ideas: Array<{ title: string; format: string; hook: string; why: string }>;
 }
 
 export interface HistoryGroup { key: string; label: string; posts: number; medianViews: number; medianEngagement: number; best: number }
-
-export interface SpendDay { date: string; usd: number; calls: number; byTask: Record<string, number> }
 
 export interface Bottleneck { id: string; label: string; value: string; severity: Severity; detail: string }
 
@@ -54,7 +149,6 @@ export interface HqSnapshot {
   generatedAt: number;
   today: TodayItem[];
   health: { checkedAt: number; items: Array<{ id: string; label: string; ok: boolean; detail: string }> } | null;
-  scout: { updatedAt: number; accounts: ScoutEntry[]; unreadable: string[]; candidatesWaiting: number } | null;
   calgaryDaily: {
     followers: number | null;
     followerTrend: Array<{ date: string; count: number }>;
@@ -65,17 +159,14 @@ export interface HqSnapshot {
     avgDelayMinutes: number | null;
     queue: { waiting: number; scheduled: number; published7d: number; failed7d: number };
   } | null;
+  posts?: HqPost[];
+  inbox?: { replies: InboxReply[]; pitches: InboxPitch[]; at: number };
+  activity?: ActivityItem[];
   pipelines: Pipeline[];
+  pipelineDetail?: { calgarywatch: PipelineDetail | null };
+  instagram?: { accounts: OwnAccount[]; inspiration: Outperformer[]; analysis: InspirationAnalysis | null; updatedAt: number | null };
   pipelinesAt: number;
-  spend: { days: SpendDay[]; monthToDate: number; last7: number; last30: number };
   bottlenecks: Bottleneck[];
-}
-
-/** What you enter on the Money tab: the Anthropic balance after your last top-up. */
-export interface HqSettings {
-  balanceUsd: number | null;
-  balanceAt: number | null;
-  dailyCapUsd: number | null;
 }
 
 /** Arctos outreach, read from outreach/sent.json on the arctos-launchpad branch. */
@@ -84,13 +175,47 @@ export interface ArctosOutreach {
   last30: number;
   today: number;
   lastSentAt: number | null;
-  recent: Array<{ business: string; subject: string; at: number }>;
+  sendsByDay: Array<{ date: string; sent: number }>;
+  sends: Array<{ business: string; subject: string; at: number }>;
+}
+
+export type CommandType =
+  | "approve-post" | "reject-post" | "redraft-post" | "unschedule-post"
+  | "approve-pitch" | "skip-pitch"
+  | "approve-reply" | "handled-reply";
+
+export interface HqCommandRecord {
+  id: string;
+  type: CommandType;
+  targetId: string;
+  by: string;
+  at: number;
+  status: "pending" | "done" | "failed";
+  result: string | null;
+  appliedAt: number | null;
+}
+
+export interface WorkflowSummary {
+  repo: string;
+  file: string;
+  name: string;
+  job: string;
+  /** The workflow's schedule, UTC, as written in the workflow file. */
+  cron: string;
+  lastRunAt: number | null;
+  lastStatus: "success" | "failure" | "running" | "queued" | "cancelled" | "skipped" | "unknown";
+  lastDurationSec: number | null;
+  lastUrl: string | null;
+  recent: Array<WorkflowSummary["lastStatus"]>;
+  /** Newest first. */
+  runs: Array<{ at: number; end: number | null; status: WorkflowSummary["lastStatus"]; url: string; event: string }>;
 }
 
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
-  settings: HqSettings;
   arctos: ArctosOutreach | null;
+  commands: HqCommandRecord[];
+  workflows: WorkflowSummary[] | null;
   errors: string[];
 }
