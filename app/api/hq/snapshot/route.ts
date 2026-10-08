@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
 import { workflowSummaries } from "@/lib/hq/github";
 import { queryRecent, readStringField } from "@/lib/hq/google";
-import type { ArctosOutreach, CommandType, HqCommandRecord, HqResponse, HqSnapshot } from "@/lib/hq/types";
+import type { ArctosOutreach, CommandType, GmailSummary, HqCommandRecord, HqResponse, HqSnapshot } from "@/lib/hq/types";
 
 /**
  * Everything the /hq page shows, for a signed-in HQ account. POST so the
@@ -68,13 +68,14 @@ export async function POST(request: Request) {
     errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   };
-  const [snapshot, arctos, cmds, workflows] = await Promise.all([
+  const [snapshot, arctos, cmds, workflows, gmail] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
     arctosOutreach(now).catch(note("Arctos sends")),
     commands(now).catch(note("HQ actions")),
     workflowSummaries().catch(note("Agent runs")),
+    readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(note("Gmail")),
   ]);
 
-  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, errors };
+  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, gmail, errors };
   return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
 }

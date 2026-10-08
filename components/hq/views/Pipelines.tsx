@@ -6,6 +6,7 @@ import { Columns } from "../Charts";
 import { useHq } from "../context";
 import { LEAD_STAGE, ago, num, when } from "../format";
 import { Empty, Stat } from "../ui";
+import { GmailPipeline } from "./GmailPipeline";
 
 const rate = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
 
@@ -105,7 +106,8 @@ function CalgaryWatchPipeline({ p, d }: { p: Pipeline | undefined; d: PipelineDe
 }
 
 function ArctosPipeline({ a }: { a: ArctosOutreach | null }) {
-  const { now } = useHq();
+  const { now, data } = useHq();
+  const gmailReplies = data.gmail ? data.gmail.replies.filter((r) => r.business === "arctos" && r.toPitch && r.kind === "reply").length : null;
   const [q, setQ] = useState("");
   if (!a) return <Empty title="Couldn't read the Arctos send log." />;
   const needle = q.trim().toLowerCase();
@@ -119,7 +121,7 @@ function ArctosPipeline({ a }: { a: ArctosOutreach | null }) {
           <Stat value={num(a.last30)} label="sent, 30 days" />
           <Stat value={num(a.total)} label="sent in total" />
           <Stat value={ago(a.lastSentAt, now)} label="last send" />
-          <Stat value="—" label="replies (connect Gmail)" />
+          <Stat value={gmailReplies === null ? "—" : num(gmailReplies)} label={gmailReplies === null ? "replies (Gmail sync)" : "real replies, from Gmail"} />
         </div>
         <Columns data={a.sendsByDay.map((x) => ({ x: x.date.slice(5), y: x.sent }))} format={(n) => String(Math.round(n))} label="Arctos emails sent per day, last 30 days" />
       </section>
@@ -136,8 +138,6 @@ function ArctosPipeline({ a }: { a: ArctosOutreach | null }) {
     </>
   );
 }
-
-const GMAIL_NOTE = "Vow Motion sends from aldo@vowmotionweddings.com through Gmail, so its sends, replies and opt-outs live in mrotiz14@gmail.com. Connecting Gmail lets the agent count every send, catch every reply, add opt-outs to the shared list and draft answers for you here.";
 
 export function PipelinesView() {
   const { data, filter } = useHq();
@@ -160,8 +160,8 @@ export function PipelinesView() {
         {tabs.map((t) => <button key={t.id} type="button" aria-pressed={t.id === tab} onClick={() => setPicked(t.id)}>{t.label}</button>)}
       </div>
       {tab === "calgarywatch" ? <CalgaryWatchPipeline p={snap?.pipelines.find((p) => p.business === "calgarywatch")} d={snap?.pipelineDetail?.calgarywatch ?? null} /> : null}
-      {tab === "arctos" ? <ArctosPipeline a={data.arctos} /> : null}
-      {tab === "vowmotion" ? <Empty title="Vow Motion connects through Gmail.">{GMAIL_NOTE}</Empty> : null}
+      {tab === "arctos" ? <><ArctosPipeline a={data.arctos} /><GmailPipeline business="arctos" address="aldo@arctoslaunchpad.com" title="Arctos, sent from Gmail" /></> : null}
+      {tab === "vowmotion" ? <GmailPipeline business="vowmotion" address="aldo@vowmotionweddings.com" title="Vow Motion" /> : null}
       {!tabs.length ? <Empty title="No outreach for this business." /> : null}
     </div>
   );

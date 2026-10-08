@@ -60,3 +60,19 @@ Variables:
 - `DIGEST_MAILING_ADDRESS` (required to send outreach: CASL)
 - `OPS_SUMMARY_TO`, `OPS_SUMMARY_FROM` (the morning summary)
 - `OUTREACH_MAILBOX` (defaults to aldo@calgarywatch.ca), `ANTHROPIC_WORKSPACE_ID` (optional)
+
+## Gmail sync
+
+`ops/gmail/hq-sync.gs` is a Google Apps Script that runs inside
+mrotiz14@gmail.com every 15 minutes. It reads 30 days of mail from the
+send-as addresses (aldo@vowmotionweddings.com, aldo@arctoslaunchpad.com,
+aldo@calgarywatch.ca) and posts a summary to `/api/hq/ingest/gmail`: every
+pitch, who answered, auto-replies, opt-outs, bounces, and pitches sent from the
+wrong address. Bodies stay in Gmail; replies carry a short snippet. The summary
+is stored at `hq/gmail` in arctos-hq and drives the Vow Motion pipeline, the
+Gmail half of the Arctos pipeline, Gmail replies in the Inbox and the Vow Motion
+outreach task.
+
+The endpoint checks the `x-hq-key` header against `HQ_GMAIL_KEY` (Vercel,
+production). Setup: new project at script.google.com, paste the file, set
+`HQ_KEY` (or a Script property of that name), run `setup` once and allow.

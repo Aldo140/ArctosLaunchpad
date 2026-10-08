@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { HqPost, InboxPitch, InboxReply } from "@/lib/hq/types";
+import type { GmailReply, HqPost, InboxPitch, InboxReply } from "@/lib/hq/types";
 import { CommandState } from "../CommandState";
 import { inFilter, latestCommand, useHq } from "../context";
 import { BUSINESS_LABEL, STATUS_LABEL, ago, cdn, plural, until, when } from "../format";
 import { Empty, Thumb } from "../ui";
+import { gmailWaiting } from "./GmailPipeline";
 
 type Kind = "all" | "posts" | "pitches" | "replies";
 
@@ -148,6 +149,26 @@ function ReplyDecision({ reply }: { reply: InboxReply }) {
   );
 }
 
+function GmailReplyCard({ reply }: { reply: GmailReply }) {
+  const { now } = useHq();
+  return (
+    <article className="hq-card hq-decision">
+      <div className="hq-card__head">
+        <div>
+          <p className="hq-eyebrow">{BUSINESS_LABEL[reply.business] ?? "Gmail"} · reply to your pitch · {ago(reply.at, now)}</p>
+          <h2 className="hq-h2">{reply.name || reply.from}</h2>
+        </div>
+      </div>
+      <p className="hq-small" style={{ margin: 0 }}>{reply.subject}</p>
+      <blockquote className="hq-quote">{reply.snippet}</blockquote>
+      <div className="hq-actions">
+        <a className="hq-btn hq-btn--primary" href={reply.url} target="_blank" rel="noreferrer">Answer in Gmail</a>
+        <span className="hq-mono">to {reply.alias} · leaves this list once you&apos;ve replied</span>
+      </div>
+    </article>
+  );
+}
+
 export function InboxView() {
   const { data, filter } = useHq();
   const [kind, setKind] = useState<Kind>("all");
@@ -155,8 +176,9 @@ export function InboxView() {
   const posts = (snap?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand));
   const pitches = (snap?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business));
   const replies = (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business));
-  const total = posts.length + pitches.length + replies.length;
-  const segs: Array<[Kind, string, number]> = [["all", "Everything", total], ["replies", "Replies", replies.length], ["posts", "Posts", posts.length], ["pitches", "Pitches", pitches.length]];
+  const gmail = gmailWaiting(data.gmail, (b) => inFilter(filter, b));
+  const total = posts.length + pitches.length + replies.length + gmail.length;
+  const segs: Array<[Kind, string, number]> = [["all", "Everything", total], ["replies", "Replies", replies.length + gmail.length], ["posts", "Posts", posts.length], ["pitches", "Pitches", pitches.length]];
 
   return (
     <div className="hq-view">
@@ -170,8 +192,9 @@ export function InboxView() {
           <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{label}{n ? <b>{n}</b> : null}</button>
         ))}
       </div>
-      {total === 0 ? <Empty title="Nothing waiting.">New drafts, replies and pitches land here as the agents find them. Vow Motion and Arctos replies join once Gmail is connected.</Empty> : null}
+      {total === 0 ? <Empty title="Nothing waiting.">New drafts, replies and pitches land here as the agents find them. Replies to Vow Motion and Arctos pitches show up here from the Gmail sync.</Empty> : null}
       {(kind === "all" || kind === "replies") && replies.map((r) => <ReplyDecision key={`r-${r.leadId}`} reply={r} />)}
+      {(kind === "all" || kind === "replies") && gmail.map((r) => <GmailReplyCard key={`g-${r.url}-${r.at}`} reply={r} />)}
       {(kind === "all" || kind === "posts") && posts.map((p) => <PostDecision key={`p-${p.id}`} post={p} />)}
       {(kind === "all" || kind === "pitches") && pitches.map((p) => <PitchDecision key={`c-${p.leadId}`} pitch={p} />)}
     </div>

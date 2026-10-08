@@ -176,7 +176,24 @@ export const ROUTINES: Routine[] = [
     },
   },
   { id: "ar-instagram", owner: "arctos", title: "Post to @arctoslaunchpad", cadence: "Planned", done: "Posts drafted in the Arctos voice, approved here, published on schedule.", setup: "Needs the @arctoslaunchpad Instagram token." },
-  { id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Planned, weekdays", done: "Fifteen couples and venues pitched from aldo@vowmotionweddings.com, replies drafted here.", setup: "Starts once Gmail is connected to HQ." },
+  {
+    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Weekdays, from Gmail",
+    done: "Up to fifteen planners pitched from aldo@vowmotionweddings.com, every reply answered.",
+    proof: ({ data, dayStart }) => {
+      if (!data.gmail) return { confirmed: false, headline: "waiting for the Gmail sync", items: [] };
+      const items = today(data.gmail.sends.filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url })), dayStart);
+      const wrong = data.gmail.sends.filter((s) => s.wrongAlias === "vowmotion" && s.at >= dayStart).length;
+      return { confirmed: items.length > 0, headline: `${items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today"}${items.length > 15 ? " · over 15" : ""}${wrong ? ` · ${wrong} from the wrong address` : ""}`, items };
+    },
+  },
+  {
+    id: "sh-gmail", owner: "shared", title: "Gmail sync", cadence: "Every 15 minutes, inside Gmail",
+    done: "Every pitch, reply, opt-out and bounce from the send-as addresses is counted here.",
+    proof: ({ data, now }) => {
+      const at = data.gmail?.generatedAt ?? 0;
+      return { confirmed: at > now - 45 * 60_000, headline: at ? `last sync ${clock(at, now)}` : "not set up yet", items: [] };
+    },
+  },
   { id: "vm-instagram", owner: "vowmotion", title: "Post to @vowmotion", cadence: "Planned", done: "Wedding films cut into posts, approved here, published on schedule.", setup: "Needs the @vowmotion Instagram token." },
   {
     id: "sh-actions", owner: "shared", title: "Apply your HQ actions", cadence: "Every 30 minutes", workflow: "ops-hourly.yml",
@@ -261,6 +278,8 @@ export function evaluate(routine: Routine, data: HqResponse, now: number): TaskS
   const proof = routine.proof ? routine.proof({ data, dayStart, now }) : null;
   const base = { routine, proof, wf, next: wf ? cronFire(wf.cron, now, 1) : null, runsToday: (wf?.runs ?? []).filter((r) => r.at >= dayStart) };
   if (routine.setup) return { ...base, state: "setup", line: routine.setup };
+  // Work done by hand or outside GitHub: judged by its proof alone.
+  if (!routine.workflow && proof) return { ...base, state: proof.confirmed ? "confirmed" : proof.headline.startsWith("not set up") || proof.headline.startsWith("waiting") ? "setup" : "later", line: proof.headline };
   if (!wf || !wf.runs.length) return { ...base, state: "unknown", line: proof ? `No run history from GitHub · ${proof.headline}` : "Couldn't read the run history from GitHub." };
 
   const finished = wf.runs.find((r) => r.status === "success" || r.status === "failure");
