@@ -1,0 +1,97 @@
+name: Operations daily
+
+# The ops agents' morning run (ops/daily.ts): draft @calgarydaily posts from
+# CalgaryWatch's verified listings, flag posts whose listing changed, run the
+# Scout and inspiration analysis, find leads and draft pitches, check health
+# and email the summary (once a day, from the first run after 6 am).
+# ops-clock.yml starts it at 3, 6, 7 and 8 am Calgary; the schedule below is
+# the backup. Every step is safe to repeat.
+on:
+  schedule:
+    - cron: '5 9,12,13,14 * * *'
+  workflow_dispatch:
+
+permissions:
+  # Rendered images and the CalgaryDaily feed go to the ops-media branch.
+  contents: write
+  # Keyless sign-in to arctos-hq.
+  id-token: write
+
+concurrency:
+  group: ops-daily
+  cancel-in-progress: false
+
+jobs:
+  ready:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+    steps:
+      - id: check
+        env:
+          HAVE: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.IG_TOKEN_CALGARYDAILY != '' }}
+        run: |
+          echo "ok=$HAVE" >> "$GITHUB_OUTPUT"
+          [ "$HAVE" = true ] || echo "::notice title=Ops not set up yet::Add the ops secrets to this repository (see docs/OPS.md); until then the agents keep running from CalgaryWatch."
+
+  daily:
+    needs: ready
+    if: needs.ready.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      # The agents' code lives on main; this file also sits on the default branch
+      # (arctos-launchpad), which is where GitHub runs schedules and dispatches.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Make sure ffmpeg is available (Reels)
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      # GitHub's OIDC token is exchanged for short-lived Google credentials; no key is stored.
+      - name: Sign in to arctos-hq
+        id: hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+      # One time only: copies the agents' state from CalgaryWatch and makes CalgaryWatch's agents stand down.
+      - name: Take over from CalgaryWatch
+        run: npm run ops:handoff
+      - name: Apply HQ actions
+        continue-on-error: true
+        run: npm run ops:hq-commands
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+      - name: Draft, research, check health, send summary
+        run: npm run ops:daily
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          IG_TOKEN_CALGARYWATCH: ${{ secrets.IG_TOKEN_CALGARYWATCH }}
+          IG_TOKEN_CALGARYDAILY: ${{ secrets.IG_TOKEN_CALGARYDAILY }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          # The Scout reads other Calgary accounts (Business Discovery, Facebook-login Page token).
+          IG_DISCOVERY_TOKEN: ${{ secrets.IG_DISCOVERY_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          OPS_SUMMARY_TO: ${{ vars.OPS_SUMMARY_TO }}
+          OPS_SUMMARY_FROM: ${{ vars.OPS_SUMMARY_FROM }}
+      - name: Publish the HQ snapshot
+        if: always()
+        continue-on-error: true
+        run: npm run ops:hq
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
