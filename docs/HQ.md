@@ -95,11 +95,11 @@ the brief and the sign-off.
 - **Money moves**: everyone closest to paying, oldest first. That means pitch
   replies still waiting on an answer (they open the Gmail thread), interested
   or replied CalgaryWatch leads, then follow-ups that are due.
-- **Today**: the calendar sync (`ops/gmail/hq-calendar.gs`) runs in the same
-  Apps Script project as the Gmail sync. It posts the next seven days of
-  events every 15 minutes to `/api/hq/ingest/calendar` with the same key
-  (`HQ_GMAIL_KEY`). Setup: add the file to that project and run `setupCalendar`
-  once.
+- **Today**: the calendar sync (`ops/gmail/hq-calendar.gs`) runs as an Apps
+  Script in mrotiz14@gmail.com, on its own or beside the Gmail sync. It posts
+  the next seven days of events every 15 minutes to `/api/hq/ingest/calendar`
+  with `HQ_CALENDAR_KEY` (or the Gmail sync's `HQ_GMAIL_KEY`). Setup: paste
+  it in, set the key, run `setupCalendar` once.
 - **Gym**: the "I went today" button (or `l g`) writes to `hq_life` through
   `POST /api/hq/life`. Calendar events that look like a workout count too.
   The goal (`GYM_GOAL`, 3 a week) and the membership cost (`GYM_MONTHLY`, used
