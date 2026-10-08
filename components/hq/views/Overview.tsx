@@ -4,24 +4,34 @@ import { inFilter, useHq } from "../context";
 import { BUSINESS_LABEL, ago, calgaryParts, cdn, num, plural, short, slot, when } from "../format";
 import { Spark, Stat, Thumb } from "../ui";
 import { evaluateAll } from "../tasks";
-import { gmailWaiting } from "./GmailPipeline";
+import { brief, greeting, nextMilestone, outreachStreak, signoff, wins } from "../persona";
+import { SkyStrip } from "../Sky";
+import { replyBoard } from "@/lib/hq/triage";
 
 export function OverviewView() {
-  const { data, now, filter, go } = useHq();
+  const { data, now, filter, go, preview } = useHq();
   const snap = data.snapshot;
   const { weekday, date, hour } = calgaryParts(now);
-  const greeting = hour < 12 ? "Good morning." : hour < 18 ? "Good afternoon." : "Good evening.";
+  const story = brief(data, now, filter);
+  const good = wins(data, now, filter);
 
   const replies = (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business));
   const pitches = (snap?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business));
   const decisionPosts = (snap?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand));
-  const gmail = gmailWaiting(data.gmail, (b) => inFilter(filter, b));
+  const gmail = replyBoard(data, (r) => inFilter(filter, r.business)).board;
   const waiting = replies.length + pitches.length + decisionPosts.length + gmail.length;
   const needs = [
     ...replies.map((r) => ({ key: `r${r.leadId}`, at: r.at, label: "Reply", title: `${r.businessName} wrote back`, detail: r.text.replace(/\s+/g, " ").slice(0, 120), business: r.business })),
     ...decisionPosts.map((p) => ({ key: `p${p.id}`, at: p.updatedAt, label: p.status === "drafted" ? "Approve post" : "Fix post", title: p.headline, detail: p.suggestedFor ? `Slot ${when(p.suggestedFor)}` : p.template, business: p.brand })),
     ...pitches.map((p) => ({ key: `c${p.leadId}`, at: p.at, label: "Approve pitch", title: p.businessName, detail: p.subject, business: p.business })),
-    ...gmail.map((r) => ({ key: `g${r.url}${r.at}`, at: r.at, label: "Reply in Gmail", title: `${r.name || r.from} wrote back`, detail: r.snippet.slice(0, 120), business: r.business })),
+    ...gmail.map(({ reply: r, state, triage, decision }) => ({
+      key: `g${r.url}${r.at}`,
+      at: r.at,
+      label: state === "proposed" ? "Approve subtask" : state === "approved" ? "Subtask" : "Reply in Gmail",
+      title: `${r.name || r.from} wrote back`,
+      detail: (state === "approved" ? decision?.title ?? triage?.subtask?.title : state === "proposed" ? triage?.subtask?.title : null) ?? r.snippet.slice(0, 120),
+      business: r.business,
+    })),
   ].sort((a, b) => a.at - b.at);
 
   const accounts = (snap?.instagram?.accounts ?? []).filter((a) => inFilter(filter, a.business));
@@ -40,12 +50,26 @@ export function OverviewView() {
   const healthy = healthItems.filter((h) => h.ok).length;
   const activity = (snap?.activity ?? []).filter((a) => inFilter(filter, a.business)).slice(0, 7);
   const idea = snap?.instagram?.analysis?.ideas?.[0];
+  const streak = inFilter(filter, "arctos") && data.arctos ? outreachStreak(data.arctos.sendsByDay, now) : 0;
+  const climbs = accounts.filter((a) => a.followers > 0).map((a) => ({ handle: a.handle, followers: a.followers, ...nextMilestone(a.followers) })).sort((a, b) => b.progress - a.progress);
+  const first = needs[0];
 
   return (
     <div className="hq-view">
-      <header>
-        <p className="hq-eyebrow">{weekday} · {date}{filter !== "all" ? ` · ${BUSINESS_LABEL[filter]}` : ""}</p>
-        <h1 className="hq-h1">{greeting} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go build.</em></>}</h1>
+      <header className="hq-hello">
+        <div className="hq-hello__top">
+          <p className="hq-eyebrow">{weekday} · {date} · Calgary{filter !== "all" ? ` · ${BUSINESS_LABEL[filter]}` : ""}</p>
+          <SkyStrip preview={preview} />
+        </div>
+        <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go build.</em></>}</h1>
+        <p className="hq-brief">{story.join(" ")}</p>
+        {first ? (
+          <button type="button" className="hq-focus" onClick={() => go("inbox")}>
+            <span className="hq-eyebrow"><span>→</span> Start here</span>
+            <strong>{first.label}: {first.title}</strong>
+            <span className="hq-mono">{BUSINESS_LABEL[first.business]} · waiting {ago(first.at, now).replace(" ago", "")}</span>
+          </button>
+        ) : null}
       </header>
 
       <div className="hq-islands">
@@ -75,6 +99,35 @@ export function OverviewView() {
           </div>
         </section>
       </div>
+
+      {good.length || streak || climbs.length ? (
+        <section className="hq-card hq-momentum">
+          <div className="hq-card__head"><h2 className="hq-h2">Momentum</h2><p className="hq-mono">Last 7 days</p></div>
+          <div className="hq-momentum__grid">
+            {streak ? (
+              <div className="hq-streak">
+                <b>{streak}</b>
+                <span>{streak === 1 ? "weekday" : "weekdays"} straight of Arctos outreach</span>
+                <i aria-hidden="true">{Array.from({ length: Math.min(streak, 10) }, (_, k) => <em key={k} />)}</i>
+              </div>
+            ) : null}
+            {climbs.slice(0, 3).map((c) => (
+              <div className="hq-climb" key={c.handle}>
+                <span className="hq-mono">@{c.handle}</span>
+                <b>{num(c.left)} <small>to {num(c.target)}</small></b>
+                <span className="hq-meter" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(c.progress * 100)} aria-label={`@${c.handle} toward ${num(c.target)} followers`}><span style={{ width: `${Math.round(c.progress * 100)}%` }} /></span>
+              </div>
+            ))}
+          </div>
+          {good.length ? (
+            <ul className="hq-wins">
+              {good.slice(0, 5).map((w) => (
+                <li key={w.key}><span>{w.text}</span><span className="hq-mono">{BUSINESS_LABEL[w.business] ?? w.business} · {short(w.at, now)}</span></li>
+              ))}
+            </ul>
+          ) : <p className="hq-small">No new yeses this week yet. The next one shows up here.</p>}
+        </section>
+      ) : null}
 
       <div className="hq-cols-2">
         <section className="hq-card">
@@ -130,6 +183,8 @@ export function OverviewView() {
           <p className="hq-small">{idea.why}</p>
         </section>
       ) : null}
+
+      <p className="hq-signoff">{signoff(now)}</p>
     </div>
   );
 }

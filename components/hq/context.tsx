@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Business, CommandType, HqCommandRecord, HqResponse } from "@/lib/hq/types";
+import type { Business, CommandType, HqCommandRecord, HqResponse, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
 
 export type Filter = Business | "all";
 
@@ -12,7 +12,11 @@ export interface HqContextValue {
   /** Queue an action for the agents. Resolves once HQ has saved it. */
   act: (type: CommandType, targetId: string, payload: Record<string, unknown>, label: string) => Promise<void>;
   cancel: (id: string) => Promise<void>;
+  /** Approve, wave off, reopen or finish a checked Gmail reply's subtask; "clear" undoes the call. Saved at once. */
+  decide: (key: string, decision: TriageDecisionKind | "clear", label: string, opts?: { title?: string; previous?: TriageDecision | null }) => Promise<void>;
   go: (view: string) => void;
+  /** Rendering from sample data: nothing leaves the page. */
+  preview?: boolean;
 }
 
 export const HqContext = createContext<HqContextValue | null>(null);

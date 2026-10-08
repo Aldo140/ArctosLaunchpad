@@ -5,8 +5,12 @@
  * mail sent from each send-as address (Vow Motion, Arctos, CalgaryWatch) and
  * the replies to it, and posts a summary to arctoslaunchpad.com/hq: who was
  * pitched, from which address, who answered, auto-replies, opt-outs and
- * bounces, and any pitch that went out from the wrong address. Message bodies
- * never leave Gmail; a reply carries a 240-character snippet.
+ * bounces, and any pitch that went out from the wrong address. A reply carries
+ * a 240-character snippet. For a real reply nobody has answered yet, the
+ * newest one in its thread also carries the conversation (our first message
+ * and the latest few, each cut to its new text, 700 characters at most) so
+ * HQ's reply check can tell whether it needs you. Nothing else of a body
+ * leaves Gmail.
  *
  * Setup (once): paste this file into a new project at script.google.com, put
  * the HQ key in HQ_KEY below (or in Project Settings → Script properties as
@@ -74,6 +78,7 @@ function sync() {
 
 function readThread(thread, mine, me, since, sends, replies) {
   var messages = thread.getMessages();
+  var firstReply = replies.length;
   var url = 'https://mail.google.com/mail/u/0/#all/' + thread.getId();
   var firstFromUs = isMine(address(messages[0].getFrom()), mine);
   // What the conversation is about: the business our first message names, else its address's.
@@ -121,6 +126,21 @@ function readThread(thread, mine, me, since, sends, replies) {
         url: url,
       });
     }
+  });
+  // The newest unanswered real reply in this thread gets the conversation.
+  for (var j = replies.length - 1; j >= firstReply; j--) {
+    if (replies[j].kind === 'reply' && !replies[j].answered) {
+      replies[j].thread = conversation(messages, mine);
+      break;
+    }
+  }
+}
+
+/** Our first message and the latest seven, each cut to its new text. */
+function conversation(messages, mine) {
+  var picked = messages.length > 8 ? [messages[0]].concat(messages.slice(-7)) : messages;
+  return picked.map(function (x) {
+    return { at: x.getDate().getTime(), ours: isMine(address(x.getFrom()), mine), from: address(x.getFrom()), text: firstLines(x.getPlainBody()).slice(0, 700) };
   });
 }
 

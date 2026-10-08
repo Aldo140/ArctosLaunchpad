@@ -1,14 +1,20 @@
 import { timingSafeEqual } from "node:crypto";
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { writeStringField } from "@/lib/hq/google";
+import { runTriage } from "@/lib/hq/triageAgent";
 import type { GmailSummary } from "@/lib/hq/types";
 
 /**
  * The Gmail sync (ops/gmail/hq-sync.gs) posts here every 15 minutes with the
  * key in HQ_GMAIL_KEY. The summary is stored in arctos-hq (hq/gmail) and read
- * by /api/hq/snapshot; nothing here is public.
+ * by /api/hq/snapshot; nothing here is public. Once it's saved, the reply
+ * check (lib/hq/triageAgent.ts) looks at any reply that is new or whose
+ * surroundings changed.
  */
+
+// The reply check runs after the response, inside this function's time.
+export const maxDuration = 300;
 
 const business = z.enum(["calgarywatch", "calgarydaily", "vowmotion", "arctos", "other"]);
 const text = (max: number) => z.string().transform((s) => s.slice(0, max));
@@ -41,6 +47,7 @@ const Summary = z.object({
     toPitch: z.boolean(),
     answered: z.boolean(),
     url: text(300),
+    thread: z.array(z.object({ at: z.number(), ours: z.boolean(), from: text(200), text: text(800) })).max(8).optional(),
   })).max(500),
 });
 
@@ -63,5 +70,6 @@ export async function POST(request: Request) {
     replies: parsed.data.replies.sort((a, b) => b.at - a.at).slice(0, 400),
   };
   await writeStringField("hq/gmail", "payload", JSON.stringify(summary));
+  after(() => runTriage(summary).catch((e) => console.error(`[reply-check] ${e instanceof Error ? e.message : e}`)));
   return NextResponse.json({ ok: true, sends: summary.sends.length, replies: summary.replies.length });
 }
