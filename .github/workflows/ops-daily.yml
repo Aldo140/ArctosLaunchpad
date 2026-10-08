@@ -43,7 +43,11 @@ jobs:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       GITHUB_TOKEN: ${{ github.token }}
     steps:
+      # The agents' code lives on main; this file also sits on the default branch
+      # (arctos-launchpad), which is where GitHub runs schedules and dispatches.
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 24

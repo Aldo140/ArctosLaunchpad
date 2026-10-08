@@ -11,6 +11,10 @@ dashboard. They moved here from the CalgaryWatch repository in October 2026.
 | `ops-hourly.yml` | Every 30 min | Applies HQ actions, publishes due posts, reads partner replies, sends approved email, publishes the CalgaryDaily feed and the HQ snapshot. |
 | `ops-daily.yml` | Mornings | Drafts posts, runs the Scout and inspiration analysis, finds leads, drafts pitches, checks health, emails the summary. |
 
+The three workflow files also sit on `arctos-launchpad`, this repository's
+default branch: GitHub runs schedules and manual starts only from there. They
+check out `main` for the code, so keep both copies of each file identical.
+
 Code is in `ops/` (`npm run ops:typecheck`, `npm run ops:test`). It is its own
 ES module folder and is excluded from the Next.js type check and lint.
 
