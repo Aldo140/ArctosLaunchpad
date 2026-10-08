@@ -270,6 +270,17 @@ export interface GmailSummary {
 }
 
 /**
+ * The next few days of Aldo's Google Calendar, posted by
+ * ops/gmail/hq-calendar.gs every 15 minutes. Times are epoch ms.
+ */
+export interface CalendarEvent { title: string; start: number; end: number; allDay: boolean; location: string }
+export interface CalendarSummary { generatedAt: number; events: CalendarEvent[] }
+
+/** Personal log entries saved from HQ (a gym visit today; more kinds later). */
+export type LifeKind = "gym";
+export interface LifeEntry { id: string; kind: LifeKind; at: number }
+
+/**
  * The reply check: before a Gmail reply reaches the board, an agent reads the
  * thread and what else is going on with that sender and decides whether it
  * needs Aldo. Replies that do get a proposed subtask he approves or waves off;
@@ -320,6 +331,8 @@ export interface HqResponse {
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
   gmail: GmailSummary | null;
+  calendar: CalendarSummary | null;
+  life: LifeEntry[] | null;
   triage: GmailTriage | null;
   decisions: TriageDecision[];
   errors: string[];

@@ -84,3 +84,23 @@ on Vercel, the check runs straight after each Gmail sync instead of waiting
 for the next run. For the thread context, paste the updated
 `ops/gmail/hq-sync.gs` into the Apps Script project; until then the check
 works from the 240-character snippet.
+
+HQ reads the mood (`mood()` in persona.ts): late night, a heavy queue, a
+skipped gym, a run of wins or a quiet inbox each change the closing line of
+the brief and the sign-off.
+
+## Life
+
+- **Money moves**: everyone closest to paying, oldest first. That means pitch
+  replies still waiting on an answer (they open the Gmail thread), interested
+  or replied CalgaryWatch leads, then follow-ups that are due.
+- **Today**: the calendar sync (`ops/gmail/hq-calendar.gs`) runs in the same
+  Apps Script project as the Gmail sync. It posts the next seven days of
+  events every 15 minutes to `/api/hq/ingest/calendar` with the same key
+  (`HQ_GMAIL_KEY`). Setup: add the file to that project and run `setupCalendar`
+  once.
+- **Gym**: the "I went today" button (or `l g`) writes to `hq_life` through
+  `POST /api/hq/life`. Calendar events that look like a workout count too.
+  The goal (`GYM_GOAL`, 3 a week) and the membership cost (`GYM_MONTHLY`, used
+  for cost per visit) live in persona.ts. The card suggests the first free
+  90 minutes on today's calendar.
