@@ -1,0 +1,56 @@
+// Once a day (early morning Calgary time): draft posts, research and draft
+// partner emails, check health, and email the founder a summary.
+//
+// Without FIREBASE_SERVICE_ACCOUNT it runs as a dry run: drafts and renders
+// posts from the local discovery index into brand/preview/dry-run/ and stops.
+
+import { hasFirebase, opsDb } from './lib/firebase';
+import { loadDiscoveryIndex } from './lib/discovery';
+import { queueDrafts } from './jobs/drafts';
+import { resolveDoubleBookings, autoApprove, draftPosts, monitorPosts, redraftAndBriefs } from './jobs/posts';
+import { draftPitches, findLeads } from './jobs/outreach';
+import { checkHealth, sendSummary } from './jobs/health';
+import { collectInsights } from './jobs/insights';
+import { collectAccountHistory } from './jobs/accountHistory';
+import { runScout } from './jobs/scout';
+import { exitForQuota, isQuotaExhausted } from './lib/quota';
+import { flushUsage } from './jobs/usage';
+
+const log = (m: string) => console.log(`[ops:daily] ${m}`);
+const index = await loadDiscoveryIndex(log);
+const now = Date.now();
+const db = hasFirebase() ? opsDb() : null;
+let failed = false;
+let quota = false;
+
+async function step(name: string, run: () => Promise<unknown>) {
+  if (quota) return;
+  try { await run(); } catch (e) {
+    if (isQuotaExhausted(e)) { quota = true; log(`${name}: Firestore quota exhausted; stopping this run.`); return; }
+    failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`);
+  }
+}
+
+if (!db) {
+  log('No Firebase credentials: dry run, nothing is written remotely.');
+  await step('draft posts', () => draftPosts(null, index, now, log));
+  await step('health', () => checkHealth(null, index, now, log));
+} else {
+  await step('monitor posts', () => monitorPosts(db, index, now, log));
+  await step('insights', () => collectInsights(db, now, log));
+  await step('account history', () => collectAccountHistory(db, now, log));
+  await step('scout', () => runScout(db, now, log));
+  await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
+  await step('draft posts', () => draftPosts(db, index, now, log));
+  await step('queue drafts', () => queueDrafts(db, now, log));
+  await step('auto-approve', () => autoApprove(db, now, log));
+  await step('one post per slot', () => resolveDoubleBookings(db, now, log));
+  await step('find leads', () => findLeads(db, index, now, log));
+  await step('draft pitches', () => draftPitches(db, index, now, log));
+  let health = null as Awaited<ReturnType<typeof checkHealth>> | null;
+  await step('health', async () => { health = await checkHealth(db, index, now, log); });
+  if (health) await step('summary', () => sendSummary(db, health!, now, log));
+}
+await flushUsage(db, now, 'daily', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
+if (failed) process.exitCode = 1;
+else if (quota) exitForQuota('Operations daily');

@@ -7,9 +7,10 @@ import type { WorkflowSummary } from "./types";
  */
 
 const WATCHED: Array<{ repo: string; file: string; name: string; job: string; cron: string }> = [
-  { repo: "Aldo140/Calgary-Watch-", file: "ops-hourly.yml", cron: "7,22,37,52 * * * *", name: "Operations hourly", job: "Applies your HQ actions, publishes due posts, reads replies and sends approved email." },
-  { repo: "Aldo140/Calgary-Watch-", file: "ops-daily.yml", cron: "5 9,12,13,14 * * *", name: "Operations daily", job: "Drafts posts, runs the Scout and inspiration analysis, finds leads, checks health." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "ops-hourly.yml", cron: "7,37 * * * *", name: "Operations hourly", job: "Applies your HQ actions, publishes due posts, reads replies and sends approved email." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "ops-daily.yml", cron: "5 9,12,13,14 * * *", name: "Operations daily", job: "Drafts posts, runs the Scout and inspiration analysis, finds leads, checks health." },
   { repo: "Aldo140/Calgary-Watch-", file: "ops-maintenance.yml", cron: "40 9 * * *", name: "Nightly maintenance", job: "Type check, tests and audit; opens a fix pull request when something breaks." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "ops-clock.yml", cron: "23 */6 * * *", name: "Operations clock", job: "Starts the agents on time: hourly at :07 and :37, daily at 3, 6, 7 and 8 am." },
   { repo: "Aldo140/ArctosLaunchpad", file: "outreach.yml", cron: "11,26,41,56 14-23 * * 1-5", name: "Arctos outreach", job: "Sends the queued Arctos emails through Brevo, weekdays 9 to 4:30." },
   { repo: "Aldo140/Calgary-Watch-", file: "weekly-digest.yml", cron: "0 15 * * 1", name: "Monday digest", job: "CalgaryWatch's weekly email to members." },
   { repo: "Aldo140/Calgary-Watch-", file: "events-digest.yml", cron: "0 14 * * 4", name: "Thursday event picks", job: "CalgaryWatch's event email." },

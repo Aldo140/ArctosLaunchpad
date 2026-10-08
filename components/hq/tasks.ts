@@ -132,7 +132,7 @@ export const ROUTINES: Routine[] = [
     },
   },
   {
-    id: "cd-publish", owner: "calgarydaily", title: "Publish on schedule", cadence: "Every 15 minutes, each post at its slot", workflow: "ops-hourly.yml",
+    id: "cd-publish", owner: "calgarydaily", title: "Publish on schedule", cadence: "Every 30 minutes, each post at its slot", workflow: "ops-hourly.yml",
     done: "Every approved post is live on Instagram at its slot.",
     proof: ({ data, dayStart, now }) => {
       const posts = data.snapshot?.posts ?? [];
@@ -146,12 +146,12 @@ export const ROUTINES: Routine[] = [
     },
   },
   {
-    id: "cw-outreach", owner: "calgarywatch", title: "Partner outreach", cadence: "Every 15 minutes, approved emails only", workflow: "ops-hourly.yml",
+    id: "cw-outreach", owner: "calgarywatch", title: "Partner outreach", cadence: "Every 30 minutes, approved emails only", workflow: "ops-hourly.yml",
     done: "Every pitch and follow-up you approved has gone out from aldo@calgarywatch.ca.",
     proof: activityProof("Email sent", "calgarywatch", "email sent", "emails sent"),
   },
   {
-    id: "cw-replies", owner: "calgarywatch", title: "Read partner replies", cadence: "Every 15 minutes", workflow: "ops-hourly.yml",
+    id: "cw-replies", owner: "calgarywatch", title: "Read partner replies", cadence: "Every 30 minutes", workflow: "ops-hourly.yml",
     done: "Replies are read, sorted and drafted for you; opt-outs are honoured.",
     proof: activityProof("Reply received", "calgarywatch", "reply", "replies"),
   },
@@ -179,7 +179,7 @@ export const ROUTINES: Routine[] = [
   { id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Planned, weekdays", done: "Fifteen couples and venues pitched from aldo@vowmotionweddings.com, replies drafted here.", setup: "Starts once Gmail is connected to HQ." },
   { id: "vm-instagram", owner: "vowmotion", title: "Post to @vowmotion", cadence: "Planned", done: "Wedding films cut into posts, approved here, published on schedule.", setup: "Needs the @vowmotion Instagram token." },
   {
-    id: "sh-actions", owner: "shared", title: "Apply your HQ actions", cadence: "Every 15 minutes", workflow: "ops-hourly.yml",
+    id: "sh-actions", owner: "shared", title: "Apply your HQ actions", cadence: "Every 30 minutes", workflow: "ops-hourly.yml",
     done: "Everything you approved, rejected or redrafted here has been carried out.",
     proof: ({ data, dayStart }) => {
       const done = today(data.commands.filter((c) => c.status !== "pending").map((c) => ({ at: c.appliedAt ?? c.at, text: `${COMMAND_LABEL[c.type]}${c.status === "failed" ? " · not applied" : ""}${c.result ? ` · ${c.result}` : ""}` })), dayStart);
@@ -223,6 +223,7 @@ export const ROUTINES: Routine[] = [
       };
     },
   },
+  { id: "sh-clock", owner: "shared", title: "Keep the agents on time", cadence: "Always on, one run every 6 hours", workflow: "ops-clock.yml", done: "The clock is awake and starting hourly and daily runs on schedule, not when GitHub gets to it." },
   { id: "sh-maintenance", owner: "shared", title: "Nightly maintenance", cadence: "Nightly, 3:40 am", workflow: "ops-maintenance.yml", done: "Type check, tests and audit pass; a fix pull request opens if not." },
 ];
 

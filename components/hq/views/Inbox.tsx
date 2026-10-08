@@ -163,7 +163,7 @@ export function InboxView() {
       <header>
         <p className="hq-eyebrow"><span>02</span> Run the work</p>
         <h1 className="hq-h1">{total ? <>{plural(total, "decision")} <em>waiting on you.</em></> : <>Inbox zero. <em>Nicely done.</em></>}</h1>
-        <p className="hq-lede" style={{ marginTop: 10 }}>Replies first, then posts, then pitches. Every action here is applied by the agents on their next run, about every 15 minutes, with the same rules as the CalgaryWatch admin. Changed your mind? Undo works until then.</p>
+        <p className="hq-lede" style={{ marginTop: 10 }}>Replies first, then posts, then pitches. Every action here is applied by the agents on their next run, about every 30 minutes. Changed your mind? Undo works until then.</p>
       </header>
       <div className="hq-seg" role="group" aria-label="Show">
         {segs.map(([k, label, n]) => (

@@ -179,7 +179,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
       try {
         const { command } = (await call("/api/hq/command", { action: "create", type, targetId, payload })) as { command: HqCommandRecord };
         setData((d) => (d ? { ...d, commands: [command, ...d.commands] } : d));
-        toast(`${label}. Applied within 15 minutes.`, () => void cancel(command.id));
+        toast(`${label}. Applied within 30 minutes.`, () => void cancel(command.id));
       } catch (e) {
         toast(e instanceof Error ? e.message : "Couldn't save that.");
       }
