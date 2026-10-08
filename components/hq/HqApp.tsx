@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
 import { googleProvider, hqAuth } from "@/lib/hq/firebaseClient";
-import type { CommandType, HqCommandRecord, HqResponse } from "@/lib/hq/types";
+import type { CommandType, HqCommandRecord, HqResponse, LifeEntry } from "@/lib/hq/types";
 import { HqContext, inFilter, type Filter, type HqContextValue } from "./context";
 import { BUSINESSES, ago } from "./format";
 import { Icon } from "./ui";
@@ -122,6 +122,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     async (path: string, body?: unknown) => {
       if (preview) {
         const b = (body ?? {}) as { action?: string; type?: CommandType; targetId?: string };
+        if (path.endsWith("/life") && b.action === "log") return { entry: { id: String(Date.now()), kind: "gym", at: Date.now() } };
         if (path.endsWith("/command") && b.action === "create") return { command: { id: String(Date.now()), type: b.type!, targetId: b.targetId!, by: email, at: Date.now(), status: "pending", result: null, appliedAt: null } };
         return path.endsWith("/snapshot") ? preview : { ok: true };
       }
@@ -193,6 +194,29 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     [call, cancel, toast],
   );
 
+  const undoGym = useCallback(
+    async (id: string) => {
+      try {
+        await call("/api/hq/life", { action: "undo", id });
+        setData((d) => (d ? { ...d, life: (d.life ?? []).filter((e) => e.id !== id) } : d));
+        toast("Taken back.");
+      } catch (e) {
+        toast(e instanceof Error ? e.message : "Couldn't undo.");
+      }
+    },
+    [call, toast],
+  );
+
+  const logGym = useCallback(async () => {
+    try {
+      const { entry } = (await call("/api/hq/life", { action: "log", kind: "gym" })) as { entry: LifeEntry };
+      setData((d) => (d ? { ...d, life: [entry, ...(d.life ?? [])] } : d));
+      toast("Gym logged. That's how it's done.", () => void undoGym(entry.id));
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Couldn't save that.");
+    }
+  }, [call, toast, undoGym]);
+
   const go = useCallback((v: string) => {
     window.location.hash = v;
     setSheet(false);
@@ -214,17 +238,18 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const snap = data?.snapshot;
   const age = snap ? now - snap.generatedAt : null;
   const fresh = age === null ? "bad" : age < 30 * 60_000 ? "ok" : age < 3 * 3_600_000 ? "warn" : "bad";
-  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, go, preview: !!preview } : null;
+  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, go, logGym, undoGym, preview: !!preview } : null;
 
   const commands = useMemo<PaletteItem[]>(
     () => [
       ...PALETTE_ORDER.map((id) => ({ id: `go-${id}`, label: VIEWS[id].label, hint: "Go to", icon: VIEWS[id].icon, keys: VIEWS[id].keys, run: () => go(id) })),
+      { id: "gym", label: "I went to the gym", hint: "Log today", icon: "gym", keys: "l g", run: () => void logGym() },
       { id: "refresh", label: "Refresh", hint: "Ask the agents for the latest", icon: "refresh", run: () => void load() },
       { id: "f-all", label: "All businesses", hint: "Filter", icon: "overview", run: () => setFilter("all") },
       ...BUSINESSES.map((b) => ({ id: `f-${b.id}`, label: `${b.label} only`, hint: "Filter", icon: "pipelines", run: () => setFilter(b.id) })),
       { id: "signout", label: "Sign out", icon: "out", run: onSignOut },
     ],
-    [go, load, onSignOut],
+    [go, load, logGym, onSignOut],
   );
 
   const navLink = (id: ViewId) => (

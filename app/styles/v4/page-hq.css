@@ -482,3 +482,25 @@ details.hq-more[open] summary { margin-bottom: 8px; }
   .hq-palette__panel { animation: hq-in 0.18s var(--ease-out) both; }
   .hq-focus { transition: border-color var(--dur); }
 }
+
+/* ---- Life: money moves, today, the gym -------------------------------- */
+.hq-stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
+.hq-brief b { font-weight: 500; color: var(--fg); }
+.hq-brief[data-mood="winning"] b, .hq-brief[data-mood="gym"] b { color: var(--accent); }
+.hq-card__head > svg { width: 20px; height: 20px; color: var(--faint); flex: none; }
+.hq-row--link { width: 100%; text-align: left; font: inherit; color: inherit; text-decoration: none; cursor: pointer; }
+.hq-row--link:hover { border-color: var(--line-strong); }
+.hq-money .hq-eyebrow span { font-weight: 600; }
+
+.hq-agenda { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.hq-agenda li { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 7px 10px; border-radius: var(--radius); font-size: 0.9rem; }
+.hq-agenda li span:last-child { overflow-wrap: anywhere; }
+.hq-agenda small { display: block; color: var(--faint); font-size: 0.78rem; }
+.hq-agenda li[data-past="true"] { opacity: 0.45; }
+.hq-agenda li[data-next="true"] { background: var(--bg); box-shadow: inset 3px 0 0 var(--accent); }
+
+.hq-gym__week { display: flex; align-items: center; gap: 6px; }
+.hq-gym__week i { width: 22px; height: 8px; border-radius: 4px; background: var(--hq-hover); border: 1px solid var(--line); }
+.hq-gym__week i[data-on="true"] { background: var(--accent); border-color: var(--accent); }
+.hq-gym__week span { margin-left: 6px; font: 500 0.74rem/1 var(--mono); color: var(--faint); }
+.hq-gym .hq-small { margin: 0; }

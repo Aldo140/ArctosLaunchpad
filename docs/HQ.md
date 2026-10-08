@@ -52,3 +52,23 @@ weather from Open-Meteo (no key). ⌘K, Ctrl+K or `/` opens the command bar;
 `g` then a letter jumps to a tab (`g i` Inbox, `g t` Tasks, `g p` Pipelines,
 `g s` Instagram, `g d` Inspiration, `g n` Performance, `g h` Health,
 `g o` Overview).
+
+HQ reads the mood (`mood()` in persona.ts): late night, a heavy queue, a
+skipped gym, a run of wins or a quiet inbox each change the closing line of
+the brief and the sign-off.
+
+## Life
+
+- **Money moves**: everyone closest to paying, oldest first. That means pitch
+  replies still waiting on an answer (they open the Gmail thread), interested
+  or replied CalgaryWatch leads, then follow-ups that are due.
+- **Today**: the calendar sync (`ops/gmail/hq-calendar.gs`) runs in the same
+  Apps Script project as the Gmail sync. It posts the next seven days of
+  events every 15 minutes to `/api/hq/ingest/calendar` with the same key
+  (`HQ_GMAIL_KEY`). Setup: add the file to that project and run `setupCalendar`
+  once.
+- **Gym**: the "I went today" button (or `l g`) writes to `hq_life` through
+  `POST /api/hq/life`. Calendar events that look like a workout count too.
+  The goal (`GYM_GOAL`, 3 a week) and the membership cost (`GYM_MONTHLY`, used
+  for cost per visit) live in persona.ts. The card suggests the first free
+  90 minutes on today's calendar.

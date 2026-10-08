@@ -256,6 +256,17 @@ export interface GmailSummary {
   replies: GmailReply[];
 }
 
+/**
+ * The next few days of Aldo's Google Calendar, posted by
+ * ops/gmail/hq-calendar.gs every 15 minutes. Times are epoch ms.
+ */
+export interface CalendarEvent { title: string; start: number; end: number; allDay: boolean; location: string }
+export interface CalendarSummary { generatedAt: number; events: CalendarEvent[] }
+
+/** Personal log entries saved from HQ (a gym visit today; more kinds later). */
+export type LifeKind = "gym";
+export interface LifeEntry { id: string; kind: LifeKind; at: number }
+
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
@@ -263,5 +274,7 @@ export interface HqResponse {
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
   gmail: GmailSummary | null;
+  calendar: CalendarSummary | null;
+  life: LifeEntry[] | null;
   errors: string[];
 }

@@ -13,6 +13,9 @@ export interface HqContextValue {
   act: (type: CommandType, targetId: string, payload: Record<string, unknown>, label: string) => Promise<void>;
   cancel: (id: string) => Promise<void>;
   go: (view: string) => void;
+  /** Log a gym visit for today, or take one back. */
+  logGym: () => Promise<void>;
+  undoGym: (id: string) => Promise<void>;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }
