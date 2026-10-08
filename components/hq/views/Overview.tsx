@@ -4,7 +4,8 @@ import { inFilter, useHq } from "../context";
 import { BUSINESS_LABEL, ago, calgaryParts, cdn, num, plural, short, slot, when } from "../format";
 import { Spark, Stat, Thumb } from "../ui";
 import { evaluateAll } from "../tasks";
-import { brief, greeting, nextMilestone, outreachStreak, signoff, wins } from "../persona";
+import { brief, greeting, mood, moodSignoff, nextMilestone, outreachStreak, wins } from "../persona";
+import { GymCard, MoneyMoves, TodayCard } from "./Life";
 import { SkyStrip } from "../Sky";
 import { replyBoard } from "@/lib/hq/triage";
 
@@ -53,6 +54,7 @@ export function OverviewView() {
   const streak = inFilter(filter, "arctos") && data.arctos ? outreachStreak(data.arctos.sendsByDay, now) : 0;
   const climbs = accounts.filter((a) => a.followers > 0).map((a) => ({ handle: a.handle, followers: a.followers, ...nextMilestone(a.followers) })).sort((a, b) => b.progress - a.progress);
   const first = needs[0];
+  const feel = mood(data, now, filter, waiting);
 
   return (
     <div className="hq-view">
@@ -62,7 +64,7 @@ export function OverviewView() {
           <SkyStrip preview={preview} />
         </div>
         <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go build.</em></>}</h1>
-        <p className="hq-brief">{story.join(" ")}</p>
+        <p className="hq-brief" data-mood={feel.key}>{story.join(" ")} <b>{feel.line}</b></p>
         {first ? (
           <button type="button" className="hq-focus" onClick={() => go("inbox")}>
             <span className="hq-eyebrow"><span>→</span> Start here</span>
@@ -71,6 +73,14 @@ export function OverviewView() {
           </button>
         ) : null}
       </header>
+
+      <div className="hq-cols-2">
+        <MoneyMoves />
+        <div className="hq-stack">
+          <TodayCard />
+          <GymCard />
+        </div>
+      </div>
 
       <div className="hq-islands">
         <section className="hq-card hq-island">
@@ -184,7 +194,7 @@ export function OverviewView() {
         </section>
       ) : null}
 
-      <p className="hq-signoff">{signoff(now)}</p>
+      <p className="hq-signoff">{moodSignoff(feel.key, now)}</p>
     </div>
   );
 }

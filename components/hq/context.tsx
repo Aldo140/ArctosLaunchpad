@@ -15,6 +15,9 @@ export interface HqContextValue {
   /** Approve, wave off, reopen or finish a checked Gmail reply's subtask; "clear" undoes the call. Saved at once. */
   decide: (key: string, decision: TriageDecisionKind | "clear", label: string, opts?: { title?: string; previous?: TriageDecision | null }) => Promise<void>;
   go: (view: string) => void;
+  /** Log a gym visit for today, or take one back. */
+  logGym: () => Promise<void>;
+  undoGym: (id: string) => Promise<void>;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }
