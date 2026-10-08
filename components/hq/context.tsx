@@ -15,6 +15,8 @@ export interface HqContextValue {
   /** Approve, wave off, reopen or finish a checked Gmail reply's subtask; "clear" undoes the call. Saved at once. */
   decide: (key: string, decision: TriageDecisionKind | "clear", label: string, opts?: { title?: string; previous?: TriageDecision | null }) => Promise<void>;
   go: (view: string) => void;
+  /** Rendering from sample data: nothing leaves the page. */
+  preview?: boolean;
 }
 
 export const HqContext = createContext<HqContextValue | null>(null);

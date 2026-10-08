@@ -17,6 +17,8 @@ const PATHS: Record<string, string> = {
   refresh: "M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7",
   out: "M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10",
   external: "M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
+  search: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4",
+  spark: "M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8",
 };
 
 export function Icon({ name, title }: { name: keyof typeof PATHS | string; title?: string }) {

@@ -7,6 +7,8 @@ import type { CommandType, HqCommandRecord, HqResponse, TriageDecision, TriageDe
 import { HqContext, inFilter, type Filter, type HqContextValue } from "./context";
 import { BUSINESSES, ago } from "./format";
 import { Icon } from "./ui";
+import { Palette, type PaletteItem } from "./Palette";
+import { OWNER } from "./persona";
 import { OverviewView } from "./views/Overview";
 import { InboxView } from "./views/Inbox";
 import { InstagramView } from "./views/Instagram";
@@ -21,16 +23,16 @@ import { GlossaryView } from "./views/Glossary";
 
 type ViewId = "overview" | "inbox" | "instagram" | "inspiration" | "pipelines" | "tasks" | "performance" | "health" | "glossary";
 
-const VIEWS: Record<ViewId, { label: string; icon: string; render: () => React.ReactNode }> = {
-  overview: { label: "Overview", icon: "overview", render: () => <OverviewView /> },
-  instagram: { label: "Instagram", icon: "instagram", render: () => <InstagramView /> },
-  inspiration: { label: "Inspiration", icon: "inspiration", render: () => <InspirationView /> },
-  pipelines: { label: "Pipelines", icon: "pipelines", render: () => <PipelinesView /> },
-  inbox: { label: "Inbox", icon: "inbox", render: () => <InboxView /> },
-  tasks: { label: "Tasks", icon: "tasks", render: () => <TasksView /> },
-  performance: { label: "Performance", icon: "performance", render: () => <PerformanceView /> },
-  health: { label: "Health", icon: "health", render: () => <HealthView /> },
-  glossary: { label: "Glossary", icon: "glossary", render: () => <GlossaryView /> },
+const VIEWS: Record<ViewId, { label: string; icon: string; keys: string; render: () => React.ReactNode }> = {
+  overview: { label: "Overview", icon: "overview", keys: "g o", render: () => <OverviewView /> },
+  instagram: { label: "Instagram", icon: "instagram", keys: "g s", render: () => <InstagramView /> },
+  inspiration: { label: "Inspiration", icon: "inspiration", keys: "g d", render: () => <InspirationView /> },
+  pipelines: { label: "Pipelines", icon: "pipelines", keys: "g p", render: () => <PipelinesView /> },
+  inbox: { label: "Inbox", icon: "inbox", keys: "g i", render: () => <InboxView /> },
+  tasks: { label: "Tasks", icon: "tasks", keys: "g t", render: () => <TasksView /> },
+  performance: { label: "Performance", icon: "performance", keys: "g n", render: () => <PerformanceView /> },
+  health: { label: "Health", icon: "health", keys: "g h", render: () => <HealthView /> },
+  glossary: { label: "Glossary", icon: "glossary", keys: "g g", render: () => <GlossaryView /> },
 };
 
 /** The rail follows the Arctos islands. */
@@ -40,6 +42,8 @@ const GROUPS: Array<{ n: string; label: string; views: ViewId[] }> = [
   { n: "03", label: "See the numbers", views: ["performance", "health"] },
 ];
 const TABBAR: ViewId[] = ["overview", "inbox", "instagram", "pipelines"];
+/** Most-used first, so a short search lands on the likely one. */
+const PALETTE_ORDER: ViewId[] = ["inbox", "overview", "tasks", "instagram", "pipelines", "inspiration", "performance", "health", "glossary"];
 
 const subscribeHash = (cb: () => void) => {
   window.addEventListener("hashchange", cb);
@@ -69,8 +73,8 @@ export function HqApp() {
     return (
       <div className="hq tone-ink hq-signin">
         <div className="hq-signin__card">
-          <p className="hq-eyebrow">Arctos HQ · private</p>
-          <h1>Four businesses. <em>One bridge.</em></h1>
+          <p className="hq-eyebrow">{OWNER}&apos;s HQ · private</p>
+          <h1>Welcome back, <em>{OWNER}.</em></h1>
           <p>CalgaryWatch, CalgaryDaily, Vow Motion and Arctos Launchpad: what the agents did, what needs you, and what to make next.</p>
           <div className="hq-islandline"><span>Win the customer</span><span>Run the work</span><span>See the numbers</span></div>
           <div className="hq-actions">
@@ -111,6 +115,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const [filter, setFilter] = useState<Filter>("all");
   const [sheet, setSheet] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [palette, setPalette] = useState(false);
   const view = useView();
 
   const call = useCallback(
@@ -236,7 +241,18 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const snap = data?.snapshot;
   const age = snap ? now - snap.generatedAt : null;
   const fresh = age === null ? "bad" : age < 30 * 60_000 ? "ok" : age < 3 * 3_600_000 ? "warn" : "bad";
-  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, decide, go } : null;
+  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, decide, go, preview: !!preview } : null;
+
+  const commands = useMemo<PaletteItem[]>(
+    () => [
+      ...PALETTE_ORDER.map((id) => ({ id: `go-${id}`, label: VIEWS[id].label, hint: "Go to", icon: VIEWS[id].icon, keys: VIEWS[id].keys, run: () => go(id) })),
+      { id: "refresh", label: "Refresh", hint: "Ask the agents for the latest", icon: "refresh", run: () => void load() },
+      { id: "f-all", label: "All businesses", hint: "Filter", icon: "overview", run: () => setFilter("all") },
+      ...BUSINESSES.map((b) => ({ id: `f-${b.id}`, label: `${b.label} only`, hint: "Filter", icon: "pipelines", run: () => setFilter(b.id) })),
+      { id: "signout", label: "Sign out", icon: "out", run: onSignOut },
+    ],
+    [go, load, onSignOut],
+  );
 
   const navLink = (id: ViewId) => (
     <a key={id} className="hq-navlink" href={`#${id}`} aria-current={view === id ? "page" : undefined} onClick={() => window.scrollTo({ top: 0 })}>
@@ -249,7 +265,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   return (
     <div className="hq tone-ink">
       <aside className="hq-rail" aria-label="HQ">
-        <a className="hq-rail__brand" href="#overview"><b>Arctos</b><i>HQ</i></a>
+        <a className="hq-rail__brand" href="#overview"><b>{OWNER}&apos;s</b><i>HQ</i></a>
         <nav aria-label="Sections">
           <div className="hq-rail__group">{navLink("overview")}</div>
           {GROUPS.map((g) => (
@@ -275,6 +291,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
             <button type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>All</button>
             {BUSINESSES.map((b) => <button key={b.id} type="button" aria-pressed={filter === b.id} onClick={() => setFilter(b.id)}>{b.label}</button>)}
           </div>
+          <button className="hq-btn hq-btn--ghost hq-kbtn" type="button" onClick={() => setPalette(true)} aria-label="Command bar" aria-keyshortcuts="Meta+K Control+K /"><Icon name="search" /><kbd className="hq-hide-sm">⌘K</kbd></button>
           <button className="hq-btn hq-btn--ghost" type="button" onClick={() => void load()} disabled={loading} aria-label="Refresh"><Icon name="refresh" /><span className="hq-hide-sm">{loading ? "Refreshing" : "Refresh"}</span></button>
         </div>
 
@@ -324,6 +341,8 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
           </div>
         </div>
       </div>
+
+      <Palette items={commands} open={palette} setOpen={setPalette} />
 
       <div className="hq-toasts" aria-live="polite">
         {toasts.map((t) => (

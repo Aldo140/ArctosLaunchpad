@@ -44,6 +44,16 @@ apply pending commands at the start of every run (`npm run ops:hq-commands`, see
 so an action lands within about 30 minutes. A pending command can be undone
 until then.
 
+## Personality
+
+HQ's voice lives in `components/hq/persona.ts`: the greeting, the morning
+brief written from the live data, wins from the last seven days, the Arctos
+outreach streak and follower milestones. The Overview also shows Calgary's
+weather from Open-Meteo (no key). ⌘K, Ctrl+K or `/` opens the command bar;
+`g` then a letter jumps to a tab (`g i` Inbox, `g t` Tasks, `g p` Pipelines,
+`g s` Instagram, `g d` Inspiration, `g n` Performance, `g h` Health,
+`g o` Overview).
+
 ## The reply check
 
 Before a Gmail reply (Vow Motion, Arctos) reaches the board, an agent reads it
