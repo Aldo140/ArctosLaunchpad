@@ -39,6 +39,6 @@ Health and Glossary. The snapshot shape is `lib/hq/types.ts`; the writer is
 ## Actions
 
 Buttons write to `hq_commands` through `POST /api/hq/command`. The ops agents
-apply pending commands at the start of every run (`npm run ops:hq-commands`),
-so an action lands within about 15 minutes. A pending command can be undone
+apply pending commands at the start of every run (`npm run ops:hq-commands`, see docs/OPS.md),
+so an action lands within about 30 minutes. A pending command can be undone
 until then.

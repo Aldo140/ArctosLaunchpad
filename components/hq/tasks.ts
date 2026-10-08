@@ -132,7 +132,7 @@ export const ROUTINES: Routine[] = [
     },
   },
   {
-    id: "cd-publish", owner: "calgarydaily", title: "Publish on schedule", cadence: "Every 15 minutes, each post at its slot", workflow: "ops-hourly.yml",
+    id: "cd-publish", owner: "calgarydaily", title: "Publish on schedule", cadence: "Every 30 minutes, each post at its slot", workflow: "ops-hourly.yml",
     done: "Every approved post is live on Instagram at its slot.",
     proof: ({ data, dayStart, now }) => {
       const posts = data.snapshot?.posts ?? [];
@@ -146,12 +146,12 @@ export const ROUTINES: Routine[] = [
     },
   },
   {
-    id: "cw-outreach", owner: "calgarywatch", title: "Partner outreach", cadence: "Every 15 minutes, approved emails only", workflow: "ops-hourly.yml",
+    id: "cw-outreach", owner: "calgarywatch", title: "Partner outreach", cadence: "Every 30 minutes, approved emails only", workflow: "ops-hourly.yml",
     done: "Every pitch and follow-up you approved has gone out from aldo@calgarywatch.ca.",
     proof: activityProof("Email sent", "calgarywatch", "email sent", "emails sent"),
   },
   {
-    id: "cw-replies", owner: "calgarywatch", title: "Read partner replies", cadence: "Every 15 minutes", workflow: "ops-hourly.yml",
+    id: "cw-replies", owner: "calgarywatch", title: "Read partner replies", cadence: "Every 30 minutes", workflow: "ops-hourly.yml",
     done: "Replies are read, sorted and drafted for you; opt-outs are honoured.",
     proof: activityProof("Reply received", "calgarywatch", "reply", "replies"),
   },
@@ -176,10 +176,27 @@ export const ROUTINES: Routine[] = [
     },
   },
   { id: "ar-instagram", owner: "arctos", title: "Post to @arctoslaunchpad", cadence: "Planned", done: "Posts drafted in the Arctos voice, approved here, published on schedule.", setup: "Needs the @arctoslaunchpad Instagram token." },
-  { id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Planned, weekdays", done: "Fifteen couples and venues pitched from aldo@vowmotionweddings.com, replies drafted here.", setup: "Starts once Gmail is connected to HQ." },
+  {
+    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Weekdays, from Gmail",
+    done: "Up to fifteen planners pitched from aldo@vowmotionweddings.com, every reply answered.",
+    proof: ({ data, dayStart }) => {
+      if (!data.gmail) return { confirmed: false, headline: "waiting for the Gmail sync", items: [] };
+      const items = today(data.gmail.sends.filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url })), dayStart);
+      const wrong = data.gmail.sends.filter((s) => s.wrongAlias === "vowmotion" && s.at >= dayStart).length;
+      return { confirmed: items.length > 0, headline: `${items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today"}${items.length > 15 ? " · over 15" : ""}${wrong ? ` · ${wrong} from the wrong address` : ""}`, items };
+    },
+  },
+  {
+    id: "sh-gmail", owner: "shared", title: "Gmail sync", cadence: "Every 15 minutes, inside Gmail",
+    done: "Every pitch, reply, opt-out and bounce from the send-as addresses is counted here.",
+    proof: ({ data, now }) => {
+      const at = data.gmail?.generatedAt ?? 0;
+      return { confirmed: at > now - 45 * 60_000, headline: at ? `last sync ${clock(at, now)}` : "not set up yet", items: [] };
+    },
+  },
   { id: "vm-instagram", owner: "vowmotion", title: "Post to @vowmotion", cadence: "Planned", done: "Wedding films cut into posts, approved here, published on schedule.", setup: "Needs the @vowmotion Instagram token." },
   {
-    id: "sh-actions", owner: "shared", title: "Apply your HQ actions", cadence: "Every 15 minutes", workflow: "ops-hourly.yml",
+    id: "sh-actions", owner: "shared", title: "Apply your HQ actions", cadence: "Every 30 minutes", workflow: "ops-hourly.yml",
     done: "Everything you approved, rejected or redrafted here has been carried out.",
     proof: ({ data, dayStart }) => {
       const done = today(data.commands.filter((c) => c.status !== "pending").map((c) => ({ at: c.appliedAt ?? c.at, text: `${COMMAND_LABEL[c.type]}${c.status === "failed" ? " · not applied" : ""}${c.result ? ` · ${c.result}` : ""}` })), dayStart);
@@ -223,6 +240,7 @@ export const ROUTINES: Routine[] = [
       };
     },
   },
+  { id: "sh-clock", owner: "shared", title: "Keep the agents on time", cadence: "Always on, one run every 6 hours", workflow: "ops-clock.yml", done: "The clock is awake and starting hourly and daily runs on schedule, not when GitHub gets to it." },
   { id: "sh-maintenance", owner: "shared", title: "Nightly maintenance", cadence: "Nightly, 3:40 am", workflow: "ops-maintenance.yml", done: "Type check, tests and audit pass; a fix pull request opens if not." },
 ];
 
@@ -260,6 +278,8 @@ export function evaluate(routine: Routine, data: HqResponse, now: number): TaskS
   const proof = routine.proof ? routine.proof({ data, dayStart, now }) : null;
   const base = { routine, proof, wf, next: wf ? cronFire(wf.cron, now, 1) : null, runsToday: (wf?.runs ?? []).filter((r) => r.at >= dayStart) };
   if (routine.setup) return { ...base, state: "setup", line: routine.setup };
+  // Work done by hand or outside GitHub: judged by its proof alone.
+  if (!routine.workflow && proof) return { ...base, state: proof.confirmed ? "confirmed" : proof.headline.startsWith("not set up") || proof.headline.startsWith("waiting") ? "setup" : "later", line: proof.headline };
   if (!wf || !wf.runs.length) return { ...base, state: "unknown", line: proof ? `No run history from GitHub · ${proof.headline}` : "Couldn't read the run history from GitHub." };
 
   const finished = wf.runs.find((r) => r.status === "success" || r.status === "failure");

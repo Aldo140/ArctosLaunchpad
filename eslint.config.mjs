@@ -11,5 +11,7 @@ export default defineConfig([
     "build/**",
     "next-env.d.ts",
     ".claude/**",
+    // The ops agents have their own type check and tests (npm run ops:typecheck, ops:test).
+    "ops/**",
   ]),
 ]);

@@ -412,3 +412,7 @@ details.hq-more[open] summary { margin-bottom: 8px; }
   .hq-task__body { padding-left: 14px; }
   .hq-tracklegend__axis { margin-left: 0; }
 }
+
+/* ---- Alerts ----------------------------------------------------------- */
+.hq-card[data-sev="bad"] { border-color: var(--hq-bad-line); }
+.hq-card[data-sev="warn"] { border-color: var(--hq-warn-line); }

@@ -14,6 +14,7 @@ import { InspirationView } from "./views/Inspiration";
 import { PipelinesView } from "./views/Pipelines";
 import { TasksView } from "./views/Tasks";
 import { evaluateAll } from "./tasks";
+import { gmailWaiting } from "./views/GmailPipeline";
 import { PerformanceView } from "./views/Performance";
 import { HealthView } from "./views/Health";
 import { GlossaryView } from "./views/Glossary";
@@ -179,7 +180,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
       try {
         const { command } = (await call("/api/hq/command", { action: "create", type, targetId, payload })) as { command: HqCommandRecord };
         setData((d) => (d ? { ...d, commands: [command, ...d.commands] } : d));
-        toast(`${label}. Applied within 15 minutes.`, () => void cancel(command.id));
+        toast(`${label}. Applied within 30 minutes.`, () => void cancel(command.id));
       } catch (e) {
         toast(e instanceof Error ? e.message : "Couldn't save that.");
       }
@@ -198,7 +199,8 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     const inbox =
       (s?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length +
       (s?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business)).length +
-      (s?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand)).length;
+      (s?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand)).length +
+      gmailWaiting(data?.gmail ?? null, (b) => inFilter(filter, b)).length;
     const tasks = data ? evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length : 0;
     const health = (s?.bottlenecks ?? []).filter((b) => b.severity === "bad").length;
     return { inbox, tasks, health } as Partial<Record<ViewId, number>>;

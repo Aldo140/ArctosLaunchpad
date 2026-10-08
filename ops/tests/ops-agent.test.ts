@@ -1,0 +1,398 @@
+/**
+ * The operations agent's rules: what gets posted, what a draft must satisfy,
+ * which address a business may be emailed at, and when nothing may be sent.
+ * Everything here is pure; no network, Firestore or model calls.
+ */
+
+import assert from 'node:assert/strict';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, it } from 'node:test';
+
+import type { OpsPost, PartnerLead } from '../types';
+import { autoPublishable } from '../jobs/posts';
+import { BRANDS, brandKit, outreachConfig } from '../lib/brand';
+import { cdnUrl } from '../lib/firebase';
+import { bestCaptions, computePerformance } from '../jobs/insights';
+import {
+  checkPitch, consentBasisFor, extractEmails, hasNoSolicitationNotice, inSendWindow, isStopRequest, sendBlocker, signature,
+} from '../lib/leads';
+import { checkDraft, cleanPlace, cleanTitle, happenings, mergeShowings, roundupHeadline, selectCandidates, templateDraft, reelSlides, whenLabel, type DiscoveryIndex, type Entity } from '../lib/posts';
+import { calgaryDate, calgaryToEpoch, nextSlot, timeRange } from '../lib/time';
+import { templatePitch } from '../jobs/outreach';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const cw = brandKit('calgarywatch');
+const cd = brandKit('calgarydaily');
+const cfg = outreachConfig();
+const ADDRESS = '100 Example Ave SW, Calgary, AB T2P 0A1';
+
+function event(id: string, start: string, extra: Partial<Entity> = {}): Entity {
+  return {
+    id, kind: 'event', slug: id, title: `Event ${id}`, status: 'published', start, end: null, venue: 'Hall', pricing: 'free',
+    organizer: `Org ${id}`, categories: ['arts'], sources: [{ name: 'Organizer', url: `https://example.org/${id}`, kind: 'official' }], ...extra,
+  } as Entity;
+}
+
+describe('Calgary time', () => {
+  it('converts wall-clock times across daylight saving', () => {
+    assert.equal(new Date(calgaryToEpoch('2026-07-01', '12:00')).toISOString(), '2026-07-01T18:00:00.000Z');
+    assert.equal(new Date(calgaryToEpoch('2026-03-01', '12:00')).toISOString(), '2026-03-01T19:00:00.000Z');
+    // Alberta stays on UTC-6 year-round from March 2026 (tzdata 2026c): no fall-back in November.
+    assert.equal(new Date(calgaryToEpoch('2026-12-01', '12:00')).toISOString(), '2026-12-01T18:00:00.000Z');
+  });
+  it('schedules the next slot after now, rolling to tomorrow', () => {
+    const at = calgaryToEpoch('2026-09-24', '19:00');
+    assert.equal(nextSlot(at, ['11:30', '18:30']), calgaryToEpoch('2026-09-25', '11:30'));
+    assert.equal(nextSlot(at, ['11:30', '18:30'], 1), calgaryToEpoch('2026-09-25', '18:30'));
+  });
+  it('writes compact time ranges', () => {
+    assert.equal(timeRange(Date.parse('2026-09-30T15:00:00-06:00'), Date.parse('2026-09-30T19:00:00-06:00')), '3 to 7 pm');
+    assert.equal(timeRange(Date.parse('2026-09-30T09:00:00-06:00'), Date.parse('2026-09-30T13:30:00-06:00')), '9 am to 1:30 pm');
+  });
+});
+
+describe('choosing posts', () => {
+  const wednesday = calgaryToEpoch('2026-09-23', '06:30');
+  const index: DiscoveryIndex = {
+    entities: [
+      event('a', '2026-09-25T19:00:00-06:00'),
+      event('b', '2026-09-26T11:00:00-06:00'),
+      event('c', '2026-09-27T14:00:00-06:00'),
+      event('d', '2026-09-28T14:00:00-06:00'),
+      event('x', '2026-09-26T12:00:00-06:00', { cancelled: true }),
+      event('draft', '2026-09-26T12:00:00-06:00', { status: 'draft' }),
+    ],
+    occurrences: [],
+  };
+
+  it('never offers cancelled or unpublished listings', () => {
+    const ids = happenings(index).map(h => h.entity.id);
+    assert.ok(!ids.includes('x') && !ids.includes('draft'));
+  });
+
+  it('drafts a weekend roundup on Wednesdays plus single posts, without repeating a listing', () => {
+    const c = selectCandidates(index, cw, wednesday, new Set());
+    assert.equal(c[0].template, 'roundup');
+    assert.equal(c[0].items.length, 3);
+    assert.equal(c.length, cw.postsPerDay);
+    const again = selectCandidates(index, cw, wednesday, new Set(c.map(x => x.fingerprint)));
+    assert.ok(again.every(x => !c.some(y => y.fingerprint === x.fingerprint)));
+  });
+
+  it('gives CalgaryDaily a morning roundup, spotlights in the other slots and a Tonight Reel', () => {
+    const friday = calgaryToEpoch('2026-09-25', '06:30');
+    // One thing on today: no Today/Tonight roundup; on a Friday the weekend Reel takes the midday slot.
+    const quiet = selectCandidates(index, cd, friday, new Set());
+    assert.ok(quiet.every(x => x.template === 'event' || x.format === 'reel'));
+    const busy = { ...index, entities: [...index.entities,
+      event('e', '2026-09-25T12:00:00-06:00'), event('h', '2026-09-25T10:00:00-06:00'), event('f', '2026-09-25T18:00:00-06:00'), event('g', '2026-09-25T19:30:00-06:00')] };
+    const c = selectCandidates(busy, cd, friday, new Set());
+    assert.deepEqual(c.map(x => x.template), ['roundup', 'event', 'event', 'roundup']);
+    assert.match(c[0].title, /^Today/);
+    assert.match(c[3].title, /^Tonight/);
+    assert.equal(c[3].format, 'reel');
+    assert.deepEqual(c.map(x => new Date(x.suggestedFor).toISOString()), ['2026-09-25T14:00:00.000Z', '2026-09-25T18:00:00.000Z', '2026-09-25T21:00:00.000Z', '2026-09-25T23:00:00.000Z']);
+    // No listing appears in two of the day's posts.
+    const ids = c.flatMap(x => x.items.map(i => i.entity.id));
+    assert.equal(new Set(ids).size, ids.length);
+    // A spotlight never repeats something featured in the last couple of days.
+    const spotlight = c[1].items[0].entity.id;
+    const again = selectCandidates(busy, cd, friday, new Set(), new Set([spotlight]));
+    assert.ok(again.filter(x => x.template === 'event').every(x => x.items[0].entity.id !== spotlight));
+    // A later run that finds today's slots booked adds nothing (the 2026-09-25 double-spotlight bug).
+    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['08:00', '12:00', '15:00', '17:00', '20:00'])).length, 0);
+    const onlyNoonTaken = selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['12:00']));
+    assert.ok(onlyNoonTaken.every(x => new Date(x.suggestedFor).toISOString() !== '2026-09-25T18:00:00.000Z'));
+    assert.ok(onlyNoonTaken.length <= cd.postsPerDay - 1);
+    // Running again the same day adds nothing new.
+    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup' && !x.format).length, 0);
+  });
+
+  // CalgaryWatch publishes the index; `npm run ops:index` caches a copy here.
+  const indexFile = join(root, '.cache', 'discovery-index.json');
+  it('template drafts from the real published index always pass the brand checks', { skip: !existsSync(indexFile) && 'run npm run ops:index first' }, () => {
+    const real = JSON.parse(readFileSync(indexFile, 'utf8')) as DiscoveryIndex;
+    const monday = calgaryToEpoch(calgaryDate(Date.now()), '06:30');
+    for (const kit of [cw, cd]) {
+      for (let day = 0; day < 7; day++) {
+        for (const c of selectCandidates(real, { ...kit, postsPerDay: 5 }, monday + day * 86_400_000, new Set())) {
+          assert.deepEqual(checkDraft(templateDraft(c, kit), kit), [], `${kit.id}: ${c.title}`);
+        }
+      }
+    }
+  });
+});
+
+describe('automatic posting', () => {
+  const post = (over: Partial<OpsPost>): OpsPost => ({
+    id: 'p', brand: 'calgarydaily', template: 'roundup', status: 'drafted', fingerprint: 'calgarydaily|today|2026-09-25',
+    entityIds: [], entityStarts: {}, sourceUrls: [], facts: '', caption: 'x', altText: 'x', link: '', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' },
+    imageUrl: 'https://x', imagePath: null, warnings: [], sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: null,
+    draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
+  });
+  it('lets CalgaryDaily roundups go out on their own', () => {
+    assert.ok(autoPublishable(post({})));
+  });
+  it('holds single event and market posts for a person (they drew a median of 45 views)', () => {
+    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
+    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
+  });
+  it('keeps CalgaryWatch, briefs, paid posts and anything with a warning for a person', () => {
+    assert.ok(!autoPublishable(post({ brand: 'calgarywatch' })));
+    assert.ok(!autoPublishable(post({ template: 'update' })));
+    assert.ok(!autoPublishable(post({ template: 'partner', sponsored: true })));
+    assert.ok(!autoPublishable(post({ warnings: ['Sensitive story'] })));
+    assert.ok(!autoPublishable(post({ status: 'rejected' })));
+  });
+});
+
+describe('draft checks', () => {
+  const ok = { caption: 'Market day.\n\n#yyc #calgary', altText: 'Market day', imageText: { eyebrow: 'MARKET', headline: 'Market day', details: [], footer: 'calgarywatch.ca' } };
+  it('passes a plain draft', () => assert.deepEqual(checkDraft(ok, cw), []));
+  it('catches banned phrases and hashtag spam', () => {
+    assert.ok(checkDraft({ ...ok, caption: 'The best in Calgary!' }, cw).some(p => p.includes('banned')));
+    assert.ok(checkDraft({ ...ok, caption: '#a #b #c #d #e #f' }, cw).some(p => p.includes('hashtags')));
+  });
+  it('requires the Featured partner label on paid posts, in caption and image', () => {
+    assert.equal(checkDraft(ok, cw, { sponsored: true }).length, 2);
+    const paid = { ...ok, caption: 'Featured partner: Market day.', imageText: { ...ok.imageText, eyebrow: 'FEATURED PARTNER' } };
+    assert.deepEqual(checkDraft(paid, cw, { sponsored: true }), []);
+  });
+});
+
+describe('finding a business address', () => {
+  it('prefers a general address on the business’s own domain and ignores junk', () => {
+    const html = `<a href="mailto:owner.personal@gmail.com">x</a> info@rosso.ca <img src="logo@2x.png"> noreply@rosso.ca <script>var e="hidden@rosso.ca"</script>`;
+    assert.deepEqual(extractEmails(html, 'rosso.ca'), ['info@rosso.ca', 'owner.personal@gmail.com']);
+  });
+  it('decodes common obfuscation', () => {
+    assert.deepEqual(extractEmails('hello [at] market.ca', 'market.ca'), ['hello@market.ca']);
+    assert.deepEqual(extractEmails('hello&#64;market.ca', 'market.ca'), ['hello@market.ca']);
+  });
+  it('detects no-solicitation notices', () => {
+    assert.ok(hasNoSolicitationNotice('Please note: we do not accept unsolicited offers.', cfg));
+    assert.ok(hasNoSolicitationNotice('NO SOLICITATION', cfg));
+    assert.ok(!hasNoSolicitationNotice('Contact us about vendor applications.', cfg));
+  });
+});
+
+describe('outreach safety', () => {
+  const lead: PartnerLead = {
+    id: 'lead-1', entityId: 'e1', entityKind: 'market', businessName: 'Test Market', category: 'market', neighbourhood: 'Bridgeland',
+    website: 'https://test.ca/', contactName: null, contactRole: null, contactEmail: 'info@test.ca',
+    emailSourceUrl: 'https://test.ca/contact', emailFoundAt: 1, consentBasis: consentBasisFor('https://test.ca/contact'),
+    noSolicitationNotice: false, reasonRelevant: 'x', status: 'approved', draftSubject: 's', draftBody: 'b', followUps: 0,
+    lastContactAt: null, nextFollowUpAt: null, conversationId: null, lastReply: null, doNotContact: false, notes: '', history: [],
+    createdAt: 0, updatedAt: 0,
+  };
+  const none = new Set<string>();
+
+  it('allows a lead with a recorded consent basis', () => assert.equal(sendBlocker(lead, none, none), null));
+  it('blocks every unsafe case', () => {
+    assert.ok(sendBlocker({ ...lead, doNotContact: true }, none, none));
+    assert.ok(sendBlocker({ ...lead, status: 'do-not-contact' }, none, none));
+    assert.ok(sendBlocker({ ...lead, noSolicitationNotice: true }, none, none));
+    assert.ok(sendBlocker({ ...lead, consentBasis: null }, none, none));
+    assert.ok(sendBlocker({ ...lead, emailSourceUrl: null }, none, none));
+    assert.ok(sendBlocker(lead, new Set(['info@test.ca']), none));
+    assert.ok(sendBlocker(lead, none, new Set(['test.ca'])));
+    assert.ok(sendBlocker({ ...lead, contactEmail: null }, none, none));
+  });
+
+  it('every message identifies the sender, gives a mailing address and an opt-out', () => {
+    const sig = signature(cfg, ADDRESS);
+    const t = templatePitch(lead, 'Listing: Test Market (market) — https://calgarywatch.ca/markets/test', sig);
+    assert.deepEqual(checkPitch(t.body, cfg, ADDRESS), []);
+    assert.ok(checkPitch(t.body.replace(cfg.unsubscribeLine, ''), cfg, ADDRESS).some(p => p.includes('opt-out')));
+    assert.ok(checkPitch(t.body.replace(ADDRESS, ''), cfg, ADDRESS).some(p => p.includes('mailing address')));
+  });
+
+  it('refuses pricing talk while the paid offer is off', () => {
+    assert.equal(cfg.paidOfferEnabled, false);
+    const sig = signature(cfg, ADDRESS);
+    assert.ok(checkPitch(`Our Featured partner package is $500.\n\n${sig}`, cfg, ADDRESS).some(p => p.includes('paid')));
+  });
+
+  it('recognizes opt-outs in their own words only', () => {
+    for (const t of ['STOP', 'Please stop emailing us.', 'Unsubscribe', 'Take us off your list', 'Please don’t email me again', 'Not interested, please remove us']) {
+      assert.ok(isStopRequest(t), t);
+    }
+    for (const t of ['Stop by our booth on Saturday!'.replace(/^Stop by/, 'Come stop by'), 'Thanks! Happy to chat.\n\nOn Tue, Aldo wrote:\n> reply "stop" and I won\'t email you again']) {
+      assert.ok(!isStopRequest(t), t);
+    }
+  });
+
+  it('sends only on weekday business hours in Calgary', () => {
+    assert.ok(inSendWindow(calgaryToEpoch('2026-09-29', '10:00'), cfg));   // Tuesday
+    assert.ok(!inSendWindow(calgaryToEpoch('2026-09-29', '20:00'), cfg));
+    assert.ok(!inSendWindow(calgaryToEpoch('2026-09-27', '10:00'), cfg));  // Sunday
+  });
+});
+
+describe('roundup headlines', () => {
+  it('keep the date only in the label', () => {
+    assert.equal(roundupHeadline('Tonight in Calgary — Fri, Sep 25'), 'Tonight in Calgary');
+    assert.equal(roundupHeadline('TODAY IN CALGARY: FRIDAY, SEPT 25'), 'TODAY IN CALGARY');
+    assert.equal(roundupHeadline('This weekend in Calgary'), 'This weekend in Calgary');
+    assert.equal(roundupHeadline('Farmers-market season'), 'Farmers-market season');
+  });
+});
+
+describe('hand-written drafts', () => {
+  const dir = join(root, 'brand', 'drafts');
+  const files = readdirSync(dir).filter(f => f.endsWith('.json'));
+  it('every draft passes the brand checks and names its sources', () => {
+    for (const f of files) {
+      const data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
+      const kit = brandKit(data.brand);
+      for (const p of data.posts) {
+        // Drafts that already went out stay as published; the voice rules (2026-09-26) apply from then on.
+        const past = p.suggestedAt < '2026-09-26';
+        if (!past) assert.deepEqual(checkDraft({ caption: p.caption, altText: p.altText, imageText: p.slides[0] }, kit), [], `${f}/${p.id}`);
+        assert.ok(p.slides.length === 1 || (p.slides.length >= 2 && p.slides.length <= 10), `${f}/${p.id}: carousel size`);
+        if (p.kind !== 'event') assert.ok(p.sources.length > 0 && p.sources.every((s: any) => /^https:\/\//.test(s.url)), `${f}/${p.id}: sources`);
+        if (p.kind === 'take') assert.match(p.caption, /opinion/i, `${f}/${p.id}: opinion must be labelled`);
+        // News and opinion only go out with a named person's approval recorded next to it.
+        if (p.kind !== 'event' && p.approved) assert.ok(typeof p.approvedBy === 'string' && p.approvedBy.length > 3, `${f}/${p.id}: approvedBy is required`);
+      }
+    }
+  });
+});
+
+describe('one Instagram account', () => {
+  it('posts only for CalgaryDaily; CalgaryWatch has no account of its own', () => {
+    assert.deepEqual(BRANDS, ['calgarydaily']);
+    assert.equal(cw.enabled, false);
+  });
+  it('points CalgaryDaily readers to CalgaryWatch', () => {
+    const c = selectCandidates({ entities: [event('a', '2026-09-26T11:00:00-06:00')], occurrences: [] }, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set());
+    assert.match(templateDraft(c[0], cd).caption, /CalgaryWatch/);
+  });
+  it('serves post images to the site through the CDN', () => {
+    assert.equal(cdnUrl('https://raw.githubusercontent.com/o/r/ops-media/ops/posts/p.png'), 'https://cdn.jsdelivr.net/gh/o/r@ops-media/ops/posts/p.png');
+    assert.equal(cdnUrl('https://example.org/a.png'), 'https://example.org/a.png');
+  });
+});
+
+describe('weekend Reel', () => {
+  const index: DiscoveryIndex = {
+    entities: [
+      event('fri', '2026-09-25T19:00:00-06:00'), event('sat1', '2026-09-26T11:00:00-06:00'),
+      event('sat2', '2026-09-26T20:00:00-06:00'), event('sun', '2026-09-27T14:00:00-06:00'),
+      event('friday-lunch', '2026-09-25T12:00:00-06:00'),
+    ],
+    occurrences: [],
+  };
+  const friday = calgaryToEpoch('2026-09-25', '06:30');
+  it('takes the Friday midday slot, once, from weekend plans only', () => {
+    const c = selectCandidates(index, cd, friday, new Set());
+    const reels = c.filter(x => x.format === 'reel');
+    assert.equal(reels.length, 1);
+    assert.equal(new Date(reels[0].suggestedFor).toISOString(), '2026-09-25T18:00:00.000Z');
+    assert.ok(!reels[0].items.some(i => i.entity.id === 'friday-lunch'), 'Friday daytime is not "the weekend"');
+    assert.ok(autoPublishable({ ...reels[0], id: 'r', status: 'drafted', entityIds: [], entityStarts: {}, sourceUrls: [], caption: 'x', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' }, imageUrl: 'x', imagePath: null, warnings: [], sponsored: false, scheduledFor: null, draftedBy: 'template', createdAt: 0, updatedAt: 0 } as OpsPost));
+    assert.equal(selectCandidates(index, cd, friday, new Set(reels.map(r => r.fingerprint))).filter(x => x.format === 'reel').length, 0);
+    assert.equal(c.length <= cd.postsPerDay, true);
+  });
+  it('is not made on other days', () => {
+    assert.equal(selectCandidates(index, cd, calgaryToEpoch('2026-09-24', '06:30'), new Set()).filter(x => x.format === 'reel').length, 0);
+  });
+  it('has a cover, one slide per plan and a follow card, all within the brand checks', () => {
+    const [reel] = selectCandidates(index, cd, friday, new Set()).filter(x => x.format === 'reel');
+    const slides = reelSlides(reel);
+    assert.equal(slides.length, reel.items.length + 2);
+    for (const s of slides) assert.deepEqual(checkDraft({ caption: 'x #yyc', altText: 'x', imageText: s }, cd), []);
+  });
+});
+
+describe('performance', () => {
+  const now = calgaryToEpoch('2026-10-10', '09:00');
+  const pub = (id: string, over: Partial<OpsPost>): OpsPost => ({
+    id, brand: 'calgarydaily', template: 'event', status: 'published', fingerprint: `calgarydaily|event|${id}`, entityIds: [], entityStarts: {}, sourceUrls: [], facts: '',
+    caption: `caption ${id}`, altText: 'x', link: '', imageText: { eyebrow: '', headline: id, details: [], footer: '' }, imageUrl: 'x', imagePath: null, warnings: [],
+    sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: now - 2 * 86_400_000, publishedAt: now - 2 * 86_400_000 + 20 * 60_000, permalink: `https://instagram.com/p/${id}`,
+    reviewedByEmail: 'auto (brand rules)', draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
+  });
+  const ins = (reach: number, saves = 0) => ({ reach, views: null, likes: 0, comments: 0, saves, shares: 0, fetchedAt: now });
+  const posts = [
+    pub('reel', { videoUrl: 'v', fingerprint: 'calgarydaily|weekend-reel|2026-10-09', insights: ins(900, 12) }),
+    pub('img1', { insights: ins(150, 1) }),
+    pub('img2', { insights: ins(110, 5) }),
+    pub('news', { fingerprint: 'calgarydaily|draft|x|y', template: 'news', insights: ins(2000, 40) }),
+    pub('old', { publishedAt: now - 60 * 86_400_000, insights: ins(5000) }),
+  ];
+  it('ranks formats by reach and reports how late automatic posts went out', () => {
+    const p = computePerformance(posts, { '2026-10-10': 4400 }, now);
+    assert.deepEqual(p.byFormat.map(r => [r.key, r.avgReach]), [['reel', 900], ['image', 753]]); // news counts as an image
+    assert.equal(p.top[0].headline, 'news');
+    assert.ok(!p.top.some(t => t.headline === 'old'), 'only the last 30 days count');
+    assert.equal(p.avgDelayMinutes, 20);
+  });
+  it('learns only from listing posts, best saves and shares first', () => {
+    assert.deepEqual(bestCaptions(posts, 'calgarydaily', now), ['caption reel', 'caption img2']);
+  });
+});
+
+describe('sounding like a person', () => {
+  it('uses the name people say', () => {
+    assert.equal(cleanTitle('Outback Presents Maria Bamford'), 'Maria Bamford');
+    assert.equal(cleanTitle('Where Dark Things Dwell (Saturdays)- Outdoor Escape Room'), 'Where Dark Things Dwell');
+    assert.equal(cleanTitle('Exhibition - Held. Together.'), 'Held. Together.');
+    assert.equal(cleanTitle('TOUR – Introduction to Textiles'), 'Introduction to Textiles');
+    assert.equal(cleanTitle('Taking it to the Streets: Stories of Resilience, Connection, and Living Well with Dementia'), 'Taking it to the Streets');
+    assert.equal(cleanTitle("Women's Soccer — Regina Cougars vs. Mount Royal Cougars"), "Women's Soccer — Regina Cougars vs. Mount Royal Cougars");
+    assert.equal(cleanPlace('PF 1239 (Professional Faculties Building)'), 'Professional Faculties Building');
+    assert.equal(cleanPlace('White Buffalo Lodge (EDT 314)'), 'White Buffalo Lodge');
+  });
+  it('never shows a made-up one-hour end time, and merges two showings', () => {
+    const at = (t: string) => Date.parse(`2026-09-26T${t}:00-06:00`);
+    assert.equal(whenLabel({ start: at('20:00'), end: at('21:00') }, true), '8 pm');
+    assert.equal(whenLabel({ start: at('19:30'), end: at('23:55') }, true), 'from 7:30 pm');
+    assert.equal(whenLabel({ start: at('12:00'), end: null }, false), 'noon');
+    const shows = mergeShowings(happenings({ entities: [
+      event('m1', '2026-09-26T17:00:00-06:00', { title: 'Outback Presents Maria Bamford' }),
+      event('m2', '2026-09-26T20:00:00-06:00', { title: 'Outback Presents Maria Bamford' }),
+    ], occurrences: [] }));
+    assert.equal(shows.length, 1);
+    assert.equal(shows[0].times.length, 2);
+  });
+  it('writes roundups in sentence case with no hype', () => {
+    const index: DiscoveryIndex = { entities: [
+      event('a', '2026-09-26T10:00:00-06:00', { title: 'Exhibition - Held. Together.' }), event('b', '2026-09-26T11:00:00-06:00'),
+      event('c', '2026-09-26T19:00:00-06:00'), event('d', '2026-09-26T20:00:00-06:00'),
+    ], occurrences: [] };
+    for (const c of selectCandidates(index, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set())) {
+      const d = templateDraft(c, cd);
+      assert.deepEqual(checkDraft(d, cd), []);
+      assert.ok(!/[A-Z]{5,}/.test(d.caption.split('\n')[0]), `no shouting: ${d.caption.split('\n')[0]}`);
+      assert.ok(!/!/.test(d.caption), 'no exclamation marks');
+    }
+    assert.ok(checkDraft({ caption: 'An epic night #yyc', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' } }, cd).length > 0);
+    assert.deepEqual(checkDraft({ caption: 'At the Epicentre #yyc', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' } }, cd), []);
+  });
+});
+
+describe('date night', () => {
+  it('on Thursdays, the 3 pm slot is a date-night roundup of Friday and Saturday evenings, no kids’ events', () => {
+    const cd = brandKit('calgarydaily');
+    const thursday = calgaryToEpoch('2026-10-15', '06:30');
+    const ev = (id: string, iso: string, categories: string[]) => event(id, iso, { categories, pricing: 'paid', venue: `Venue ${id}` });
+    const index = { entities: [
+      ev('a', '2026-10-16T19:30:00-06:00', ['arts']), ev('b', '2026-10-17T20:00:00-06:00', ['nightlife']),
+      ev('k', '2026-10-17T18:00:00-06:00', ['family', 'arts']), ev('m', '2026-10-16T10:00:00-06:00', ['arts']),
+    ], occurrences: [] } as unknown as DiscoveryIndex;
+    const c = selectCandidates(index, cd, thursday, new Set());
+    const date = c.find(x => x.fingerprint.includes('|date-night-weekend|'));
+    assert.ok(date, 'a date-night post');
+    assert.deepEqual(date!.items.map(i => i.entity.id).sort(), ['a', 'b']);
+    assert.equal(new Date(date!.suggestedFor).toISOString(), '2026-10-15T21:00:00.000Z');
+    assert.match(date!.link, /\/date-night\?/);
+    const draft = templateDraft(date!, cd);
+    assert.deepEqual(checkDraft(draft, cd), []);
+    assert.equal(draft.imageText.headline, 'Date night this weekend');
+    // Other days of the week get no date-night post.
+    assert.ok(!selectCandidates(index, cd, calgaryToEpoch('2026-10-14', '06:30'), new Set()).some(x => x.fingerprint.includes('date-night')));
+  });
+});

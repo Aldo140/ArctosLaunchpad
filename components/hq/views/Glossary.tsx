@@ -1,5 +1,5 @@
 const GLOSSARY: Array<[string, string]> = [
-  ["Inbox", "Everything waiting for a decision: posts to approve, replies to answer, pitches to send. Your action is applied by the agents on their next run, about every 15 minutes."],
+  ["Inbox", "Everything waiting for a decision: posts to approve, replies to answer, pitches to send. Your action is applied by the agents on their next run, about every 30 minutes."],
   ["Tasks", "Every recurring job the agents own, grouped by business, with a midnight-to-midnight track of today's runs."],
   ["Confirmed", "The job ran and its result shows up in the data: the email is in the send log, the post is live on Instagram, the Scout read landed."],
   ["Ran clean", "The job finished without errors but had nothing to prove today, such as no approved emails waiting to send."],

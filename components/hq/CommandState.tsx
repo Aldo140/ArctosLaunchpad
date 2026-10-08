@@ -12,7 +12,7 @@ export function CommandState({ command }: { command: HqCommandRecord }) {
     return (
       <div className="hq-state" data-sev="warn" role="status">
         <span className="hq-pill" data-sev="warn">Queued</span>
-        <span>{label} · the agents apply it within 15 minutes</span>
+        <span>{label} · the agents apply it within 30 minutes</span>
         <button className="hq-btn hq-btn--ghost" type="button" onClick={() => void cancel(command.id)}>Undo</button>
       </div>
     );

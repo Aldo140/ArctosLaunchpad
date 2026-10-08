@@ -41,3 +41,24 @@ jobs:
           npm run smoke
         env:
           BASE_URL: http://localhost:3000
+
+  # The ops agents (ops/): their own type check and tests, on the Node they run on.
+  ops:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run ops:typecheck
+      - name: Cache the CalgaryWatch index
+        continue-on-error: true
+        run: npm run ops:index
+      - name: Test
+        run: npm run ops:test

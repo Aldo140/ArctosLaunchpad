@@ -1,0 +1,92 @@
+{
+  "id": "calgarydaily",
+  "name": "Calgary Daily",
+  "confirmed": true,
+  "confirmNote": "Confirmed 2026-09-25 against instagram.com/calgarydaily (\"Calgary Daily | News & Events YYC\"). The feed is mostly reels with no fixed palette, so the bold black/yellow template is the house style for photo posts. Change colors here to restyle every future post.",
+  "site": "https://calgarywatch.ca",
+  "handle": "calgarydaily",
+  "wordmark": "CALGARYDAILY",
+  "colors": {
+    "background": "#111111",
+    "surface": "#1C1C1C",
+    "ink": "#FFFFFF",
+    "muted": "#B8B8B8",
+    "line": "#333333",
+    "brand": "#FFD23F",
+    "live": "#111111",
+    "onLive": "#FFFFFF"
+  },
+  "fonts": {
+    "display": "Bricolage Grotesque",
+    "body": "Inter",
+    "data": "IBM Plex Mono"
+  },
+  "voice": {
+    "summary": "Calgary Daily sounds like a friend who lives here and always knows what is on: relaxed, specific, a little dry, never selling. Write the way you would text a friend who asked \"anything good this weekend?\": sentence case, short plain sentences, real names and places, the details people need to show up (where, when, if it is free). Warm without gushing. If a line would sound odd said out loud at a bus stop, cut it.",
+    "examples": [
+      "A few good reasons to get out today.\n\nCalgary Farmers' Market West · 9 am to 7 pm\nCrossroads Market · 9 am to 5 pm\nHeld. Together., Nickle Galleries · 9 am to 4 pm · free\nFarmers & Makers at cSPACE · 10 am to 2 pm\n\nFull list on CalgaryWatch, link in bio.",
+      "Tonight's shortlist.\n\nMaria Bamford, Bella Concert Hall · 5 and 8 pm\nWhere Dark Things Dwell, Heritage Park · 7:30 pm\nLove Letters From the Diaspora · 6 pm\n\nFull list on CalgaryWatch, link in bio.",
+      "Held. Together. is on at Nickle Galleries until Friday, 9 am to 4 pm, and it's free.\n\nFour artists and one question: what holds a community together? Worth a lunch break if you're near campus.\n\nListed by the University of Calgary. Details on CalgaryWatch, link in bio."
+    ],
+    "rules": [
+      "Use only facts supplied with the item or its source page. Never invent numbers, quotes, performers, crowds, prices, parking, weather or what it feels like to be there. No first-hand claims (\"we went\", \"we loved\").",
+      "Sentence case everywhere. No all-caps words or hooks.",
+      "Roundup captions: one plain opening line (no date, no exclamation mark), then one line per item as \"Name, venue · time · free\" (free only if free; list two showings as \"5 and 8 pm\"), then \"Full list on CalgaryWatch, link in bio.\" No descriptions in roundups. Under 600 characters before the hashtags.",
+      "Spotlight captions: start with the name and when and where in one natural sentence, then at most two short sentences from the facts about what it is. You may add one practical, fact-based aside (\"Worth a lunch break if you're near campus\") only when the facts support it. Under 450 characters before the hashtags.",
+      "Name the source organization once (\"Listed by the University of Calgary\").",
+      "CalgaryDaily is the Instagram sister of CalgaryWatch (calgarywatch.ca). Point to it once: \"Full list on CalgaryWatch, link in bio.\" or \"Details on CalgaryWatch, link in bio.\"",
+      "No calls to action beyond that one line. Do not ask people to tag friends, comment, like or share.",
+      "At most one emoji, and usually none. Never use one in place of a fact.",
+      "No hype and no marketing words: nothing is epic, iconic, unmissable, a must-see, a hidden gem or a vibe. No \"you won't want to miss\", \"mark your calendars\", \"sorted\", \"we've got you\" or \"link in bio!\" with an exclamation mark.",
+      "News about crime, collisions, fires or other emergencies always waits for human approval and never uses illustrated scenes.",
+      "At most 5 hashtags, always #yyc #calgary #calgarydaily."
+    ],
+    "bannedPhrases": [
+      "you won't believe",
+      "shocking",
+      "viral",
+      "guaranteed",
+      "#1",
+      "epic",
+      "iconic",
+      "unmissable",
+      "must-see",
+      "must see",
+      "hidden gem",
+      "vibes",
+      "vibe check",
+      "sorted",
+      "mark your calendar",
+      "you won't want to miss",
+      "don't miss",
+      "we've got you",
+      "level up",
+      "🔥",
+      "look no further",
+      "tag who",
+      "tag a friend",
+      "tag your"
+    ]
+  },
+  "hashtags": [
+    "#yyc",
+    "#calgary",
+    "#calgarydaily"
+  ],
+  "linkInBio": "https://calgarywatch.ca/?utm_source=instagram&utm_medium=social&utm_campaign=calgarydaily_bio",
+  "autoPublish": {
+    "events": false,
+    "markets": false,
+    "roundups": true,
+    "partner": false,
+    "incidents": false
+  },
+  "postsPerDay": 5,
+  "postingSlots": [
+    "08:00",
+    "12:00",
+    "15:00",
+    "17:00",
+    "20:00"
+  ]
+}

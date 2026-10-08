@@ -211,11 +211,57 @@ export interface WorkflowSummary {
   runs: Array<{ at: number; end: number | null; status: WorkflowSummary["lastStatus"]; url: string; event: string }>;
 }
 
+/**
+ * What the Gmail sync (ops/gmail/hq-sync.gs, an Apps Script inside
+ * mrotiz14@gmail.com) reports every 15 minutes: sends from each send-as
+ * address and the replies to them, last 30 days. Bodies never leave Gmail;
+ * replies carry a short snippet.
+ */
+export type MailBusiness = Business | "other";
+export type ReplyKind = "reply" | "auto" | "optout" | "bounce";
+export interface GmailSend {
+  at: number;
+  alias: string;
+  /** The business the message is about (named in it), not necessarily its address's. */
+  business: MailBusiness;
+  to: string;
+  domain: string;
+  subject: string;
+  /** First message of its thread: a pitch, not a reply to someone. */
+  first: boolean;
+  /** Sent from this other business's address by mistake (Gmail's default send-as). */
+  wrongAlias: MailBusiness | null;
+  replied: boolean;
+  url: string;
+}
+export interface GmailReply {
+  at: number;
+  alias: string;
+  business: MailBusiness;
+  from: string;
+  name: string;
+  subject: string;
+  snippet: string;
+  kind: ReplyKind;
+  /** A reply to one of our pitches (the thread started with us). */
+  toPitch: boolean;
+  answered: boolean;
+  url: string;
+}
+export interface GmailSummary {
+  generatedAt: number;
+  account: string;
+  days: number;
+  sends: GmailSend[];
+  replies: GmailReply[];
+}
+
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
   arctos: ArctosOutreach | null;
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
+  gmail: GmailSummary | null;
   errors: string[];
 }
