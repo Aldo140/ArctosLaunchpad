@@ -24,7 +24,8 @@ directly; the database has no client rules.
 
 `GCP_PROJECT_ID`, `GCP_PROJECT_NUMBER`, `GCP_WORKLOAD_IDENTITY_POOL_ID`,
 `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID`, `GCP_SERVICE_ACCOUNT_EMAIL`,
-`NEXT_PUBLIC_FIREBASE_*` (public identifiers) and `HQ_ALLOWED_EMAILS`.
+`NEXT_PUBLIC_FIREBASE_*` (public identifiers), `HQ_ALLOWED_EMAILS`, `HQ_GMAIL_KEY` and
+`ANTHROPIC_API_KEY` (the reply check, below).
 
 ## Tabs
 
@@ -42,3 +43,32 @@ Buttons write to `hq_commands` through `POST /api/hq/command`. The ops agents
 apply pending commands at the start of every run (`npm run ops:hq-commands`, see docs/OPS.md),
 so an action lands within about 30 minutes. A pending command can be undone
 until then.
+
+## The reply check
+
+Before a Gmail reply (Vow Motion, Arctos) reaches the board, an agent reads it
+and decides whether it needs you. It runs right after each Gmail sync
+(`/api/hq/ingest/gmail`, logic in `lib/hq/triage.ts` and
+`lib/hq/triageAgent.ts`) and looks at:
+
+- the whole conversation, not just the last message (the sync sends the
+  thread for unanswered real replies, each message cut to its new text);
+- every other mail with that person or organisation in the last 30 days:
+  another thread, a follow-up you already sent elsewhere, an auto-reply, an
+  opt-out;
+- links they mention on our sites or theirs, fetched to see whether a
+  reported problem is real or already fixed.
+
+A reply that needs you shows a proposed subtask under it in Inbox → Replies
+(and in Pipelines). Approve it (reword it first if you like), or press "No
+action needed". Replies that need nothing stay off the board, listed under
+"Filtered out by the reply check" with the reason, where "Needs action after
+all" puts one back. Decisions are saved straight away in
+`hq_reply_decisions`; nothing is ever sent. A new reply in the thread, or new
+mail with that person, gets a fresh check.
+
+It needs `ANTHROPIC_API_KEY` (and `ANTHROPIC_WORKSPACE_ID` if the key needs a
+workspace) on Vercel. Without it, every reply shows as before, marked "Not
+checked yet". For the thread context, paste the updated
+`ops/gmail/hq-sync.gs` into the Apps Script project; until then the check
+works from the 240-character snippet.

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
 import { googleProvider, hqAuth } from "@/lib/hq/firebaseClient";
-import type { CommandType, HqCommandRecord, HqResponse } from "@/lib/hq/types";
+import type { CommandType, HqCommandRecord, HqResponse, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
 import { HqContext, inFilter, type Filter, type HqContextValue } from "./context";
 import { BUSINESSES, ago } from "./format";
 import { Icon } from "./ui";
@@ -14,7 +14,7 @@ import { InspirationView } from "./views/Inspiration";
 import { PipelinesView } from "./views/Pipelines";
 import { TasksView } from "./views/Tasks";
 import { evaluateAll } from "./tasks";
-import { gmailWaiting } from "./views/GmailPipeline";
+import { replyBoard } from "@/lib/hq/triage";
 import { PerformanceView } from "./views/Performance";
 import { HealthView } from "./views/Health";
 import { GlossaryView } from "./views/Glossary";
@@ -188,6 +188,33 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     [call, cancel, toast],
   );
 
+  // Aldo's call on a checked Gmail reply. Saved at once (no agent run needed); undo restores the previous call.
+  const saveDecision = useCallback(
+    async (key: string, decision: TriageDecisionKind | "clear", title?: string) => {
+      await call("/api/hq/triage", { key, decision, title });
+      const record: TriageDecision | null = decision === "clear" ? null : { key, decision, title: title || null, by: email, at: Date.now() };
+      setData((d) => (d ? { ...d, decisions: [...(d.decisions ?? []).filter((x) => x.key !== key), ...(record ? [record] : [])] } : d));
+    },
+    [call, email],
+  );
+
+  const decide = useCallback(
+    async (key: string, decision: TriageDecisionKind | "clear", label: string, opts: { title?: string; previous?: TriageDecision | null } = {}) => {
+      try {
+        await saveDecision(key, decision, opts.title);
+        const prev = opts.previous ?? null;
+        toast(label, () =>
+          void saveDecision(key, prev ? prev.decision : "clear", prev?.title ?? undefined)
+            .then(() => toast("Undone."))
+            .catch((e) => toast(e instanceof Error ? e.message : "Couldn't undo.")),
+        );
+      } catch (e) {
+        toast(e instanceof Error ? e.message : "Couldn't save that.");
+      }
+    },
+    [saveDecision, toast],
+  );
+
   const go = useCallback((v: string) => {
     window.location.hash = v;
     setSheet(false);
@@ -200,7 +227,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
       (s?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length +
       (s?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business)).length +
       (s?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand)).length +
-      gmailWaiting(data?.gmail ?? null, (b) => inFilter(filter, b)).length;
+      (data ? replyBoard(data, (r) => inFilter(filter, r.business)).board.length : 0);
     const tasks = data ? evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length : 0;
     const health = (s?.bottlenecks ?? []).filter((b) => b.severity === "bad").length;
     return { inbox, tasks, health } as Partial<Record<ViewId, number>>;
@@ -209,7 +236,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const snap = data?.snapshot;
   const age = snap ? now - snap.generatedAt : null;
   const fresh = age === null ? "bad" : age < 30 * 60_000 ? "ok" : age < 3 * 3_600_000 ? "warn" : "bad";
-  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, go } : null;
+  const ctx: HqContextValue | null = data ? { data, now, filter, act, cancel, decide, go } : null;
 
   const navLink = (id: ViewId) => (
     <a key={id} className="hq-navlink" href={`#${id}`} aria-current={view === id ? "page" : undefined} onClick={() => window.scrollTo({ top: 0 })}>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { GmailReply, GmailSummary, MailBusiness, ReplyKind } from "@/lib/hq/types";
+import type { MailBusiness, ReplyKind } from "@/lib/hq/types";
+import { replyBoard, triageKey } from "@/lib/hq/triage";
 import { Columns } from "../Charts";
+import { ReplyCheck } from "../ReplyCheck";
 import { useHq } from "../context";
 import { BUSINESS_LABEL, ago, num, when } from "../format";
 import { Empty, Stat } from "../ui";
@@ -17,15 +19,14 @@ export const KIND: Record<ReplyKind, { label: string; sev: "ok" | "warn" | "bad"
   bounce: { label: "Bounced", sev: "warn" },
 };
 
-/** Real answers to our pitches that nobody has answered yet. */
-export function gmailWaiting(gmail: GmailSummary | null, business: (b: MailBusiness) => boolean): GmailReply[] {
-  return (gmail?.replies ?? []).filter((r) => r.kind === "reply" && r.toPitch && !r.answered && business(r.business));
-}
-
 export const GMAIL_SETUP = "The Gmail sync is a small script inside mrotiz14@gmail.com that reports here every 15 minutes: every pitch from each send-as address, who answered, auto-replies, opt-outs and bounces. It hasn't reported yet.";
 
 export function GmailPipeline({ business, address, title }: { business: MailBusiness; address: string; title: string }) {
   const { data, now } = useHq();
+  const checked = useMemo(() => {
+    const { board, filtered } = replyBoard(data, (r) => r.business === business);
+    return { board, byKey: new Map([...board, ...filtered].map((i) => [triageKey(i.reply), i])) };
+  }, [data, business]);
   const gmail = data.gmail;
   const [q, setQ] = useState("");
   const [show, setShow] = useState<"all" | "replied" | "waiting">("all");
@@ -56,7 +57,6 @@ export function GmailPipeline({ business, address, title }: { business: MailBusi
       replyRate: pitches.length ? Math.round((repliedPeople.size / pitches.length) * 1000) / 10 : null,
       byDay: [...days.entries()].map(([date, sent]) => ({ x: date.slice(5), y: sent })),
       misdirected,
-      waiting: replies.filter((r) => r.kind === "reply" && !r.answered),
     };
   }, [gmail, business, now]);
 
@@ -104,20 +104,26 @@ export function GmailPipeline({ business, address, title }: { business: MailBusi
       ) : null}
 
       <section className="hq-card">
-        <div className="hq-card__head"><h3 className="hq-h3">Replies · {view.replies.length}</h3>{view.waiting.length ? <span className="hq-pill" data-sev="warn">{view.waiting.length} waiting for you</span> : null}</div>
+        <div className="hq-card__head"><h3 className="hq-h3">Replies · {view.replies.length}</h3>{checked.board.length ? <span className="hq-pill" data-sev="warn">{checked.board.length} waiting for you</span> : null}</div>
         {view.replies.length ? (
           <ul className="hq-list">
-            {view.replies.slice(0, 30).map((r) => (
-              <li key={`${r.url}-${r.at}`} className="hq-row" data-sev={r.kind === "reply" ? (r.answered ? "ok" : "warn") : r.kind === "optout" ? "bad" : undefined}>
+            {view.replies.slice(0, 30).map((r) => {
+              const item = r.kind === "reply" && !r.answered ? checked.byKey.get(triageKey(r)) : undefined;
+              const off = item?.state === "filtered" || item?.state === "done";
+              return (
+              <li key={`${r.url}-${r.at}`} className="hq-row" data-sev={r.kind === "reply" ? (r.answered || off ? "ok" : "warn") : r.kind === "optout" ? "bad" : undefined}>
                 <strong><span className="hq-pill" data-sev={KIND[r.kind].sev} style={{ marginRight: 8 }}>{KIND[r.kind].label}</span>{r.name || r.from}</strong>
                 <span className="hq-when">{ago(r.at, now)}</span>
                 <p>{r.snippet || r.subject}</p>
                 <p className="hq-mono" style={{ margin: 0 }}>
                   <a className="hq-link" href={r.url} target="_blank" rel="noreferrer">Open in Gmail</a>
-                  {r.kind === "reply" ? (r.answered ? " · answered" : " · not answered yet") : r.kind === "optout" ? " · never email again" : ""}
+                  {r.kind === "reply" ? (r.answered ? " · answered" : item?.state === "filtered" ? " · no action needed" : item?.state === "done" ? " · subtask done" : " · not answered yet") : r.kind === "optout" ? " · never email again" : ""}
                 </p>
+                {item && off && item.triage ? <p>{item.decision?.decision === "dismissed" ? "You marked it as needing no action." : item.triage.reason}</p> : null}
+                {item && !off ? <div style={{ gridColumn: "1 / -1" }}><ReplyCheck key={`${triageKey(r)}-${item.triage?.at ?? 0}`} item={item} /></div> : null}
               </li>
-            ))}
+              );
+            })}
           </ul>
         ) : <p className="hq-small">No replies yet.</p>}
       </section>

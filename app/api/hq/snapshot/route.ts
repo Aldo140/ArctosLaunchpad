@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
 import { workflowSummaries } from "@/lib/hq/github";
 import { queryRecent, readStringField } from "@/lib/hq/google";
+import { readDecisions, readTriage } from "@/lib/hq/triageAgent";
 import type { ArctosOutreach, CommandType, GmailSummary, HqCommandRecord, HqResponse, HqSnapshot } from "@/lib/hq/types";
 
 /**
@@ -68,14 +69,16 @@ export async function POST(request: Request) {
     errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   };
-  const [snapshot, arctos, cmds, workflows, gmail] = await Promise.all([
+  const [snapshot, arctos, cmds, workflows, gmail, triage, decisions] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
     arctosOutreach(now).catch(note("Arctos sends")),
     commands(now).catch(note("HQ actions")),
     workflowSummaries().catch(note("Agent runs")),
     readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(note("Gmail")),
+    readTriage().catch(note("Reply check")),
+    readDecisions(now - 45 * DAY).catch(note("Reply decisions")),
   ]);
 
-  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, gmail, errors };
+  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [], errors };
   return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
 }
