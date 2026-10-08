@@ -2,7 +2,7 @@
 
 import { useHq } from "../context";
 import { BUSINESS_LABEL, ago, slot } from "../format";
-import { GYM_GOAL, agenda, gymSlot, gymStats, moneyMoves } from "../persona";
+import { GYM_GOAL, GYM_MONTHLY, agenda, gymSlot, gymStats, moneyMoves } from "../persona";
 import { Icon } from "../ui";
 
 const time = (t: number) => slot(t).split(" ").slice(1).join(" ");
@@ -96,7 +96,7 @@ export function GymCard() {
       </div>
       <p className="hq-small">
         {g.month} {g.month === 1 ? "visit" : "visits"} this month
-        {g.costPerVisit !== null ? ` · $${g.costPerVisit.toFixed(2)} a visit` : ""}
+        {g.costPerVisit !== null ? ` · $${g.costPerVisit.toFixed(2)} a visit` : GYM_MONTHLY ? ` · $${GYM_MONTHLY} paid for nothing so far` : ""}
         {g.weekStreak > 1 ? ` · ${g.weekStreak} weeks in a row at ${GYM_GOAL}+` : ""}
       </p>
       {free ? <p className="hq-small"><b style={{ color: "var(--fg)" }}>Free slot:</b> {time(free)}, 90 minutes clear.</p> : null}

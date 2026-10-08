@@ -145,7 +145,7 @@ const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 /** Anytime Fitness. Visits a week that count as "going". */
 export const GYM_GOAL = 3;
 /** The membership's monthly cost in dollars, for cost per visit. Null hides it. */
-export const GYM_MONTHLY: number | null = null;
+export const GYM_MONTHLY: number | null = 50;
 
 const TZ = "America/Edmonton";
 const dayKey = (t: number) => new Date(t).toLocaleDateString("en-CA", { timeZone: TZ });
