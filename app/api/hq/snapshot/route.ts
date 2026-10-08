@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
 import { workflowSummaries } from "@/lib/hq/github";
 import { queryRecent, readStringField } from "@/lib/hq/google";
+import { readDecisions, readTriage } from "@/lib/hq/triageAgent";
 import type { ArctosOutreach, CalendarSummary, CommandType, GmailSummary, HqCommandRecord, HqResponse, HqSnapshot, LifeEntry } from "@/lib/hq/types";
 
 /**
@@ -76,16 +77,18 @@ export async function POST(request: Request) {
     errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   };
-  const [snapshot, arctos, cmds, workflows, gmail, calendar, lifeLog] = await Promise.all([
+  const [snapshot, arctos, cmds, workflows, gmail, triage, decisions, calendar, lifeLog] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
     arctosOutreach(now).catch(note("Arctos sends")),
     commands(now).catch(note("HQ actions")),
     workflowSummaries().catch(note("Agent runs")),
     readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(note("Gmail")),
+    readTriage().catch(note("Reply check")),
+    readDecisions(now - 45 * DAY).catch(note("Reply decisions")),
     readStringField("hq/calendar", "payload").then((s) => (s ? (JSON.parse(s) as CalendarSummary) : null)).catch(note("Calendar")),
     life(now).catch(note("Gym log")),
   ]);
 
-  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, gmail, calendar, life: lifeLog, errors };
+  const body: HqResponse = { viewer, snapshot, arctos, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [], calendar, life: lifeLog, errors };
   return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
 }

@@ -4,10 +4,10 @@ import { inFilter, useHq } from "../context";
 import { BUSINESS_LABEL, ago, calgaryParts, cdn, num, plural, short, slot, when } from "../format";
 import { Spark, Stat, Thumb } from "../ui";
 import { evaluateAll } from "../tasks";
-import { gmailWaiting } from "./GmailPipeline";
 import { brief, greeting, mood, moodSignoff, nextMilestone, outreachStreak, wins } from "../persona";
 import { GymCard, MoneyMoves, TodayCard } from "./Life";
 import { SkyStrip } from "../Sky";
+import { replyBoard } from "@/lib/hq/triage";
 
 export function OverviewView() {
   const { data, now, filter, go, preview } = useHq();
@@ -19,13 +19,20 @@ export function OverviewView() {
   const replies = (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business));
   const pitches = (snap?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business));
   const decisionPosts = (snap?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand));
-  const gmail = gmailWaiting(data.gmail, (b) => inFilter(filter, b));
+  const gmail = replyBoard(data, (r) => inFilter(filter, r.business)).board;
   const waiting = replies.length + pitches.length + decisionPosts.length + gmail.length;
   const needs = [
     ...replies.map((r) => ({ key: `r${r.leadId}`, at: r.at, label: "Reply", title: `${r.businessName} wrote back`, detail: r.text.replace(/\s+/g, " ").slice(0, 120), business: r.business })),
     ...decisionPosts.map((p) => ({ key: `p${p.id}`, at: p.updatedAt, label: p.status === "drafted" ? "Approve post" : "Fix post", title: p.headline, detail: p.suggestedFor ? `Slot ${when(p.suggestedFor)}` : p.template, business: p.brand })),
     ...pitches.map((p) => ({ key: `c${p.leadId}`, at: p.at, label: "Approve pitch", title: p.businessName, detail: p.subject, business: p.business })),
-    ...gmail.map((r) => ({ key: `g${r.url}${r.at}`, at: r.at, label: "Reply in Gmail", title: `${r.name || r.from} wrote back`, detail: r.snippet.slice(0, 120), business: r.business })),
+    ...gmail.map(({ reply: r, state, triage, decision }) => ({
+      key: `g${r.url}${r.at}`,
+      at: r.at,
+      label: state === "proposed" ? "Approve subtask" : state === "approved" ? "Subtask" : "Reply in Gmail",
+      title: `${r.name || r.from} wrote back`,
+      detail: (state === "approved" ? decision?.title ?? triage?.subtask?.title : state === "proposed" ? triage?.subtask?.title : null) ?? r.snippet.slice(0, 120),
+      business: r.business,
+    })),
   ].sort((a, b) => a.at - b.at);
 
   const accounts = (snap?.instagram?.accounts ?? []).filter((a) => inFilter(filter, a.business));

@@ -1,7 +1,7 @@
 import type { HqResponse } from "@/lib/hq/types";
 import { inFilter, type Filter } from "./context";
 import { calgaryDayStart, evaluateAll } from "./tasks";
-import { gmailWaiting } from "./views/GmailPipeline";
+import { replyBoard } from "@/lib/hq/triage";
 import { BUSINESS_LABEL, num, plural, slot } from "./format";
 
 /**
@@ -57,7 +57,7 @@ export function brief(data: HqResponse, now: number, filter: Filter): string[] {
   const done = [...postBits, arctosBit].filter(Boolean) as string[];
   if (done.length) out.push(`${joinList(done)} today.`);
 
-  const replies = gmailWaiting(data.gmail, (b) => inFilter(filter, b)).length + (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length;
+  const replies = replyBoard(data, (r) => inFilter(filter, r.business)).board.length + (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length;
   const failing = evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length;
   const asks: string[] = [];
   if (replies) asks.push(`${plural(replies, "person", "people")} wrote back and ${replies === 1 ? "is" : "are"} waiting on you`);
@@ -266,8 +266,10 @@ export interface MoneyMove { key: string; at: number; business: string; title: s
  */
 export function moneyMoves(data: HqResponse, now: number, filter: Filter): MoneyMove[] {
   const out: MoneyMove[] = [];
-  for (const r of gmailWaiting(data.gmail, (b) => inFilter(filter, b))) {
-    out.push({ key: `g${r.url}${r.at}`, at: r.at, business: r.business, title: `${r.name || r.from} is waiting on an answer`, detail: r.snippet.slice(0, 110), href: r.url });
+  /* Only replies the reply check says need Aldo; its subtask, when there is one, says what to do. */
+  for (const { reply: r, triage, decision } of replyBoard(data, (x) => inFilter(filter, x.business)).board) {
+    const todo = decision?.title ?? triage?.subtask?.title;
+    out.push({ key: `g${r.url}${r.at}`, at: r.at, business: r.business, title: `${r.name || r.from} is waiting on an answer`, detail: (todo ?? r.snippet).slice(0, 110), href: r.url });
   }
   for (const l of data.snapshot?.pipelineDetail?.calgarywatch?.leads ?? []) {
     if (!inFilter(filter, "calgarywatch") || !["interested", "replied"].includes(l.status)) continue;

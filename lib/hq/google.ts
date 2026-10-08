@@ -113,6 +113,18 @@ export async function queryRecent(collection: string, field: string, min: number
   }));
 }
 
+/** Writes a whole document (creating or replacing it) from plain values. */
+export async function setDoc(path: string, fields: Record<string, string | number | null>): Promise<void> {
+  const body: Record<string, Value> = {};
+  for (const [k, v] of Object.entries(fields)) body[k] = v === null ? { nullValue: null } : typeof v === "number" ? { integerValue: String(Math.round(v)) } : { stringValue: v };
+  const r = await fetch(`${FIRESTORE()}/${path}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${await googleAccessToken()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: body }),
+  });
+  if (!r.ok) throw new Error(`Writing ${path}: HTTP ${r.status}`);
+}
+
 export async function deleteDoc(path: string): Promise<void> {
   const r = await fetch(`${FIRESTORE()}/${path}`, { method: "DELETE", headers: { Authorization: `Bearer ${await googleAccessToken()}` } });
   if (!r.ok && r.status !== 404) throw new Error(`Deleting ${path}: HTTP ${r.status}`);
