@@ -13,6 +13,8 @@ export interface HqContextValue {
   act: (type: CommandType, targetId: string, payload: Record<string, unknown>, label: string) => Promise<void>;
   cancel: (id: string) => Promise<void>;
   go: (view: string) => void;
+  /** Rendering from sample data: nothing leaves the page. */
+  preview?: boolean;
 }
 
 export const HqContext = createContext<HqContextValue | null>(null);
