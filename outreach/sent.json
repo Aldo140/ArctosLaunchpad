@@ -796,5 +796,40 @@
     "subject": "Mobile framing consultations",
     "at": "2026-10-08T19:56:32.208Z",
     "messageId": "<202610081956.15981909140@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "alpineca@telus.net",
+    "business": "Alpine Catering",
+    "subject": "Catering quotes at Alpine",
+    "at": "2026-10-09T19:32:19.301Z",
+    "messageId": "<202610091932.25096473523@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@flaircatering.ca",
+    "business": "A Certain Flair Catering",
+    "subject": "Event orders at A Certain Flair",
+    "at": "2026-10-09T19:32:19.301Z",
+    "messageId": "<202610091932.87712141271@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "Info@harlingfoodco.com",
+    "business": "Harling Food Co.",
+    "subject": "Dinner party bookings at Harling",
+    "at": "2026-10-09T19:32:19.301Z",
+    "messageId": "<202610091932.86334437130@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "byblosbathroom@gmail.com",
+    "business": "Byblos Bathroom",
+    "subject": "Bathroom estimates by the owners",
+    "at": "2026-10-09T19:32:19.301Z",
+    "messageId": "<202610091932.43247375844@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@madrenos.ca",
+    "business": "M.A.D. Renovations",
+    "subject": "Estimates within 72 hours",
+    "at": "2026-10-09T19:32:19.301Z",
+    "messageId": "<202610091932.54504049051@smtp-relay.mailin.fr>"
   }
 ]
