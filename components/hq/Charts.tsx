@@ -129,3 +129,67 @@ export function Bars({ rows, format }: { rows: Array<{ label: string; value: num
     </div>
   );
 }
+
+/**
+ * Money this month, added up day by day, against last month and the pace a
+ * goal needs. One axis (dollars); this month is the accent line, last month a
+ * quiet dashed one, the goal a straight dashed diagonal. Hover or touch shows
+ * the day.
+ */
+export function Pace({ month, last, today, days, goal, format }: { month: number[]; last: number[]; today: number; days: number; goal: number | null; format: (cents: number) => string }) {
+  const [ref, W] = useWidth();
+  const [hover, setHover] = useState<number | null>(null);
+  const h = 190;
+  const pad = { top: 14, right: 14, bottom: 22, left: 52 };
+  const upto = month.slice(0, today);
+  const max = niceMax(Math.max(1, ...upto, ...last, goal ?? 0));
+  const iw = W - pad.left - pad.right;
+  const ih = h - pad.top - pad.bottom;
+  const span = Math.max(days, last.length) - 1 || 1;
+  const x = (i: number) => pad.left + (i / span) * iw;
+  const y = (v: number) => pad.top + ih - (v / max) * ih;
+  const path = (xs: number[]) => xs.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  const area = upto.length ? `${path(upto)}L${x(upto.length - 1).toFixed(1)},${pad.top + ih}L${pad.left},${pad.top + ih}Z` : "";
+  const i = hover ?? today - 1;
+  const onMove = (e: React.PointerEvent<SVGRectElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setHover(Math.max(0, Math.min(days - 1, Math.round(((e.clientX - r.left) / r.width) * span))));
+  };
+  const tipX = Math.min(W - pad.right - 150, Math.max(pad.left, x(i) + 10));
+  return (
+    <div ref={ref} className="hq-pace">
+      <svg className="hq-chart" viewBox={`0 0 ${W} ${h}`} width={W} height={h} role="img" aria-label={`Money this month: ${format(upto[upto.length - 1] ?? 0)} by day ${today}, against ${format(last[Math.min(today, last.length) - 1] ?? 0)} by the same day last month`}>
+        {[0, max / 2, max].map((t) => (
+          <g key={t}>
+            <line className="grid" x1={pad.left} x2={W - pad.right} y1={y(t)} y2={y(t)} />
+            <text x={pad.left - 8} y={y(t) + 4} textAnchor="end">{format(t)}</text>
+          </g>
+        ))}
+        {goal ? <line className="goal" x1={x(0)} y1={y(0)} x2={x(days - 1)} y2={y(goal)} /> : null}
+        {last.length ? <path className="last" d={path(last)} /> : null}
+        {area ? <path className="area area--accent" d={area} /> : null}
+        {upto.length ? <path className="line line--accent" d={path(upto)} /> : null}
+        {upto.length ? <circle className="dot dot--accent" cx={x(upto.length - 1)} cy={y(upto[upto.length - 1])} r={4.5} /> : null}
+        <line className="cross" x1={x(i)} x2={x(i)} y1={pad.top} y2={pad.top + ih} data-on={hover !== null} />
+        <text x={pad.left} y={h - 4}>1</text>
+        <text x={x(today - 1)} y={h - 4} textAnchor="middle">Today</text>
+        <text x={W - pad.right} y={h - 4} textAnchor="end">{days}</text>
+        <rect x={pad.left} y={pad.top} width={iw} height={ih} fill="transparent" onPointerMove={onMove} onPointerDown={onMove} onPointerLeave={() => setHover(null)} style={{ touchAction: "pan-y" }} />
+        {hover !== null ? (
+          <g className="tip" transform={`translate(${tipX},${pad.top + 4})`} pointerEvents="none">
+            <rect width={150} height={goal ? 72 : 56} rx={6} />
+            <text x={10} y={18} className="tip__h">Day {i + 1}</text>
+            {i < today ? <text x={10} y={35}><tspan className="k k--accent">●</tspan> This month {format(month[i])}</text> : <text x={10} y={35}>Not here yet</text>}
+            <text x={10} y={50}><tspan className="k">●</tspan> Last month {format(last[Math.min(i, last.length - 1)] ?? 0)}</text>
+            {goal ? <text x={10} y={65}><tspan className="k">–</tspan> Goal pace {format(Math.round((goal * i) / (days - 1)))}</text> : null}
+          </g>
+        ) : null}
+      </svg>
+      <p className="hq-legend">
+        <span><i data-k="this" /> This month</span>
+        <span><i data-k="last" /> Last month</span>
+        {goal ? <span><i data-k="goal" /> Pace to the goal</span> : null}
+      </p>
+    </div>
+  );
+}

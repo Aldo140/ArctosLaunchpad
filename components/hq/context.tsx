@@ -20,13 +20,18 @@ export interface HqContextValue {
   undoGym: (id: string) => Promise<void>;
   /** Money that came in, in cents. */
   logMoney: (amount: number, business: string, text: string, at?: number) => Promise<boolean>;
-  addNote: (text: string) => Promise<boolean>;
+  /** A to-do, with the day it's due (noon Calgary time) when it has one. */
+  addNote: (text: string, due?: number | null) => Promise<boolean>;
   toggleNote: (id: string, done: boolean) => Promise<void>;
+  setNoteDue: (id: string, due: number | null) => Promise<void>;
+  /** Money someone owes, in cents; marking it paid logs the payment. */
+  addOwed: (amount: number, business: string, text: string, due: number | null) => Promise<boolean>;
+  markPaid: (entry: LifeEntry, paid: boolean) => Promise<void>;
   /** Remove any log entry; the toast's Undo puts it back. */
   removeLife: (entry: LifeEntry, label: string) => Promise<void>;
   setGoal: (cents: number | null) => Promise<void>;
   /** Opens the quick-add sheet on a tab. */
-  quickAdd: (tab: "gym" | "money" | "note") => void;
+  quickAdd: (tab: "gym" | "money" | "note" | "owed") => void;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }

@@ -34,11 +34,13 @@ Grouped by what you do, not by what the agents do.
 
 - **You**: Today (the day in four numbers: waiting on you, money in this
   month, gym this week, next on the calendar; the three things to clear first;
-  the day as one timeline; money moves, notes, momentum), Decide (every
+  the day as one timeline with what's due today; to-dos, money owed, money
+  moves, the week scored against last week, momentum), Decide (every
   post, pitch and reply waiting on you as one list, people who wrote back
   first; one-tap Approve / Send / Skip on each row, open a row to edit first;
-  `j`/`k` move, `o` opens), Money (money in against a monthly goal, logged by
-  hand) and Life (the gym, the week's calendar, notes).
+  `j`/`k` move, `o` opens), Money (money in against a monthly goal, a
+  day-by-day pace chart against last month, money owed to you, logged by
+  hand) and Life (the gym, the week's calendar with due items, to-dos).
 - **The businesses**: Growth (Instagram accounts, post ideas, what works) and
   Pipelines (CalgaryWatch, Arctos, Vow Motion).
 - **Engine room**: System (the agents' jobs, every connection, a glossary).
@@ -120,8 +122,17 @@ the brief and the sign-off.
   what for. Entries are `hq_life` rows of kind `money` (cents); the monthly
   goal is `hq_settings/me`. The brief mentions the month's total and what a
   day it takes to hit the goal.
-- **Notes**: ideas and to-dos (`l n`), `hq_life` rows of kind `note`, checked
-  off or deleted from Today or Life.
+- **Owed to you**: invoices and agreed prices (`l o`), `hq_life` rows of kind
+  `owed` (cents, business, who, an optional `due` day). **Paid** writes a
+  `money` row linked by `paidId`, so it counts as money in; **Not paid** (or
+  the toast's Undo) deletes that row again. Late ones show on the Money tile,
+  in the brief and under "Your day".
+- **To-dos**: (`l n`), `hq_life` rows of kind `note` with an optional `due`
+  day (noon Calgary time). Late and due-today ones show under "Your day" and
+  in the week; one tap pushes one to tomorrow.
+- **Your week**: money in, gym days, pitches sent, posts out and calls made in
+  HQ, this week so far against last week to the same moment (`weekScore` in
+  persona.ts).
 
 ## On your phone (Telegram)
 

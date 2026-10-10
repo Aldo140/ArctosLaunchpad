@@ -3,12 +3,14 @@
 import { inFilter, useHq } from "../context";
 import { calgaryDayStart } from "../tasks";
 import { BUSINESS_LABEL, calgaryParts, num, plural, short, slot } from "../format";
-import { GYM_GOAL, agenda, brief, dollars, greeting, gymSlot, gymStats, mood, moodSignoff, moneyStats, nextMilestone, outreachStreak, wins } from "../persona";
+import { useState } from "react";
+import { GYM_GOAL, agenda, brief, dollars, greeting, gymSlot, gymStats, mood, moodSignoff, moneyStats, nextMilestone, outreachStreak, owedStats, todoStats, weekScore, wins } from "../persona";
 import { openDecisions } from "../queue";
 import { SkyStrip } from "../Sky";
 import { Icon } from "../ui";
 import { QueueRow } from "./Inbox";
-import { MoneyMoves, NotesCard } from "./Life";
+import { MoneyMoves, TodoCard } from "./Life";
+import { OwedCard } from "./Money";
 
 const time = (t: number) => slot(t).split(" ").slice(1).join(" ");
 
@@ -26,6 +28,9 @@ export function OverviewView() {
   const events = agenda(data, now);
   const nextEvent = events.find((e) => !e.allDay && e.end > now);
   const free = gym.wentToday ? null : gymSlot(data, now);
+  const owed = owedStats(data, now, filter);
+  const todos = todoStats(data, now);
+  const [more, setMore] = useState(false);
 
   // The day as one timeline: calendar, posts going out, and the gym slot.
   const dayEnd = calgaryDayStart(now) + 86_400_000;
@@ -35,6 +40,9 @@ export function OverviewView() {
     ...posts.map((p) => ({ key: `p${p.id}`, at: p.scheduledFor!, end: p.scheduledFor!, allDay: false, kind: "post" as const, title: p.headline, note: `${BUSINESS_LABEL[p.brand]} post goes out` })),
     ...(free ? [{ key: "gym", at: free, end: free + 90 * 60_000, allDay: false, kind: "gym" as const, title: "Free for the gym", note: "90 minutes clear" }] : []),
   ].sort((a, b) => a.at - b.at);
+  // What's due today (or late) has no time of its own; it sits under the day.
+  const dueToday = [...todos.overdue, ...todos.today];
+  const owedToday = owed.overdue.concat(owed.dueSoon.filter((e) => e.due! < dayEnd));
 
   const good = wins(data, now, filter);
   const streak = filter === "all" || filter === "arctos" ? (data.arctos ? outreachStreak(data.arctos.sendsByDay, now) : 0) : 0;
@@ -50,7 +58,10 @@ export function OverviewView() {
         </div>
         <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go find money.</em></>}</h1>
         <p className="hq-mood" data-mood={feel.key}>{feel.line}</p>
-        <p className="hq-brief">{story.join(" ")}</p>
+        <ul className="hq-brieflist" data-open={more}>
+          {story.map((line) => <li key={line}>{line}</li>)}
+        </ul>
+        {story.length > 2 ? <button type="button" className="hq-linkbtn hq-brief__more" data-few={story.length <= 4} onClick={() => setMore((m) => !m)} aria-expanded={more}>{more ? "Less" : "The rest of the brief"}</button> : null}
       </header>
 
       <div className="hq-pulse">
@@ -63,7 +74,7 @@ export function OverviewView() {
           <span className="hq-tile2__label"><Icon name="money" /> In this month</span>
           <b>{dollars(money.month)}</b>
           {money.goal ? <span className="hq-meter"><span style={{ width: `${Math.round((money.progress ?? 0) * 100)}%` }} /></span> : null}
-          <span className="hq-tile2__sub">{money.goal ? `of ${dollars(money.goal)} goal` : money.month ? `${dollars(money.lastMonth)} last month` : "tap to log a payment"}</span>
+          <span className="hq-tile2__sub" data-sev={owed.overdue.length ? "warn" : undefined}>{owed.overdue.length ? `${dollars(owed.overdueTotal)} owed is late` : money.goal ? `of ${dollars(money.goal)} goal${owed.total ? ` · ${dollars(owed.total)} owed` : ""}` : owed.total ? `${dollars(owed.total)} still owed to you` : money.month ? `${dollars(money.lastMonth)} last month` : "tap to log a payment"}</span>
         </button>
         <div className="hq-tile2" data-sev={!gym.wentToday && (gym.daysSince ?? 99) >= 4 ? "bad" : undefined}>
           <button type="button" className="hq-tile2__link" onClick={() => go("life")} aria-label="Gym details" />
@@ -102,13 +113,27 @@ export function OverviewView() {
               ))}
             </ol>
           ) : <p className="hq-small" style={{ margin: 0 }}>{data.calendar ? "Nothing booked. The whole day is yours." : "Your calendar hasn't reported yet."}</p>}
+          {dueToday.length || owedToday.length ? (
+            <div className="hq-dueday">
+              <p className="hq-qgroup">Due today</p>
+              <ul>
+                {owedToday.map((e) => <li key={e.id} data-kind="owed"><span>{dollars(e.amount ?? 0)} from {e.text}</span><button type="button" className="hq-linkbtn" onClick={() => go("money")}>{e.due! < dayEnd - 86_400_000 ? "Late" : "Chase"}</button></li>)}
+                {dueToday.map((e) => <li key={e.id} data-kind="todo" data-late={e.due! < dayEnd - 86_400_000}><span>{e.text}</span><button type="button" className="hq-linkbtn" onClick={() => go("life")}>{e.due! < dayEnd - 86_400_000 ? "Late" : "To-do"}</button></li>)}
+              </ul>
+            </div>
+          ) : null}
         </section>
       </div>
 
       <div className="hq-cols-2">
-        <MoneyMoves besideQueue />
-        <NotesCard limit={4} />
+        <TodoCard compact />
+        <div className="hq-stack">
+          {owed.open.length ? <OwedCard compact /> : null}
+          <MoneyMoves besideQueue />
+        </div>
       </div>
+
+      <WeekScore />
 
       {good.length || streak || climb ? (
         <section className="hq-card hq-momentum">
@@ -147,5 +172,40 @@ export function OverviewView() {
 
       <p className="hq-signoff">{moodSignoff(feel.key, now)}</p>
     </div>
+  );
+}
+
+const fmtDelta = (d: number, money: boolean) => `${d > 0 ? "+" : d < 0 ? "−" : "±"}${money ? dollars(Math.abs(d)) : Math.abs(d)}`;
+
+/** This week so far against last week to the same moment: is it a better week? */
+function WeekScore() {
+  const { data, now, filter, go } = useHq();
+  const { lines } = weekScore(data, now, filter);
+  const ahead = lines.filter((l) => l.value > l.last).length;
+  const behind = lines.filter((l) => l.value < l.last).length;
+  const verdict = ahead > behind ? "Ahead of last week." : behind > ahead ? "Behind last week, so far." : "Level with last week.";
+  return (
+    <section className="hq-card hq-score">
+      <div className="hq-card__head">
+        <div>
+          <p className="hq-eyebrow"><span>↗</span> Your week</p>
+          <h2 className="hq-h2">{verdict}</h2>
+        </div>
+        <span className="hq-mono">vs last week, same point</span>
+      </div>
+      <div className="hq-score__grid">
+        {lines.map((l) => {
+          const d = l.value - l.last;
+          const money = l.format === "money";
+          return (
+            <button key={l.key} type="button" className="hq-score__cell" data-dir={d > 0 ? "up" : d < 0 ? "down" : "flat"} onClick={() => go(l.view)}>
+              <span className="hq-score__label">{l.label}</span>
+              <b>{money ? dollars(l.value) : l.value}{l.goal ? <small>/{l.goal}</small> : null}</b>
+              <span className="hq-score__delta">{fmtDelta(d, money)} <span>vs {money ? dollars(l.last) : l.last}</span></span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }

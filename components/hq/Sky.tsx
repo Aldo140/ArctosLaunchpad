@@ -88,7 +88,7 @@ export function SkyStrip({ preview }: { preview?: boolean }) {
       <b>{Math.round(sky.temp)}°</b>
       <span>{words(sky.code)}</span>
       <span className="hq-mono">H {Math.round(sky.high)}° · L {Math.round(sky.low)}°</span>
-      <span className="hq-mono">Sunset {clockOf(sky.sunset)}</span>
+      <span className="hq-mono hq-sky__sun">Sunset {clockOf(sky.sunset)}</span>
       {sky.chinook ? <span className="hq-chip hq-chip--warm">Chinook</span> : null}
     </p>
   );
