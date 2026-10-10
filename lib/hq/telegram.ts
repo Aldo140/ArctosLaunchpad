@@ -39,7 +39,11 @@ export async function sendCard(chatId: number, c: Card): Promise<void> {
   await sendText(chatId, c.text, c.buttons);
 }
 
-export const sendTyping = (chatId: number) => call("sendChatAction", { chat_id: chatId, action: "typing" }).catch(() => null);
+/** What Telegram last saw when it called the webhook (for the GET health check). */
+export const webhookInfo = () =>
+  call<{ url: string; pending_update_count: number; last_error_date?: number; last_error_message?: string }>("getWebhookInfo", {});
+
+export const sendTyping =(chatId: number) => call("sendChatAction", { chat_id: chatId, action: "typing" }).catch(() => null);
 
 export const answerButton = (callbackId: string, text: string) => call("answerCallbackQuery", { callback_query_id: callbackId, text }).catch(() => null);
 
