@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { askConfigured, askHq } from "@/lib/hq/ask";
 import { createDoc, deleteDoc, readFields, readStringField } from "@/lib/hq/google";
-import { answerButton, sendCard, sendText, sendTyping, setButtons } from "@/lib/hq/telegram";
+import { answerButton, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
 import { HELP, briefing, chunks, decodeButton, encodeUndo, escapeHtml, inboxCards, telegramUsers } from "@/lib/hq/telegramBot";
 import type { GmailSummary, HqSnapshot } from "@/lib/hq/types";
 
@@ -84,11 +84,16 @@ async function onButton(q: NonNullable<Update["callback_query"]>, email: string)
 }
 
 export async function POST(request: Request) {
-  if (!secretMatches(request.headers.get("x-telegram-bot-api-secret-token"))) return NextResponse.json({ error: "Not allowed." }, { status: 401 });
+  if (!secretMatches(request.headers.get("x-telegram-bot-api-secret-token"))) {
+    console.warn("hq/telegram: refused an update with a missing or wrong secret");
+    return NextResponse.json({ error: "Not allowed." }, { status: 401 });
+  }
   const update = (await request.json().catch(() => null)) as Update | null;
   const users = telegramUsers(process.env.HQ_TELEGRAM_USERS);
   const from = update?.callback_query?.from ?? update?.message?.from;
   const chatId = update?.callback_query?.message?.chat.id ?? update?.message?.chat.id;
+  const kind = update?.callback_query ? "button" : update?.message?.text ? "text" : "other";
+  console.log(`hq/telegram: ${kind} update from ${from?.id ?? "nobody"} (${from && users.has(from.id) ? "allowed" : "not on HQ_TELEGRAM_USERS"})`);
 
   // Always 200: Telegram retries anything else, and a retried button tap would queue twice.
   try {
@@ -102,7 +107,25 @@ export async function POST(request: Request) {
     if (update?.callback_query) await onButton(update.callback_query, email);
     else if (update?.message?.text) await onMessage(chatId, update.message.text);
   } catch (e) {
-    await sendText(chatId!, `Something went wrong: ${escapeHtml(e instanceof Error ? e.message : String(e))}`).catch(() => null);
+    console.error("hq/telegram: handling the update failed", e);
+    await sendText(chatId!, `Something went wrong: ${escapeHtml(e instanceof Error ? e.message : String(e))}`).catch((e2) =>
+      console.error("hq/telegram: couldn't send the error message either", e2),
+    );
   }
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * Health check: GET /api/hq/telegram?check=<HQ_TELEGRAM_WEBHOOK_SECRET> says
+ * which settings are present (never their values) and what Telegram last saw.
+ */
+export async function GET(request: Request) {
+  if (!secretMatches(new URL(request.url).searchParams.get("check"))) return NextResponse.json({ error: "Not allowed." }, { status: 401 });
+  const info = await webhookInfo().catch((e: unknown) => ({ error: e instanceof Error ? e.message : String(e) }));
+  return NextResponse.json({
+    botToken: Boolean(process.env.HQ_TELEGRAM_BOT_TOKEN),
+    users: [...telegramUsers(process.env.HQ_TELEGRAM_USERS).keys()],
+    questions: askConfigured(),
+    webhook: info,
+  });
 }
