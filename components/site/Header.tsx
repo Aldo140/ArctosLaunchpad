@@ -30,13 +30,16 @@ function useToneUnderHeader(pathname: string) {
   useEffect(() => {
     // Watch a one-pixel line 36px down the screen rather than measuring every
     // section on every scroll frame: the browser reports crossings for free.
-    const sections = [...document.querySelectorAll<HTMLElement>("main [data-tone]")];
+    const sections = [
+      ...document.querySelectorAll<HTMLElement>("main [data-tone]"),
+    ];
     const under = new Set<HTMLElement>();
     let observer: IntersectionObserver | null = null;
     const pick = () => {
       // The last match in document order wins, so a nested section beats its parent.
       let next: Tone = "ink";
-      for (const section of sections) if (under.has(section)) next = section.dataset.tone as Tone;
+      for (const section of sections)
+        if (under.has(section)) next = section.dataset.tone as Tone;
       setTone(next);
     };
     const watch = () => {
@@ -122,7 +125,9 @@ export function Header() {
       }
       if (e.key !== "Tab" || !panel.current) return;
       const items = Array.from(
-        panel.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+        panel.current.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled])",
+        ),
       ).filter((el) => el.offsetParent !== null);
       if (!items.length) return;
       const head = items[0];
@@ -146,14 +151,19 @@ export function Header() {
     };
   }, [close, open]);
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header
       className={`hdr tone-${open ? "ink" : tone}${condensed ? " is-condensed" : ""}${open ? " is-open" : ""}`}
     >
       <div className="hdr__bar">
-        <Link className="hdr__brand" href="/" aria-label="Arctos Launchpad — home">
+        <Link
+          className="hdr__brand"
+          href="/"
+          aria-label="Arctos Launchpad — home"
+        >
           <ArctosLockup size={32} />
         </Link>
 
@@ -206,11 +216,18 @@ export function Header() {
         aria-label="Site menu"
         aria-hidden={!open}
         inert={!open}
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) close();
+        }}
       >
         <div className="menu__panel" ref={panel}>
           <div className="menu__head">
             <ArctosLockup size={30} />
-            <button type="button" className="menu__close" onClick={() => close()}>
+            <button
+              type="button"
+              className="menu__close"
+              onClick={() => close()}
+            >
               Close
             </button>
           </div>
@@ -222,7 +239,7 @@ export function Header() {
                 className={`menu__item${isActive(href) ? " is-active" : ""}`}
                 aria-current={isActive(href) ? "page" : undefined}
                 onClick={() => close(false)}
-                style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms" }}
+                style={{ transitionDelay: open ? `${70 + i * 35}ms` : "0ms" }}
               >
                 <span className="index">{String(i + 1).padStart(2, "0")}</span>
                 <span className="menu__label">{label}</span>
@@ -239,7 +256,11 @@ export function Header() {
                 </li>
               ))}
             </ul>
-            <Link className="btn btn--block" href="/contact" onClick={() => close(false)}>
+            <Link
+              className="btn btn--block"
+              href="/contact"
+              onClick={() => close(false)}
+            >
               <span>Start a project</span>
               <span className="btn__dot" aria-hidden="true">
                 →

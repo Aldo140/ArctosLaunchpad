@@ -1,0 +1,62 @@
+/* Homepage-only breathing room. The wrapper keeps these adjustments from
+   changing the shared sections on interior routes. */
+
+.home-index .isles {
+  padding-top: calc(var(--section) * 1.12);
+  padding-bottom: calc(var(--section) * 0.82);
+}
+
+.home-index .wr__pin {
+  padding-top: calc(var(--section) * 1.12);
+  padding-bottom: clamp(72px, 8vw, 112px);
+}
+
+.home-index .method {
+  padding-block: calc(var(--section) * 1.12);
+}
+
+.home-index .studio-note:not(.is-live) {
+  padding-block: calc(var(--section) * 1.12);
+}
+
+.home-index .close {
+  padding-block: calc(var(--section) * 1.12);
+}
+
+@media (max-width: 1023px) {
+  .home-index .isles {
+    padding-block: clamp(92px, 18vw, 144px);
+  }
+
+  .home-index .wr__pin {
+    padding-block: clamp(88px, 17vw, 136px) clamp(80px, 15vw, 120px);
+  }
+
+  .home-index .method {
+    padding-block: clamp(88px, 17vw, 128px);
+  }
+
+  .home-index .studio-note {
+    padding-block: clamp(88px, 17vw, 128px) clamp(96px, 19vw, 144px);
+  }
+
+  .home-index .close {
+    padding-block: clamp(96px, 19vw, 144px);
+  }
+}
+
+@media (max-width: 520px) {
+  .home-index .isles,
+  .home-index .method,
+  .home-index .close {
+    padding-block: 88px;
+  }
+
+  .home-index .wr__pin {
+    padding-block: 88px 80px;
+  }
+
+  .home-index .studio-note {
+    padding-block: 88px 104px;
+  }
+}
