@@ -1062,7 +1062,7 @@
     left: auto;
     right: 0;
     top: 0;
-    width: 46cqw;
+    width: 44cqw;
     text-align: right;
   }
 
@@ -1071,7 +1071,9 @@
   }
 
   .ism__label--run {
-    top: 31cqh;
+    /* Keep the copy in the open water beneath the gateway/tower. Its former
+       31cqh anchor crossed the art at every tested phone and tablet ratio. */
+    top: 40cqh;
     width: 46cqw;
   }
 
