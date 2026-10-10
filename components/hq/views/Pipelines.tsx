@@ -153,7 +153,7 @@ export function PipelinesView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>01</span> Win the customer</p>
+        
         <h1 className="hq-h1">Who we&apos;ve reached, <em>and who&apos;s reaching back.</em></h1>
       </header>
       <div className="hq-seg" role="group" aria-label="Business">

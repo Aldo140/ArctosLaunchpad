@@ -30,12 +30,22 @@ questions, below). The Telegram bot adds `HQ_TELEGRAM_*`.
 
 ## Tabs
 
-Grouped by island. 01 Win the customer: Overview, Inbox (posts, pitches and
-replies to approve, edit, redraft or reject), Instagram (all four accounts),
-Inspiration (what outperforms on other Calgary accounts, and the agents'
-ideas), Pipelines (CalgaryWatch, Arctos, Vow Motion). 02 Run the work: Tasks
-(every recurring job with today's proof, run history and GitHub schedule reliability; routines are defined in `components/hq/tasks.ts`). 03 See the numbers: Performance,
-Health and Glossary. The snapshot shape is `lib/hq/types.ts`; the writer is
+Grouped by what you do, not by what the agents do.
+
+- **You**: Today (the day in four numbers: waiting on you, money in this
+  month, gym this week, next on the calendar; the three things to clear first;
+  the day as one timeline; money moves, notes, momentum), Decide (every
+  post, pitch and reply waiting on you as one list, people who wrote back
+  first; one-tap Approve / Send / Skip on each row, open a row to edit first;
+  `j`/`k` move, `o` opens), Money (money in against a monthly goal, logged by
+  hand) and Life (the gym, the week's calendar, notes).
+- **The businesses**: Growth (Instagram accounts, post ideas, what works) and
+  Pipelines (CalgaryWatch, Arctos, Vow Motion).
+- **Engine room**: System (the agents' jobs, every connection, a glossary).
+
+Old links still work: `#inbox` opens Decide, `#tasks` opens System, and so
+on (`ALIASES` in `components/hq/HqApp.tsx`). The decision list is
+`components/hq/queue.ts`. The snapshot shape is `lib/hq/types.ts`; the writer is
 `scripts/ops/lib/hqSnapshot.ts` in the CalgaryWatch repository.
 
 ## Actions
@@ -101,10 +111,17 @@ the brief and the sign-off.
   with `HQ_CALENDAR_KEY` (or the Gmail sync's `HQ_GMAIL_KEY`). Setup: paste
   it in, set the key, run `setupCalendar` once.
 - **Gym**: the "I went today" button (or `l g`) writes to `hq_life` through
-  `POST /api/hq/life`. Calendar events that look like a workout count too.
+  `POST /api/hq/life`; Life can also log yesterday or any day in the last 60. Calendar events that look like a workout count too.
   The goal (`GYM_GOAL`, 3 a week) and the membership cost (`GYM_MONTHLY`, used
   for cost per visit) live in persona.ts. The card suggests the first free
   90 minutes on today's calendar.
+
+- **Money**: the + button (or `l m`) logs a payment: amount, which business,
+  what for. Entries are `hq_life` rows of kind `money` (cents); the monthly
+  goal is `hq_settings/me`. The brief mentions the month's total and what a
+  day it takes to hit the goal.
+- **Notes**: ideas and to-dos (`l n`), `hq_life` rows of kind `note`, checked
+  off or deleted from Today or Life.
 
 ## On your phone (Telegram)
 

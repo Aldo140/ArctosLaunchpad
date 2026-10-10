@@ -276,9 +276,26 @@ export interface GmailSummary {
 export interface CalendarEvent { title: string; start: number; end: number; allDay: boolean; location: string }
 export interface CalendarSummary { generatedAt: number; events: CalendarEvent[] }
 
-/** Personal log entries saved from HQ (a gym visit today; more kinds later). */
-export type LifeKind = "gym";
-export interface LifeEntry { id: string; kind: LifeKind; at: number }
+/**
+ * Personal log entries saved from HQ: a gym visit, money that came in (amount
+ * in cents, and which business it was for), or a note to self.
+ */
+export type LifeKind = "gym" | "money" | "note";
+export interface LifeEntry {
+  id: string;
+  kind: LifeKind;
+  at: number;
+  /** money: cents. */
+  amount?: number;
+  /** money: the business it came from ("other" for anything else). */
+  business?: string;
+  /** money: what it was for. note: the note. */
+  text?: string;
+  /** note: checked off. */
+  done?: boolean;
+}
+/** Aldo's own settings, saved from HQ. */
+export interface HqSettings { moneyGoal: number | null }
 
 /**
  * The reply check: before a Gmail reply reaches the board, an agent reads the
@@ -333,6 +350,7 @@ export interface HqResponse {
   gmail: GmailSummary | null;
   calendar: CalendarSummary | null;
   life: LifeEntry[] | null;
+  settings?: HqSettings | null;
   triage: GmailTriage | null;
   decisions: TriageDecision[];
   errors: string[];

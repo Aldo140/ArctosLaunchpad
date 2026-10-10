@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import type { HqPost, InboxPitch, InboxReply } from "@/lib/hq/types";
+import { useEffect, useMemo, useState } from "react";
+import type { CommandType, HqPost, InboxPitch, InboxReply } from "@/lib/hq/types";
 import { replyBoard, triageKey, type BoardItem } from "@/lib/hq/triage";
 import { CommandState } from "../CommandState";
 import { inFilter, latestCommand, useHq } from "../context";
-import { BUSINESS_LABEL, STATUS_LABEL, ago, cdn, plural, until, when } from "../format";
-import { Empty, Thumb } from "../ui";
+import { BUSINESS_LABEL, STATUS_LABEL, ago, cdn, plural, short, until, when } from "../format";
+import { Empty, Icon, Thumb } from "../ui";
 import { FilteredReplies, ReplyCheck } from "../ReplyCheck";
+import { QUEUE_GROUP, decisionQueue, describe, isQueued, type QueueItem } from "../queue";
+import { calgaryDayStart } from "../tasks";
 
 type Kind = "all" | "posts" | "pitches" | "replies";
 
@@ -174,35 +176,183 @@ function GmailReplyCard({ item }: { item: BoardItem }) {
   );
 }
 
-export function InboxView() {
-  const { data, filter } = useHq();
+const TARGET: Record<QueueItem["kind"], { id: (i: QueueItem) => string; types: CommandType[] }> = {
+  reply: { id: (i) => (i.kind === "reply" ? i.reply.leadId : ""), types: ["approve-reply", "handled-reply"] },
+  gmail: { id: () => "", types: [] },
+  post: { id: (i) => (i.kind === "post" ? i.post.id : ""), types: ["approve-post", "reject-post", "redraft-post", "unschedule-post"] },
+  pitch: { id: (i) => (i.kind === "pitch" ? i.pitch.leadId : ""), types: ["approve-pitch", "skip-pitch"] },
+};
+
+/** The one-tap actions on a row, so most decisions never need the full card. */
+function Quick({ item, onOpen }: { item: QueueItem; onOpen: () => void }) {
+  const { data, act, cancel, decide } = useHq();
+  const [busy, setBusy] = useState(false);
+  const run = (fn: () => Promise<void>) => {
+    setBusy(true);
+    void fn().finally(() => setBusy(false));
+  };
+  const t = TARGET[item.kind];
+  const cmd = t.types.length ? latestCommand(data.commands, t.id(item), t.types) : null;
+  if (cmd?.status === "pending") {
+    return (
+      <span className="hq-q__queued">
+        <span className="hq-pill" data-sev="ok">Queued</span>
+        <button type="button" className="hq-linkbtn" onClick={() => void cancel(cmd.id)}>Undo</button>
+      </span>
+    );
+  }
+  switch (item.kind) {
+    case "post":
+      return item.post.status === "drafted" ? (
+        <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" disabled={busy} onClick={() => run(() => act("approve-post", item.post.id, {}, `Approved “${item.post.headline}”`))}>Approve</button>
+      ) : (
+        <button type="button" className="hq-btn hq-btn--sm" onClick={onOpen}>Fix it</button>
+      );
+    case "pitch":
+      return (
+        <>
+          <button type="button" className="hq-btn hq-btn--ghost hq-btn--sm" disabled={busy} onClick={() => run(() => act("skip-pitch", item.pitch.leadId, {}, `Skipped ${item.pitch.businessName}`))}>Skip</button>
+          <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" disabled={busy || !item.pitch.body.trim()} onClick={() => run(() => act("approve-pitch", item.pitch.leadId, { subject: item.pitch.subject, body: item.pitch.body }, `Pitch to ${item.pitch.businessName} approved`))}>Send</button>
+        </>
+      );
+    case "reply":
+      return <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" disabled={busy || !item.reply.suggestedBody.trim()} onClick={() => run(() => act("approve-reply", item.reply.leadId, { body: item.reply.suggestedBody }, `Reply to ${item.reply.businessName} approved`))}>Send reply</button>;
+    case "gmail": {
+      const { state, triage, reply } = item.item;
+      if (state === "proposed" && triage?.subtask) {
+        const title = triage.subtask.title;
+        return <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" disabled={busy} onClick={() => run(() => decide(triageKey(reply), "approved", `On your list: ${title}`, { title, previous: item.item.decision }))}>Add to-do</button>;
+      }
+      if (state === "approved") return <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" disabled={busy} onClick={() => run(() => decide(triageKey(reply), "done", "Done. Nice.", { previous: item.item.decision }))}>Done</button>;
+      return <a className="hq-btn hq-btn--sm" href={reply.url} target="_blank" rel="noreferrer">Gmail <Icon name="external" /></a>;
+    }
+  }
+}
+
+function Body({ item }: { item: QueueItem }) {
+  switch (item.kind) {
+    case "post": return <PostDecision post={item.post} />;
+    case "pitch": return <PitchDecision pitch={item.pitch} />;
+    case "reply": return <ReplyDecision reply={item.reply} />;
+    case "gmail": return <GmailReplyCard item={item.item} />;
+  }
+}
+
+/**
+ * One decision as a row: what it is, who, how long it's waited, and the
+ * one-tap action. Opening it shows the full card to edit before deciding.
+ */
+export function QueueRow({ item, open, onToggle }: { item: QueueItem; open?: boolean; onToggle?: () => void }) {
+  const { now, go } = useHq();
+  const d = describe(item);
+  const toggle = onToggle ?? (() => go(`decide/${item.key}`));
+  const waited = now - item.at;
+  const sev = item.kind === "post" && item.post.status !== "drafted" ? "bad" : waited > 2 * 86_400_000 ? "bad" : waited > 12 * 3_600_000 ? "warn" : "ok";
+  const img = item.kind === "post" ? cdn(item.post.imageUrl) : null;
+  return (
+    <li className="hq-q" data-open={open ? "true" : undefined} data-sev={sev} id={`q-${item.key}`}>
+      <div className="hq-q__row">
+        <button type="button" className="hq-q__head" aria-expanded={!!open} onClick={toggle}>
+          {item.kind === "post" ? <span className="hq-q__thumb"><Thumb src={img} alt="" /></span> : <span className="hq-q__dot" aria-hidden="true">{(item.kind === "pitch" ? item.pitch.businessName : d.title).charAt(0)}</span>}
+          <span className="hq-q__main">
+            <span className="hq-q__meta"><b>{d.label}</b> · {BUSINESS_LABEL[item.business] ?? item.business} · {short(item.at, now).replace(" ago", "")}</span>
+            <strong>{d.title}</strong>
+            <span className="hq-q__detail">{d.detail}</span>
+          </span>
+        </button>
+        <span className="hq-q__quick"><Quick item={item} onOpen={toggle} /></span>
+      </div>
+      {open ? <div className="hq-q__body"><Body item={item} /></div> : null}
+    </li>
+  );
+}
+
+export function InboxView({ focus }: { focus?: string }) {
+  const { data, filter, now } = useHq();
   const [kind, setKind] = useState<Kind>("all");
-  const snap = data.snapshot;
-  const posts = (snap?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand));
-  const pitches = (snap?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business));
-  const replies = (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business));
-  const { board: gmail, filtered } = replyBoard(data, (r) => inFilter(filter, r.business));
-  const total = posts.length + pitches.length + replies.length + gmail.length;
-  const segs: Array<[Kind, string, number]> = [["all", "Everything", total], ["replies", "Replies", replies.length + gmail.length], ["posts", "Posts", posts.length], ["pitches", "Pitches", pitches.length]];
+  // Still to decide first; what you've already queued drops to the bottom until the agents pick it up.
+  const everything = useMemo(() => decisionQueue(data, filter), [data, filter]);
+  const all = everything.filter((i) => !isQueued(data, i));
+  const queued = everything.filter((i) => isQueued(data, i));
+  const { filtered } = replyBoard(data, (r) => inFilter(filter, r.business));
+  const shown = [...all, ...queued].filter((i) => kind === "all" || (kind === "replies" ? i.kind === "reply" || i.kind === "gmail" : kind === "posts" ? i.kind === "post" : i.kind === "pitch"));
+  const [openKey, setOpenKey] = useState<string | null>(focus ?? null);
+  const open = shown.find((i) => i.key === openKey)?.key ?? null;
+  const count = (k: Kind) => all.filter((i) => k === "all" || (k === "replies" ? i.kind === "reply" || i.kind === "gmail" : k === "posts" ? i.kind === "post" : i.kind === "pitch")).length;
+  const segs: Array<[Kind, string]> = [["all", "Everything"], ["replies", "Replies"], ["posts", "Posts"], ["pitches", "Pitches"]];
+
+  // What you've already cleared today, so the list reads as progress.
+  const dayStart = calgaryDayStart(now);
+  const cleared = new Set([...data.commands.filter((c) => c.at >= dayStart).map((c) => c.targetId), ...(data.decisions ?? []).filter((d) => d.at >= dayStart).map((d) => d.key)]).size;
+  const total = cleared + all.length;
+
+  // j / k to move between decisions, o to open or close the current one.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.metaKey || e.ctrlKey || e.altKey || (t && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)))) return;
+      const at = shown.findIndex((i) => i.key === open);
+      const pick = (n: number) => {
+        const k = shown[Math.max(0, Math.min(shown.length - 1, n))]?.key;
+        if (!k) return;
+        setOpenKey(k);
+        window.requestAnimationFrame(() => document.getElementById(`q-${k}`)?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+      };
+      if (e.key === "j") pick(at + 1);
+      else if (e.key === "k") pick(at - 1);
+      else if (e.key === "o") setOpenKey(open ? "" : shown[0]?.key ?? null);
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [shown, open]);
 
   return (
     <div className="hq-view">
-      <header>
-        <p className="hq-eyebrow"><span>02</span> Run the work</p>
-        <h1 className="hq-h1">{total ? <>{plural(total, "decision")} <em>waiting on you.</em></> : <>Inbox zero. <em>Nicely done.</em></>}</h1>
-        <p className="hq-lede" style={{ marginTop: 10 }}>Replies first, then posts, then pitches. Every action here is applied by the agents on their next run, about every 30 minutes. Changed your mind? Undo works until then.</p>
+      <header className="hq-viewhead">
+        <h1 className="hq-h1">{all.length ? <>{plural(all.length, "decision")} <em>waiting on you.</em></> : <>All clear. <em>Nicely done.</em></>}</h1>
+        <p className="hq-lede">People who wrote back come first, because that&apos;s money. Most things take one tap; open a row to edit before you decide. The agents carry it out within 30 minutes, and Undo works until then.</p>
+        {total ? (
+          <div className="hq-progress" aria-label={`${cleared} of ${total} cleared today`}>
+            <span className="hq-meter"><span style={{ width: `${Math.round((cleared / total) * 100)}%` }} /></span>
+            <span className="hq-mono">{cleared} cleared today · {all.length} to go</span>
+          </div>
+        ) : null}
       </header>
       <div className="hq-seg" role="group" aria-label="Show">
-        {segs.map(([k, label, n]) => (
-          <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{label}{n ? <b>{n}</b> : null}</button>
+        {segs.map(([k, label]) => (
+          <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{label}{count(k) ? <b>{count(k)}</b> : null}</button>
         ))}
       </div>
-      {total === 0 ? <Empty title="Nothing waiting.">New drafts, replies and pitches land here as the agents find them. Replies to Vow Motion and Arctos pitches show up here from the Gmail sync.</Empty> : null}
-      {(kind === "all" || kind === "replies") && replies.map((r) => <ReplyDecision key={`r-${r.leadId}`} reply={r} />)}
-      {(kind === "all" || kind === "replies") && gmail.map((i) => <GmailReplyCard key={`g-${triageKey(i.reply)}`} item={i} />)}
+      {shown.length ? (
+        <ul className="hq-qlist">
+          {shown.map((i, n) => {
+            const g = QUEUE_GROUP[i.kind];
+            const done = isQueued(data, i);
+            const prevDone = n > 0 && isQueued(data, shown[n - 1]);
+            const label = done ? (n === 0 || !prevDone ? "Queued, the agents do it next" : null) : kind === "all" && (n === 0 || QUEUE_GROUP[shown[n - 1].kind] !== g) ? g : null;
+            return (
+              <QueueGroup key={i.key} label={label}>
+                <QueueRow item={i} open={i.key === open} onToggle={() => setOpenKey(i.key === open ? "" : i.key)} />
+              </QueueGroup>
+            );
+          })}
+        </ul>
+      ) : (
+        <Empty title="Nothing waiting here.">New drafts, replies and pitches land here the moment the agents find them.</Empty>
+      )}
       {(kind === "all" || kind === "replies") && <FilteredReplies items={filtered} />}
-      {(kind === "all" || kind === "posts") && posts.map((p) => <PostDecision key={`p-${p.id}`} post={p} />)}
-      {(kind === "all" || kind === "pitches") && pitches.map((p) => <PitchDecision key={`c-${p.leadId}`} pitch={p} />)}
+      <p className="hq-mono hq-hide-sm">j / k to move · o to open or close</p>
     </div>
+  );
+}
+
+function QueueGroup({ label, children }: { label: string | null; children: React.ReactNode }) {
+  return (
+    <>
+      {label ? <li className="hq-qgroup" aria-hidden="true">{label}</li> : null}
+      {children}
+    </>
   );
 }

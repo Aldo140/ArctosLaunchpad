@@ -13,7 +13,7 @@ export function InspirationView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>01</span> Win the customer</p>
+        
         <h1 className="hq-h1">What&apos;s working in Calgary, <em>and what we make of it.</em></h1>
         <p className="hq-lede" style={{ marginTop: 10 }}>Every morning the agent reads other Calgary accounts and pulls the posts that beat their own usual, so a small account&apos;s breakout counts as much as a big account&apos;s ordinary day. Then it writes down the patterns and turns them into original ideas. It never copies; reposts only with credit and permission.</p>
       </header>

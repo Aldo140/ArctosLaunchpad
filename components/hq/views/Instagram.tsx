@@ -102,7 +102,7 @@ export function InstagramView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>01</span> Win the customer</p>
+        
         <h1 className="hq-h1">Four accounts. <em>One feed of truth.</em></h1>
       </header>
       <div className="hq-seg" role="group" aria-label="Account">

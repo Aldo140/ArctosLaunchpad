@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Business, CommandType, HqCommandRecord, HqResponse, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
+import type { Business, CommandType, HqCommandRecord, HqResponse, LifeEntry, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
 
 export type Filter = Business | "all";
 
@@ -15,9 +15,18 @@ export interface HqContextValue {
   /** Approve, wave off, reopen or finish a checked Gmail reply's subtask; "clear" undoes the call. Saved at once. */
   decide: (key: string, decision: TriageDecisionKind | "clear", label: string, opts?: { title?: string; previous?: TriageDecision | null }) => Promise<void>;
   go: (view: string) => void;
-  /** Log a gym visit for today, or take one back. */
-  logGym: () => Promise<void>;
+  /** Log a gym visit (today, or an earlier day), or take one back. */
+  logGym: (at?: number) => Promise<void>;
   undoGym: (id: string) => Promise<void>;
+  /** Money that came in, in cents. */
+  logMoney: (amount: number, business: string, text: string, at?: number) => Promise<boolean>;
+  addNote: (text: string) => Promise<boolean>;
+  toggleNote: (id: string, done: boolean) => Promise<void>;
+  /** Remove any log entry; the toast's Undo puts it back. */
+  removeLife: (entry: LifeEntry, label: string) => Promise<void>;
+  setGoal: (cents: number | null) => Promise<void>;
+  /** Opens the quick-add sheet on a tab. */
+  quickAdd: (tab: "gym" | "money" | "note") => void;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }

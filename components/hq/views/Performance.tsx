@@ -16,7 +16,7 @@ export function PerformanceView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>03</span> See the numbers</p>
+        
         <h1 className="hq-h1">@calgarydaily, <em>every post it ever made.</em></h1>
         <p className="hq-lede" style={{ marginTop: 10 }}>
           {credited && original ? `A credited Reel gets a median of ${num(credited)} views; an original post gets ${num(original)}. That gap is what the new posting plan is built on.` : "What a typical post does, by origin, format and topic."}

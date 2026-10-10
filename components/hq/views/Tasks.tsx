@@ -109,7 +109,7 @@ export function TasksView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>02</span> Run the work</p>
+        
         <h1 className="hq-h1">
           {dueToday ? <>{done} of {dueToday} jobs done today, {needs ? <em>{needs} {needs === 1 ? "needs" : "need"} a look.</em> : late ? <em>{late} running late.</em> : <em>{confirmed} confirmed.</em>}</> : <>Nothing has come due yet. <em>The day starts at 3 am.</em></>}
         </h1>
