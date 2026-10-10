@@ -20,7 +20,8 @@ export interface BrandKit {
   voice: { summary: string; examples: string[]; rules: string[]; bannedPhrases: string[] };
   hashtags: string[];
   linkInBio: string;
-  autoPublish: Record<'events' | 'markets' | 'roundups' | 'partner' | 'incidents', boolean>;
+  /** news covers briefs, news and opinion posts; they also need credible sources (lib/sources.ts). */
+  autoPublish: Record<'events' | 'markets' | 'roundups' | 'partner' | 'incidents' | 'news', boolean>;
   postsPerDay: number;
   postingSlots: string[];
 }

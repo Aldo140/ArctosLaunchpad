@@ -1,5 +1,5 @@
 // Instagram post jobs: draft new candidates, re-draft on request, expire stale
-// drafts, flag published posts whose listing changed, and publish approved posts.
+// drafts, and publish approved posts.
 
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -12,9 +12,10 @@ import { COLLECTIONS, uploadImage, uploadVideo } from '../lib/firebase';
 import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { bestCaptions } from './insights';
-import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, reelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
+import { checkDraft, roundupHeadline, selectCandidates, templateDraft, reelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { makeReel } from '../lib/reel';
 import { renderPost, renderReelBackdrop } from '../lib/render';
+import { credibleSources } from '../lib/sources';
 import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryDate, nextSlot } from '../lib/time';
 import { calgaryDateTimeFormat } from '../lib/calgaryTz';
@@ -196,8 +197,12 @@ export async function redraftAndBriefs(db: Firestore, now: number, log: Log): Pr
   }
 }
 
-/** Expire drafts whose date passed; flag published posts whose listing changed or was cancelled. */
-export async function monitorPosts(db: Firestore, index: DiscoveryIndex, now: number, log: Log): Promise<void> {
+/**
+ * Expire drafts whose date passed. Published posts are left as they are, even
+ * when a listing in one changes or is cancelled (the owner stopped corrections
+ * on 2026-10-10); posts already flagged go back to published.
+ */
+export async function monitorPosts(db: Firestore, now: number, log: Log): Promise<void> {
   const stale = await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'approved', 'redraft']).get();
   for (const d of stale.docs) {
     if (!BRANDS.includes(d.get('brand'))) {
@@ -207,7 +212,7 @@ export async function monitorPosts(db: Firestore, index: DiscoveryIndex, now: nu
     }
     // Automatic listing posts written in an older look and voice are cleared, so the drafting step
     // (which runs next) writes them again. Hand-written and hand-approved posts are left alone.
-    const auto = !String(d.get('fingerprint') ?? '').includes('|draft|') && !d.get('videoUrl') && (d.get('status') === 'drafted' || String(d.get('reviewedByEmail') ?? '').startsWith('auto'));
+    const auto = !String(d.get('fingerprint') ?? '').includes('|draft|') && ['roundup', 'event'].includes(d.get('template')) && !d.get('videoUrl') && (d.get('status') === 'drafted' || String(d.get('reviewedByEmail') ?? '').startsWith('auto'));
     if (auto && d.get('brand') === 'calgarydaily' && (d.get('designVersion') ?? 1) < DAILY_DESIGN_VERSION) {
       await d.ref.delete();
       log(`cleared ${d.id} to redraft in the current voice and design`);
@@ -216,21 +221,10 @@ export async function monitorPosts(db: Firestore, index: DiscoveryIndex, now: nu
     const until = d.get('relevantUntil');
     if (until && until < now) { await d.ref.update({ status: 'expired', updatedAt: now }); log(`expired ${d.id}`); }
   }
-  const current = new Map<string, number[]>();
-  for (const h of happenings(index)) current.set(h.entity.id, [...(current.get(h.entity.id) ?? []), h.start]);
-  const published = (await db.collection(COLLECTIONS.posts).where('status', '==', 'published').get()).docs.filter(d => (d.get('relevantUntil') ?? 0) > now);
-  for (const d of published) {
-    const p = d.data() as OpsPost;
-    const problems: string[] = [];
-    for (const [id, start] of Object.entries(p.entityStarts ?? {})) {
-      const starts = current.get(id);
-      if (!starts) problems.push(`A listing in this post was removed or cancelled (${id}).`);
-      else if (!starts.includes(Date.parse(start))) problems.push(`A listing's time changed from ${start}.`);
-    }
-    if (problems.length) {
-      await d.ref.update({ status: 'needs-correction', correction: problems.join(' '), updatedAt: now });
-      log(`needs correction: ${d.id} — ${problems.join(' ')}`);
-    }
+  const flagged = await db.collection(COLLECTIONS.posts).where('status', '==', 'needs-correction').get();
+  for (const d of flagged.docs) {
+    await d.ref.update({ status: 'published', correction: null, updatedAt: now });
+    log(`left ${d.id} as published (corrections are off)`);
   }
 }
 
@@ -293,17 +287,20 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
 }
 
 /**
- * Posts that may go out without a person approving them: event, market and
- * roundup posts built only from verified listings, with no warnings, for a
- * brand whose kit turns that category on (the owner opted CalgaryDaily in on
- * 2026-09-25). News briefs, sensitive stories and paid posts always wait.
+ * Posts that go out without a person approving them (the owner asked for
+ * everything on 2026-10-10, as long as news rests on credible sources). Each
+ * category still has a switch in the brand kit. What always waits: a post that
+ * fails the brand checks, and a news, opinion or other post whose sources are
+ * missing or not on the credible list (ops/lib/sources.ts).
  */
 export function autoPublishable(p: OpsPost): boolean {
   const kit = brandKit(p.brand);
-  if (!kit.confirmed || p.sponsored || p.status !== 'drafted' || (p.warnings ?? []).length) return false;
+  if (!kit.confirmed || p.status !== 'drafted') return false;
+  if (checkDraft({ caption: p.caption, altText: p.altText, imageText: p.imageText }, kit, { sponsored: p.sponsored }).length) return false;
   if (p.template === 'roundup') return kit.autoPublish.roundups;
   if (p.template === 'event') return p.fingerprint.includes('|market|') ? kit.autoPublish.markets : kit.autoPublish.events;
-  return false;
+  if (p.template === 'partner') return kit.autoPublish.partner;
+  return kit.autoPublish.news && credibleSources(p.sourceUrls);
 }
 
 export async function autoApprove(db: Firestore, now: number, log: Log): Promise<void> {
