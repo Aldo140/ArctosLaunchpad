@@ -1188,6 +1188,24 @@
   }
 }
 
+/* Short phone screens leave less vertical water between the copy and the
+   generated bridge. Extend the composition downward so the middle tower and
+   both bridge spans sit below the Run the work quote. Taller phones already
+   have that space and keep the original framing. */
+@media (max-width: 430px) and (min-aspect-ratio: 1 / 2) {
+  .ism__isl--run {
+    top: 33cqh;
+  }
+
+  .ism__isl--see {
+    top: 66cqh;
+  }
+
+  .ism__label--see {
+    top: 80cqh;
+  }
+}
+
 @media (min-width: 640px) and (max-width: 1023.98px) {
   .isles.is-live-m .isl {
     flex-basis: min(46vw, 420px);
