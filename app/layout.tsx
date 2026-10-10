@@ -9,6 +9,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Motion } from "@/components/site/Motion";
 import {
   SITE_NAME,
+  SITE_DESCRIPTION,
   SITE_URL,
   graph,
   jsonLd,
@@ -24,17 +25,16 @@ import {
  * through `pageMetadata` — Next.js shallow-merges metadata, so a page that
  * declares `openGraph` replaces this one wholesale rather than extending it.
  */
-const homeCardTitle = "Win the customer. Run the work. See the numbers.";
+const homeCardTitle = "Arctos Launchpad | Calgary Marketing & Software Agency";
 const homeCard = ogImageUrl(homeCardTitle, "Calgary, Alberta");
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Arctos Launchpad | Calgary Web Design, Software & Automation",
+    default: "Arctos Launchpad | Calgary Marketing & Software Agency",
     template: "%s | Arctos Launchpad",
   },
-  description:
-    "Calgary web design, custom software, and automation studio for organizations across Canada and the US: websites, lead generation, workflows, and reporting.",
+  description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   robots: {
@@ -54,8 +54,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     url: SITE_URL,
     title: homeCardTitle,
-    description:
-      "Arctos designs and builds the websites, software, automation and reporting that connect how a business wins customers, runs its work and sees its numbers.",
+    description: SITE_DESCRIPTION,
     images: [
       { url: homeCard, width: 1200, height: 630, alt: homeCardTitle },
     ],
@@ -63,7 +62,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Arctos Launchpad",
-    description: homeCardTitle,
+    description: SITE_DESCRIPTION,
     images: [homeCard],
   },
 };

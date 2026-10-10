@@ -840,7 +840,7 @@ export function BridgeHero() {
           <div className="wrap hero__grid">
             <div className="hero__copy">
               <p className="eyebrow hero__eyebrow">
-                <span className="hero__eyebrow-in">Calgary web design &amp; software studio</span>
+                <span className="hero__eyebrow-in">Calgary marketing &amp; software agency</span>
               </p>
               <h1 id="hero-title" className="display hero__title">
                 <span className="visually-hidden">Win the customer. Run the work. See the numbers.</span>
@@ -871,8 +871,9 @@ export function BridgeHero() {
               <SystemDemo />
 
               <p className="lead hero__lead">
-                Arctos designs and builds the websites, software, automation and reporting that
-                connect them, so a growing business stops running on inboxes and spreadsheets.
+                Arctos Launchpad is a Calgary agency. We design and build websites, custom
+                software, marketing campaigns and automation so your business can win
+                customers, run the work and see the numbers.
               </p>
               <div className="actions">
                 <Btn href="/contact">Start a project</Btn>

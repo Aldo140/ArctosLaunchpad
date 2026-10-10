@@ -30,7 +30,7 @@ export function StudioNote() {
                 lines={["Busywork in.", <em key="s">A working system out.</em>]}
               />
               <p className="lead" data-reveal style={d(2)}>
-                Arctos is a Calgary studio. The people you talk to are the people who design and
+                Arctos Launchpad is a Calgary marketing and software agency. The people you talk to design and
                 build the work, across the customer-facing side and the systems behind it.
               </p>
               <ol className="studio-note__list">

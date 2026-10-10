@@ -15,8 +15,8 @@ export function Footer() {
           <div className="ftr__brand">
             <ArctosLockup size={40} />
             <p>
-              A Calgary studio building the bridge between how a business wins customers, runs its
-              work, and sees its numbers.
+              Arctos Launchpad is a Calgary marketing and software agency building websites,
+              custom applications, automation and reporting for businesses across Canada and the US.
             </p>
             <div className="ftr__start">
               <Link className="ftr__big" href="/contact">

@@ -23,6 +23,8 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 export const SITE_NAME = "Arctos Launchpad";
+export const SITE_DESCRIPTION =
+  "Arctos Launchpad is a Calgary marketing and software agency building websites, custom applications, automation and reporting for businesses in Canada and US.";
 export const SITE_LOCALE = "en_CA";
 
 /** Stable node identifiers so the graph can be referenced, not repeated. */
@@ -146,9 +148,8 @@ export function organizationSchema() {
     "@id": ORGANIZATION_ID,
     name: SITE_NAME,
     url: SITE_URL,
-    description:
-      "A Calgary digital growth and technology studio connecting marketing, websites, software, automation, and reporting into one system.",
-    slogan: "The system behind the work you repeat.",
+    description: SITE_DESCRIPTION,
+    slogan: "Win the customer. Run the work. See the numbers.",
     logo: `${SITE_URL}/icon.png`,
     image: `${SITE_URL}/icon.png`,
     address: ADDRESS,

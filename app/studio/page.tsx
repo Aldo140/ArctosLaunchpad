@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { projects } from "@/lib/content";
-import { breadcrumbSchema, graph, pageMetadata, webPageSchema } from "@/lib/seo";
+import { breadcrumbSchema, graph, ORGANIZATION_ID, SITE_DESCRIPTION, pageMetadata, webPageSchema } from "@/lib/seo";
 import { Crumbs, JsonLd, StartBand } from "@/components/site/Page";
 import { statusTone } from "@/components/site/ui";
 import { StudioHero } from "@/components/site/studio/StudioHero";
@@ -10,10 +10,9 @@ import { StudioPrinciples } from "@/components/site/studio/StudioPrinciples";
 import { StudioTogether, type TogetherItem } from "@/components/site/studio/StudioTogether";
 
 export const metadata: Metadata = pageMetadata({
-  title: "About Arctos Launchpad | Calgary Digital Studio",
+  title: "About Arctos Launchpad | Calgary Marketing & Software Agency",
   absoluteTitle: true,
-  description:
-    "Arctos Launchpad is a Calgary studio connecting websites, design, software, automation and reporting around how a business actually works.",
+  description: SITE_DESCRIPTION,
   path: "/studio",
   cardTitle: "Busywork in. A working system out.",
 });
@@ -50,7 +49,7 @@ export default function StudioPage() {
       <StartBand title={["What would make", <>the business <em key="w">work better?</em></>]} size="h1" />
       <JsonLd
         data={graph(
-          webPageSchema({ type: "AboutPage", name: "Studio", path: "/studio", description: "A Calgary digital growth and technology studio." }),
+          { ...webPageSchema({ type: "AboutPage", name: "About Arctos Launchpad", path: "/studio", description: SITE_DESCRIPTION }), mainEntity: { "@id": ORGANIZATION_ID } },
           breadcrumbSchema([{ name: "Studio", path: "/studio" }]),
         )}
       />

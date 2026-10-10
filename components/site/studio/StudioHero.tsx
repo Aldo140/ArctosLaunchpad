@@ -218,8 +218,9 @@ export function StudioHero({ crumbs }: { crumbs: ReactNode }) {
           </span>
         </h1>
         <p className="lead st-hero__lead" data-reveal style={d(4)}>
-          We connect the customer-facing work with the systems behind it: strategy, design,
-          development and automation, shaped around the same business.
+          Arctos Launchpad is a Calgary marketing and software agency. We work directly with
+          businesses to design and build websites, applications, campaigns and automation,
+          connecting the customer-facing work with the systems behind it.
         </p>
       </div>
 
