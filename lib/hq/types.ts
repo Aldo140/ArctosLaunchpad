@@ -278,21 +278,25 @@ export interface CalendarSummary { generatedAt: number; events: CalendarEvent[] 
 
 /**
  * Personal log entries saved from HQ: a gym visit, money that came in (amount
- * in cents, and which business it was for), or a note to self.
+ * in cents, and which business it was for), a to-do, or money someone owes.
  */
-export type LifeKind = "gym" | "money" | "note";
+export type LifeKind = "gym" | "money" | "note" | "owed";
 export interface LifeEntry {
   id: string;
   kind: LifeKind;
   at: number;
-  /** money: cents. */
+  /** money, owed: cents. */
   amount?: number;
-  /** money: the business it came from ("other" for anything else). */
+  /** money, owed: the business it came from ("other" for anything else). */
   business?: string;
-  /** money: what it was for. note: the note. */
+  /** money: what it was for. note: the to-do. owed: who owes it and for what. */
   text?: string;
-  /** note: checked off. */
+  /** note: checked off. owed: paid. */
   done?: boolean;
+  /** note, owed: the day it's due (noon Calgary time), if it has one. */
+  due?: number | null;
+  /** owed, once paid: the money entry the payment became. */
+  paidId?: string | null;
 }
 /** Aldo's own settings, saved from HQ. */
 export interface HqSettings { moneyGoal: number | null }

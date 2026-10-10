@@ -718,3 +718,143 @@ main > .hq-subnav, main > .hq-sysline { margin-bottom: 18px; }
 }
 .hq-gymgrid { grid-auto-columns: 16px; gap: 4px; justify-content: start; }
 .hq-gymgrid i { width: 16px; height: 16px; aspect-ratio: auto; }
+
+/* =========================================================================
+   Second pass: the brief as lines, money owed, dated to-dos, the pace
+   chart and the week score.
+   ========================================================================= */
+
+/* Today's brief: one fact per line, the first two always showing. */
+.hq-brieflist { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; max-width: 64ch; }
+.hq-brieflist li { position: relative; padding-left: 16px; color: var(--muted); font-size: 0.97rem; line-height: 1.45; text-wrap: pretty; }
+.hq-brieflist li::before { content: ""; position: absolute; left: 1px; top: 0.62em; width: 5px; height: 5px; border-radius: 50%; background: var(--line-strong); }
+.hq-brieflist li:first-child::before { background: var(--accent); }
+.hq-brief__more { display: none; justify-self: start; font-size: 0.86rem; }
+.hq-warntext { color: var(--hq-warn); font-weight: 500; }
+.hq-tile2__sub[data-sev="warn"] { color: var(--hq-warn); }
+
+/* Due days */
+.hq-due { display: inline-flex; gap: 6px; min-width: 0; }
+.hq-due select.hq-input { width: auto; min-width: 0; }
+.hq-due input[type="date"] { width: auto; }
+.hq-duetag { display: inline-flex; align-items: center; white-space: nowrap; font: 500 0.68rem/1 var(--mono); letter-spacing: 0.04em; padding: 4px 7px; border-radius: 999px; color: var(--muted); border: 1px solid var(--line-strong); }
+.hq-duetag[data-due="today"] { color: var(--accent); border-color: var(--accent); }
+.hq-duetag[data-due="late"] { color: var(--bg); background: var(--hq-warn); border-color: var(--hq-warn); }
+
+/* To-dos */
+.hq-todo .hq-addnote { flex-wrap: wrap; }
+.hq-todo .hq-addnote > .hq-input { flex: 1 1 220px; }
+.hq-todo__count { margin: 2px 0 0; }
+.hq-todo__side { display: inline-flex; align-items: center; gap: 10px; }
+.hq-todo__push { font-size: 0.8rem; white-space: nowrap; }
+.hq-todo__x { color: var(--faint); font-size: 1.1rem; padding: 0 4px; }
+.hq-todo .hq-notes li { grid-template-columns: minmax(0, 1fr) auto; }
+.hq-notes li[data-due="late"] label span { color: var(--fg); }
+.hq-todo__groups { display: grid; gap: 6px; }
+.hq-qgroup span { color: var(--faint); margin-left: 4px; }
+.hq-qgroup[data-k="late"] { color: var(--hq-warn); }
+.hq-qgroup[data-k="today"] { color: var(--accent); }
+
+/* Owed to you */
+.hq-h2 small.hq-mono { font-size: 0.72rem; color: var(--faint); margin-left: 6px; }
+.hq-owed[data-sev="warn"] .hq-h2 small { color: var(--hq-warn); }
+.hq-owed__list { list-style: none; margin: 0; padding: 0; display: grid; }
+.hq-owed__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.hq-owed__row:last-child { border-bottom: 0; }
+.hq-owed__main { display: grid; gap: 2px; min-width: 0; }
+.hq-owed__main strong { font-weight: 600; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hq-owed__main strong span { font-weight: 400; color: var(--muted); margin-left: 6px; }
+.hq-owed__main .hq-small { margin: 0; }
+.hq-owed__side { display: inline-flex; align-items: center; gap: 8px; }
+.hq-owed__row[data-done="true"] strong { color: var(--faint); text-decoration: line-through; }
+
+/* Due today, under the timeline */
+.hq-dueday { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+.hq-dueday ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.hq-dueday li { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 6px 10px; border-radius: var(--radius); font-size: 0.9rem; box-shadow: inset 3px 0 0 var(--accent); background: var(--bg); }
+.hq-dueday li[data-kind="owed"], .hq-dueday li[data-late="true"] { box-shadow: inset 3px 0 0 var(--hq-warn); }
+.hq-dueday li span { overflow-wrap: anywhere; }
+.hq-dueday .hq-linkbtn { font: 500 0.7rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.hq-week ul li[data-kind] .hq-mono { color: var(--accent); }
+.hq-week ul li[data-kind="owed"] .hq-mono { color: var(--hq-warn); }
+
+/* The pace chart */
+.hq-pace { display: grid; gap: 8px; }
+.hq-chart .line--accent { stroke: var(--accent); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.hq-chart .area--accent { fill: var(--accent); opacity: 0.1; }
+.hq-chart .dot--accent { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.hq-chart .last { fill: none; stroke: var(--muted); stroke-width: 1.75; stroke-dasharray: 2 4; stroke-linecap: round; opacity: 0.8; }
+.hq-chart .goal { stroke: var(--faint); stroke-width: 1.25; stroke-dasharray: 6 5; }
+.hq-chart .cross { stroke: var(--line-strong); stroke-width: 1; opacity: 0; }
+.hq-chart .cross[data-on="true"] { opacity: 1; }
+.hq-chart .tip rect { fill: var(--ink-2); stroke: var(--line-strong); }
+.hq-chart .tip text { fill: var(--muted); font: 11px var(--sans); }
+.hq-chart .tip .tip__h { fill: var(--fg); font: 600 11px var(--mono); }
+.hq-chart .tip .k { fill: var(--muted); }
+.hq-chart .tip .k--accent { fill: var(--accent); }
+.hq-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; font-size: 0.8rem; color: var(--muted); }
+.hq-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.hq-legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--accent); }
+.hq-legend i[data-k="last"] { border-top: 2px dotted var(--muted); }
+.hq-legend i[data-k="goal"] { border-top: 1.5px dashed var(--faint); }
+
+/* The week, scored */
+.hq-score__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.hq-score__cell { display: grid; gap: 4px; align-content: start; text-align: left; font: inherit; color: var(--fg); padding: 12px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; min-width: 0; }
+.hq-score__cell:hover { border-color: var(--line-strong); }
+.hq-score__label { font: 500 0.66rem/1.2 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.hq-score__cell b { font: 400 1.7rem/1.05 var(--serif); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hq-score__cell b small { font-size: 0.55em; color: var(--faint); margin-left: 2px; }
+.hq-score__delta { font: 500 0.74rem/1.2 var(--mono); color: var(--muted); }
+.hq-score__delta span { color: var(--faint); font-weight: 400; }
+.hq-score__cell[data-dir="up"] .hq-score__delta { color: var(--hq-ok); }
+.hq-score__cell[data-dir="down"] .hq-score__delta { color: var(--hq-warn); }
+
+/* Quick add: four tabs share the row evenly. */
+.hq-seg--full { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); justify-self: stretch; }
+.hq-seg--full button { padding-inline: 6px; text-align: center; }
+
+@media (max-width: 1023px) {
+  .hq-score__grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+  /* Phone hero: weather on one line, the brief cut to two facts until asked. */
+  .hq-sky { font-size: 0.8rem; gap: 2px 10px; }
+  .hq-sky b { font-size: 1.15rem; }
+  .hq-brieflist:not([data-open="true"]) li:nth-child(n + 3) { display: none; }
+  .hq-brief__more { display: inline; }
+}
+@media (max-width: 640px) {
+  .hq-sky__sun { display: none; }
+  .hq-score__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hq-score__cell:last-child { grid-column: 1 / -1; }
+  .hq-owed__row { grid-template-columns: minmax(0, 1fr); }
+  .hq-owed__side { justify-content: flex-start; }
+  .hq-todo .hq-addnote { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .hq-todo .hq-addnote > .hq-input { grid-column: 1 / -1; }
+  .hq-quick .hq-addnote { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .hq-quick .hq-addnote > .hq-input { grid-column: 1 / -1; }
+  .hq-due select.hq-input { width: 100%; }
+  .hq-form .hq-due { width: 100%; }
+  .hq-seg--full button { font-size: 0.78rem; padding: 8px 4px; }
+}
+
+/* Every payment: one line each, grouped by month. */
+.hq-paylist { display: grid; gap: 10px; }
+.hq-paylist ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.hq-paylist li { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) auto auto; gap: 12px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+.hq-paylist li:last-child { border-bottom: 0; }
+.hq-paylist b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.hq-paylist__what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hq-paylist__what small { margin-left: 8px; font: 500 0.66rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.hq-todo .hq-notes .hq-todo__push, .hq-notes .hq-todo__push { font: 500 0.8rem/1 var(--sans); color: var(--accent); padding: 0; }
+.hq-brieflist:not([data-open="true"]) li:nth-child(n + 5) { display: none; }
+.hq-brief__more { display: inline; }
+@media (min-width: 1024px) { .hq-brief__more[data-few="true"] { display: none; } }
+@media (max-width: 640px) {
+  .hq-paylist li { grid-template-columns: 5.5em minmax(0, 1fr) auto; }
+  .hq-paylist li .hq-when { display: none; }
+}
+.hq-gym__body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 40px; align-items: center; }
+.hq-gym__grid { display: grid; gap: 6px; justify-items: start; }
+.hq-gym__axis { display: flex; justify-content: space-between; width: 100%; margin: 0; font-size: 0.68rem; color: var(--faint); }
+.hq-gym__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) { .hq-gym__body { grid-template-columns: minmax(0, 1fr); } }

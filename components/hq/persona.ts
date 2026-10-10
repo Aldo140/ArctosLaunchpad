@@ -69,6 +69,12 @@ export function brief(data: HqResponse, now: number, filter: Filter): string[] {
 
   const money = moneyLine(moneyStats(data, now, filter));
   if (money) out.push(money);
+  const owed = owedStats(data, now, filter);
+  if (owed.overdue.length) out.push(`${dollars(owed.overdueTotal)} owed to you is past due, chase ${owed.overdue.length === 1 ? owed.overdue[0].text : `${plural(owed.overdue.length, "person", "people")}`}.`);
+  else if (owed.dueSoon.length) out.push(`${dollars(owed.dueSoon.reduce((n, e) => n + (e.amount ?? 0), 0))} is due to come in this week.`);
+
+  const t = todoStats(data, now);
+  if (t.overdue.length || t.today.length) out.push(`${plural(t.overdue.length + t.today.length, "to-do")} due${t.overdue.length ? `, ${t.overdue.length} late` : " today"}.`);
 
   const next = (snap?.posts ?? []).filter((p) => p.status === "approved" && p.scheduledFor && p.scheduledFor > now && inFilter(filter, p.brand)).sort((a, b) => a.scheduledFor! - b.scheduledFor!)[0];
   if (next) out.push(`Next post goes out ${slot(next.scheduledFor)}.`);
@@ -342,6 +348,135 @@ export function dollars(cents: number): string {
   return `$${d.toLocaleString("en-CA", { minimumFractionDigits: Number.isInteger(d) ? 0 : 2, maximumFractionDigits: 2 })}`;
 }
 
-/* ---------- notes ---------- */
+/** Cumulative money by day of the month, this month and last, for the pace chart. Cents. */
+export function moneyPace(data: HqResponse, now: number, filter: Filter): { days: number; today: number; month: number[]; last: number[] } {
+  const today = dayKey(now);
+  const [y, m] = today.slice(0, 7).split("-").map(Number);
+  const ly = m === 1 ? y - 1 : y;
+  const lm = m === 1 ? 12 : m - 1;
+  const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const lastDays = new Date(Date.UTC(ly, lm, 0)).getUTCDate();
+  const month = new Array(days).fill(0);
+  const last = new Array(lastDays).fill(0);
+  const thisKey = today.slice(0, 7);
+  const lastKey = `${ly}-${String(lm).padStart(2, "0")}`;
+  for (const e of data.life ?? []) {
+    if (e.kind !== "money" || !inFilter(filter, e.business ?? "other")) continue;
+    const k = dayKey(e.at);
+    const d = Number(k.slice(8, 10)) - 1;
+    if (k.startsWith(thisKey)) month[d] += e.amount ?? 0;
+    else if (k.startsWith(lastKey)) last[d] += e.amount ?? 0;
+  }
+  for (let i = 1; i < month.length; i++) month[i] += month[i - 1];
+  for (let i = 1; i < last.length; i++) last[i] += last[i - 1];
+  return { days, today: Number(today.slice(8, 10)), month, last };
+}
+
+/* ---------- owed to you ---------- */
+
+export interface OwedStats {
+  open: LifeEntry[];
+  total: number;
+  overdue: LifeEntry[];
+  overdueTotal: number;
+  /** Due in the next 7 days (not yet late). */
+  dueSoon: LifeEntry[];
+  paid: LifeEntry[];
+}
+
+/** Money people owe Aldo: late first, then by due day, undated last. */
+export function owedStats(data: HqResponse, now: number, filter: Filter): OwedStats {
+  const all = (data.life ?? []).filter((e) => e.kind === "owed" && inFilter(filter, e.business ?? "other"));
+  const todayStart = calgaryDayStart(now);
+  const open = all.filter((e) => !e.done).sort((a, b) => (a.due ?? Infinity) - (b.due ?? Infinity) || a.at - b.at);
+  const overdue = open.filter((e) => e.due && e.due < todayStart);
+  const dueSoon = open.filter((e) => e.due && e.due >= todayStart && e.due < todayStart + 7 * DAY);
+  const sum = (xs: LifeEntry[]) => xs.reduce((n, e) => n + (e.amount ?? 0), 0);
+  return { open, total: sum(open), overdue, overdueTotal: sum(overdue), dueSoon, paid: all.filter((e) => e.done).sort((a, b) => b.at - a.at) };
+}
+
+/* ---------- to-dos ---------- */
 
 export const openNotes = (data: HqResponse) => (data.life ?? []).filter((e) => e.kind === "note" && !e.done).sort((a, b) => b.at - a.at);
+
+/** Noon on a Calgary day, from "2026-10-09". Due days are stored this way so they never slip across midnight. */
+export const noonOf = (key: string) => Date.parse(`${key}T12:00:00-06:00`);
+export const dueKey = dayKey;
+
+export type DueState = "late" | "today" | "soon" | "later" | "none";
+export function dueState(due: number | null | undefined, now: number): DueState {
+  if (!due) return "none";
+  const start = calgaryDayStart(now);
+  if (due < start) return "late";
+  if (due < start + DAY) return "today";
+  if (due < start + 7 * DAY) return "soon";
+  return "later";
+}
+
+/** "Late · Tue", "Today", "Tomorrow", "Fri", "Oct 24". */
+export function dueLabel(due: number, now: number): string {
+  const st = dueState(due, now);
+  const start = calgaryDayStart(now);
+  const wd = new Date(due).toLocaleDateString("en-CA", { timeZone: TZ, weekday: "short" });
+  if (st === "late") return start - due < 6 * DAY ? `Late · ${wd}` : `Late · ${new Date(due).toLocaleDateString("en-CA", { timeZone: TZ, month: "short", day: "numeric" })}`;
+  if (st === "today") return "Today";
+  if (due < start + 2 * DAY) return "Tomorrow";
+  if (st === "soon") return wd;
+  return new Date(due).toLocaleDateString("en-CA", { timeZone: TZ, month: "short", day: "numeric" });
+}
+
+/** Open to-dos sorted the way you'd do them: late, today, this week, later, then undated newest first. */
+export function todoStats(data: HqResponse, now: number) {
+  const open = (data.life ?? []).filter((e) => e.kind === "note" && !e.done);
+  const dated = open.filter((e) => e.due).sort((a, b) => a.due! - b.due!);
+  const undated = open.filter((e) => !e.due).sort((a, b) => b.at - a.at);
+  return {
+    open: [...dated, ...undated],
+    overdue: dated.filter((e) => dueState(e.due, now) === "late"),
+    today: dated.filter((e) => dueState(e.due, now) === "today"),
+  };
+}
+
+/* ---------- the week, scored ---------- */
+
+export interface ScoreLine { key: string; label: string; value: number; last: number; format: "money" | "count"; view: string; goal?: number }
+
+/**
+ * This week so far against last week up to the same moment, so a Tuesday
+ * isn't measured against a whole week.
+ */
+export function weekScore(data: HqResponse, now: number, filter: Filter): { lines: ScoreLine[]; weekStart: number } {
+  const todayStart = calgaryDayStart(now);
+  const dow = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(new Date(now).toLocaleDateString("en-CA", { timeZone: TZ, weekday: "short" }));
+  const weekStart = todayStart - dow * DAY;
+  const thisWeek = (t: number) => t >= weekStart && t <= now;
+  const lastWeek = (t: number) => t >= weekStart - 7 * DAY && t <= now - 7 * DAY;
+  const count = <T>(xs: T[], at: (x: T) => number, inRange: (t: number) => boolean) => xs.filter((x) => inRange(at(x))).length;
+  const sumOf = <T>(xs: T[], at: (x: T) => number, v: (x: T) => number, inRange: (t: number) => boolean) => xs.reduce((n, x) => n + (inRange(at(x)) ? v(x) : 0), 0);
+
+  const money = (data.life ?? []).filter((e) => e.kind === "money" && inFilter(filter, e.business ?? "other"));
+  const noonOfDate = (d: string) => Date.parse(`${d}T12:00:00-06:00`);
+  const sends: Array<{ at: number; n: number }> = [];
+  if (inFilter(filter, "arctos")) for (const d of data.arctos?.sendsByDay ?? []) sends.push({ at: Math.min(noonOfDate(d.date), now), n: d.sent });
+  if (inFilter(filter, "calgarywatch")) for (const d of data.snapshot?.pipelineDetail?.calgarywatch?.sendsByDay ?? []) sends.push({ at: Math.min(noonOfDate(d.date), now), n: d.sent });
+  if (inFilter(filter, "vowmotion")) for (const s of data.gmail?.sends ?? []) if (s.business === "vowmotion" && s.first) sends.push({ at: s.at, n: 1 });
+  const posts = (data.snapshot?.posts ?? []).filter((p) => p.publishedAt && inFilter(filter, p.brand));
+  const decided = [...data.commands.map((c) => c.at), ...(data.decisions ?? []).map((d) => d.at)];
+
+  // Gym days, counted once a day, from the log and the calendar.
+  const gymDays = new Map<string, number>();
+  for (const e of data.life ?? []) if (e.kind === "gym") gymDays.set(dayKey(e.at), e.at);
+  for (const e of data.calendar?.events ?? []) if (!e.allDay && e.end <= now && GYM_WORDS.test(e.title)) gymDays.set(dayKey(e.start), e.start);
+  const gym = [...gymDays.values()];
+
+  return {
+    weekStart,
+    lines: [
+      { key: "money", label: "Money in", value: sumOf(money, (e) => e.at, (e) => e.amount ?? 0, thisWeek), last: sumOf(money, (e) => e.at, (e) => e.amount ?? 0, lastWeek), format: "money", view: "money" },
+      { key: "gym", label: "Gym", value: count(gym, (t) => t, thisWeek), last: count(gym, (t) => t, lastWeek), format: "count", view: "life", goal: GYM_GOAL },
+      { key: "sent", label: "Pitches sent", value: sumOf(sends, (s) => s.at, (s) => s.n, thisWeek), last: sumOf(sends, (s) => s.at, (s) => s.n, lastWeek), format: "count", view: "pipelines" },
+      { key: "posts", label: "Posts out", value: count(posts, (p) => p.publishedAt!, thisWeek), last: count(posts, (p) => p.publishedAt!, lastWeek), format: "count", view: "growth" },
+      { key: "decided", label: "Calls made", value: count(decided, (t) => t, thisWeek), last: count(decided, (t) => t, lastWeek), format: "count", view: "decide" },
+    ],
+  };
+}

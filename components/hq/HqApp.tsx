@@ -12,8 +12,8 @@ import { OWNER } from "./persona";
 import { OverviewView } from "./views/Overview";
 import { InboxView } from "./views/Inbox";
 import { PipelinesView } from "./views/Pipelines";
-import { MoneyView, MoneyForm } from "./views/Money";
-import { LifeView } from "./views/Life";
+import { MoneyView, MoneyForm, OwedForm } from "./views/Money";
+import { LifeView, TodoForm } from "./views/Life";
 import { GrowthView, type GrowthTab } from "./views/Growth";
 import { SystemView, type SystemTab } from "./views/System";
 import { evaluateAll } from "./tasks";
@@ -67,7 +67,7 @@ function useRoute(): Route {
   return head in VIEWS ? { view: head as ViewId, sub: rest.join("/") || null } : { view: "today", sub: null };
 }
 
-type QuickTab = "gym" | "money" | "note";
+type QuickTab = "gym" | "money" | "note" | "owed";
 
 type Toast = { id: number; text: string; undo?: () => void };
 
@@ -135,11 +135,13 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const call = useCallback(
     async (path: string, body?: unknown) => {
       if (preview) {
-        const b = (body ?? {}) as { action?: string; type?: CommandType; targetId?: string; kind?: string; at?: number; amount?: number; business?: string; text?: string };
+        const b = (body ?? {}) as { action?: string; type?: CommandType; targetId?: string; kind?: string; at?: number; amount?: number; business?: string; text?: string; due?: number | null; paid?: boolean };
         const id = String(Date.now());
         if (path.endsWith("/life") && b.action === "log") return { entry: { id, kind: "gym", at: b.at ?? Date.now() } };
         if (path.endsWith("/life") && b.action === "money") return { entry: { id, kind: "money", at: b.at ?? Date.now(), amount: b.amount, business: b.business, text: b.text ?? "" } };
-        if (path.endsWith("/life") && b.action === "note") return { entry: { id, kind: "note", at: Date.now(), text: b.text, done: false } };
+        if (path.endsWith("/life") && b.action === "note") return { entry: { id, kind: "note", at: b.at ?? Date.now(), text: b.text, done: false, due: b.due ?? null } };
+        if (path.endsWith("/life") && b.action === "owed") return { entry: { id, kind: "owed", at: b.at ?? Date.now(), amount: b.amount, business: b.business, text: b.text, due: b.due ?? null, done: false, paidId: null } };
+        if (path.endsWith("/life") && b.action === "owed-paid" && b.paid) return { paidId: id };
         if (path.endsWith("/command") && b.action === "create") return { command: { id, type: b.type!, targetId: b.targetId!, by: email, at: Date.now(), status: "pending", result: null, appliedAt: null } };
         return path.endsWith("/snapshot") ? preview : { ok: true };
       }
@@ -222,9 +224,13 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
 
   const restore = useCallback(
     async (e: LifeEntry) => {
-      const body = e.kind === "money" ? { action: "money", amount: e.amount, business: e.business ?? "other", text: e.text ?? "", at: e.at } : e.kind === "note" ? { action: "note", text: e.text } : { action: "log", kind: "gym", at: e.at };
+      const body =
+        e.kind === "money" ? { action: "money", amount: e.amount, business: e.business ?? "other", text: e.text ?? "", at: e.at }
+        : e.kind === "note" ? { action: "note", text: e.text, due: e.due ?? null, at: e.at }
+        : e.kind === "owed" ? { action: "owed", amount: e.amount, business: e.business ?? "other", text: e.text ?? "", due: e.due ?? null, at: e.at }
+        : { action: "log", kind: "gym", at: e.at };
       const { entry } = (await call("/api/hq/life", body)) as { entry: LifeEntry };
-      addEntry(e.kind === "note" ? { ...entry, at: e.at, done: e.done } : entry);
+      addEntry(entry);
     },
     [call],
   );
@@ -284,18 +290,79 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   );
 
   const addNote = useCallback(
-    async (text: string) => {
+    async (text: string, due?: number | null) => {
       try {
-        const { entry } = (await call("/api/hq/life", { action: "note", text })) as { entry: LifeEntry };
+        const { entry } = (await call("/api/hq/life", { action: "note", text, due: due ?? null })) as { entry: LifeEntry };
         addEntry(entry);
-        toast("Noted.");
+        toast(due ? "On the list, with a date." : "On the list.", () => void removeLife(entry, "Taken off."));
         return true;
       } catch (e) {
         fail(e, "Couldn't save that.");
         return false;
       }
     },
-    [call, toast, fail],
+    [call, toast, fail, removeLife],
+  );
+
+  const setNoteDue = useCallback(
+    async (id: string, due: number | null) => {
+      const before = data?.life?.find((e) => e.id === id)?.due ?? null;
+      const put = (v: number | null) => setData((d) => (d ? { ...d, life: (d.life ?? []).map((e) => (e.id === id ? { ...e, due: v } : e)) } : d));
+      put(due);
+      try {
+        await call("/api/hq/life", { action: "note-due", id, due });
+      } catch (e) {
+        put(before);
+        fail(e, "Couldn't save that.");
+      }
+    },
+    [call, fail, data],
+  );
+
+  const addOwed = useCallback(
+    async (amount: number, business: string, text: string, due: number | null) => {
+      try {
+        const { entry } = (await call("/api/hq/life", { action: "owed", amount, business, text, due })) as { entry: LifeEntry };
+        addEntry(entry);
+        toast(`${dollars(amount)} on the books. HQ will nag you when it's due.`, () => void removeLife(entry, "Taken off."));
+        return true;
+      } catch (e) {
+        fail(e, "Couldn't save that.");
+        return false;
+      }
+    },
+    [call, toast, fail, removeLife],
+  );
+
+  // Paid turns the owed entry into money in (server side); not paid takes that payment back out.
+  const savePaid = useCallback(
+    async (owed: LifeEntry, paid: boolean) => {
+      const res = (await call("/api/hq/life", { action: "owed-paid", id: owed.id, paid })) as { paidId?: string };
+      const paidId = paid ? res.paidId ?? null : null;
+      const payment: LifeEntry | null = paidId ? { id: paidId, kind: "money", at: Date.now(), amount: owed.amount, business: owed.business, text: owed.text } : null;
+      setData((d) => {
+        if (!d) return d;
+        const was = (d.life ?? []).find((e) => e.id === owed.id)?.paidId;
+        let life = (d.life ?? []).map((e) => (e.id === owed.id ? { ...e, done: paid, paidId } : e));
+        if (payment && !life.some((e) => e.id === payment.id)) life = [payment, ...life];
+        if (!paid && was) life = life.filter((e) => e.id !== was);
+        return { ...d, life };
+      });
+    },
+    [call],
+  );
+
+  const markPaid = useCallback(
+    async (owed: LifeEntry, paid: boolean) => {
+      try {
+        await savePaid(owed, paid);
+        if (paid) toast(`${dollars(owed.amount ?? 0)} paid. Logged as money in.`, () => void savePaid(owed, false).then(() => toast("Back to owed.")).catch((e) => fail(e, "Couldn't undo.")));
+        else toast("Back to owed. The payment came out of money in.");
+      } catch (e) {
+        fail(e, "Couldn't save that.");
+      }
+    },
+    [savePaid, toast, fail],
   );
 
   const toggleNote = useCallback(
@@ -368,7 +435,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const age = snap ? now - snap.generatedAt : null;
   const fresh = age === null ? "bad" : age < 30 * 60_000 ? "ok" : age < 3 * 3_600_000 ? "warn" : "bad";
   const ctx: HqContextValue | null = data
-    ? { data, now, filter, act, cancel, decide, go, logGym, undoGym, logMoney, addNote, toggleNote, removeLife, setGoal, quickAdd: setQuick, preview: !!preview }
+    ? { data, now, filter, act, cancel, decide, go, logGym, undoGym, logMoney, addNote, toggleNote, setNoteDue, addOwed, markPaid, removeLife, setGoal, quickAdd: setQuick, preview: !!preview }
     : null;
 
   const commands = useMemo<PaletteItem[]>(
@@ -378,7 +445,8 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
       { id: "go-performance", label: "What works on Instagram", hint: "Go to", icon: "performance", keys: "g n", run: () => go("performance") },
       { id: "gym", label: "I went to the gym", hint: "Log today", icon: "gym", keys: "l g", run: () => void logGym() },
       { id: "money", label: "Money came in", hint: "Log a payment", icon: "money", keys: "l m", run: () => setQuick("money") },
-      { id: "note", label: "Add a note", hint: "Idea or to-do", icon: "glossary", keys: "l n", run: () => setQuick("note") },
+      { id: "note", label: "Add a to-do", hint: "With a due day if you like", icon: "glossary", keys: "l n", run: () => setQuick("note") },
+      { id: "owed", label: "Someone owes me", hint: "Track an invoice", icon: "money", keys: "l o", run: () => setQuick("owed") },
       { id: "refresh", label: "Refresh", hint: "Ask the agents for the latest", icon: "refresh", run: () => void load() },
       { id: "f-all", label: "All businesses", hint: "Filter", icon: "overview", run: () => setFilter("all") },
       ...BUSINESSES.map((b) => ({ id: `f-${b.id}`, label: `${b.label} only`, hint: "Filter", icon: "pipelines", run: () => setFilter(b.id) })),
@@ -497,8 +565,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
 
 /** One sheet for the three things you log yourself: a gym visit, money in, a note. */
 function QuickAdd({ tab, setTab }: { tab: QuickTab | null; setTab: (t: QuickTab | null) => void }) {
-  const { data, now, logGym, addNote } = useHq();
-  const [note, setNote] = useState("");
+  const { data, now, logGym } = useHq();
   useEffect(() => {
     if (!tab) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setTab(null);
@@ -514,24 +581,20 @@ function QuickAdd({ tab, setTab }: { tab: QuickTab | null; setTab: (t: QuickTab 
           <h2 className="hq-h2">Log something</h2>
           <button type="button" className="hq-btn hq-btn--ghost" onClick={() => setTab(null)}>Close</button>
         </div>
-        <div className="hq-seg" role="tablist">
-          {([["money", "Money in"], ["gym", "Gym"], ["note", "Note"]] as Array<[QuickTab, string]>).map(([id, label]) => (
+        <div className="hq-seg hq-seg--full" role="tablist">
+          {([["money", "Money in"], ["owed", "Owed to me"], ["gym", "Gym"], ["note", "To-do"]] as Array<[QuickTab, string]>).map(([id, label]) => (
             <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}</button>
           ))}
         </div>
         {tab === "money" ? <MoneyForm onDone={() => setTab(null)} /> : null}
+        {tab === "owed" ? <OwedForm onDone={() => setTab(null)} /> : null}
         {tab === "gym" ? (
           <div className="hq-actions">
             <button type="button" className="hq-btn hq-btn--primary" disabled={went} onClick={() => void logGym().then(() => setTab(null))}>{went ? "Already logged today" : "I went today"}</button>
             <button type="button" className="hq-btn" onClick={() => void logGym(now - 86_400_000).then(() => setTab(null))}>I went yesterday</button>
           </div>
         ) : null}
-        {tab === "note" ? (
-          <form className="hq-addnote" onSubmit={async (e) => { e.preventDefault(); if (note.trim() && (await addNote(note.trim()))) { setNote(""); setTab(null); } }}>
-            <input className="hq-input" autoFocus value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} placeholder="An idea, a to-do, anything" aria-label="Note" />
-            <button type="submit" className="hq-btn hq-btn--primary" disabled={!note.trim()}>Save</button>
-          </form>
-        ) : null}
+        {tab === "note" ? <TodoForm autoFocus onDone={() => setTab(null)} /> : null}
       </div>
     </div>
   );
