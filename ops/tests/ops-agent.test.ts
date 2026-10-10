@@ -132,18 +132,24 @@ describe('automatic posting', () => {
     imageUrl: 'https://x', imagePath: null, warnings: [], sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: null,
     draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
   });
-  it('lets CalgaryDaily roundups go out on their own', () => {
+  it('lets every CalgaryDaily listing post go out on their own', () => {
     assert.ok(autoPublishable(post({})));
+    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
+    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
+    assert.ok(autoPublishable(post({ warnings: ['Sensitive story'] })), 'a warning alone no longer holds a post');
   });
-  it('holds single event and market posts for a person (they drew a median of 45 views)', () => {
-    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
-    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
+  it('posts news and opinion on their own only from credible sources', () => {
+    assert.ok(autoPublishable(post({ template: 'update', sourceUrls: ['https://www.cbc.ca/news/canada/calgary/x'] })));
+    assert.ok(autoPublishable(post({ template: 'news', sourceUrls: ['https://newsroom.calgary.ca/x', 'https://calgaryherald.com/y'] })));
+    assert.ok(!autoPublishable(post({ template: 'update', sourceUrls: [] })), 'no source');
+    assert.ok(!autoPublishable(post({ template: 'take', sourceUrls: ['https://www.instagram.com/p/x'] })), 'social media');
+    assert.ok(!autoPublishable(post({ template: 'update', sourceUrls: ['https://cbc.ca/a', 'https://someblog.example/b'] })), 'one source is unknown');
+    assert.ok(!autoPublishable(post({ template: 'update', sourceUrls: ['https://cbc.ca.evil.example/a'] })), 'lookalike domain');
   });
-  it('keeps CalgaryWatch, briefs, paid posts and anything with a warning for a person', () => {
+  it('keeps CalgaryWatch, and anything failing the brand checks, for a person', () => {
     assert.ok(!autoPublishable(post({ brand: 'calgarywatch' })));
-    assert.ok(!autoPublishable(post({ template: 'update' })));
-    assert.ok(!autoPublishable(post({ template: 'partner', sponsored: true })));
-    assert.ok(!autoPublishable(post({ warnings: ['Sensitive story'] })));
+    assert.ok(!autoPublishable(post({ caption: '' })));
+    assert.ok(!autoPublishable(post({ template: 'partner', sponsored: true })), 'paid post without the Featured partner label');
     assert.ok(!autoPublishable(post({ status: 'rejected' })));
   });
 });

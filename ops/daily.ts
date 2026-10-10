@@ -36,7 +36,7 @@ if (!db) {
   await step('draft posts', () => draftPosts(null, index, now, log));
   await step('health', () => checkHealth(null, index, now, log));
 } else {
-  await step('monitor posts', () => monitorPosts(db, index, now, log));
+  await step('monitor posts', () => monitorPosts(db, now, log));
   await step('insights', () => collectInsights(db, now, log));
   await step('account history', () => collectAccountHistory(db, now, log));
   await step('scout', () => runScout(db, now, log));

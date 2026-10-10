@@ -57,7 +57,8 @@
     "markets": false,
     "roundups": false,
     "partner": false,
-    "incidents": false
+    "incidents": false,
+    "news": false
   },
   "postsPerDay": 2,
   "postingSlots": [
