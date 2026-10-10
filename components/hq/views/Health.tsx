@@ -12,7 +12,7 @@ export function HealthView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow"><span>03</span> See the numbers</p>
+        
         <h1 className="hq-h1">{bad ? <>{bad} {bad === 1 ? "thing is" : "things are"} <em>holding work up.</em></> : <>Nothing is <em>holding work up.</em></>}</h1>
       </header>
       <section className="hq-card">

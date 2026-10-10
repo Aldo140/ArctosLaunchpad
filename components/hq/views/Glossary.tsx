@@ -25,7 +25,7 @@ export function GlossaryView() {
   return (
     <div className="hq-view">
       <header>
-        <p className="hq-eyebrow">Reference</p>
+        
         <h1 className="hq-h1">Words on <em>this page.</em></h1>
       </header>
       <dl className="hq-gloss">

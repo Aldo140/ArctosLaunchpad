@@ -1,118 +1,118 @@
 "use client";
 
 import { inFilter, useHq } from "../context";
-import { BUSINESS_LABEL, ago, calgaryParts, cdn, num, plural, short, slot, when } from "../format";
-import { Spark, Stat, Thumb } from "../ui";
-import { evaluateAll } from "../tasks";
-import { brief, greeting, mood, moodSignoff, nextMilestone, outreachStreak, wins } from "../persona";
-import { GymCard, MoneyMoves, TodayCard } from "./Life";
+import { calgaryDayStart } from "../tasks";
+import { BUSINESS_LABEL, calgaryParts, num, plural, short, slot } from "../format";
+import { GYM_GOAL, agenda, brief, dollars, greeting, gymSlot, gymStats, mood, moodSignoff, moneyStats, nextMilestone, outreachStreak, wins } from "../persona";
+import { openDecisions } from "../queue";
 import { SkyStrip } from "../Sky";
-import { replyBoard } from "@/lib/hq/triage";
+import { Icon } from "../ui";
+import { QueueRow } from "./Inbox";
+import { MoneyMoves, NotesCard } from "./Life";
 
+const time = (t: number) => slot(t).split(" ").slice(1).join(" ");
+
+/** Today: how the day stands in four numbers, what to clear first, and the day itself. */
 export function OverviewView() {
-  const { data, now, filter, go, preview } = useHq();
+  const { data, now, filter, go, preview, logGym } = useHq();
   const snap = data.snapshot;
   const { weekday, date, hour } = calgaryParts(now);
+  const queue = openDecisions(data, filter);
+  const waiting = queue.length;
+  const feel = mood(data, now, filter, waiting);
   const story = brief(data, now, filter);
-  const good = wins(data, now, filter);
+  const money = moneyStats(data, now, filter);
+  const gym = gymStats(data, now);
+  const events = agenda(data, now);
+  const nextEvent = events.find((e) => !e.allDay && e.end > now);
+  const free = gym.wentToday ? null : gymSlot(data, now);
 
-  const replies = (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business));
-  const pitches = (snap?.inbox?.pitches ?? []).filter((p) => inFilter(filter, p.business));
-  const decisionPosts = (snap?.posts ?? []).filter((p) => ["drafted", "needs-correction", "failed"].includes(p.status) && inFilter(filter, p.brand));
-  const gmail = replyBoard(data, (r) => inFilter(filter, r.business)).board;
-  const waiting = replies.length + pitches.length + decisionPosts.length + gmail.length;
-  const needs = [
-    ...replies.map((r) => ({ key: `r${r.leadId}`, at: r.at, label: "Reply", title: `${r.businessName} wrote back`, detail: r.text.replace(/\s+/g, " ").slice(0, 120), business: r.business })),
-    ...decisionPosts.map((p) => ({ key: `p${p.id}`, at: p.updatedAt, label: p.status === "drafted" ? "Approve post" : "Fix post", title: p.headline, detail: p.suggestedFor ? `Slot ${when(p.suggestedFor)}` : p.template, business: p.brand })),
-    ...pitches.map((p) => ({ key: `c${p.leadId}`, at: p.at, label: "Approve pitch", title: p.businessName, detail: p.subject, business: p.business })),
-    ...gmail.map(({ reply: r, state, triage, decision }) => ({
-      key: `g${r.url}${r.at}`,
-      at: r.at,
-      label: state === "proposed" ? "Approve subtask" : state === "approved" ? "Subtask" : "Reply in Gmail",
-      title: `${r.name || r.from} wrote back`,
-      detail: (state === "approved" ? decision?.title ?? triage?.subtask?.title : state === "proposed" ? triage?.subtask?.title : null) ?? r.snippet.slice(0, 120),
-      business: r.business,
-    })),
+  // The day as one timeline: calendar, posts going out, and the gym slot.
+  const dayEnd = calgaryDayStart(now) + 86_400_000;
+  const posts = (snap?.posts ?? []).filter((p) => p.status === "approved" && p.scheduledFor && p.scheduledFor > now - 3_600_000 && p.scheduledFor < dayEnd && inFilter(filter, p.brand));
+  const timeline = [
+    ...events.map((e) => ({ key: `e${e.start}${e.title}`, at: e.allDay ? 0 : e.start, end: e.end, allDay: e.allDay, kind: "cal" as const, title: e.title, note: e.location })),
+    ...posts.map((p) => ({ key: `p${p.id}`, at: p.scheduledFor!, end: p.scheduledFor!, allDay: false, kind: "post" as const, title: p.headline, note: `${BUSINESS_LABEL[p.brand]} post goes out` })),
+    ...(free ? [{ key: "gym", at: free, end: free + 90 * 60_000, allDay: false, kind: "gym" as const, title: "Free for the gym", note: "90 minutes clear" }] : []),
   ].sort((a, b) => a.at - b.at);
 
-  const accounts = (snap?.instagram?.accounts ?? []).filter((a) => inFilter(filter, a.business));
-  const followers = accounts.reduce((n, a) => n + a.followers, 0);
-  const followerDelta = accounts.reduce((n, a) => n + (a.trend.length > 1 ? a.followers - a.trend[0].followers : 0), 0);
-  const cdTrend = accounts.find((a) => a.handle === "calgarydaily")?.trend.map((t) => t.followers) ?? snap?.calgaryDaily?.followerTrend.map((t) => t.count) ?? [];
-  const cw = snap?.pipelines.find((p) => p.business === "calgarywatch");
-  const gmailPitches = (data.gmail?.sends ?? []).filter((s) => s.first && s.at >= now - 30 * 86_400_000 && s.business !== "other" && inFilter(filter, s.business)).length;
-  const sent30 = (inFilter(filter, "calgarywatch") ? cw?.sent30 ?? 0 : 0) + (inFilter(filter, "arctos") ? data.arctos?.last30 ?? 0 : 0) + gmailPitches;
-  const scheduled = (snap?.posts ?? []).filter((p) => p.status === "approved" && inFilter(filter, p.brand)).sort((a, b) => (a.scheduledFor ?? 0) - (b.scheduledFor ?? 0));
-  const tasks = evaluateAll(data, now).filter((t) => inFilter(filter, t.routine.owner) || t.routine.owner === "shared");
-  const tasksDone = tasks.filter((t) => t.state === "confirmed" || t.state === "done").length;
-  const tasksDue = tasks.filter((t) => !["later", "setup", "unknown"].includes(t.state)).length;
-  const failing = tasks.filter((t) => t.state === "failed" || t.state === "missed").length;
-  const healthItems = snap?.health?.items ?? [];
-  const healthy = healthItems.filter((h) => h.ok).length;
-  const activity = (snap?.activity ?? []).filter((a) => inFilter(filter, a.business)).slice(0, 7);
+  const good = wins(data, now, filter);
+  const streak = filter === "all" || filter === "arctos" ? (data.arctos ? outreachStreak(data.arctos.sendsByDay, now) : 0) : 0;
+  const climb = (snap?.instagram?.accounts ?? []).filter((a) => a.followers > 0 && (filter === "all" || a.business === filter)).map((a) => ({ handle: a.handle, followers: a.followers, ...nextMilestone(a.followers) })).sort((a, b) => b.progress - a.progress)[0];
   const idea = snap?.instagram?.analysis?.ideas?.[0];
-  const streak = inFilter(filter, "arctos") && data.arctos ? outreachStreak(data.arctos.sendsByDay, now) : 0;
-  const climbs = accounts.filter((a) => a.followers > 0).map((a) => ({ handle: a.handle, followers: a.followers, ...nextMilestone(a.followers) })).sort((a, b) => b.progress - a.progress);
-  const first = needs[0];
-  const feel = mood(data, now, filter, waiting);
 
   return (
     <div className="hq-view">
       <header className="hq-hello">
         <div className="hq-hello__top">
-          <p className="hq-eyebrow">{weekday} · {date} · Calgary{filter !== "all" ? ` · ${BUSINESS_LABEL[filter]}` : ""}</p>
+          <p className="hq-eyebrow">{weekday} · {date}{filter !== "all" ? ` · ${BUSINESS_LABEL[filter]}` : ""}</p>
           <SkyStrip preview={preview} />
         </div>
-        <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go build.</em></>}</h1>
-        <p className="hq-brief" data-mood={feel.key}>{story.join(" ")} <b>{feel.line}</b></p>
-        {first ? (
-          <button type="button" className="hq-focus" onClick={() => go("inbox")}>
-            <span className="hq-eyebrow"><span>→</span> Start here</span>
-            <strong>{first.label}: {first.title}</strong>
-            <span className="hq-mono">{BUSINESS_LABEL[first.business]} · waiting {ago(first.at, now).replace(" ago", "")}</span>
-          </button>
-        ) : null}
+        <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go find money.</em></>}</h1>
+        <p className="hq-mood" data-mood={feel.key}>{feel.line}</p>
+        <p className="hq-brief">{story.join(" ")}</p>
       </header>
 
-      <div className="hq-cols-2">
-        <MoneyMoves />
-        <div className="hq-stack">
-          <TodayCard />
-          <GymCard />
+      <div className="hq-pulse">
+        <button type="button" className="hq-tile2" data-sev={waiting ? "warn" : "ok"} onClick={() => go("decide")}>
+          <span className="hq-tile2__label"><Icon name="inbox" /> Waiting on you</span>
+          <b>{waiting}</b>
+          <span className="hq-tile2__sub">{waiting ? `oldest ${short(Math.min(...queue.map((q) => q.at)), now).replace(" ago", "")}` : "all clear"}</span>
+        </button>
+        <button type="button" className="hq-tile2" onClick={() => go("money")}>
+          <span className="hq-tile2__label"><Icon name="money" /> In this month</span>
+          <b>{dollars(money.month)}</b>
+          {money.goal ? <span className="hq-meter"><span style={{ width: `${Math.round((money.progress ?? 0) * 100)}%` }} /></span> : null}
+          <span className="hq-tile2__sub">{money.goal ? `of ${dollars(money.goal)} goal` : money.month ? `${dollars(money.lastMonth)} last month` : "tap to log a payment"}</span>
+        </button>
+        <div className="hq-tile2" data-sev={!gym.wentToday && (gym.daysSince ?? 99) >= 4 ? "bad" : undefined}>
+          <button type="button" className="hq-tile2__link" onClick={() => go("life")} aria-label="Gym details" />
+          <span className="hq-tile2__label"><Icon name="gym" /> Gym this week</span>
+          <b>{gym.week}<small>/{GYM_GOAL}</small></b>
+          {gym.wentToday ? <span className="hq-tile2__sub">done today</span> : <button type="button" className="hq-btn hq-btn--primary hq-btn--sm hq-tile2__cta" onClick={() => void logGym()}>I went today</button>}
         </div>
+        <button type="button" className="hq-tile2" onClick={() => go("life")}>
+          <span className="hq-tile2__label"><Icon name="calendar" /> Next up</span>
+          <b className="hq-tile2__time">{nextEvent ? time(nextEvent.start) : "Free"}</b>
+          <span className="hq-tile2__sub">{nextEvent ? nextEvent.title : data.calendar ? "nothing else today" : "calendar not synced yet"}</span>
+        </button>
       </div>
 
-      <div className="hq-islands">
-        <section className="hq-card hq-island">
-          <div className="hq-card__head"><p className="hq-eyebrow"><span>01</span> Win the customer</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("instagram")}>Instagram</button></div>
-          <div className="hq-stats">
-            <Stat value={num(followers)} label={`followers, ${accounts.length} ${accounts.length === 1 ? "account" : "accounts"}`} delta={followerDelta ? `${followerDelta > 0 ? "+" : ""}${followerDelta} tracked` : undefined} dir={followerDelta > 0 ? "up" : followerDelta < 0 ? "down" : "flat"} />
-            <Stat value={num(sent30)} label="outreach emails, 30 days" />
-            <Stat value={num(cw?.interested30 ?? 0)} label="interested, 30 days" />
+      <div className="hq-cols-2">
+        <section className="hq-card">
+          <div className="hq-card__head">
+            <h2 className="hq-h2">Clear these first</h2>
+            {waiting ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("decide")}>{waiting > 3 ? `All ${waiting}` : "Open"}</button> : null}
           </div>
-          <Spark values={cdTrend} label="CalgaryDaily followers, recent days" />
+          {queue.length ? (
+            <ul className="hq-qlist hq-qlist--compact">
+              {queue.slice(0, 3).map((i) => <QueueRow key={i.key} item={i} />)}
+            </ul>
+          ) : <p className="hq-small" style={{ margin: 0 }}>Nothing waiting. Replies, drafts and pitches land here the moment the agents find them.</p>}
         </section>
-        <section className="hq-card hq-island">
-          <div className="hq-card__head"><p className="hq-eyebrow"><span>02</span> Run the work</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("tasks")}>Tasks</button></div>
-          <div className="hq-stats">
-            <Stat value={waiting} label="waiting on you" delta={needs[0] ? `oldest ${ago(needs[0].at, now)}` : undefined} />
-            <Stat value={scheduled.length} label="posts scheduled" />
-            <Stat value={tasksDue ? `${tasksDone}/${tasksDue}` : "—"} label="jobs done today" delta={failing ? `${failing} need a look` : undefined} dir={failing ? "down" : undefined} />
-          </div>
-        </section>
-        <section className="hq-card hq-island">
-          <div className="hq-card__head"><p className="hq-eyebrow"><span>03</span> See the numbers</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("performance")}>Numbers</button></div>
-          <div className="hq-stats">
-            <Stat value={snap?.calgaryDaily?.queue.published7d ?? "—"} label="posts published, 7 days" />
-            <Stat value={snap?.calgaryDaily?.avgDelayMinutes == null ? "—" : `${Math.round(snap.calgaryDaily.avgDelayMinutes)} min`} label="average lateness" />
-            <Stat value={healthItems.length ? `${healthy}/${healthItems.length}` : "—"} label="connections healthy" dir={healthy < healthItems.length ? "down" : undefined} delta={healthy < healthItems.length ? `${healthItems.length - healthy} broken` : undefined} />
-          </div>
+        <section className="hq-card">
+          <div className="hq-card__head"><h2 className="hq-h2">Your day</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("life")}>Week</button></div>
+          {timeline.length ? (
+            <ol className="hq-agenda hq-agenda--timeline">
+              {timeline.map((x) => (
+                <li key={x.key} data-kind={x.kind} data-past={!x.allDay && x.end <= now} data-next={x.kind === "cal" && nextEvent && x.at === nextEvent.start}>
+                  <span className="hq-mono">{x.allDay ? "All day" : time(x.at)}</span>
+                  <span>{x.title}{x.note ? <small>{x.note}</small> : null}</span>
+                </li>
+              ))}
+            </ol>
+          ) : <p className="hq-small" style={{ margin: 0 }}>{data.calendar ? "Nothing booked. The whole day is yours." : "Your calendar hasn't reported yet."}</p>}
         </section>
       </div>
 
-      {good.length || streak || climbs.length ? (
+      <div className="hq-cols-2">
+        <MoneyMoves besideQueue />
+        <NotesCard limit={4} />
+      </div>
+
+      {good.length || streak || climb ? (
         <section className="hq-card hq-momentum">
-          <div className="hq-card__head"><h2 className="hq-h2">Momentum</h2><p className="hq-mono">Last 7 days</p></div>
+          <div className="hq-card__head"><h2 className="hq-h2">Momentum</h2><span className="hq-mono">Last 7 days</span></div>
           <div className="hq-momentum__grid">
             {streak ? (
               <div className="hq-streak">
@@ -121,77 +121,28 @@ export function OverviewView() {
                 <i aria-hidden="true">{Array.from({ length: Math.min(streak, 10) }, (_, k) => <em key={k} />)}</i>
               </div>
             ) : null}
-            {climbs.slice(0, 3).map((c) => (
-              <div className="hq-climb" key={c.handle}>
-                <span className="hq-mono">@{c.handle}</span>
-                <b>{num(c.left)} <small>to {num(c.target)}</small></b>
-                <span className="hq-meter" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(c.progress * 100)} aria-label={`@${c.handle} toward ${num(c.target)} followers`}><span style={{ width: `${Math.round(c.progress * 100)}%` }} /></span>
+            {climb ? (
+              <div className="hq-climb">
+                <span className="hq-mono">@{climb.handle}</span>
+                <b>{num(climb.left)} <small>to {num(climb.target)}</small></b>
+                <span className="hq-meter" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(climb.progress * 100)} aria-label={`@${climb.handle} toward ${num(climb.target)} followers`}><span style={{ width: `${Math.round(climb.progress * 100)}%` }} /></span>
               </div>
-            ))}
-          </div>
-          {good.length ? (
-            <ul className="hq-wins">
-              {good.slice(0, 5).map((w) => (
-                <li key={w.key}><span>{w.text}</span><span className="hq-mono">{BUSINESS_LABEL[w.business] ?? w.business} · {short(w.at, now)}</span></li>
-              ))}
-            </ul>
-          ) : <p className="hq-small">No new yeses this week yet. The next one shows up here.</p>}
-        </section>
-      ) : null}
-
-      <div className="hq-cols-2">
-        <section className="hq-card">
-          <div className="hq-card__head"><h2 className="hq-h2">Needs you</h2>{needs.length ? <button type="button" className="hq-btn hq-btn--primary" onClick={() => go("inbox")}>Open inbox</button> : null}</div>
-          {needs.length ? (
-            <ul className="hq-list">
-              {needs.slice(0, 6).map((n) => (
-                <li key={n.key} className="hq-row" data-sev={now - n.at > 3 * 86_400_000 ? "bad" : now - n.at > 86_400_000 ? "warn" : "ok"}>
-                  <strong><span className="hq-chip" style={{ marginRight: 8 }}>{n.label}</span>{n.title}</strong>
-                  <span className="hq-when">{ago(n.at, now)}</span>
-                  <p>{BUSINESS_LABEL[n.business]} · {n.detail}</p>
-                </li>
-              ))}
-            </ul>
-          ) : <p className="hq-small">Nothing is waiting. Replies, drafts and pitches land here the moment the agents find them.</p>}
-          {needs.length > 6 ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("inbox")}>And {needs.length - 6} more</button> : null}
-        </section>
-        <section className="hq-card">
-          <div className="hq-card__head"><h2 className="hq-h2">Latest from the agents</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("tasks")}>All</button></div>
-          {activity.length ? (
-            <ol className="hq-feed">
-              {activity.map((a, i) => (
-                <li key={`${a.at}-${i}`} data-type={a.type}>
-                  <b>{a.type} <span className="hq-mono">· {ago(a.at, now)}</span></b>
-                  <p>{a.text}</p>
-                </li>
-              ))}
-            </ol>
-          ) : <p className="hq-small">Quiet for now.</p>}
-        </section>
-      </div>
-
-      {scheduled.length ? (
-        <section className="hq-card">
-          <div className="hq-card__head"><h2 className="hq-h2">Up next on Instagram</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("instagram")}>Queue</button></div>
-          <div className="hq-gallery">
-            {scheduled.slice(0, 6).map((p) => (
-              <div className="hq-tile" key={p.id}>
-                <Thumb src={cdn(p.imageUrl)} alt={p.altText || p.headline} tag={p.format === "reel" ? "Reel" : undefined} />
-                <span className="hq-mono"><span>{slot(p.scheduledFor)}</span><span>{p.scheduledFor ? short(p.scheduledFor, now) : ""}</span></span>
-                <p>{p.headline}</p>
-              </div>
-            ))}
+            ) : null}
+            {good.length ? (
+              <ul className="hq-wins">
+                {good.slice(0, 4).map((w) => <li key={w.key}><span>{w.text}</span><span className="hq-mono">{short(w.at, now)}</span></li>)}
+              </ul>
+            ) : null}
           </div>
         </section>
       ) : null}
 
       {idea ? (
-        <section className="hq-card">
-          <div className="hq-card__head"><p className="hq-eyebrow">Today&apos;s idea from Inspiration</p><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("inspiration")}>All ideas</button></div>
-          <h2 className="hq-h2">{idea.title} <span className="hq-chip" style={{ marginLeft: 6 }}>{idea.format}</span></h2>
-          <p className="hq-lede"><b style={{ color: "var(--fg)" }}>Hook:</b> {idea.hook}</p>
-          <p className="hq-small">{idea.why}</p>
-        </section>
+        <button type="button" className="hq-idea" onClick={() => go("inspiration")}>
+          <span className="hq-eyebrow"><span>✦</span> Post idea</span>
+          <strong>{idea.title} <span className="hq-chip">{idea.format}</span></strong>
+          <span className="hq-small">{idea.hook}</span>
+        </button>
       ) : null}
 
       <p className="hq-signoff">{moodSignoff(feel.key, now)}</p>

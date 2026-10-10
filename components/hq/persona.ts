@@ -1,4 +1,4 @@
-import type { HqResponse } from "@/lib/hq/types";
+import type { HqResponse, LifeEntry } from "@/lib/hq/types";
 import { inFilter, type Filter } from "./context";
 import { calgaryDayStart, evaluateAll } from "./tasks";
 import { replyBoard } from "@/lib/hq/triage";
@@ -66,6 +66,9 @@ export function brief(data: HqResponse, now: number, filter: Filter): string[] {
 
   const today = agenda(data, now).filter((e) => !e.allDay && e.end > now);
   if (today.length) out.push(`${plural(today.length, "thing")} left on your calendar, next is ${today[0].title} at ${slot(today[0].start).split(" ").slice(1).join(" ")}.`);
+
+  const money = moneyLine(moneyStats(data, now, filter));
+  if (money) out.push(money);
 
   const next = (snap?.posts ?? []).filter((p) => p.status === "approved" && p.scheduledFor && p.scheduledFor > now && inFilter(filter, p.brand)).sort((a, b) => a.scheduledFor! - b.scheduledFor!)[0];
   if (next) out.push(`Next post goes out ${slot(next.scheduledFor)}.`);
@@ -258,7 +261,7 @@ export const moodSignoff = (key: MoodKey, now: number) => {
   return list[Math.floor(calgaryDayStart(now) / DAY) % list.length];
 };
 
-export interface MoneyMove { key: string; at: number; business: string; title: string; detail: string; href?: string; view?: string }
+export interface MoneyMove { key: string; at: number; business: string; title: string; detail: string; href?: string; view?: string; who?: string }
 
 /**
  * Who is closest to paying, closest first: people who wrote back to a pitch
@@ -273,10 +276,72 @@ export function moneyMoves(data: HqResponse, now: number, filter: Filter): Money
   }
   for (const l of data.snapshot?.pipelineDetail?.calgarywatch?.leads ?? []) {
     if (!inFilter(filter, "calgarywatch") || !["interested", "replied"].includes(l.status)) continue;
-    out.push({ key: `l${l.id}`, at: l.replyAt ?? l.createdAt, business: "calgarywatch", title: l.status === "interested" ? `${l.businessName} is interested. Close them.` : `${l.businessName} replied`, detail: [l.category, l.neighbourhood].filter(Boolean).join(" · "), view: "pipelines" });
+    out.push({ key: `l${l.id}`, who: l.businessName, at: l.replyAt ?? l.createdAt, business: "calgarywatch", title: l.status === "interested" ? `${l.businessName} is interested. Close them.` : `${l.businessName} replied`, detail: [l.category, l.neighbourhood].filter(Boolean).join(" · "), view: "pipelines" });
   }
   out.sort((a, b) => a.at - b.at);
   const due = data.snapshot?.pipelineDetail?.calgarywatch?.followUpsDue ?? 0;
   if (due && inFilter(filter, "calgarywatch")) out.push({ key: "fu", at: now, business: "calgarywatch", title: `${plural(due, "follow-up")} due`, detail: "Second touches win most deals.", view: "pipelines" });
   return out;
 }
+
+/* ---------- money in ---------- */
+
+export interface MoneyStats {
+  /** Cents, this calendar month (Calgary). */
+  month: number;
+  lastMonth: number;
+  year: number;
+  goal: number | null;
+  /** 0..1 of the goal, or null without one. */
+  progress: number | null;
+  /** What it takes a day, for the rest of the month, to hit the goal. */
+  perDayToGoal: number | null;
+  byBusiness: Array<{ business: string; amount: number }>;
+  entries: LifeEntry[];
+  daysLeft: number;
+}
+
+export function moneyStats(data: HqResponse, now: number, filter: Filter): MoneyStats {
+  const today = dayKey(now);
+  const monthKey = today.slice(0, 7);
+  const [y, m] = monthKey.split("-").map(Number);
+  const lastKey = m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
+  const entries = (data.life ?? []).filter((e) => e.kind === "money" && inFilter(filter, e.business ?? "other")).sort((a, b) => b.at - a.at);
+  const sum = (xs: LifeEntry[]) => xs.reduce((n, e) => n + (e.amount ?? 0), 0);
+  const inMonth = entries.filter((e) => dayKey(e.at).startsWith(monthKey));
+  const by = new Map<string, number>();
+  for (const e of inMonth) by.set(e.business ?? "other", (by.get(e.business ?? "other") ?? 0) + (e.amount ?? 0));
+  const month = sum(inMonth);
+  const goal = filter === "all" ? data.settings?.moneyGoal ?? null : null;
+  const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const daysLeft = daysInMonth - Number(today.slice(8, 10)) + 1;
+  return {
+    month,
+    lastMonth: sum(entries.filter((e) => dayKey(e.at).startsWith(lastKey))),
+    year: sum(entries.filter((e) => dayKey(e.at).startsWith(String(y)))),
+    goal,
+    progress: goal ? Math.min(1, month / goal) : null,
+    perDayToGoal: goal && goal > month ? Math.ceil((goal - month) / Math.max(1, daysLeft)) : null,
+    byBusiness: [...by].map(([business, amount]) => ({ business, amount })).sort((a, b) => b.amount - a.amount),
+    entries,
+    daysLeft,
+  };
+}
+
+/** The money line for the brief: nothing when nothing's logged and no goal is set. */
+export function moneyLine(s: MoneyStats): string | null {
+  if (!s.goal && !s.month) return null;
+  if (s.goal && s.month >= s.goal) return `You've hit this month's ${dollars(s.goal)} goal with ${dollars(s.month)} in.`;
+  if (s.goal) return `${dollars(s.month)} of ${dollars(s.goal)} this month, ${dollars(s.perDayToGoal ?? 0)} a day closes it.`;
+  return `${dollars(s.month)} in this month.`;
+}
+
+/** "$1,250" from cents; cents only when there are some. */
+export function dollars(cents: number): string {
+  const d = cents / 100;
+  return `$${d.toLocaleString("en-CA", { minimumFractionDigits: Number.isInteger(d) ? 0 : 2, maximumFractionDigits: 2 })}`;
+}
+
+/* ---------- notes ---------- */
+
+export const openNotes = (data: HqResponse) => (data.life ?? []).filter((e) => e.kind === "note" && !e.done).sort((a, b) => b.at - a.at);
