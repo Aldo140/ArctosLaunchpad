@@ -134,6 +134,21 @@ the brief and the sign-off.
   HQ, this week so far against last week to the same moment (`weekScore` in
   persona.ts).
 
+## On your phone (the dashboard)
+
+- **Home screen app**: `app/hq/manifest.webmanifest` and the HQ layout's
+  `appleWebApp` metadata let "Add to Home Screen" open HQ full screen at
+  `/hq#today`. The More sheet shows how until it's installed.
+- **Tab bar**: Today, Decide, the **+** (log money, owed, gym, to-do), Money,
+  Life. Growth, Pipelines and System sit behind the ⋯ button at the top.
+- **Swipe** (`components/hq/Swipe.tsx`, touch only): Decide rows swipe right
+  for their main action (approve, send, add to-do, done) and left to open or
+  skip; to-dos swipe right for done, left to move to today or tomorrow; owed
+  rows swipe right for paid. Every swipe has the same toast and Undo as the
+  buttons.
+- **Pull down** at the top of any tab to refresh; sheets close by dragging
+  their handle down (`components/hq/Mobile.tsx`).
+
 ## On your phone (Telegram)
 
 A private Telegram bot answers from the same report. `/today` is the
