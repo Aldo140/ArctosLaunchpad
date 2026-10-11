@@ -187,8 +187,11 @@ A job is one of two kinds, and never both:
   tests and build pass (Vercel then deploys it). Otherwise the change waits on
   an `hq-agent/<job>` branch and the message links it.
 - **mail** reads the aldo@calgarywatch.ca Outlook mailbox through Microsoft
-  Graph (the ops `MS_*` secrets) and HQ's Gmail summary (`hq/gmail`) with
-  `ops/agent-mail.ts`. It can't edit files, run anything else, send or push.
+  Graph and HQ's Gmail summary (`hq/gmail`) with `ops/agent-mail.ts`. It can't
+  edit files, run anything else, send or push. It runs in Calgary-Watch-
+  (`hq-agent-mail.yml`, started by its `hq-agent-clock.yml`), because that
+  repository holds the `MS_*` secrets; it checks out this repository's main
+  for the tools. This repository's clock only claims code jobs.
 
 Keeping them apart means nothing an email says can turn into code on main.
 The repository and its Actions logs are public, so only the job id is a

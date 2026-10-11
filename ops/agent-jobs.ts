@@ -2,7 +2,9 @@
 // No imports, so the ops clock runs it with plain Node (no npm install).
 // Never prints a task or a result: the Actions logs are public.
 //
-//   node ops/agent-jobs.ts pending              new jobs: marks them queued, prints their ids (the ops clock)
+//   node ops/agent-jobs.ts pending [code|mail]  new jobs of that kind (default code): marks them queued,
+//                                               prints their ids. Code jobs run here (ops-clock.yml); mail
+//                                               jobs in Calgary-Watch-, which holds the Outlook secrets.
 //   node ops/agent-jobs.ts claim <id>           marks the job running, prints its kind (code or mail)
 //   node ops/agent-jobs.ts task <id> <file>     writes the task to <file>
 //   node ops/agent-jobs.ts finish <id> <status> [result file]
@@ -73,10 +75,13 @@ try {
     const rows = await json(await fetch(`${DOCS}:runQuery`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: COLLECTION }], where: { fieldFilter: { field: { fieldPath: 'status' }, op: 'EQUAL', value: { stringValue: 'pending' } } }, limit: 5 } }),
+      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: COLLECTION }], where: { fieldFilter: { field: { fieldPath: 'status' }, op: 'EQUAL', value: { stringValue: 'pending' } } }, limit: 20 } }),
     }), 'Reading jobs');
-    for (const r of rows as Array<{ document?: { name: string } }>) {
+    const want = id === 'mail' ? 'mail' : 'code';
+    for (const r of rows as Array<{ document?: { name: string; fields?: Record<string, { stringValue?: string }> } }>) {
       if (!r.document) continue;
+      // Jobs saved before kinds existed are code jobs.
+      if ((r.document.fields?.kind?.stringValue === 'mail' ? 'mail' : 'code') !== want) continue;
       const jobId = r.document.name.split('/').pop()!;
       await patch(token, jobId, { status: 'queued' });
       console.log(jobId);
@@ -107,7 +112,7 @@ try {
       run: process.env.RUN_URL || null, finishedAt: Date.now(),
     });
   } else {
-    console.error('Usage: pending | claim <id> | task <id> <file> | finish <id> <status> [result file]');
+    console.error('Usage: pending [code|mail] | claim <id> | task <id> <file> | finish <id> <status> [result file]');
     process.exit(2);
   }
 } catch (e) {
