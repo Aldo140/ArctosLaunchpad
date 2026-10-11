@@ -7,9 +7,21 @@ import type { LifeEntry } from "@/lib/hq/types";
 import { dollars, moneyPace, moneyStats, owedStats } from "../persona";
 import { Pace } from "../Charts";
 import { Empty, Stat } from "../ui";
+import { Swipe } from "../Swipe";
 import { DuePicker, DueTag, MoneyMoves } from "./Life";
 
 const MONEY_BUSINESSES = [...BUSINESSES.map((b) => ({ id: b.id as string, label: b.label })), { id: "other", label: "Other" }];
+
+/** Which business it's for, as one tap on a chip rather than a dropdown. */
+function BizPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <span className="hq-chippick" role="radiogroup" aria-label="Business">
+      {MONEY_BUSINESSES.map((b) => (
+        <button key={b.id} type="button" role="radio" aria-checked={value === b.id} onClick={() => onChange(b.id)}>{b.label}</button>
+      ))}
+    </span>
+  );
+}
 
 /** "1,250.50" or "$1250" typed in, to cents. Null when it isn't a positive amount. */
 export function toCents(s: string): number | null {
@@ -43,14 +55,12 @@ export function MoneyForm({ onDone }: { onDone?: () => void }) {
     >
       <label className="hq-field hq-field--money">
         <span>Amount</span>
-        <span className="hq-money-input"><i>$</i><input className="hq-input" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount in dollars" /></span>
+        <span className="hq-money-input"><i>$</i><input className="hq-input" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount in dollars" autoFocus={!!onDone} enterKeyHint="done" /></span>
       </label>
-      <label className="hq-field">
+      <div className="hq-field hq-field--wide">
         <span>From</span>
-        <select className="hq-input" value={business} onChange={(e) => setBusiness(e.target.value)}>
-          {MONEY_BUSINESSES.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
-        </select>
-      </label>
+        <BizPicker value={business} onChange={setBusiness} />
+      </div>
       <label className="hq-field hq-field--grow">
         <span>For what (optional)</span>
         <input className="hq-input" value={text} maxLength={200} onChange={(e) => setText(e.target.value)} placeholder="e.g. Peak Physio website, deposit" />
@@ -94,12 +104,10 @@ export function OwedForm({ onDone }: { onDone?: () => void }) {
         <span>Amount</span>
         <span className="hq-money-input"><i>$</i><input className="hq-input" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount owed in dollars" /></span>
       </label>
-      <label className="hq-field">
+      <div className="hq-field hq-field--wide">
         <span>For</span>
-        <select className="hq-input" value={business} onChange={(e) => setBusiness(e.target.value)}>
-          {MONEY_BUSINESSES.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
-        </select>
-      </label>
+        <BizPicker value={business} onChange={setBusiness} />
+      </div>
       <label className="hq-field">
         <span>Due</span>
         <DuePicker value={due} onChange={setDue} label="Due" />
@@ -112,20 +120,24 @@ export function OwedForm({ onDone }: { onDone?: () => void }) {
 function OwedRow({ e }: { e: LifeEntry }) {
   const { now, markPaid, removeLife } = useHq();
   return (
-    <li className="hq-owed__row" data-done={e.done}>
-      <div className="hq-owed__main">
-        <strong>{dollars(e.amount ?? 0)} <span>{e.text}</span></strong>
-        <span className="hq-small">{BUSINESS_LABEL[e.business ?? ""] ?? "Other"} · {e.done ? "paid" : `added ${ago(e.at, now)}`}</span>
-      </div>
-      <div className="hq-owed__side">
-        {e.done ? null : <DueTag due={e.due} />}
-        {e.done ? (
-          <button type="button" className="hq-btn hq-btn--ghost hq-btn--sm" onClick={() => void markPaid(e, false)}>Not paid</button>
-        ) : (
-          <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" onClick={() => void markPaid(e, true)}>Paid</button>
-        )}
-        <button type="button" className="hq-linkbtn hq-todo__x" aria-label="Remove" onClick={() => void removeLife(e, "Removed")}>×</button>
-      </div>
+    <li data-done={e.done}>
+      <Swipe right={e.done ? null : { label: "Paid", run: () => void markPaid(e, true), tone: "go" }} left={{ label: "Remove", run: () => void removeLife(e, "Removed"), tone: "calm" }}>
+        <div className="hq-owed__row" data-done={e.done}>
+          <div className="hq-owed__main">
+            <strong>{dollars(e.amount ?? 0)} <span>{e.text}</span></strong>
+            <span className="hq-small">{BUSINESS_LABEL[e.business ?? ""] ?? "Other"} · {e.done ? "paid" : `added ${ago(e.at, now)}`}</span>
+          </div>
+          <div className="hq-owed__side">
+            {e.done ? null : <DueTag due={e.due} />}
+            {e.done ? (
+              <button type="button" className="hq-btn hq-btn--ghost hq-btn--sm" onClick={() => void markPaid(e, false)}>Not paid</button>
+            ) : (
+              <button type="button" className="hq-btn hq-btn--primary hq-btn--sm" onClick={() => void markPaid(e, true)}>Paid</button>
+            )}
+            <button type="button" className="hq-linkbtn hq-todo__x" aria-label="Remove" onClick={() => void removeLife(e, "Removed")}>×</button>
+          </div>
+        </div>
+      </Swipe>
     </li>
   );
 }

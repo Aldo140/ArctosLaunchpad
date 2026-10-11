@@ -6,6 +6,7 @@ import { BUSINESS_LABEL, ago, slot } from "../format";
 import type { LifeEntry } from "@/lib/hq/types";
 import { GYM_GOAL, GYM_MONTHLY, agenda, dollars, dueLabel, dueState, gymSlot, gymStats, moneyMoves, noonOf, todoStats } from "../persona";
 import { Icon } from "../ui";
+import { Swipe } from "../Swipe";
 
 const time = (t: number) => slot(t).split(" ").slice(1).join(" ");
 
@@ -279,16 +280,23 @@ function TodoRow({ n }: { n: LifeEntry }) {
   const st = dueState(n.due, now);
   return (
     <li data-done={n.done} data-due={st}>
-      <label>
-        <input type="checkbox" checked={!!n.done} onChange={(e) => void toggleNote(n.id, e.target.checked)} />
-        <span>{n.text}</span>
-      </label>
-      <span className="hq-todo__side">
-        {n.done ? null : <DueTag due={n.due} />}
-        {!n.done && (st === "late" || st === "today") ? <button type="button" className="hq-linkbtn hq-todo__push" onClick={() => void setNoteDue(n.id, inDays(now, 1))}>Tomorrow</button> : null}
-        {!n.done && st === "none" ? <button type="button" className="hq-linkbtn hq-todo__push" onClick={() => void setNoteDue(n.id, inDays(now, 0))}>Do today</button> : null}
-        <button type="button" className="hq-linkbtn hq-todo__x" aria-label="Delete to-do" onClick={() => void removeLife(n, "To-do deleted")}>×</button>
-      </span>
+      <Swipe
+        right={{ label: n.done ? "Not done" : "Done", run: () => void toggleNote(n.id, !n.done), tone: "go" }}
+        left={n.done ? { label: "Delete", run: () => void removeLife(n, "To-do deleted"), tone: "calm" } : { label: st === "late" || st === "today" ? "Tomorrow" : "Today", run: () => void setNoteDue(n.id, inDays(now, st === "late" || st === "today" ? 1 : 0)), tone: "calm" }}
+      >
+        <div className="hq-todo__row">
+          <label>
+            <input type="checkbox" checked={!!n.done} onChange={(e) => void toggleNote(n.id, e.target.checked)} />
+            <span>{n.text}</span>
+          </label>
+          <span className="hq-todo__side">
+            {n.done ? null : <DueTag due={n.due} />}
+            {!n.done && (st === "late" || st === "today") ? <button type="button" className="hq-linkbtn hq-todo__push" onClick={() => void setNoteDue(n.id, inDays(now, 1))}>Tomorrow</button> : null}
+            {!n.done && st === "none" ? <button type="button" className="hq-linkbtn hq-todo__push" onClick={() => void setNoteDue(n.id, inDays(now, 0))}>Do today</button> : null}
+            <button type="button" className="hq-linkbtn hq-todo__x" aria-label="Delete to-do" onClick={() => void removeLife(n, "To-do deleted")}>×</button>
+          </span>
+        </div>
+      </Swipe>
     </li>
   );
 }

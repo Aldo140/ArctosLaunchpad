@@ -858,3 +858,95 @@ main > .hq-subnav, main > .hq-sysline { margin-bottom: 18px; }
 .hq-gym__axis { display: flex; justify-content: space-between; width: 100%; margin: 0; font-size: 0.68rem; color: var(--faint); }
 .hq-gym__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 760px) { .hq-gym__body { grid-template-columns: minmax(0, 1fr); } }
+
+/* =========================================================================
+   Third pass: HQ on the phone. A real tab bar with the + in the middle,
+   swipe to decide, pull to refresh, sheets you drag closed, and a home
+   screen app that opens full screen.
+   ========================================================================= */
+
+html:has(.hq) { overscroll-behavior-y: contain; }
+.hq { -webkit-tap-highlight-color: transparent; }
+
+/* Swipe rows */
+.hq-swipe { position: relative; overflow: hidden; border-radius: inherit; }
+.hq-swipe__top { position: relative; z-index: 1; background: inherit; touch-action: pan-y; border-radius: inherit; }
+.hq-swipe[data-active] .hq-swipe__top { background: var(--surface); }
+.hq-qlist--compact .hq-swipe[data-active] .hq-swipe__top { background: var(--bg); }
+.hq-swipe__top[data-settling] { transition: transform 0.2s var(--ease-out); }
+.hq-swipe__under { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 18px; font: 600 0.8rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--hq-hover); }
+.hq-swipe__under[data-side="left"] { justify-content: flex-end; }
+.hq-swipe__under[data-tone="go"][data-past="true"] { background: var(--accent); color: var(--btn-fg); }
+.hq-swipe__under[data-tone="calm"][data-past="true"] { background: var(--line-strong); color: var(--fg); }
+.hq-swipehint { margin: -8px 0 0; font-size: 0.7rem; color: var(--faint); }
+
+/* To-do and owed rows sit inside their swipe layer. */
+.hq-todo .hq-notes li { display: block; padding: 0; }
+.hq-todo__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; }
+.hq-todo__row label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; min-width: 0; }
+.hq-todo__row label span { overflow-wrap: anywhere; }
+.hq-notes li[data-done="true"] .hq-todo__row label span { text-decoration: line-through; color: var(--faint); }
+.hq-notes li[data-due="late"] .hq-todo__row label span { color: var(--fg); }
+.hq-owed__list > li { border-bottom: 1px solid var(--line); }
+.hq-owed__list > li:last-child { border-bottom: 0; }
+.hq-owed__list .hq-owed__row { border-bottom: 0; }
+.hq-swipe .hq-todo__row, .hq-swipe .hq-owed__row { background: inherit; }
+
+/* Business chips instead of a dropdown */
+.hq-field--wide { flex: 1 1 100%; }
+.hq-chippick { display: flex; flex-wrap: wrap; gap: 6px; }
+.hq-chippick button { font: 500 0.84rem/1 var(--sans); color: var(--muted); background: var(--bg); border: 1px solid var(--line-strong); border-radius: 999px; padding: 9px 13px; cursor: pointer; }
+.hq-chippick button[aria-checked="true"] { color: var(--btn-fg); background: var(--fg); border-color: var(--fg); }
+
+/* Pull to refresh */
+.hq-ptr { position: fixed; top: env(safe-area-inset-top, 0px); left: 50%; z-index: 30; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: var(--ink-2); border: 1px solid var(--line-strong); box-shadow: var(--shadow-2); color: var(--muted); pointer-events: none; }
+.hq-ptr[data-ready="true"] { color: var(--accent); border-color: var(--accent); }
+.hq-ptr svg { width: 18px; height: 18px; }
+
+/* Install tip */
+.hq-install { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--bg); }
+.hq-install__icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; font: italic 400 1rem/1 var(--serif); color: var(--accent); background: var(--surface); border: 1px solid var(--line-strong); }
+.hq-install b { font-weight: 600; }
+.hq-install p { margin: 4px 0 0; }
+
+.hq-quick__grab { display: none; }
+.hq-top__more { position: relative; }
+.hq-top__more .hq-count { position: absolute; top: -2px; right: -2px; font: 600 0.6rem/1 var(--mono); color: var(--bg); background: var(--accent); border-radius: 999px; padding: 2px 5px; }
+.hq-top__more[data-current] { color: var(--fg); border-color: var(--line); }
+.hq-tabbar__add { display: none; }
+
+@media (max-width: 1023px) {
+  .hq-fab { display: none !important; }
+  /* Under the status bar when HQ runs from the home screen. */
+  .hq-top { top: 0; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+  .hq-top__spacer { flex: 1; }
+
+  .hq-tabbar { align-items: end; padding-top: 4px; background: color-mix(in srgb, var(--ink-2) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .hq-tabbar a { padding-block: 8px 6px; }
+  .hq-tabbar a[aria-current="page"]::before { content: ""; position: absolute; top: -4px; left: 30%; right: 30%; height: 2px; border-radius: 0 0 2px 2px; background: var(--accent); }
+  .hq-tabbar__add { display: grid; place-items: center; padding: 0 0 4px; background: none; border: 0; cursor: pointer; }
+  .hq-tabbar__add span { width: 52px; height: 52px; margin-top: -22px; display: grid; place-items: center; border-radius: 18px; color: var(--btn-fg); background: var(--accent); box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 0 4px var(--bg); }
+  .hq-tabbar__add svg { width: 24px; height: 24px; stroke-width: 2.3; }
+  .hq-tabbar__add:active span { transform: scale(0.94); }
+  .hq-toasts { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+
+  .hq-quick__grab { display: grid; place-items: center; margin: -10px -18px 0; padding: 4px 0 8px; touch-action: none; cursor: grab; }
+  .hq-sheet__panel .hq-quick__grab { margin: -8px -16px 0; }
+  .hq-sheet__panel > .hq-sheet__grip { display: none; }
+  .hq-quick__panel, .hq-sheet__panel { transition: transform 0.2s var(--ease-out); max-height: 88dvh; overflow: auto; }
+  .hq-quick .hq-money-input .hq-input { font-size: 1.6rem; padding-block: 12px; }
+  .hq-quick .hq-money-input i { font-size: 1.3rem; }
+
+  /* Inputs at 16px so iOS doesn't zoom the page on focus. */
+  .hq-input, .hq-textarea, select.hq-input { font-size: 16px; }
+
+  .hq-btn { min-height: 42px; }
+  .hq-btn--sm { min-height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hq-swipe__top[data-settling], .hq-quick__panel, .hq-sheet__panel { transition: none; }
+}
+@media (max-width: 1023px) {
+  .hq-tabbar { background: color-mix(in srgb, var(--ink-2) 97%, transparent); }
+}
+.hq-form .hq-field--wide { grid-column: 1 / -1; }
