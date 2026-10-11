@@ -831,5 +831,68 @@
     "subject": "Estimates within 72 hours",
     "at": "2026-10-09T19:32:19.301Z",
     "messageId": "<202610091932.54504049051@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "devour@devourcatering.com",
+    "business": "Devour Catering",
+    "subject": "Event planning requests at Devour",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.34708343319@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "events@forkandfarmcatering.com",
+    "business": "Fork + Farm Catered Events",
+    "subject": "Wedding inquiries for 2026 and 2027",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.82929929798@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "grazing@brieandbanquet.com",
+    "business": "Brie & Banquet Wild Catering Co.",
+    "subject": "Grazing table bookings at Brie & Banquet",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.69372397687@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "lorina.s@linasmarket.com",
+    "business": "Lina's Market",
+    "subject": "Private event inquiries at Lina's",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.19172402868@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@romacatering.ca",
+    "business": "Roma Catering",
+    "subject": "Catering orders at Roma",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.89356281431@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@gathercatering.ca",
+    "business": "Gather Catering & Events",
+    "subject": "Custom quotes at Gather",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.22423086349@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "events@saloncatering.com",
+    "business": "Salon Catering",
+    "subject": "Event inquiries at Salon",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.27272515813@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@bridgelandmarket.com",
+    "business": "Bridgeland Market",
+    "subject": "Office tray and corporate orders",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.91467400739@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "events@taikotaco.com",
+    "business": "Taiko Taco",
+    "subject": "Private event bookings at Taiko",
+    "at": "2026-10-11T02:24:45.121Z",
+    "messageId": "<202610110224.68419165441@smtp-relay.mailin.fr>"
   }
 ]
