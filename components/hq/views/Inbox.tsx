@@ -10,6 +10,7 @@ import { Empty, Icon, Thumb } from "../ui";
 import { FilteredReplies, ReplyCheck } from "../ReplyCheck";
 import { QUEUE_GROUP, decisionQueue, describe, isQueued, type QueueItem } from "../queue";
 import { calgaryDayStart } from "../tasks";
+import { Swipe, type SwipeAction } from "../Swipe";
 
 type Kind = "all" | "posts" | "pitches" | "replies";
 
@@ -229,6 +230,37 @@ function Quick({ item, onOpen }: { item: QueueItem; onOpen: () => void }) {
   }
 }
 
+/** What a swipe does on a row: right is the row's main action, left skips a pitch or opens the rest. */
+function useSwipes(item: QueueItem, onOpen: () => void): { right: SwipeAction | null; left: SwipeAction | null } {
+  const { data, act, decide } = useHq();
+  const t = TARGET[item.kind];
+  const cmd = t.types.length ? latestCommand(data.commands, t.id(item), t.types) : null;
+  if (cmd?.status === "pending") return { right: null, left: null };
+  const open: SwipeAction = { label: "Open", run: onOpen, tone: "calm" };
+  switch (item.kind) {
+    case "post":
+      return item.post.status === "drafted"
+        ? { right: { label: "Approve", run: () => void act("approve-post", item.post.id, {}, `Approved “${item.post.headline}”`), tone: "go" }, left: open }
+        : { right: null, left: { ...open, label: "Fix it" } };
+    case "pitch":
+      return {
+        right: item.pitch.body.trim() ? { label: "Send", run: () => void act("approve-pitch", item.pitch.leadId, { subject: item.pitch.subject, body: item.pitch.body }, `Pitch to ${item.pitch.businessName} approved`), tone: "go" } : null,
+        left: { label: "Skip", run: () => void act("skip-pitch", item.pitch.leadId, {}, `Skipped ${item.pitch.businessName}`), tone: "calm" },
+      };
+    case "reply":
+      return { right: item.reply.suggestedBody.trim() ? { label: "Send reply", run: () => void act("approve-reply", item.reply.leadId, { body: item.reply.suggestedBody }, `Reply to ${item.reply.businessName} approved`), tone: "go" } : null, left: open };
+    case "gmail": {
+      const { state, triage, reply } = item.item;
+      if (state === "proposed" && triage?.subtask) {
+        const title = triage.subtask.title;
+        return { right: { label: "Add to-do", run: () => void decide(triageKey(reply), "approved", `On your list: ${title}`, { title, previous: item.item.decision }), tone: "go" }, left: open };
+      }
+      if (state === "approved") return { right: { label: "Done", run: () => void decide(triageKey(reply), "done", "Done. Nice.", { previous: item.item.decision }), tone: "go" }, left: open };
+      return { right: null, left: open };
+    }
+  }
+}
+
 function Body({ item }: { item: QueueItem }) {
   switch (item.kind) {
     case "post": return <PostDecision post={item.post} />;
@@ -249,8 +281,10 @@ export function QueueRow({ item, open, onToggle }: { item: QueueItem; open?: boo
   const waited = now - item.at;
   const sev = item.kind === "post" && item.post.status !== "drafted" ? "bad" : waited > 2 * 86_400_000 ? "bad" : waited > 12 * 3_600_000 ? "warn" : "ok";
   const img = item.kind === "post" ? cdn(item.post.imageUrl) : null;
+  const swipes = useSwipes(item, toggle);
   return (
     <li className="hq-q" data-open={open ? "true" : undefined} data-sev={sev} id={`q-${item.key}`}>
+      <Swipe right={open ? null : swipes.right} left={open ? null : swipes.left}>
       <div className="hq-q__row">
         <button type="button" className="hq-q__head" aria-expanded={!!open} onClick={toggle}>
           {item.kind === "post" ? <span className="hq-q__thumb"><Thumb src={img} alt="" /></span> : <span className="hq-q__dot" aria-hidden="true">{(item.kind === "pitch" ? item.pitch.businessName : d.title).charAt(0)}</span>}
@@ -262,6 +296,7 @@ export function QueueRow({ item, open, onToggle }: { item: QueueItem; open?: boo
         </button>
         <span className="hq-q__quick"><Quick item={item} onOpen={toggle} /></span>
       </div>
+      </Swipe>
       {open ? <div className="hq-q__body"><Body item={item} /></div> : null}
     </li>
   );
@@ -325,6 +360,7 @@ export function InboxView({ focus }: { focus?: string }) {
           <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>{label}{count(k) ? <b>{count(k)}</b> : null}</button>
         ))}
       </div>
+      {shown.length ? <p className="hq-mono hq-show-sm hq-swipehint">Swipe a row right to do it, left to {kind === "pitches" ? "skip" : "open or skip"}.</p> : null}
       {shown.length ? (
         <ul className="hq-qlist">
           {shown.map((i, n) => {

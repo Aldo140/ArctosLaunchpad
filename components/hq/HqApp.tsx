@@ -19,6 +19,8 @@ import { SystemView, type SystemTab } from "./views/System";
 import { evaluateAll } from "./tasks";
 import { openDecisions } from "./queue";
 import { dollars } from "./persona";
+import { buzz } from "./Swipe";
+import { InstallTip, PullToRefresh, useDragToClose } from "./Mobile";
 
 type ViewId = "today" | "decide" | "money" | "life" | "growth" | "pipelines" | "system";
 type Route = { view: ViewId; sub: string | null };
@@ -131,6 +133,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [palette, setPalette] = useState(false);
   const { view, sub } = useRoute();
+  const sheetDrag = useDragToClose(() => setSheet(false));
 
   const call = useCallback(
     async (path: string, body?: unknown) => {
@@ -187,6 +190,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
 
   const toast = useCallback((text: string, undo?: () => void) => {
     const id = Date.now() + Math.random();
+    buzz(8);
     setToasts((t) => [...t.slice(-2), { id, text, undo }]);
     window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 7000);
   }, []);
@@ -463,8 +467,17 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     </a>
   );
 
+  const tab = (id: ViewId) => (
+    <a key={id} href={`#${id}`} aria-current={view === id ? "page" : undefined} onClick={() => { buzz(5); window.scrollTo({ top: 0 }); }}>
+      <Icon name={VIEWS[id].icon} />
+      {VIEWS[id].label}
+      {counts[id] ? <span className="hq-count">{counts[id]}</span> : null}
+    </a>
+  );
+
   return (
     <div className="hq tone-ink">
+      <PullToRefresh onRefresh={load} busy={loading} />
       <aside className="hq-rail" aria-label="HQ">
         <a className="hq-rail__brand" href="#today"><b>{OWNER}&apos;s</b><i>HQ</i></a>
         <button type="button" className="hq-btn hq-btn--primary hq-rail__add" onClick={() => setQuick("money")}><Icon name="plus" /> Log something</button>
@@ -497,7 +510,10 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
             {BUSINESSES.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
           </select>
           <button className="hq-btn hq-btn--ghost hq-kbtn hq-hide-sm" type="button" onClick={() => setPalette(true)} aria-label="Command bar" aria-keyshortcuts="Meta+K Control+K /"><Icon name="search" /><kbd>⌘K</kbd></button>
-          <button className="hq-btn hq-btn--ghost hq-iconbtn" type="button" onClick={() => void load()} disabled={loading} aria-label="Refresh"><span className="hq-spin" data-on={loading}><Icon name="refresh" /></span></button>
+          <button className="hq-btn hq-btn--ghost hq-iconbtn hq-hide-sm" type="button" onClick={() => void load()} disabled={loading} aria-label="Refresh"><span className="hq-spin" data-on={loading}><Icon name="refresh" /></span></button>
+          <button className="hq-btn hq-btn--ghost hq-iconbtn hq-show-sm hq-top__more" type="button" onClick={() => setSheet(true)} aria-expanded={sheet} aria-label="More sections" data-current={MORE.includes(view) || undefined}>
+            <Icon name="more" />{counts.system ? <span className="hq-count">{counts.system}</span> : null}
+          </button>
         </div>
 
         {error ? <p className="hq-error hq-banner" role="alert">{error} <button type="button" className="hq-linkbtn" onClick={() => void load()}>Try again</button></p> : null}
@@ -517,23 +533,17 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
         )}
       </div>
 
-      {ctx ? <button type="button" className="hq-fab" onClick={() => setQuick("money")} aria-label="Log something"><Icon name="plus" /></button> : null}
 
       <nav className="hq-tabbar" aria-label="HQ sections">
-        {TABBAR.map((id) => (
-          <a key={id} href={`#${id}`} aria-current={view === id ? "page" : undefined} onClick={() => window.scrollTo({ top: 0 })}>
-            <Icon name={VIEWS[id].icon} />
-            {VIEWS[id].label}
-            {counts[id] ? <span className="hq-count">{counts[id]}</span> : null}
-          </a>
-        ))}
-        <button type="button" onClick={() => setSheet(true)} aria-expanded={sheet} aria-current={MORE.includes(view) ? "page" : undefined}>
-          <Icon name="more" />More{counts.system ? <span className="hq-count">{counts.system}</span> : null}
+        {TABBAR.slice(0, 2).map(tab)}
+        <button type="button" className="hq-tabbar__add" onClick={() => setQuick("money")} aria-label="Log something" disabled={!ctx}>
+          <span><Icon name="plus" /></span>
         </button>
+        {TABBAR.slice(2).map(tab)}
       </nav>
       <div className="hq-sheet" data-open={sheet} onClick={(e) => e.target === e.currentTarget && setSheet(false)} role="dialog" aria-modal="true" aria-label="More sections" hidden={!sheet}>
-        <div className="hq-sheet__panel">
-          <span className="hq-sheet__grip" aria-hidden="true" />
+        <div className="hq-sheet__panel" style={sheetDrag.dy ? { transform: `translateY(${sheetDrag.dy}px)` } : undefined}>
+          <div className="hq-quick__grab" {...sheetDrag.handlers}><span className="hq-sheet__grip" aria-hidden="true" /></div>
           <div className="hq-rail__group">
             <p className="hq-rail__label">The businesses</p>
             {navLink("growth", () => setSheet(false))}
@@ -541,7 +551,9 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
             <p className="hq-rail__label" style={{ marginTop: 10 }}>Engine room</p>
             {navLink("system", () => setSheet(false))}
           </div>
+          <InstallTip />
           <div className="hq-actions">
+            <button className="hq-btn" type="button" onClick={() => { setSheet(false); void load(); }}><Icon name="refresh" /> Refresh</button>
             <button className="hq-btn" type="button" onClick={() => { setSheet(false); setPalette(true); }}><Icon name="search" /> Search</button>
             <button className="hq-btn hq-btn--ghost" type="button" onClick={onSignOut}>Sign out</button>
             <span className="hq-small">{email}</span>
@@ -566,6 +578,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
 /** One sheet for the three things you log yourself: a gym visit, money in, a note. */
 function QuickAdd({ tab, setTab }: { tab: QuickTab | null; setTab: (t: QuickTab | null) => void }) {
   const { data, now, logGym } = useHq();
+  const drag = useDragToClose(() => setTab(null));
   useEffect(() => {
     if (!tab) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setTab(null);
@@ -576,7 +589,8 @@ function QuickAdd({ tab, setTab }: { tab: QuickTab | null; setTab: (t: QuickTab 
   const went = (data.life ?? []).some((e) => e.kind === "gym" && new Date(e.at).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" }) === new Date(now).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" }));
   return (
     <div className="hq-quick" role="dialog" aria-modal="true" aria-label="Log something" onClick={(e) => e.target === e.currentTarget && setTab(null)}>
-      <div className="hq-quick__panel">
+      <div className="hq-quick__panel" style={drag.dy ? { transform: `translateY(${drag.dy}px)`, transition: "none" } : undefined}>
+        <div className="hq-quick__grab" {...drag.handlers}><span className="hq-sheet__grip" aria-hidden="true" /></div>
         <div className="hq-card__head">
           <h2 className="hq-h2">Log something</h2>
           <button type="button" className="hq-btn hq-btn--ghost" onClick={() => setTab(null)}>Close</button>
