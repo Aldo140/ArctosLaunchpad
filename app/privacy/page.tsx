@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { META_PIXEL_ID } from "@/lib/metaPixel";
+import { GOOGLE_ADS_ID } from "@/lib/googleAds";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -111,6 +112,17 @@ export default function PrivacyPage() {
                 visited before the form, on your device only; the page list is
                 sent with your enquiry so we know what you read.
               </p>
+              {GOOGLE_ADS_ID ? (
+                <p>
+                  When we advertise on Google, this site also loads the Google
+                  Ads tag. It sets cookies so Google can tell us whether someone
+                  who clicked an ad went on to send a request. Google receives
+                  page visits and the fact that a form was sent, never what you
+                  typed into it. You can control this in your{" "}
+                  <a href="https://myadcenter.google.com/">Google ad settings</a>{" "}
+                  or by blocking third-party cookies in your browser.
+                </p>
+              ) : null}
               {META_PIXEL_ID ? (
                 <p>
                   When we advertise on Facebook or Instagram, this site also
