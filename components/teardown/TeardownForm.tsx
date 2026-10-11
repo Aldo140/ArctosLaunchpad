@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
+import { metaTrack } from "@/components/site/MetaPixel";
 
 type FieldName = "name" | "email" | "challenge" | "company" | "sample";
 type FieldErrors = Partial<Record<FieldName | "form", string>>;
@@ -163,6 +164,7 @@ export function TeardownForm() {
         return;
       }
 
+      metaTrack("Lead", { content_name: PROJECT_TYPE });
       form.reset();
       setReady({ name: false, email: false, challenge: false });
       setStatus("success");
