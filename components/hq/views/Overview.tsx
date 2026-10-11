@@ -4,7 +4,7 @@ import { inFilter, useHq } from "../context";
 import { calgaryDayStart } from "../tasks";
 import { BUSINESS_LABEL, calgaryParts, num, plural, short, slot } from "../format";
 import { useState } from "react";
-import { GYM_GOAL, agenda, brief, dollars, greeting, gymSlot, gymStats, mood, moodSignoff, moneyStats, nextMilestone, outreachStreak, owedStats, todoStats, weekScore, wins } from "../persona";
+import { GREETING, GYM_GOAL, agenda, brief, dollars,gymSlot, gymStats, mood, moodSignoff, moneyStats, nextMilestone, outreachStreak, owedStats, todoStats, weekScore, wins } from "../persona";
 import { openDecisions } from "../queue";
 import { SkyStrip } from "../Sky";
 import { Icon } from "../ui";
@@ -18,7 +18,7 @@ const time = (t: number) => slot(t).split(" ").slice(1).join(" ");
 export function OverviewView() {
   const { data, now, filter, go, preview, logGym } = useHq();
   const snap = data.snapshot;
-  const { weekday, date, hour } = calgaryParts(now);
+  const { weekday, date } = calgaryParts(now);
   const queue = openDecisions(data, filter);
   const waiting = queue.length;
   const feel = mood(data, now, filter, waiting);
@@ -56,7 +56,7 @@ export function OverviewView() {
           <p className="hq-eyebrow">{weekday} · {date}{filter !== "all" ? ` · ${BUSINESS_LABEL[filter]}` : ""}</p>
           <SkyStrip preview={preview} />
         </div>
-        <h1 className="hq-h1">{greeting(hour)} {waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go find money.</em></>}</h1>
+        <h1 className="hq-h1">{GREETING}{waiting ? <><em>{plural(waiting, "thing")}</em> {waiting === 1 ? "needs" : "need"} you.</> : <>Nothing needs you. <em>Go find money.</em></>}</h1>
         <p className="hq-mood" data-mood={feel.key}>{feel.line}</p>
         <ul className="hq-brieflist" data-open={more}>
           {story.map((line) => <li key={line}>{line}</li>)}

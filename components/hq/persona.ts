@@ -16,13 +16,7 @@ export const ARCTOS_DAILY_CAP = 50;
 
 const DAY = 86_400_000;
 
-export function greeting(hour: number): string {
-  if (hour < 5) return `Late one, ${OWNER}.`;
-  if (hour < 12) return `Morning, ${OWNER}.`;
-  if (hour < 17) return `Afternoon, ${OWNER}.`;
-  if (hour < 22) return `Evening, ${OWNER}.`;
-  return `Late one, ${OWNER}.`;
-}
+export const GREETING = "Let's get it, chat.";
 
 /** A sign-off for the bottom of the brief, picked by the day so it stays put all day. */
 const SIGNOFFS = [
