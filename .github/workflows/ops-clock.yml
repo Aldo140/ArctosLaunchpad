@@ -45,25 +45,25 @@ jobs:
           GH_REPO: ${{ github.repository }}
           READY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.IG_TOKEN_CALGARYDAILY != '' }}
         run: |
-          if [ "$READY" != true ]; then
-            echo "::notice title=Clock idle::The ops secrets aren't in this repository yet."
-            exit 0
-          fi
+          # Without the ops secrets the ops runs are skipped, but HQ agent jobs still start.
+          [ "$READY" = true ] || echo "::notice title=Ops idle::The ops secrets aren't in this repository yet; only HQ agent jobs run."
           start() { gh workflow run "$1" && echo "$(date -u +%H:%M) started $1" || echo "::warning::couldn't start $1"; }
           end=$((SECONDS + 5 * 3600 + 45 * 60))
           last_hourly=""; last_daily=""
           while [ "$SECONDS" -lt "$end" ]; do
             h=$(date -u +%H); m=$((10#$(date -u +%M)))
-            if [ $((m % 30)) -ge 7 ]; then
+            if [ "$READY" = true ] && [ $((m % 30)) -ge 7 ]; then
               key="$(date -u +%Y%m%d)$h-$((m / 30))"
               [ "$key" != "$last_hourly" ] && { start ops-hourly.yml; last_hourly=$key; }
             fi
-            case "$h" in 09|12|13|14)
-              if [ "$m" -ge 5 ]; then
-                key="$(date -u +%Y%m%d)$h"
-                [ "$key" != "$last_daily" ] && { start ops-daily.yml; last_daily=$key; }
-              fi;;
-            esac
+            if [ "$READY" = true ]; then
+              case "$h" in 09|12|13|14)
+                if [ "$m" -ge 5 ]; then
+                  key="$(date -u +%Y%m%d)$h"
+                  [ "$key" != "$last_daily" ] && { start ops-daily.yml; last_daily=$key; }
+                fi;;
+              esac
+            fi
             for job in $(node ops/agent-jobs.ts pending || true); do
               gh workflow run hq-agent.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ agent job" || echo "::warning::couldn't start HQ agent job $job"
             done
