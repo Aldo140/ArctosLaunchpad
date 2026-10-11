@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { ConversionTracking } from "@/components/site/ConversionTracking";
+import { MetaPixel } from "@/components/site/MetaPixel";
 import { Analytics } from "@vercel/analytics/next";
 import { Motion } from "@/components/site/Motion";
 import {
@@ -110,6 +111,7 @@ export default function RootLayout({
           <Footer />
         </SiteChrome>
         <ConversionTracking />
+        <MetaPixel />
         {/* Only Vercel serves the analytics endpoint; elsewhere it would 404. */}
         {process.env.VERCEL ? <Analytics /> : null}
         <script

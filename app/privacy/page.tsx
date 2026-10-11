@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { META_PIXEL_ID } from "@/lib/metaPixel";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -110,6 +111,20 @@ export default function PrivacyPage() {
                 visited before the form, on your device only; the page list is
                 sent with your enquiry so we know what you read.
               </p>
+              {META_PIXEL_ID ? (
+                <p>
+                  When we advertise on Facebook or Instagram, this site also
+                  loads the Meta Pixel. It sets cookies so Meta can tell us how
+                  many people who saw an ad visited the site or sent a request,
+                  and so our ads reach people likely to be interested. Meta
+                  receives page visits and the fact that a form was sent, never
+                  what you typed into it. You can control this in your{" "}
+                  <a href="https://www.facebook.com/adpreferences/ad_settings">
+                    Meta ad preferences
+                  </a>{" "}
+                  or by blocking third-party cookies in your browser.
+                </p>
+              ) : null}
             </section>
 
             <section id="use" className="policy__section">

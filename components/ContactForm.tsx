@@ -4,6 +4,7 @@ import { track } from "@vercel/analytics";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import { LANDING_KEY, PREV_KEY } from "@/components/site/ConversionTracking";
+import { metaTrack } from "@/components/site/MetaPixel";
 
 type FieldName =
   | "name"
@@ -385,6 +386,7 @@ export function ContactForm({
       }
 
       track("enquiry_sent", { type: String(formData.get("projectType") ?? "") });
+      metaTrack("Lead", { content_name: String(formData.get("projectType") ?? "") });
       clearDraft();
       form.reset();
       setReady({ name: false, email: false, challenge: false });
