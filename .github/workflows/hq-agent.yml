@@ -1,0 +1,194 @@
+name: HQ agent
+
+# One job from the HQ agent queue (hq_agent_jobs in arctos-hq, see
+# lib/hq/agentJobs.ts). Aldo texts the HQ bot; the ops clock starts this run
+# for the job within a minute, and the answer goes back to Telegram.
+#
+# A job is one of two kinds, kept apart on purpose:
+# - code: Claude Code edits a checkout of main. It has no email access and no
+#   push rights; the workflow pushes its change to main only after the type
+#   check, lint, ops tests and build pass, otherwise to an hq-agent/<job> branch.
+# - mail: Claude Code reads Aldo's email (ops/agent-mail.ts) to answer a
+#   question. It can't edit files, run anything else, or push.
+# So nothing an email says can ever turn into code on main.
+#
+# Both repositories are public, and so are these logs: the task, Claude's
+# output and any email never print here. Only the job id is an input.
+# This file also sits on the default branch (arctos-launchpad), where GitHub
+# runs dispatches; it always works on main.
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'hq_agent_jobs document id'
+        required: true
+
+permissions:
+  contents: read
+
+# One job at a time, in order, so two changes never race to main.
+concurrency:
+  group: hq-agent
+  cancel-in-progress: false
+
+env:
+  JOB: ${{ inputs.job }}
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  CLAUDE_CODE: '@anthropic-ai/claude-code@2.1.290'
+  HQ_PROVIDER: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+  HQ_ACCOUNT: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+
+jobs:
+  pick-up:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      kind: ${{ steps.load.outputs.kind }}
+    steps:
+      - name: Check the job id
+        run: '[[ "$JOB" =~ ^[A-Za-z0-9_-]{1,100}$ ]] || { echo "::error::Bad job id"; exit 1; }'
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: ops/agent-jobs.ts
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - id: load
+        run: echo "kind=$(node ops/agent-jobs.ts claim "$JOB")" >> "$GITHUB_OUTPUT"
+
+  code:
+    needs: pick-up
+    if: needs.pick-up.outputs.kind == 'code'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          # Claude can't push; only the step after the checks does.
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Read the task
+        run: |
+          node ops/agent-jobs.ts task "$JOB" "$RUNNER_TEMP/task.txt"
+          echo "START=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Make the change (Claude Code)
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WORKSPACE: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+        run: |
+          [ -n "$WORKSPACE" ] && export ANTHROPIC_CUSTOM_HEADERS="anthropic-workspace-id: $WORKSPACE"
+          export COMMIT_MESSAGE_FILE="$RUNNER_TEMP/commit-message.txt"
+          { cat ops/agent/code-brief.md; echo; cat "$RUNNER_TEMP/task.txt"; } > "$RUNNER_TEMP/prompt.txt"
+          # Edits, reads and the repo's own npm scripts only. Output goes to a file, not the public log.
+          npx -y "$CLAUDE_CODE" -p "$(cat "$RUNNER_TEMP/prompt.txt")" \
+            --model claude-opus-5-5 --max-turns 200 --output-format json \
+            --permission-mode acceptEdits \
+            --allowedTools "Read" "Edit" "Write" "Glob" "Grep" "Bash(npm run *)" "Bash(npx tsc *)" "Bash(git diff *)" "Bash(git status *)" "Bash(ls *)" \
+            --disallowedTools "WebFetch" "WebSearch" \
+            > "$RUNNER_TEMP/claude.json" 2> /dev/null || echo "Claude Code exited with $?"
+      - name: Check and push to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          jq -r '.result // empty' "$RUNNER_TEMP/claude.json" > "$RUNNER_TEMP/result.txt" 2>/dev/null || true
+          finished=yes
+          if [ ! -s "$RUNNER_TEMP/result.txt" ]; then
+            echo "The agent stopped before it finished (it may have hit its time or turn limit)." > "$RUNNER_TEMP/result.txt"
+            finished=no
+          fi
+          git reset -q --soft "$START"
+          git add -A
+          if git diff --cached --quiet; then
+            if [ "$finished" = yes ]; then echo "STATUS=answered" >> "$GITHUB_ENV"; else echo "STATUS=failed" >> "$GITHUB_ENV"; fi
+            echo "No code changes."
+            exit 0
+          fi
+          git diff --cached --stat
+          git config user.name "hq-agent"
+          git config user.email "aldo@arctoslaunchpad.com"
+          msg=$(head -n 1 "$RUNNER_TEMP/commit-message.txt" 2>/dev/null | cut -c1-200 || true)
+          git commit -q -m "${msg:-Change made by the HQ agent}" -m "HQ agent job $JOB: $RUN_URL"
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          # A half-finished change never goes to main, even if it happens to pass.
+          if [ "$finished" = yes ] && npm run typecheck && npm run lint && npm run ops:typecheck && npm run ops:test && npm run build; then
+            git fetch -q origin main
+            if git rebase -q origin/main && git -c http.https://github.com/.extraheader="$auth" push origin HEAD:main; then
+              echo "COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+              echo "STATUS=pushed" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            printf '\n\nmain changed while I worked and my change no longer applies cleanly.' >> "$RUNNER_TEMP/result.txt"
+          fi
+          git -c http.https://github.com/.extraheader="$auth" push -f origin "HEAD:refs/heads/hq-agent/$JOB"
+          echo "BRANCH=hq-agent/$JOB" >> "$GITHUB_ENV"
+          if [ "$finished" = yes ]; then echo "STATUS=checks-failed" >> "$GITHUB_ENV"; else echo "STATUS=failed" >> "$GITHUB_ENV"; fi
+      - name: Report back
+        if: always()
+        run: bash ops/agent/report.sh
+
+  mail:
+    needs: pick-up
+    if: needs.pick-up.outputs.kind == 'mail'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Sign in to arctos-hq
+        id: hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.HQ_PROVIDER }}
+          service_account: ${{ env.HQ_ACCOUNT }}
+          token_format: access_token
+      - name: Read the task
+        run: node ops/agent-jobs.ts task "$JOB" "$RUNNER_TEMP/task.txt"
+      - name: Look through the email (Claude Code)
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WORKSPACE: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
+        run: |
+          [ -n "$WORKSPACE" ] && export ANTHROPIC_CUSTOM_HEADERS="anthropic-workspace-id: $WORKSPACE"
+          { cat ops/agent/mail-brief.md; echo; cat "$RUNNER_TEMP/task.txt"; } > "$RUNNER_TEMP/prompt.txt"
+          # The mail reader and nothing else: no edits, no other commands, no web.
+          npx -y "$CLAUDE_CODE" -p "$(cat "$RUNNER_TEMP/prompt.txt")" \
+            --model claude-opus-5-5 --max-turns 60 --output-format json \
+            --allowedTools "Bash(npx tsx ops/agent-mail.ts *)" \
+            --disallowedTools "Edit" "Write" "NotebookEdit" "WebFetch" "WebSearch" \
+            > "$RUNNER_TEMP/claude.json" 2> /dev/null || echo "Claude Code exited with $?"
+          jq -r '.result // empty' "$RUNNER_TEMP/claude.json" > "$RUNNER_TEMP/result.txt" 2>/dev/null || true
+          if [ -s "$RUNNER_TEMP/result.txt" ]; then echo "STATUS=answered" >> "$GITHUB_ENV"; else echo "STATUS=failed" >> "$GITHUB_ENV"; fi
+      - name: Report back
+        if: always()
+        run: bash ops/agent/report.sh

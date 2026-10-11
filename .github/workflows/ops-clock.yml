@@ -5,7 +5,9 @@ name: Operations clock
 # keeps time instead. One run stays awake for just under six hours, starts
 # Operations hourly at :07 and :37 and Operations daily at 3, 6, 7 and 8 am
 # Calgary (09, 12, 13, 14 UTC), then starts the next clock before it ends.
-# Its own schedule only restarts the chain if it ever breaks. A dispatch made
+# Every minute it also starts hq-agent.yml for each new HQ agent job (jobs
+# the HQ bot saves in arctos-hq; ops/agent-jobs.ts). Its own schedule only
+# restarts the chain if it ever breaks. A dispatch made
 # with the workflow's token is one of the few events GitHub lets start a run.
 # Public repository: runner minutes are free.
 on:
@@ -15,6 +17,9 @@ on:
 
 permissions:
   actions: write
+  contents: read
+  # Keyless sign-in to arctos-hq to look for new HQ agent jobs.
+  id-token: write
 
 # Exactly one clock at a time; a second one waits until the first hands over.
 concurrency:
@@ -26,6 +31,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 355
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: ops/agent-jobs.ts
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Keep time
         env:
           GH_TOKEN: ${{ github.token }}
@@ -51,6 +64,9 @@ jobs:
                 [ "$key" != "$last_daily" ] && { start ops-daily.yml; last_daily=$key; }
               fi;;
             esac
+            for job in $(node ops/agent-jobs.ts pending || true); do
+              gh workflow run hq-agent.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ agent job" || echo "::warning::couldn't start HQ agent job $job"
+            done
             sleep 60
           done
           start ops-clock.yml
