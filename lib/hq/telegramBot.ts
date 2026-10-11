@@ -57,8 +57,10 @@ export const HELP = [
   "",
   "/today: what's waiting on you",
   "/inbox: posts, pitches and replies to approve, one tap each",
+  "/agent: change the site or HQ, like <i>/agent add a gym streak to Today</i>. The agent pushes it to main once the checks pass and texts you back.",
+  "/mail: ask about your email, like <i>/mail did the Stampede sponsor ever reply?</i> The agent reads your calgarywatch.ca inbox (and Gmail, once it syncs) and texts you back.",
   "",
-  "Or just ask, like <i>how did Calgary Daily do this week?</i> or <i>who replied to a pitch today?</i>",
+  "Or just ask, like <i>how did Calgary Daily do this week?</i> or <i>who replied to a pitch today?</i> Ask for a change and I'll hand it to the agent.",
   "",
   "Approvals go to the same queue as the dashboard. The agents apply them at :07 and :37, so Undo works until then.",
 ].join("\n");
