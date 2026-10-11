@@ -43,7 +43,9 @@ const sentToday = sent.filter((s) => calgary(new Date(s.at)).date === local.date
 
 const queue = readdirSync(DIR).filter((f) => /^batch-.*\.json$/.test(f)).sort()
   .flatMap((f) => JSON.parse(readFileSync(join(DIR, f), "utf8")))
-  .filter((m) => !sentEmails.has(norm(m.email)) && !suppressed.has(norm(m.email)));
+  .filter((m) => !sentEmails.has(norm(m.email)) && !suppressed.has(norm(m.email)))
+  // A batch can wait for a set day (YYYY-MM-DD, Calgary time), e.g. to skip a holiday.
+  .filter((m) => !m.notBefore || m.notBefore <= local.date);
 
 const inWindow = WINDOW.days.includes(local.day) && local.minutes >= WINDOW.start && local.minutes < WINDOW.end;
 console.log(`${queue.length} queued, ${sentToday}/${DAILY_CAP} sent today, ${inWindow ? "inside" : "outside"} the send window.`);
