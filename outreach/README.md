@@ -23,5 +23,5 @@ custom bakeries).
 ## Batches
 
 - `batch-2026-10-06.json`, `batch-2026-10-06b.json` — 44 businesses, sent 2026-10-06.
-- `batch-2026-10-13.json` — 9 Calgary caterers, a test run; held until Tuesday 2026-10-13 (`notBefore`) so nothing goes out on Thanksgiving Monday.
+- `batch-2026-10-13.json` — 9 Calgary caterers, a test run; sent early on Aldo's request (Saturday 2026-10-10 evening) with the manual "send now" option.
 - `batch-2026-10-07.json` — 50 businesses (glass, closets, flooring, millwork, welding, print, signs, furniture, framing, wraps, landscaping, cakes, catering, auto repair, tailoring).

@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: "11,26,41,56 14-23 * * 1-5"
   workflow_dispatch:
+    inputs:
+      send_now:
+        description: Send now, even outside the weekday send window
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,6 +32,7 @@ jobs:
       - name: Send the next queued email
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          OUTREACH_SEND_NOW: ${{ inputs.send_now }}
         run: node scripts/send-outreach.mjs
       - name: Record what was sent
         if: always()

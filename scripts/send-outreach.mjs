@@ -17,6 +17,8 @@ const DAILY_CAP = 50;
 const WINDOW = { start: 9 * 60, end: 16 * 60 + 30, days: [1, 2, 3, 4, 5] }; // Calgary time
 const SENDER = { name: "Aldo Ortiz", email: "aldo@arctoslaunchpad.com" };
 const dryRun = process.argv.includes("--dry-run");
+// A manual run can send outside the window when Aldo asks for it now.
+const sendNow = process.env.OUTREACH_SEND_NOW === "true";
 
 const calgary = (d) => {
   const parts = Object.fromEntries(
@@ -49,7 +51,7 @@ const queue = readdirSync(DIR).filter((f) => /^batch-.*\.json$/.test(f)).sort()
 
 const inWindow = WINDOW.days.includes(local.day) && local.minutes >= WINDOW.start && local.minutes < WINDOW.end;
 console.log(`${queue.length} queued, ${sentToday}/${DAILY_CAP} sent today, ${inWindow ? "inside" : "outside"} the send window.`);
-if (!inWindow && !dryRun) process.exit(0);
+if (!inWindow && !dryRun && !sendNow) process.exit(0);
 
 const budget = Math.max(0, Math.min(PER_RUN, DAILY_CAP - sentToday));
 const batch = queue.slice(0, dryRun ? queue.length : budget);
