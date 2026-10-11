@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { askConfigured, askHq } from "@/lib/hq/ask";
+import { AGENT_COLLECTION, cleanTask, startedMessage, type AgentJobKind } from "@/lib/hq/agentJobs";
 import { createDoc, deleteDoc, readFields, readStringField } from "@/lib/hq/google";
 import { answerButton, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
 import { HELP, briefing, chunks, decodeButton, encodeUndo, escapeHtml, inboxCards, telegramUsers } from "@/lib/hq/telegramBot";
@@ -44,9 +45,20 @@ async function sendAnswer(chatId: number, html: string) {
   }
 }
 
-async function onMessage(chatId: number, text: string) {
+/** Saves a job for the HQ agent; the ops clock starts it within a minute. */
+const jobStarter = (chatId: number, email: string) => (kind: AgentJobKind, task: string) =>
+  createDoc(AGENT_COLLECTION, { kind, task, by: email, chatId, at: Date.now(), status: "pending" });
+
+async function onMessage(chatId: number, text: string, email: string) {
   const command = text.trim().split(/[\s@]/)[0].toLowerCase();
   if (command === "/start" || command === "/help") return sendText(chatId, HELP);
+  if (command === "/agent" || command === "/mail") {
+    const kind: AgentJobKind = command === "/mail" ? "mail" : "code";
+    const task = cleanTask(text.trim().replace(/^\/\w+(@\w+)?/, ""));
+    if (!task) return sendText(chatId, kind === "mail" ? "Ask about your email, like <i>/mail did the Stampede sponsor ever reply?</i>" : "Tell the agent what to change, like <i>/agent make the Money tab show this month first</i>.");
+    await jobStarter(chatId, email)(kind, task);
+    return sendText(chatId, startedMessage(kind, task));
+  }
   await sendTyping(chatId);
   const { snapshot, gmail } = await report();
   const now = Date.now();
@@ -59,7 +71,7 @@ async function onMessage(chatId: number, text: string) {
     return;
   }
   if (!askConfigured()) return sendText(chatId, `${HELP}\n\n(Questions need ANTHROPIC_API_KEY on Vercel.)`);
-  return sendAnswer(chatId, await askHq(text.slice(0, 2000), snapshot, gmail, now));
+  return sendAnswer(chatId, await askHq(text.slice(0, 2000), snapshot, gmail, now, jobStarter(chatId, email)));
 }
 
 async function onButton(q: NonNullable<Update["callback_query"]>, email: string) {
@@ -105,7 +117,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
     if (update?.callback_query) await onButton(update.callback_query, email);
-    else if (update?.message?.text) await onMessage(chatId, update.message.text);
+    else if (update?.message?.text) await onMessage(chatId, update.message.text, email);
   } catch (e) {
     console.error("hq/telegram: handling the update failed", e);
     await sendText(chatId!, `Something went wrong: ${escapeHtml(e instanceof Error ? e.message : String(e))}`).catch((e2) =>

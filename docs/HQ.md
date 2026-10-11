@@ -155,8 +155,8 @@ A private Telegram bot answers from the same report. `/today` is the
 briefing, `/inbox` sends each post, pitch and drafted reply as a card with the
 dashboard's buttons (they queue the same `hq_commands`, signed with your email,
 with an Undo until the agents run), and any other text is a question Claude
-answers from the report and the Gmail summary. It can read but not act:
-nothing is approved except by a button. The webhook is
+answers from the report and the Gmail summary. Nothing is approved except by
+a button; bigger jobs go to the HQ agent (below). The webhook is
 `app/api/hq/telegram/route.ts`; the messages are `lib/hq/telegramBot.ts`.
 
 Setup, once:
@@ -170,3 +170,29 @@ Setup, once:
 4. Message the bot. It replies with your Telegram id; add
    `HQ_TELEGRAM_USERS` = `thatId=you@gmail.com` on Vercel (comma-separate more
    people) and redeploy. Everyone else only ever sees "This bot is private".
+
+### The HQ agent (`/agent`, `/mail`)
+
+Work too big for a text answer goes to the HQ agent: Claude Code on a GitHub
+runner. Text `/agent <change>` or `/mail <question>`, or just ask and the bot
+hands it over itself. The job is saved in `hq_agent_jobs` (arctos-hq), the ops
+clock starts `.github/workflows/hq-agent.yml` for it within a minute, and the
+result comes back as a Telegram message (`app/api/hq/agent/notify`, which
+trusts the run's GitHub OIDC token, so there is no key to set up).
+
+A job is one of two kinds, and never both:
+
+- **code** edits a checkout of main. It has no email access and can't push;
+  the workflow pushes its change to main only after the type check, lint, ops
+  tests and build pass (Vercel then deploys it). Otherwise the change waits on
+  an `hq-agent/<job>` branch and the message links it.
+- **mail** reads the aldo@calgarywatch.ca Outlook mailbox through Microsoft
+  Graph (the ops `MS_*` secrets) and HQ's Gmail summary (`hq/gmail`) with
+  `ops/agent-mail.ts`. It can't edit files, run anything else, send or push.
+
+Keeping them apart means nothing an email says can turn into code on main.
+The repository and its Actions logs are public, so only the job id is a
+workflow input and Claude's output never prints there. The briefs are
+`ops/agent/code-brief.md` and `ops/agent/mail-brief.md`; the queue is
+`lib/hq/agentJobs.ts` and `ops/agent-jobs.ts`. It only changes this
+repository; CalgaryWatch code needs its own setup.

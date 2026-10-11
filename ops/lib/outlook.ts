@@ -77,3 +77,38 @@ export async function inboxSince(since: number): Promise<InboundMessage[]> {
   }
   return out;
 }
+
+export interface MailListing { id: string; folder: string; from: string; to: string; subject: string; preview: string; at: number; read: boolean }
+
+const listing = (m: any): MailListing => ({
+  id: m.id, folder: m.parentFolderId ?? '', from: `${m.from?.emailAddress?.name ?? ''} <${m.from?.emailAddress?.address ?? ''}>`.trim(),
+  to: (m.toRecipients ?? []).map((r: any) => r.emailAddress?.address).filter(Boolean).join(', '),
+  subject: m.subject ?? '', preview: m.bodyPreview ?? '', at: Date.parse(m.receivedDateTime ?? m.sentDateTime), read: Boolean(m.isRead),
+});
+const LIST_FIELDS = 'id,parentFolderId,from,toRecipients,subject,bodyPreview,receivedDateTime,sentDateTime,isRead';
+
+/**
+ * Messages in the whole mailbox matching a search (Outlook's own search:
+ * words, from:, subject:…), or the newest ones when `query` is empty. For the
+ * HQ agent (ops/agent-mail.ts); read-only.
+ */
+export async function searchMail(query: string, top = 25): Promise<MailListing[]> {
+  const n = Math.min(Math.max(top, 1), 50);
+  const path = query.trim()
+    ? `/users/${mailbox()}/messages?$search=${encodeURIComponent(`"${query.replace(/"/g, '')}"`)}&$top=${n}&$select=${LIST_FIELDS}`
+    : `/users/${mailbox()}/messages?$orderby=receivedDateTime desc&$top=${n}&$select=${LIST_FIELDS}`;
+  const page = await call(path);
+  return (page.value ?? []).map(listing).sort((a: MailListing, b: MailListing) => b.at - a.at);
+}
+
+/** One message in full, as plain text. */
+export async function readMail(id: string): Promise<MailListing & { cc: string; text: string; conversationId: string }> {
+  const m = await call(`/users/${mailbox()}/messages/${encodeURIComponent(id)}?$select=${LIST_FIELDS},ccRecipients,body,conversationId`, {
+    headers: { Prefer: 'outlook.body-content-type="text"' },
+  });
+  return {
+    ...listing(m), conversationId: m.conversationId,
+    cc: (m.ccRecipients ?? []).map((r: any) => r.emailAddress?.address).filter(Boolean).join(', '),
+    text: String(m.body?.content ?? '').slice(0, 50_000),
+  };
+}
