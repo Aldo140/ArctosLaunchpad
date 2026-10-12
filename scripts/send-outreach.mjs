@@ -3,6 +3,8 @@
 // .github/workflows/outreach.yml every 30 minutes; each run sends at most
 // PER_RUN emails inside the weekday send window, up to DAILY_CAP a day.
 // Sent addresses are recorded in outreach/sent.json so nothing is sent twice.
+// A run with emails to send texts Aldo through the HQ bot when it starts and
+// when it ends (/api/hq/alerts/outreach, signed in with the run's GitHub OIDC token).
 //
 //   BREVO_API_KEY=... node scripts/send-outreach.mjs          # send
 //   node scripts/send-outreach.mjs --dry-run                  # show what would send
@@ -30,6 +32,28 @@ const calgary = (d) => {
   const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
   return { date: `${parts.year}-${parts.month}-${parts.day}`, minutes: Number(parts.hour) * 60 + Number(parts.minute), day };
 };
+
+const REPORT_URL = "https://arctoslaunchpad.com/api/hq/alerts/outreach";
+
+/** Tells HQ how the run is going. Never fails the run; does nothing outside GitHub Actions. */
+async function report(body) {
+  const { ACTIONS_ID_TOKEN_REQUEST_URL: url, ACTIONS_ID_TOKEN_REQUEST_TOKEN: bearer, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
+  if (!url || !bearer) return;
+  try {
+    const oidc = await fetch(`${url}&audience=arctos-hq-outreach`, { headers: { Authorization: `Bearer ${bearer}` } }).then((r) => r.json());
+    const runUrl = GITHUB_RUN_ID ? `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}` : undefined;
+    const r = await fetch(REPORT_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${oidc.value}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ ...body, runUrl }),
+    });
+    if (!r.ok) console.log(`::warning::Couldn't text Aldo (HTTP ${r.status}).`);
+    // The workflow's crash text skips a run that already said how it ended.
+    if (body.event === "done" && process.env.RUNNER_TEMP) writeFileSync(join(process.env.RUNNER_TEMP, "outreach-reported"), "");
+  } catch (e) {
+    console.log(`::warning::Couldn't text Aldo: ${e instanceof Error ? e.message : e}`);
+  }
+}
 
 const norm = (email) => String(email).trim().toLowerCase();
 const now = new Date();
@@ -66,6 +90,10 @@ if (!process.env.BREVO_API_KEY) {
   process.exit(0);
 }
 
+await report({ event: "start", planned: batch.length });
+
+const sentNow = [];
+let failed = null;
 for (const m of batch) {
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
@@ -78,10 +106,13 @@ for (const m of batch) {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
     console.error(`send failed for ${m.email}: ${res.status} ${body.message ?? ""}`);
+    failed = { business: m.business, error: `${res.status} ${body.message ?? ""}`.trim() };
     process.exitCode = 1;
     break;
   }
   sent.push({ email: m.email, business: m.business, subject: m.subject, at: now.toISOString(), messageId: body.messageId ?? null });
+  sentNow.push(m.business);
   console.log(`sent: ${m.business} (${m.email})`);
 }
 writeFileSync(SENT_FILE, `${JSON.stringify(sent, null, 2)}\n`);
+await report({ event: "done", sent: sentNow, failed, sentToday: sentToday + sentNow.length, cap: DAILY_CAP, left: queue.length - sentNow.length });

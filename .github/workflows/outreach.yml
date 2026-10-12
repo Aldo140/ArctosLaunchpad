@@ -16,6 +16,8 @@ on:
 
 permissions:
   contents: write
+  # Keyless sign-in to HQ, to text Aldo when a run starts sending and how it ended.
+  id-token: write
 
 concurrency:
   group: outreach
@@ -34,6 +36,15 @@ jobs:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           OUTREACH_SEND_NOW: ${{ inputs.send_now }}
         run: node scripts/send-outreach.mjs
+      # The script reports its own start and end; this covers it dying before it could.
+      - name: Text Aldo if the run crashed
+        if: failure()
+        run: |
+          [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] && [ ! -e "$RUNNER_TEMP/outreach-reported" ] || exit 0
+          oidc=$(curl -sf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=arctos-hq-outreach" | jq -r .value) || exit 0
+          curl -sf -X POST https://arctoslaunchpad.com/api/hq/alerts/outreach \
+            -H "Authorization: Bearer $oidc" -H 'Content-Type: application/json' \
+            -d "{\"event\":\"crashed\",\"runUrl\":\"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" > /dev/null || echo "::warning::Couldn't text Aldo."
       - name: Record what was sent
         if: always()
         run: |
