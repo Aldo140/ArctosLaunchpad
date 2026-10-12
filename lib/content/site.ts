@@ -78,6 +78,15 @@ export const calgaryLandingPages = [
       "Conversion-focused website strategy, design, development, and integration from a Calgary-based studio.",
   },
   {
+    slug: "calgary-contractor-websites",
+    route: "/calgary-contractor-websites" as const,
+    title: "Calgary Contractor Websites",
+    headline: "A website that brings you real quote requests.",
+    serviceSlug: "web-design-development",
+    summary:
+      "Websites and quote forms for Calgary contractors, renovators, millwork, fabrication and sign shops.",
+  },
+  {
     slug: "calgary-business-automation",
     route: "/calgary-business-automation" as const,
     title: "Calgary Business Automation",

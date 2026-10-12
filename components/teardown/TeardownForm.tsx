@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import { metaTrack } from "@/components/site/MetaPixel";
+import { googleAdsLead } from "@/components/site/GoogleAdsTag";
 
 type FieldName = "name" | "email" | "challenge" | "company" | "sample";
 type FieldErrors = Partial<Record<FieldName | "form", string>>;
@@ -165,6 +166,7 @@ export function TeardownForm() {
       }
 
       metaTrack("Lead", { content_name: PROJECT_TYPE });
+      googleAdsLead();
       form.reset();
       setReady({ name: false, email: false, challenge: false });
       setStatus("success");
