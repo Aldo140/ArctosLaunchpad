@@ -191,6 +191,7 @@ export const HELLO = [
   "• someone fills in the Arctos contact form",
   "• an email reply actually needs you (not newsletters or auto-replies)",
   "• a lead answers one of your pitches",
+  "• Arctos outreach starts sending, and how it went",
   "• a post fails or something stops working",
   "• a meeting starts in under 45 minutes",
   "• money owed to you is due",
@@ -216,4 +217,34 @@ export function leadAlert(
     ...(s.source ? [`Came from: ${escapeHtml(clip(s.source, 120))}`] : []),
     receiptSent ? "They got an automatic receipt. Fast replies win: aim for today." : "Fast replies win: aim for today.",
   ].join("\n");
+}
+
+/** What outreach.yml reports about an Arctos outreach run (app/api/hq/alerts/outreach). */
+export interface OutreachRun {
+  event: "start" | "done" | "crashed";
+  /** start: how many it's about to send. */
+  planned?: number;
+  /** done: the businesses it emailed. */
+  sent?: string[];
+  /** done: the send Brevo refused, which stops the run. */
+  failed?: { business: string; error: string } | null;
+  sentToday?: number;
+  cap?: number;
+  /** Still queued after this run. */
+  left?: number;
+  runUrl?: string;
+}
+
+/** The text for an outreach run starting or ending. Runs with nothing to send report nothing. */
+export function outreachAlert(r: OutreachRun): string {
+  const link = r.runUrl ? `\n<a href="${escapeHtml(r.runUrl)}">See the run</a>` : "";
+  if (r.event === "start") return `📤 Arctos outreach is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from aldo@arctoslaunchpad.com.`;
+  if (r.event === "crashed") return `❌ <b>Arctos outreach failed</b> before it could finish. Nothing more will send until the next run.${link}`;
+  const sent = r.sent ?? [];
+  const names = sent.slice(0, 10).map((b) => `• ${escapeHtml(clip(b, 80))}`).join("\n");
+  const counts = [r.sentToday !== undefined && r.cap ? `${r.sentToday}/${r.cap} today` : "", r.left !== undefined ? `${r.left} still queued` : ""].filter(Boolean).join(", ");
+  if (r.failed) {
+    return `⚠️ <b>Arctos outreach stopped</b> after ${sent.length} email${sent.length === 1 ? "" : "s"}. Brevo refused ${escapeHtml(clip(r.failed.business, 80))}: ${escapeHtml(clip(r.failed.error, 200))}${names ? `\n\nSent:\n${names}` : ""}${counts ? `\n\n${counts}` : ""}${link}`;
+  }
+  return `✅ <b>Arctos outreach done</b>: ${sent.length} email${sent.length === 1 ? "" : "s"} sent.\n${names}${sent.length > 10 ? `\n…and ${sent.length - 10} more` : ""}${counts ? `\n\n${counts}` : ""}`;
 }
