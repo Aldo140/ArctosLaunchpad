@@ -894,5 +894,75 @@
     "subject": "Private event bookings at Taiko",
     "at": "2026-10-11T02:24:45.121Z",
     "messageId": "<202610110224.68419165441@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@casaflores.ca",
+    "business": "Casa Flores Custom Cabinetry",
+    "subject": "Casa Flores quotes and job tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.64961219946@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jeff.loeb@valleymetal.com",
+    "business": "Valley Metal Ltd.",
+    "subject": "Valley Metal custom job tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.54370103374@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@swiftsignscalgary.ca",
+    "business": "Swift Signs Alberta Ltd.",
+    "subject": "Swift Signs quotes and installs",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.68740435011@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@turnersigns.com",
+    "business": "Turner Signs",
+    "subject": "Turner Signs custom order tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.21451110710@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@graniteguys.ca",
+    "business": "The Granite Guys",
+    "subject": "Granite Guys templating and install tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.66000472253@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@dauterstone.com",
+    "business": "Dauter Stone",
+    "subject": "Dauter Stone quotes and orders",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.77464364270@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@pacificstone.ca",
+    "business": "Pacific Stone Fabrication",
+    "subject": "Pacific Stone countertop job tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.51645192073@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@hgbstone.ca",
+    "business": "HGB Stone",
+    "subject": "HGB Stone quotes and install scheduling",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.92331857639@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@stoneselection.ca",
+    "business": "Stone Selection Ltd.",
+    "subject": "Stone Selection slab and order tracking",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.37625665613@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@royalrailing.ca",
+    "business": "Royal Railing Ltd",
+    "subject": "Royal Railing quotes and installs",
+    "at": "2026-10-12T16:31:32.002Z",
+    "messageId": "<202610121631.78618353488@smtp-relay.mailin.fr>"
   }
 ]
