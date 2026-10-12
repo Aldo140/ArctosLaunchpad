@@ -345,6 +345,9 @@ export interface TriageDecision {
   at: number;
 }
 
+/** Everything HQ knows, minus who is looking: what the dashboard and the Telegram bot both read. */
+export type HqData = Omit<HqResponse, "viewer">;
+
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;

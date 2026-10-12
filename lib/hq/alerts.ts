@@ -1,4 +1,5 @@
-import { escapeHtml } from "./telegramBot";
+import { GYM_GOAL, gymStats } from "../../components/hq/persona";
+import { encodePaid, encodeTriage, escapeHtml, type Button } from "./telegramBot";
 import type { CalendarSummary, GmailSummary, GmailTriage, HqSnapshot, LifeEntry, TriageDecision } from "./types";
 
 /**
@@ -20,9 +21,6 @@ const HOUR = 60 * MIN;
 const DAY = 24 * HOUR;
 const TZ = "America/Edmonton";
 
-/** Same as GYM_GOAL in components/hq/persona.ts. */
-const GYM_GOAL = 3;
-const GYM_WORDS = /\b(gym|workout|work out|lift|lifting|leg day|push day|pull day|anytime fitness)\b/i;
 /** Health checks whose failure stops real work. "late" and "you" are on the dashboard already; failed posts get their own text. */
 const BREAKS = new Set(["inbox", "workflows", "inventory", "scout", "claude", "outlook"]);
 /** At most this many texts per check; the rest are summed up in one line. */
@@ -33,7 +31,11 @@ const KEEP = 14 * DAY;
 export interface Alert {
   key: string;
   text: string;
+  /** Act on it from the text itself: the same actions as the dashboard. */
+  buttons?: Button[];
 }
+
+const tap = (text: string, data: string | null): Button[] => (data ? [{ text, data }] : []);
 
 export interface AlertInput {
   now: number;
@@ -78,7 +80,8 @@ export function alertsFor(input: AlertInput): Alert[] {
     const what = t.subtask?.title ? `: ${escapeHtml(clip(t.subtask.title, 120))}` : "";
     out.push({
       key: `mail:${t.key}`,
-      text: `📬 <b>${escapeHtml(clip(t.from, 80))}</b> needs you${what}\n${escapeHtml(clip(t.reason, 300))}${t.subtask?.draftReply ? "\n\nThere's a draft reply on the board." : ""}\n\n<a href="${escapeHtml(t.url)}">Open in Gmail</a>`,
+      text: `📬 <b>${escapeHtml(clip(t.from, 80))}</b> needs you${what}\n${escapeHtml(clip(t.reason, 300))}${t.subtask?.draftReply ? `\n\n<b>Draft reply</b>\n${escapeHtml(clip(t.subtask.draftReply, 600))}` : ""}`,
+      buttons: [...tap("✅ Add to my list", encodeTriage("approved", t.key)), ...tap("👋 Not needed", encodeTriage("dismissed", t.key)), { text: "Open in Gmail", url: t.url }],
     });
   }
 
@@ -87,7 +90,8 @@ export function alertsFor(input: AlertInput): Alert[] {
     if (r.approved || r.at < now - 2 * DAY) continue;
     out.push({
       key: `pitch-reply:${r.leadId}:${r.at}`,
-      text: `💬 <b>${escapeHtml(r.businessName)}</b> replied to your ${escapeHtml(BUSINESS[r.business] ?? r.business)} pitch (${escapeHtml(r.classification)})\n“${escapeHtml(clip(r.text, 300))}”\n\nAn answer is drafted. /inbox to send it.`,
+      text: `💬 <b>${escapeHtml(r.businessName)}</b> replied to your ${escapeHtml(BUSINESS[r.business] ?? r.business)} pitch (${escapeHtml(r.classification)})\n“${escapeHtml(clip(r.text, 300))}”\n\nAn answer is drafted.`,
+      buttons: [{ text: "📥 See the draft", data: "i" }],
     });
   }
 
@@ -96,7 +100,8 @@ export function alertsFor(input: AlertInput): Alert[] {
     if (p.status !== "failed" || p.updatedAt < now - DAY) continue;
     out.push({
       key: `post-failed:${p.id}`,
-      text: `🔴 A ${escapeHtml(BUSINESS[p.brand] ?? p.brand)} post didn't publish: ${escapeHtml(clip(p.headline, 100))}\n${escapeHtml(clip(p.error ?? p.warnings[0] ?? "Instagram refused it.", 200))}\n\n/inbox to retry or drop it.`,
+      text: `🔴 A ${escapeHtml(BUSINESS[p.brand] ?? p.brand)} post didn't publish: ${escapeHtml(clip(p.headline, 100))}\n${escapeHtml(clip(p.error ?? p.warnings[0] ?? "Instagram refused it.", 200))}`,
+      buttons: [{ text: "📥 Retry or drop it", data: "i" }],
     });
   }
 
@@ -125,46 +130,27 @@ export function alertsFor(input: AlertInput): Alert[] {
     if (due.length) {
       const lines = due.slice(0, 6).map((e) => `• ${escapeHtml(clip(e.text ?? "Someone", 80))}: ${money(e.amount ?? 0)}${dayKey(e.due!) < today ? ` (late since ${new Date(e.due!).toLocaleDateString("en-CA", { timeZone: TZ, month: "short", day: "numeric" })})` : " (due today)"}`);
       const total = due.reduce((s, e) => s + (e.amount ?? 0), 0);
-      out.push({ key: `owed:${today}`, text: `💵 <b>${money(total)} owed to you is due</b>\n${lines.join("\n")}${due.length > 6 ? `\n…and ${due.length - 6} more` : ""}\n\nGo collect.` });
+      out.push({
+        key: `owed:${today}`,
+        text: `💵 <b>${money(total)} owed to you is due</b>\n${lines.join("\n")}${due.length > 6 ? `\n…and ${due.length - 6} more` : ""}\n\nGo collect. Tap when it lands.`,
+        buttons: due.slice(0, 4).flatMap((e) => tap(`💵 ${clip(e.text ?? "Paid", 20)} paid`, encodePaid(e.id))),
+      });
     }
   }
 
   // The gym, at 5 pm, only when the week's goal is slipping.
   if (hour >= 17 && hour < 21) {
-    const gym = gymWeek(input);
+    const gym = gymStats(input, now);
     const daysLeft = 7 - gym.sinceMonday; // today included
     const need = GYM_GOAL - gym.week;
     if (!gym.wentToday && need > 0 && (need >= daysLeft || (gym.daysSince ?? 99) >= 3)) {
       const since = gym.daysSince === null ? "" : ` Last time was ${gym.daysSince === 1 ? "yesterday" : `${gym.daysSince} days ago`}.`;
       const push = need >= daysLeft ? `${need} more to hit ${GYM_GOAL} and ${daysLeft === 1 ? "today is the last day" : `only ${daysLeft} days left`}.` : `${gym.week}/${GYM_GOAL} this week.`;
-      out.push({ key: `gym:${today}`, text: `🏋️ Gym check: ${push}${since} Anytime Fitness is open. Log it in HQ when you're done.` });
+      out.push({ key: `gym:${today}`, text: `🏋️ Gym check: ${push}${since} Anytime Fitness is open. Tap when you're done.`, buttons: [{ text: "🏋️ I went", data: "g" }] });
     }
   }
 
   return out;
-}
-
-/** Gym visits this week (Monday first), from the HQ log and workout-looking calendar events that already ended. */
-export function gymWeek({ now, life, calendar }: Pick<AlertInput, "now" | "life" | "calendar">) {
-  const times = [
-    ...life.filter((e) => e.kind === "gym").map((e) => e.at),
-    ...(calendar?.events ?? []).filter((e) => !e.allDay && e.end <= now && GYM_WORDS.test(e.title)).map((e) => e.start),
-  ].sort((a, b) => b - a);
-  const days = new Set(times.map(dayKey));
-  const sinceMonday = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(new Date(now).toLocaleDateString("en-CA", { timeZone: TZ, weekday: "short" }));
-  const week = new Set<string>();
-  for (let d = 0; d <= sinceMonday; d++) {
-    const k = dayKey(now - d * DAY);
-    if (days.has(k)) week.add(k);
-  }
-  const today = dayKey(now);
-  const last = times[0] ?? null;
-  return {
-    week: week.size,
-    sinceMonday,
-    wentToday: days.has(today),
-    daysSince: last === null ? null : Math.round((Date.parse(`${today}T12:00:00Z`) - Date.parse(`${dayKey(last)}T12:00:00Z`)) / DAY),
-  };
 }
 
 /**
