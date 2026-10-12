@@ -74,6 +74,33 @@ export async function writeStringField(path: string, field: string, value: strin
   if (!r.ok) throw new Error(`Writing ${path}: HTTP ${r.status}`);
 }
 
+/** A string field and the document's update time, for writeStringFieldIf. */
+export async function readStringFieldVersioned(path: string, field: string): Promise<{ value: string | null; updateTime: string | null }> {
+  const r = await fetch(`${FIRESTORE()}/${path}`, { headers: { Authorization: `Bearer ${await googleAccessToken()}` }, cache: "no-store" });
+  if (r.status === 404) return { value: null, updateTime: null };
+  if (!r.ok) throw new Error(`Reading ${path}: HTTP ${r.status}`);
+  const doc = (await r.json()) as { updateTime?: string; fields?: Record<string, { stringValue?: string }> };
+  return { value: doc.fields?.[field]?.stringValue ?? null, updateTime: doc.updateTime ?? null };
+}
+
+/**
+ * Writes only if nobody wrote the document since `updateTime` was read (null:
+ * only if it doesn't exist yet). False when someone did, so two runs at once
+ * can't both act on the same read.
+ */
+export async function writeStringFieldIf(path: string, field: string, value: string, updateTime: string | null): Promise<boolean> {
+  const precondition = updateTime ? `currentDocument.updateTime=${encodeURIComponent(updateTime)}` : "currentDocument.exists=false";
+  const r = await fetch(`${FIRESTORE()}/${path}?updateMask.fieldPaths=${field}&${precondition}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${await googleAccessToken()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: { [field]: { stringValue: value } } }),
+  });
+  if (r.ok) return true;
+  const text = await r.text();
+  if (/FAILED_PRECONDITION|ALREADY_EXISTS|NOT_FOUND/.test(text)) return false;
+  throw new Error(`Writing ${path}: HTTP ${r.status}`);
+}
+
 type Value = { stringValue?: string; integerValue?: string; nullValue?: null };
 
 /** Creates a document with a generated id; returns the id. */

@@ -23,8 +23,8 @@ async function call<T = unknown>(method: string, body: Record<string, unknown>):
 const keyboard = (buttons: Card["buttons"]): Markup | undefined =>
   buttons.length ? { inline_keyboard: [buttons.map((b) => ({ text: b.text, callback_data: b.data }))] } : undefined;
 
-export const sendText = (chatId: number, text: string, buttons: Card["buttons"] = []) =>
-  call("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", link_preview_options: { is_disabled: true }, reply_markup: keyboard(buttons) });
+export const sendText = (chatId: number, text: string, buttons: Card["buttons"] = [], silent = false) =>
+  call("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", link_preview_options: { is_disabled: true }, reply_markup: keyboard(buttons), disable_notification: silent });
 
 /** A card with its image when it has one (captions stop at 1024 characters, so long ones go as text). */
 export async function sendCard(chatId: number, c: Card): Promise<void> {

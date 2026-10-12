@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { writeStringField } from "@/lib/hq/google";
+import { runAlertsSafely } from "@/lib/hq/alertsRun";
 import { runTriage, triageConfigured } from "@/lib/hq/triageAgent";
 import { vercelTriageStore } from "@/lib/hq/triageStore";
 import type { GmailSummary } from "@/lib/hq/types";
@@ -12,7 +13,8 @@ import type { GmailSummary } from "@/lib/hq/types";
  * by /api/hq/snapshot; nothing here is public. When ANTHROPIC_API_KEY is set
  * here, the reply check (lib/hq/triageAgent.ts) then looks at any reply that
  * is new or whose surroundings changed; without it, the ops agents' hourly
- * run does (ops/reply-check.ts).
+ * run does (ops/reply-check.ts). Then the bot texts Aldo anything new that
+ * needs him (lib/hq/alertsRun.ts).
  */
 
 // The reply check runs after the response, inside this function's time.
@@ -73,6 +75,9 @@ export async function POST(request: Request) {
   };
   await writeStringField("hq/gmail", "payload", JSON.stringify(summary));
   // With a key on Vercel the check runs right away; otherwise the ops agents' hourly run does it.
-  if (triageConfigured()) after(() => runTriage(summary, vercelTriageStore).catch((e) => console.error(`[reply-check] ${e instanceof Error ? e.message : e}`)));
+  after(async () => {
+    if (triageConfigured()) await runTriage(summary, vercelTriageStore).catch((e) => console.error(`[reply-check] ${e instanceof Error ? e.message : e}`));
+    await runAlertsSafely();
+  });
   return NextResponse.json({ ok: true, sends: summary.sends.length, replies: summary.replies.length });
 }
