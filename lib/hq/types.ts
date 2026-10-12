@@ -140,6 +140,15 @@ export interface InspirationAnalysis {
   ideas: Array<{ title: string; format: string; hook: string; why: string }>;
 }
 
+/** The posting agent's week (Calgary-Watch- scripts/ops/jobs/coordinator.ts). */
+export interface ContentPlan {
+  at: number;
+  direction: string;
+  plan: Array<{ date: string; slot: string; pillar: string; format: string; idea: string; hook: string; asset: string; listing: string }>;
+  shootList: Array<{ what: string; where: string; when: string; why: string }>;
+  outreach: Array<{ handle: string; postUrl: string; why: string; dm: string }>;
+}
+
 export interface HistoryGroup { key: string; label: string; posts: number; medianViews: number; medianEngagement: number; best: number }
 
 export interface Bottleneck { id: string; label: string; value: string; severity: Severity; detail: string }
@@ -164,7 +173,7 @@ export interface HqSnapshot {
   activity?: ActivityItem[];
   pipelines: Pipeline[];
   pipelineDetail?: { calgarywatch: PipelineDetail | null };
-  instagram?: { accounts: OwnAccount[]; inspiration: Outperformer[]; analysis: InspirationAnalysis | null; updatedAt: number | null };
+  instagram?: { accounts: OwnAccount[]; inspiration: Outperformer[]; analysis: InspirationAnalysis | null; updatedAt: number | null; coordinator?: ContentPlan | null };
   pipelinesAt: number;
   bottlenecks: Bottleneck[];
 }

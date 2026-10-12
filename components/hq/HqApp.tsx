@@ -30,7 +30,7 @@ const VIEWS: Record<ViewId, { label: string; icon: string; keys: string; render:
   decide: { label: "Decide", icon: "inbox", keys: "g i", render: (sub) => <InboxView focus={sub ?? undefined} /> },
   money: { label: "Money", icon: "money", keys: "g m", render: () => <MoneyView /> },
   life: { label: "Life", icon: "gym", keys: "g l", render: () => <LifeView /> },
-  growth: { label: "Growth", icon: "instagram", keys: "g s", render: (sub) => <GrowthView tab={(sub as GrowthTab) ?? "instagram"} /> },
+  growth: { label: "Growth", icon: "instagram", keys: "g s", render: (sub) => <GrowthView tab={(sub as GrowthTab) ?? "week"} /> },
   pipelines: { label: "Pipelines", icon: "pipelines", keys: "g p", render: () => <PipelinesView /> },
   system: { label: "System", icon: "health", keys: "g h", render: (sub) => <SystemView tab={(sub as SystemTab) ?? "tasks"} /> },
 };
@@ -40,6 +40,7 @@ const ALIASES: Record<string, Route> = {
   overview: { view: "today", sub: null },
   inbox: { view: "decide", sub: null },
   instagram: { view: "growth", sub: "instagram" },
+  week: { view: "growth", sub: "week" },
   inspiration: { view: "growth", sub: "inspiration" },
   performance: { view: "growth", sub: "performance" },
   tasks: { view: "system", sub: "tasks" },
