@@ -230,7 +230,7 @@ export function leadAlert(
 
 /** What outreach.yml reports about an outreach run (app/api/hq/alerts/outreach). */
 export interface OutreachRun {
-  event: "start" | "done" | "crashed";
+  event: "start" | "done" | "crashed" | "prospects";
   /** Which campaign; reports from before Vow Motion joined carry none and are Arctos. */
   campaign?: "arctos" | "vowmotion" | "calgarywatch";
   /** start: how many it's about to send. */
@@ -241,8 +241,14 @@ export interface OutreachRun {
   failed?: { business: string; error: string } | null;
   sentToday?: number;
   cap?: number;
-  /** Still queued after this run. */
+  /** Still queued after this run (prospects: queued for the next sends, new ones included). */
   left?: number;
+  /** prospects: new businesses that passed the checks and joined the queue. */
+  found?: number;
+  /** prospects: researched but dropped by the checks (already contacted, no mail server, copy rules). */
+  dropped?: number;
+  /** prospects: the research itself didn't finish. */
+  error?: string;
   runUrl?: string;
 }
 
@@ -252,6 +258,13 @@ export function outreachAlert(r: OutreachRun): string {
   const name = r.campaign === "vowmotion" ? "Vow Motion outreach" : r.campaign === "calgarywatch" ? "CalgaryWatch outreach" : "Arctos outreach";
   const from = r.campaign === "calgarywatch" ? "aldo@calgarywatch.ca" : "aldo@arctoslaunchpad.com";
   if (r.event === "start") return `📤 ${name} is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from ${from}.`;
+  if (r.event === "prospects") {
+    const who = r.campaign === "vowmotion" ? "Vow Motion" : "Arctos";
+    const queued = r.left !== undefined ? ` ${r.left} now queued to send.` : "";
+    if (r.error) return `⚠️ <b>${who} prospect research didn't finish</b>: ${escapeHtml(clip(r.error, 200))}.${queued}${link}`;
+    const dropped = r.dropped ? ` ${r.dropped} more didn't pass the checks and were left out.` : "";
+    return `🔎 Found ${r.found ?? 0} new ${who} prospect${r.found === 1 ? "" : "s"}, each with an email written for them.${dropped}${queued}`;
+  }
   if (r.event === "crashed") return `❌ <b>Outreach failed</b> before it could finish. Nothing more will send until the next run, in about half an hour.${link}`;
   const sent = r.sent ?? [];
   const names = sent.slice(0, 10).map((b) => `• ${escapeHtml(clip(b, 80))}`).join("\n");

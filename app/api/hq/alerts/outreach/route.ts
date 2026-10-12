@@ -9,15 +9,16 @@ import { telegramUsers } from "@/lib/hq/telegramBot";
  * The outreach workflow (outreach.yml on the arctos-launchpad branch, which
  * sends for Arctos and Vow Motion) and CalgaryWatch's ops-hourly.yml in
  * Calgary-Watch- call this when a run that has emails to send starts and when it ends, and
- * the HQ bot texts Aldo. The run proves who it is with GitHub's OIDC token.
+ * the HQ bot texts Aldo. prospects.yml (same branch) reports the new businesses
+ * it found for the next sends. The run proves who it is with GitHub's OIDC token.
  */
 
 const AUDIENCE = "arctos-hq-outreach";
-const WORKFLOWS = ["Aldo140/ArctosLaunchpad/.github/workflows/outreach.yml@", "Aldo140/Calgary-Watch-/.github/workflows/ops-hourly.yml@"];
+const WORKFLOWS = ["Aldo140/ArctosLaunchpad/.github/workflows/outreach.yml@", "Aldo140/ArctosLaunchpad/.github/workflows/prospects.yml@", "Aldo140/Calgary-Watch-/.github/workflows/ops-hourly.yml@"];
 
 const text = (max: number) => z.string().transform((s) => s.slice(0, max));
 const Run = z.object({
-  event: z.enum(["start", "done", "crashed"]),
+  event: z.enum(["start", "done", "crashed", "prospects"]),
   campaign: z.enum(["arctos", "vowmotion", "calgarywatch"]).optional(),
   planned: z.number().int().min(0).max(1000).optional(),
   sent: z.array(text(120)).max(100).optional(),
@@ -25,6 +26,9 @@ const Run = z.object({
   sentToday: z.number().int().min(0).max(1000).optional(),
   cap: z.number().int().min(0).max(1000).optional(),
   left: z.number().int().min(0).max(100_000).optional(),
+  found: z.number().int().min(0).max(1000).optional(),
+  dropped: z.number().int().min(0).max(1000).optional(),
+  error: text(300).optional(),
   runUrl: z.string().url().regex(/^https:\/\/github\.com\/Aldo140\/(ArctosLaunchpad|Calgary-Watch-)\/actions\/runs\//).max(200).optional(),
 });
 
