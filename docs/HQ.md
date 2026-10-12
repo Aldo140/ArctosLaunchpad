@@ -151,13 +151,26 @@ the brief and the sign-off.
 
 ## On your phone (Telegram)
 
-A private Telegram bot answers from the same report. `/today` is the
-briefing, `/inbox` sends each post, pitch and drafted reply as a card with the
-dashboard's buttons (they queue the same `hq_commands`, signed with your email,
-with an Undo until the agents run), and any other text is a question Claude
-answers from the report and the Gmail summary. Nothing is approved except by
-a button; bigger jobs go to the HQ agent (below). The webhook is
-`app/api/hq/telegram/route.ts`; the messages are `lib/hq/telegramBot.ts`.
+A private Telegram bot reads everything the dashboard reads (`lib/hq/load.ts`)
+and counts it with the dashboard's own code (`components/hq/persona.ts` and
+`queue.ts`), so the two never disagree. `/today` is HQ's Today as a text
+(waiting count, mood, money against the goal, owed, gym, next on the calendar,
+what's due, then the queue). `/inbox` sends each open decision as a card with
+the dashboard's buttons: posts, pitches and drafted replies queue the same
+`hq_commands` (with an Undo until the agents run), and Gmail replies the reply
+check kept get "Add to my list" / "Not needed" (the same `hq_reply_decisions`).
+`/money` is the month and who owes you, with a Paid button each; `/gym` logs a
+visit.
+
+Any other text goes to Claude with the report, HQ's computed totals, Aldo's
+log and the calendar. It answers, and logs what belongs in the log ("got paid
+1200 from the Smith wedding", "Ramsay owes me 400, due Friday", "remind me to
+call the venue") through `lib/hq/lifeWrites.ts`, the same writes as the
+dashboard. The bot confirms each log with the updated total and an Undo
+button. Alerts carry buttons too (gym "I went", "paid" on money due, reply
+check calls). Nothing is approved except by a button; bigger jobs go to the HQ
+agent (below). The webhook is `app/api/hq/telegram/route.ts`; the messages are
+`lib/hq/telegramBot.ts`; the / menu is set by the webhook itself.
 
 Setup, once:
 

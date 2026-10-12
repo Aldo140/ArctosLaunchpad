@@ -2,8 +2,9 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { HELLO, MAX_PER_RUN, alertsFor, gymWeek, leadAlert, outreachAlert, planAlerts, quietHours, type AlertInput } from '../../lib/hq/alerts';
+import { HELLO, MAX_PER_RUN, alertsFor, leadAlert, outreachAlert, planAlerts, quietHours, type AlertInput } from '../../lib/hq/alerts';
 import type { HqSnapshot, ReplyTriage } from '../../lib/hq/types';
+import { gymStats } from '../../components/hq/persona';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -107,8 +108,8 @@ describe('alertsFor', () => {
 
   it('counts calendar workouts as gym days', () => {
     const calendar = { generatedAt: wed6pm, events: [{ title: 'Leg day', start: wed6pm - 3 * HOUR, end: wed6pm - 2 * HOUR, allDay: false, location: '' }] };
-    assert.equal(gymWeek({ now: wed6pm, life: [], calendar }).wentToday, true);
-    assert.equal(gymWeek({ now: wed6pm, life: [], calendar }).week, 1);
+    assert.equal(gymStats({ life: [], calendar }, wed6pm).wentToday, true);
+    assert.equal(gymStats({ life: [], calendar }, wed6pm).week, 1);
   });
 });
 

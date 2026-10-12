@@ -1,25 +1,32 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { askConfigured, askHq } from "@/lib/hq/ask";
+import { askConfigured, askHq, type AskActions, type Done } from "@/lib/hq/ask";
 import { AGENT_COLLECTION, cleanTask, startedMessage, type AgentJobKind } from "@/lib/hq/agentJobs";
-import { createDoc, deleteDoc, readFields, readStringField } from "@/lib/hq/google";
-import { answerButton, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
-import { HELP, briefing, chunks, decodeButton, encodeUndo, escapeHtml, inboxCards, telegramUsers } from "@/lib/hq/telegramBot";
-import type { GmailSummary, HqSnapshot } from "@/lib/hq/types";
+import { createDoc, deleteDoc, readFields, setDoc } from "@/lib/hq/google";
+import { addNote, addOwed, logGym, logMoney, removeLife, setNote, setOwedPaid } from "@/lib/hq/lifeWrites";
+import { loadHq } from "@/lib/hq/load";
+import { answerButton, ensureMenu, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
+import {
+  HELP, briefing, chunks, decodeButton, encodePaid, encodeRemove, encodeTodo, encodeTriage, encodeUndo, escapeHtml, inboxCards, loggedText, moneyCard, telegramUsers,
+  type Button,
+} from "@/lib/hq/telegramBot";
+import type { HqData, LifeEntry } from "@/lib/hq/types";
 
 /**
  * Telegram's webhook for the HQ bot. Telegram signs each update with the
  * secret set by scripts/hq-telegram-webhook.mjs (HQ_TELEGRAM_WEBHOOK_SECRET),
  * and only the accounts in HQ_TELEGRAM_USERS get answers. Button taps queue
- * the same hq_commands the dashboard does, signed with that account's email.
+ * the same hq_commands the dashboard does, signed with that account's email,
+ * and money, gym, to-dos and owed go to the same log (lib/hq/lifeWrites.ts).
  */
 
 export const maxDuration = 60;
 
 type From = { id: number };
+type Key = { text: string; callback_data?: string; url?: string };
 type Update = {
   message?: { message_id: number; from?: From; chat: { id: number }; text?: string };
-  callback_query?: { id: string; from: From; data?: string; message?: { message_id: number; chat: { id: number } } };
+  callback_query?: { id: string; from: From; data?: string; message?: { message_id: number; chat: { id: number }; reply_markup?: { inline_keyboard?: Key[][] } } };
 };
 
 function secretMatches(given: string | null): boolean {
@@ -30,18 +37,12 @@ function secretMatches(given: string | null): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-async function report(): Promise<{ snapshot: HqSnapshot | null; gmail: GmailSummary | null }> {
-  const [snapshot, gmail] = await Promise.all([
-    readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)),
-    readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(() => null),
-  ]);
-  return { snapshot, gmail };
-}
-
 /** Claude writes Telegram HTML; if it's malformed, send the words without the tags. */
-async function sendAnswer(chatId: number, html: string) {
-  for (const part of chunks(html)) {
-    await sendText(chatId, part).catch(() => sendText(chatId, escapeHtml(part.replace(/<[^>]+>/g, ""))));
+async function sendAnswer(chatId: number, html: string, buttons: Button[] = []) {
+  const parts = chunks(html);
+  for (const [i, part] of parts.entries()) {
+    const keys = i === parts.length - 1 ? buttons : [];
+    await sendText(chatId, part, keys).catch(() => sendText(chatId, escapeHtml(part.replace(/<[^>]+>/g, "")), keys));
   }
 }
 
@@ -49,7 +50,68 @@ async function sendAnswer(chatId: number, html: string) {
 const jobStarter = (chatId: number, email: string) => (kind: AgentJobKind, task: string) =>
   createDoc(AGENT_COLLECTION, { kind, task, by: email, chatId, at: Date.now(), status: "pending" });
 
+/** Keeps the loaded data in step with a write, so the confirmation shows the new totals. */
+function apply(data: HqData, d: Done) {
+  const life = data.life ?? (data.life = []);
+  if (d.kind === "logged") life.unshift(d.entry);
+  else if (d.kind === "paid") {
+    const owed = life.find((e) => e.id === d.owedId);
+    if (owed) owed.done = true;
+    if (d.entry) life.unshift(d.entry);
+  } else {
+    const note = life.find((e) => e.id === d.id);
+    if (note) note.done = true;
+  }
+}
+
+const UNDO_WHAT: Record<LifeEntry["kind"], string> = { gym: "gym", money: "money", owed: "owed", note: "to-do" };
+
+/** The bot's own words for what it just did, and an Undo for each. */
+function confirm(data: HqData, done: Done[], now: number): { lines: string[]; buttons: Button[] } {
+  const lines: string[] = [];
+  const buttons: Button[] = [];
+  const many = done.length > 1;
+  for (const d of done) {
+    if (d.kind === "logged") {
+      lines.push(loggedText(d.entry, data, now));
+      const data_ = encodeRemove(d.entry.id);
+      if (data_) buttons.push({ text: many ? `↩️ Undo ${UNDO_WHAT[d.entry.kind]}` : "↩️ Undo", data: data_ });
+    } else if (d.kind === "paid") {
+      const owed = data.life?.find((e) => e.id === d.owedId);
+      lines.push(d.entry ? loggedText(d.entry, data, now).replace("Logged", "Paid:") : `${escapeHtml(owed?.text ?? "That")} was already marked paid.`);
+      const data_ = d.entry ? encodePaid(d.owedId, false) : null;
+      if (data_) buttons.push({ text: many ? "↩️ Undo paid" : "↩️ Undo", data: data_ });
+    } else {
+      const note = data.life?.find((e) => e.id === d.id);
+      lines.push(`☑️ Done: ${escapeHtml(note?.text ?? "that to-do")}`);
+      const data_ = encodeTodo(d.id, false);
+      if (data_) buttons.push({ text: many ? "↩️ Undo done" : "↩️ Undo", data: data_ });
+    }
+  }
+  return { lines, buttons };
+}
+
+function actions(chatId: number, email: string): AskActions {
+  return {
+    startJob: jobStarter(chatId, email),
+    logMoney: (m) => logMoney(email, Date.now(), m),
+    addOwed: (o) => addOwed(email, Date.now(), o),
+    markPaid: async (id) => (await setOwedPaid(id, true, email, Date.now())).entry,
+    addNote: (n) => addNote(email, Date.now(), n),
+    completeNote: (id) => setNote(id, Date.now(), { done: true }),
+    logGym: (at) => logGym(email, Date.now(), at),
+  };
+}
+
+async function sendInbox(chatId: number, data: HqData, now: number) {
+  const cards = inboxCards(data, now);
+  if (!cards.length) return sendText(chatId, "Nothing to decide. Go find money.");
+  for (const c of cards.slice(0, 15)) await sendCard(chatId, c);
+  if (cards.length > 15) await sendText(chatId, `…and ${cards.length - 15} more on the dashboard.`);
+}
+
 async function onMessage(chatId: number, text: string, email: string) {
+  ensureMenu();
   const command = text.trim().split(/[\s@]/)[0].toLowerCase();
   if (command === "/start" || command === "/help") return sendText(chatId, HELP);
   if (command === "/agent" || command === "/mail") {
@@ -60,39 +122,108 @@ async function onMessage(chatId: number, text: string, email: string) {
     return sendText(chatId, startedMessage(kind, task));
   }
   await sendTyping(chatId);
-  const { snapshot, gmail } = await report();
   const now = Date.now();
-  if (command === "/today") return sendText(chatId, briefing(snapshot, gmail, now));
-  if (command === "/inbox") {
-    const cards = inboxCards(snapshot, gmail, now);
-    if (!cards.length) return sendText(chatId, "Inbox zero. Nothing to approve.");
-    for (const c of cards.slice(0, 15)) await sendCard(chatId, c);
-    if (cards.length > 15) await sendText(chatId, `…and ${cards.length - 15} more on the dashboard.`);
-    return;
+  const data = await loadHq(now);
+  if (command === "/today") return sendCard(chatId, briefing(data, now));
+  if (command === "/inbox") return sendInbox(chatId, data, now);
+  if (command === "/money") return sendCard(chatId, moneyCard(data, now));
+  if (command === "/gym") {
+    const entry = await logGym(email, now);
+    const d: Done = { kind: "logged", entry };
+    apply(data, d);
+    const { lines, buttons } = confirm(data, [d], now);
+    return sendText(chatId, lines.join("\n"), buttons);
   }
   if (!askConfigured()) return sendText(chatId, `${HELP}\n\n(Questions need ANTHROPIC_API_KEY on Vercel.)`);
-  return sendAnswer(chatId, await askHq(text.slice(0, 2000), snapshot, gmail, now, jobStarter(chatId, email)));
+  const result = await askHq(text.slice(0, 2000), data, now, actions(chatId, email));
+  for (const d of result.done) apply(data, d);
+  const { lines, buttons } = confirm(data, result.done, now);
+  const reply = [...lines, ...(result.text ? [result.text] : [])].join(lines.length && result.text ? "\n\n" : "\n");
+  return sendAnswer(chatId, reply || "Done.", buttons);
 }
+
+/** The message's buttons minus the one just tapped (so "I went today" can't log twice). */
+const without = (keys: Key[][] | undefined, tapped: string): Button[] =>
+  (keys ?? []).flat().filter((k) => k.callback_data !== tapped).map((k) => ({ text: k.text, data: k.callback_data, url: k.url }));
 
 async function onButton(q: NonNullable<Update["callback_query"]>, email: string) {
   const action = q.data ? decodeButton(q.data) : null;
   const msg = q.message;
   if (!action || !msg) return answerButton(q.id, "That button has expired.");
-  if (action.kind === "queue") {
-    const at = Date.now();
-    const id = await createDoc("hq_commands", { type: action.type, targetId: action.targetId, payload: "{}", by: email, at, status: "pending" });
-    await setButtons(msg.chat.id, msg.message_id, [{ text: "↩️ Undo", data: encodeUndo(id) }]);
-    return answerButton(q.id, "Queued. The agents apply it at :07 or :37.");
+  const chat = msg.chat.id;
+  const now = Date.now();
+  const rest = without(msg.reply_markup?.inline_keyboard, q.data!);
+
+  switch (action.kind) {
+    case "queue": {
+      const id = await createDoc("hq_commands", { type: action.type, targetId: action.targetId, payload: "{}", by: email, at: now, status: "pending" });
+      await setButtons(chat, msg.message_id, [{ text: "↩️ Undo", data: encodeUndo(id) }]);
+      return answerButton(q.id, "Queued. The agents apply it at :07 or :37.");
+    }
+    case "undo": {
+      const current = await readFields(`hq_commands/${action.commandId}`);
+      if (current && current.status !== "pending") {
+        await setButtons(chat, msg.message_id, []);
+        return answerButton(q.id, "Too late, the agents already applied it.");
+      }
+      await deleteDoc(`hq_commands/${action.commandId}`);
+      await setButtons(chat, msg.message_id, []);
+      await answerButton(q.id, "Undone.");
+      return sendText(chat, "Undone. Send /inbox to see it again.");
+    }
+    case "triage": {
+      if (action.decision === "clear") {
+        await deleteDoc(`hq_reply_decisions/${action.key}`);
+        await setButtons(chat, msg.message_id, []);
+        return answerButton(q.id, "Undone. It's back on the board.");
+      }
+      await setDoc(`hq_reply_decisions/${action.key}`, { key: action.key, decision: action.decision, title: null, by: email, at: now });
+      const undo = encodeTriage("clear", action.key);
+      await setButtons(chat, msg.message_id, [...rest.filter((b) => b.url), ...(undo ? [{ text: "↩️ Undo", data: undo }] : [])]);
+      return answerButton(q.id, action.decision === "approved" ? "On your list." : action.decision === "done" ? "Done. Off the board." : "Waved off.");
+    }
+    case "gym": {
+      const entry = await logGym(email, now);
+      await setButtons(chat, msg.message_id, rest);
+      await answerButton(q.id, "Logged 💪");
+      const data = await loadHq(now);
+      const { lines, buttons } = confirm(data, [{ kind: "logged", entry }], now);
+      return sendText(chat, lines.join("\n"), buttons);
+    }
+    case "paid": {
+      if (!action.paid) {
+        await setOwedPaid(action.id, false, email, now);
+        await setButtons(chat, msg.message_id, []);
+        return answerButton(q.id, "Undone. It's owed again.");
+      }
+      const { entry } = await setOwedPaid(action.id, true, email, now);
+      await setButtons(chat, msg.message_id, rest);
+      await answerButton(q.id, entry ? "Marked paid 💵" : "Already paid.");
+      if (!entry) return;
+      const data = await loadHq(now);
+      const { lines, buttons } = confirm(data, [{ kind: "paid", owedId: action.id, entry }], now);
+      return sendText(chat, lines.join("\n"), buttons);
+    }
+    case "todo": {
+      await setNote(action.id, now, { done: action.done });
+      if (!action.done) await setButtons(chat, msg.message_id, []);
+      else await setButtons(chat, msg.message_id, [...rest, ...(encodeTodo(action.id, false) ? [{ text: "↩️ Undo", data: encodeTodo(action.id, false)! }] : [])]);
+      return answerButton(q.id, action.done ? "Checked off." : "Back on your list.");
+    }
+    case "remove": {
+      await removeLife(action.id);
+      await setButtons(chat, msg.message_id, []);
+      return answerButton(q.id, "Undone.");
+    }
+    case "today": {
+      await answerButton(q.id, "");
+      return sendCard(chat, briefing(await loadHq(now), now));
+    }
+    case "inbox": {
+      await answerButton(q.id, "");
+      return sendInbox(chat, await loadHq(now), now);
+    }
   }
-  const current = await readFields(`hq_commands/${action.commandId}`);
-  if (current && current.status !== "pending") {
-    await setButtons(msg.chat.id, msg.message_id, []);
-    return answerButton(q.id, "Too late, the agents already applied it.");
-  }
-  await deleteDoc(`hq_commands/${action.commandId}`);
-  await setButtons(msg.chat.id, msg.message_id, []);
-  await answerButton(q.id, "Undone.");
-  return sendText(msg.chat.id, "Undone. Send /inbox to see it again.");
 }
 
 export async function POST(request: Request) {

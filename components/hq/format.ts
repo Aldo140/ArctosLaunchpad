@@ -1,4 +1,4 @@
-import type { Business } from "@/lib/hq/types";
+import type { Business } from "../../lib/hq/types";
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;

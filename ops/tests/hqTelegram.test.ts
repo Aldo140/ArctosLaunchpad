@@ -2,11 +2,13 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { briefing, chunks, decodeButton, encodeQueue, encodeUndo, inboxCards, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
-import type { GmailSummary, HqPost, HqSnapshot } from '../../lib/hq/types';
+import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
+import { triageKey } from '../../lib/hq/triage';
+import type { GmailSummary, HqData, HqPost, HqSnapshot, LifeEntry } from '../../lib/hq/types';
 
 const now = Date.parse('2026-10-08T18:00:00Z');
 const HOUR = 3_600_000;
+const DAY = 24 * HOUR;
 
 const post = (over: Partial<HqPost>): HqPost => ({
   id: 'p1', brand: 'calgarydaily', status: 'drafted', template: 'event', format: 'image', headline: 'Elk in Banff', caption: 'Caption <b>', altText: 'alt',
@@ -36,6 +38,21 @@ const gmail: GmailSummary = {
   ],
 };
 
+const life: LifeEntry[] = [
+  { id: 'm1', kind: 'money', at: now - HOUR, amount: 120_000, business: 'vowmotion', text: 'Smith wedding' },
+  { id: 'm0', kind: 'money', at: now - 40 * DAY, amount: 99_900, business: 'arctos', text: 'Old site' },
+  { id: 'o1', kind: 'owed', at: now - 10 * DAY, amount: 40_000, business: 'arctos', text: 'Ramsay Coffee', done: false, due: now - 2 * DAY, paidId: null },
+  { id: 'g1', kind: 'gym', at: now - DAY },
+  { id: 'n1', kind: 'note', at: now - DAY, text: 'Call the venue', done: false, due: now - HOUR },
+];
+
+/** What HQ knows, as loadHq returns it. */
+const data = (over: Partial<HqData> = {}): HqData => ({
+  snapshot: snapshot(), arctos: null, commands: [], workflows: [], gmail,
+  calendar: { generatedAt: now, events: [{ title: 'Call with Ramsay', start: now + HOUR, end: now + 2 * HOUR, allDay: false, location: '' }] },
+  life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [], errors: [], ...over,
+});
+
 describe('telegramUsers', () => {
   it('reads id=email pairs and skips malformed ones', () => {
     const users = telegramUsers(' 123=Me@Gmail.com, abc=x@y.z, 456=, 789=other@x.ca ');
@@ -46,9 +63,9 @@ describe('telegramUsers', () => {
 
 describe('buttons', () => {
   it('round-trips queue and undo payloads', () => {
-    const data = encodeQueue('approve-reply', 'lead_42');
-    assert.equal(data, 'q:ar:lead_42');
-    assert.deepEqual(decodeButton(data!), { kind: 'queue', type: 'approve-reply', targetId: 'lead_42' });
+    const payload = encodeQueue('approve-reply', 'lead_42');
+    assert.equal(payload, 'q:ar:lead_42');
+    assert.deepEqual(decodeButton(payload!), { kind: 'queue', type: 'approve-reply', targetId: 'lead_42' });
     assert.deepEqual(decodeButton(encodeUndo('abcDEF123')), { kind: 'undo', commandId: 'abcDEF123' });
   });
   it('refuses payloads over Telegram\'s 64 bytes and unknown codes', () => {
@@ -56,32 +73,79 @@ describe('buttons', () => {
     assert.equal(decodeButton('q:zz:abc'), null);
     assert.equal(decodeButton('u:../etc'), null);
   });
+  it('round-trips the life and reply-check buttons', () => {
+    assert.deepEqual(decodeButton(encodeTriage('approved', '18c2f_1760000000000')!), { kind: 'triage', decision: 'approved', key: '18c2f_1760000000000' });
+    assert.deepEqual(decodeButton(encodeTriage('clear', 'k1')!), { kind: 'triage', decision: 'clear', key: 'k1' });
+    assert.deepEqual(decodeButton(encodePaid('o1')!), { kind: 'paid', id: 'o1', paid: true });
+    assert.deepEqual(decodeButton(encodePaid('o1', false)!), { kind: 'paid', id: 'o1', paid: false });
+    assert.deepEqual(decodeButton(encodeTodo('n1')!), { kind: 'todo', id: 'n1', done: true });
+    assert.deepEqual(decodeButton(encodeRemove('abc')!), { kind: 'remove', id: 'abc' });
+    assert.deepEqual(decodeButton('g'), { kind: 'gym' });
+    assert.deepEqual(decodeButton('i'), { kind: 'inbox' });
+    assert.equal(decodeButton('x:a/b'), null);
+  });
 });
 
 describe('briefing', () => {
-  it('counts what is waiting and lists unanswered people, not auto-replies', () => {
-    const text = briefing(snapshot(), gmail, now);
-    assert.match(text, /report from 2h ago/);
-    assert.match(text, /1 post to review, 1 pitch to approve, 1 drafted reply, 1 unanswered email/);
-    assert.match(text, /Jo \(Vow Motion\), 3h ago: Wedding/);
+  it('shows Today from the same numbers as the dashboard', () => {
+    const { text, buttons } = briefing(data(), now);
+    // 1 post + 1 pitch + 1 drafted reply + Jo's pitch reply (the auto-reply doesn't count): the dashboard's queue.
+    assert.match(text, /4 things need you/);
+    assert.match(text, /\$1,200 of \$5,000 this month/);
+    assert.match(text, /\$400 owed to you is late: Ramsay Coffee/);
+    assert.match(text, /Gym 1\/3 this week, last went yesterday/);
+    assert.match(text, /Next 1:00 pm: Call with Ramsay/);
+    assert.match(text, /Due: Call the venue/);
+    assert.match(text, /Agents' report from 2h ago/);
     assert.doesNotMatch(text, /Out of office/);
+    assert.deepEqual(buttons.map((b) => b.data ?? b.url), ['i', 'g', 'https://arctoslaunchpad.com/hq']);
   });
-  it('says so when there is no report', () => {
-    assert.match(briefing(null, null, now), /haven't published/);
+  it('leaves Gmail replies the reply check filtered out off the count, like HQ does', () => {
+    const key = triageKey(gmail.replies[0]);
+    const filtered = data({ triage: { at: now, error: null, items: [{ key, url: 'https://mail/1', replyAt: now - 3 * HOUR, from: 'jo@x.ca', at: now, fingerprint: '', needsAction: false, category: 'informational', reason: 'Just a thank-you.', checks: [], related: [], subtask: null }] } });
+    assert.match(briefing(filtered, now).text, /3 things need you/);
+  });
+  it('still answers with no report', () => {
+    const { text } = briefing(data({ snapshot: null, gmail: null }), now);
+    assert.match(text, /Nothing needs you/);
+    assert.match(text, /report from never/);
+  });
+});
+
+describe('moneyCard', () => {
+  it('shows the month, the goal pace and a Paid button per debt', () => {
+    const card = moneyCard(data(), now);
+    assert.match(card.text, /\$1,200 in/);
+    assert.match(card.text, /24% of \$5,000/);
+    assert.match(card.text, /Ramsay Coffee: \$400 \(late since/);
+    assert.equal(card.buttons[0].data, 'p:o1');
+  });
+});
+
+describe('loggedText', () => {
+  it('confirms with the number that moved', () => {
+    const d = data();
+    assert.match(loggedText(d.life![0], d, now), /Logged \$1,200 for Vow Motion \(Smith wedding\)\.\n\$1,200 of \$5,000/);
+    assert.match(loggedText({ id: 'g2', kind: 'gym', at: now }, d, now), /1\/3 this week, 2 to go/);
   });
 });
 
 describe('inboxCards', () => {
-  it('makes one card per open item with the dashboard\'s actions, escaped', () => {
-    const cards = inboxCards(snapshot(), gmail, now);
+  it('makes one card per open decision, in the dashboard\'s order, escaped', () => {
+    const cards = inboxCards(data(), now);
     assert.equal(cards.length, 4);
-    assert.deepEqual(cards[0].buttons.map((b) => b.data), ['q:ap:p1', 'q:rp:p1']);
-    assert.equal(cards[0].photo, 'https://img/1.png');
-    assert.match(cards[0].text, /Caption &lt;b&gt;/);
-    assert.deepEqual(cards[1].buttons.map((b) => b.data), ['q:ai:l1', 'q:si:l1']);
-    assert.deepEqual(cards[2].buttons.map((b) => b.data), ['q:ar:l2', 'q:hr:l2']);
-    assert.deepEqual(cards[3].buttons, []);
-    assert.match(cards[3].text, /href="https:\/\/mail\/1"/);
+    // Replies first (oldest first), then posts, then pitches.
+    const key = triageKey(gmail.replies[0]);
+    assert.deepEqual(cards[0].buttons.map((b) => b.data ?? b.url), [encodeTriage('approved', key), encodeTriage('dismissed', key), 'https://mail/1']);
+    assert.deepEqual(cards[1].buttons.map((b) => b.data), ['q:ar:l2', 'q:hr:l2']);
+    assert.deepEqual(cards[2].buttons.map((b) => b.data), ['q:ap:p1', 'q:rp:p1']);
+    assert.equal(cards[2].photo, 'https://img/1.png');
+    assert.match(cards[2].text, /Caption &lt;b&gt;/);
+    assert.deepEqual(cards[3].buttons.map((b) => b.data), ['q:ai:l1', 'q:si:l1']);
+  });
+  it('leaves out what was already decided and is waiting for the agents', () => {
+    const queued = data({ commands: [{ id: 'c1', type: 'approve-post', targetId: 'p1', by: 'me', at: now, status: 'pending', result: null, appliedAt: null }] });
+    assert.equal(inboxCards(queued, now).length, 3);
   });
 });
 
@@ -94,11 +158,16 @@ describe('chunks', () => {
 });
 
 describe('reportForQuestion', () => {
-  it('drops image URLs and, only when too long, whole sections', () => {
-    const small = reportForQuestion(snapshot(), gmail);
+  it('leads with HQ\'s own totals, drops image URLs and, only when too long, whole sections', () => {
+    const small = reportForQuestion(data(), now);
     assert.deepEqual(small.omitted, []);
     assert.doesNotMatch(small.json, /img\/1\.png/);
-    const tiny = reportForQuestion(snapshot(), gmail, 10);
-    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends']);
+    const totals = JSON.parse(small.json).totals;
+    assert.equal(totals.money.thisMonth, 120_000);
+    assert.equal(totals.owedToAldo.lateTotal, 40_000);
+    assert.equal(totals.gym.thisWeek, 1);
+    assert.equal(totals.waitingOnAldo.length, 4);
+    const tiny = reportForQuestion(data(), now, 10);
+    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'reply check notes']);
   });
 });

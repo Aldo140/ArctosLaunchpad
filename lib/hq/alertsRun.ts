@@ -2,7 +2,7 @@ import { HELLO, alertsFor, leadAlert, planAlerts, quietHours, type AlertState } 
 import { readStringField, readStringFieldVersioned, writeStringFieldIf } from "./google";
 import { readLife } from "./lifeStore";
 import { sendText } from "./telegram";
-import { telegramUsers } from "./telegramBot";
+import { telegramUsers, type Button } from "./telegramBot";
 import { readDecisions, readTriage } from "./triageStore";
 import type { CalendarSummary, GmailSummary, HqSnapshot } from "./types";
 
@@ -20,9 +20,9 @@ const chats = () => (process.env.HQ_TELEGRAM_BOT_TOKEN ? [...telegramUsers(proce
 
 const json = <T>(path: string) => readStringField(path, "payload").then((s) => (s ? (JSON.parse(s) as T) : null));
 
-async function broadcast(to: number[], text: string, silent: boolean) {
+async function broadcast(to: number[], text: string, silent: boolean, buttons: Button[] = []) {
   for (const chat of to) {
-    await sendText(chat, text, [], silent).catch((e) => console.error(`[alerts] couldn't text ${chat}: ${e instanceof Error ? e.message : e}`));
+    await sendText(chat, text, buttons, silent).catch((e) => console.error(`[alerts] couldn't text ${chat}: ${e instanceof Error ? e.message : e}`));
   }
 }
 
@@ -46,7 +46,7 @@ export async function runAlerts(now = Date.now()): Promise<void> {
 
   const silent = quietHours(now);
   if (plan.first) await broadcast(to, HELLO, silent);
-  for (const a of plan.send) await broadcast(to, a.text, silent);
+  for (const a of plan.send) await broadcast(to, a.text, silent, a.buttons);
   if (plan.more) await broadcast(to, `…and ${plan.more} more. /today for the rest.`, silent);
   if (plan.send.length) console.log(`[alerts] sent ${plan.send.length}${plan.more ? ` (+${plan.more} summed up)` : ""}`);
 }
