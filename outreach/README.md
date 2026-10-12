@@ -6,11 +6,15 @@ custom bakeries).
 
 ## Rules
 
+- HQ owns outreach (since 2026-10-12). Nothing sends by hand. HQ's
+  operations clock starts `.github/workflows/outreach.yml` every half hour on
+  weekdays, and the HQ bot texts Aldo when a run starts and how it ended.
 - Send only from `aldo@arctoslaunchpad.com`, never from the Vow Motion address
-  or jorti104@mtroyal.ca. `.github/workflows/outreach.yml` sends the queue
-  through Brevo (`BREVO_API_KEY` repository secret), one email per run,
-  weekdays 9:00–16:30 Calgary time, up to ten per run, at most 50 a day; `sent.json` records each
-  send. Replies reach mrotiz14@gmail.com through ForwardEmail (MX + TXT records
+  or jorti104@mtroyal.ca. The workflow sends through Brevo (`BREVO_API_KEY`
+  repository secret), weekdays 9:00–16:30 Calgary time, up to ten per run, at
+  most 50 a day; `sent.json` records each send. Hard bounces and spam
+  complaints Brevo reports are added to `suppression.txt` automatically, and
+  three hard bounces in a day stop sending until the next day. Replies reach mrotiz14@gmail.com through ForwardEmail (MX + TXT records
   on Vercel DNS).
 - Up to 50 new businesses a day, weekdays, spaced through the day. No link in
   the first email; the ask is a reply.
@@ -19,6 +23,19 @@ custom bakeries).
   dessert form and admin), Fresh Prep (internal reporting tool).
 - Footer on every email: name, Arctos, mailing address, reply-to-unsubscribe.
   Add every opt-out or bounce to `suppression.txt` the same day.
+
+## Vow Motion
+
+The same workflow sends Vow Motion's planner outreach (signed "Arctos,
+marketing for Vow Motion"). Its lists stay in Aldo140/vow-motion
+(`outreach/batch-*.json` and `outreach/suppression.txt` on branch
+`claude/great-sagan-ofu2xe`); a new batch file there is picked up on the next
+run. It sends weekdays 9:30–17:00 US Eastern, up to six per run, at most 50 a
+day. `vow-motion-sent.json` records each send, `vow-motion-suppression.txt`
+holds bounces found in Brevo, and `vow-motion-edits.json` fixes copy in rows
+without editing that repository. Everything up to row 37 of
+`batch-2026-10-08.json`, and every earlier batch, went out by hand from Gmail
+before HQ took over.
 
 ## Batches
 
