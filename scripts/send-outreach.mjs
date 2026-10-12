@@ -1,31 +1,71 @@
-// Sends queued Arctos outreach (outreach/batch-*.json) through Brevo's
-// transactional API as aldo@arctoslaunchpad.com. Run by
-// .github/workflows/outreach.yml every 30 minutes; each run sends at most
-// PER_RUN emails inside the weekday send window, up to DAILY_CAP a day.
-// Sent addresses are recorded in outreach/sent.json so nothing is sent twice.
-// A run with emails to send texts Aldo through the HQ bot when it starts and
-// when it ends (/api/hq/alerts/outreach, signed in with the run's GitHub OIDC token).
+// Sends queued cold outreach through Brevo's transactional API as
+// aldo@arctoslaunchpad.com, for two campaigns:
+//
+//   arctos     Calgary businesses, outreach/batch-*.json, weekdays 9:00-16:30 Calgary.
+//   vowmotion  Wedding planners, vow-motion/outreach/batch-*.json (outreach.yml checks
+//              out Aldo140/vow-motion there), weekdays 9:30-17:00 US Eastern.
+//
+// Run by .github/workflows/outreach.yml, which HQ's operations clock starts
+// every half hour. Each run sends at most `perRun` emails per campaign inside
+// its send window, up to `dailyCap` a day. Sent addresses are recorded in the
+// campaign's sent file so nothing is sent twice. Before sending, hard bounces
+// and spam complaints Brevo saw for the campaign are added to its suppression
+// file, and a campaign with 3 or more hard bounces today stops for the day.
+// A campaign with emails to send texts Aldo through the HQ bot when it starts
+// and when it ends (/api/hq/alerts/outreach, signed in with the run's GitHub OIDC token).
 //
 //   BREVO_API_KEY=... node scripts/send-outreach.mjs          # send
 //   node scripts/send-outreach.mjs --dry-run                  # show what would send
+//   OUTREACH_CAMPAIGN=vowmotion node scripts/send-outreach.mjs  # one campaign only
 
-import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 
-const DIR = "outreach";
-const SENT_FILE = join(DIR, "sent.json");
-const PER_RUN = 10;
-const DAILY_CAP = 50;
-const WINDOW = { start: 9 * 60, end: 16 * 60 + 30, days: [1, 2, 3, 4, 5] }; // Calgary time
 const SENDER = { name: "Aldo Ortiz", email: "aldo@arctoslaunchpad.com" };
+const WEEKDAYS = [1, 2, 3, 4, 5];
+const BOUNCE_STOP = 3;
+
+export const CAMPAIGNS = [
+  {
+    id: "arctos",
+    label: "Arctos",
+    batchDir: "outreach",
+    suppression: ["outreach/suppression.txt"],
+    sentFile: "outreach/sent.json",
+    perRun: 10,
+    dailyCap: 50,
+    window: { tz: "America/Edmonton", start: 9 * 60, end: 16 * 60 + 30 },
+    tag: "arctos-outreach",
+  },
+  {
+    id: "vowmotion",
+    label: "Vow Motion",
+    batchDir: "vow-motion/outreach",
+    // The Vow Motion repo's own list, plus bounces this script finds.
+    suppression: ["vow-motion/outreach/suppression.txt", "outreach/vow-motion-suppression.txt"],
+    sentFile: "outreach/vow-motion-sent.json",
+    perRun: 6,
+    dailyCap: 50,
+    window: { tz: "America/New_York", start: 9 * 60 + 30, end: 17 * 60 },
+    tag: "vowmotion-outreach",
+    // Everything before this row (1-based, as the sending chat counted them) went
+    // out by hand from Gmail before HQ took over on 2026-10-12, as did every
+    // earlier batch file.
+    startAt: { file: "batch-2026-10-08.json", row: 38 },
+    // Copy fixes for rows in that repository: { "<batch file>": { "<row>": [[find, replace]] } }.
+    edits: "outreach/vow-motion-edits.json",
+  },
+];
+
 const dryRun = process.argv.includes("--dry-run");
 // A manual run can send outside the window when Aldo asks for it now.
 const sendNow = process.env.OUTREACH_SEND_NOW === "true";
+const only = process.env.OUTREACH_CAMPAIGN && process.env.OUTREACH_CAMPAIGN !== "all" ? process.env.OUTREACH_CAMPAIGN : null;
 
-const calgary = (d) => {
+export const localTime = (d, tz) => {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Edmonton", year: "numeric", month: "2-digit", day: "2-digit",
+      timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
       hour: "2-digit", minute: "2-digit", weekday: "short", hourCycle: "h23",
     }).formatToParts(d).map((p) => [p.type, p.value]),
   );
@@ -48,71 +88,141 @@ async function report(body) {
       body: JSON.stringify({ ...body, runUrl }),
     });
     if (!r.ok) console.log(`::warning::Couldn't text Aldo (HTTP ${r.status}).`);
-    // The workflow's crash text skips a run that already said how it ended.
-    if (body.event === "done" && process.env.RUNNER_TEMP) writeFileSync(join(process.env.RUNNER_TEMP, "outreach-reported"), "");
   } catch (e) {
     console.log(`::warning::Couldn't text Aldo: ${e instanceof Error ? e.message : e}`);
   }
 }
 
-const norm = (email) => String(email).trim().toLowerCase();
-const now = new Date();
-const local = calgary(now);
+export const norm = (email) => String(email).trim().toLowerCase();
 
-const suppressed = new Set(
-  readFileSync(join(DIR, "suppression.txt"), "utf8").split("\n")
-    .map((l) => l.replace(/#.*/, "").trim()).filter(Boolean).map(norm),
-);
-const sent = existsSync(SENT_FILE) ? JSON.parse(readFileSync(SENT_FILE, "utf8")) : [];
-const sentEmails = new Set(sent.map((s) => norm(s.email)));
-const sentToday = sent.filter((s) => calgary(new Date(s.at)).date === local.date).length;
+const readList = (file) => existsSync(file)
+  ? readFileSync(file, "utf8").split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean).map(norm)
+  : [];
 
-const queue = readdirSync(DIR).filter((f) => /^batch-.*\.json$/.test(f)).sort()
-  .flatMap((f) => JSON.parse(readFileSync(join(DIR, f), "utf8")))
-  .filter((m) => !sentEmails.has(norm(m.email)) && !suppressed.has(norm(m.email)))
-  // A batch can wait for a set day (YYYY-MM-DD, Calgary time), e.g. to skip a holiday.
-  .filter((m) => !m.notBefore || m.notBefore <= local.date);
-
-const inWindow = WINDOW.days.includes(local.day) && local.minutes >= WINDOW.start && local.minutes < WINDOW.end;
-console.log(`${queue.length} queued, ${sentToday}/${DAILY_CAP} sent today, ${inWindow ? "inside" : "outside"} the send window.`);
-if (!inWindow && !dryRun && !sendNow) process.exit(0);
-
-const budget = Math.max(0, Math.min(PER_RUN, DAILY_CAP - sentToday));
-const batch = queue.slice(0, dryRun ? queue.length : budget);
-if (dryRun) {
-  for (const m of batch) console.log(`would send: ${m.email} | ${m.subject}`);
-  process.exit(0);
-}
-if (!batch.length) process.exit(0);
-if (!process.env.BREVO_API_KEY) {
-  // Not an error: the queue simply waits until the key is added.
-  console.log("BREVO_API_KEY is not set yet; nothing sent.");
-  process.exit(0);
-}
-
-await report({ event: "start", planned: batch.length });
-
-const sentNow = [];
-let failed = null;
-for (const m of batch) {
-  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: { "api-key": process.env.BREVO_API_KEY, "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({
-      sender: SENDER, replyTo: SENDER, to: [{ email: m.email, name: m.business }],
-      subject: m.subject, textContent: m.body, tags: ["arctos-outreach"],
-    }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    console.error(`send failed for ${m.email}: ${res.status} ${body.message ?? ""}`);
-    failed = { business: m.business, error: `${res.status} ${body.message ?? ""}`.trim() };
-    process.exitCode = 1;
-    break;
+/** Applies a campaign's copy fixes, and starts every paragraph with a capital letter. */
+export function polish(body, fixes = []) {
+  let out = body;
+  for (const [find, replace] of fixes) {
+    if (out.includes(find)) out = out.replace(find, replace);
+    else console.log(`::warning::copy fix not found: ${find.slice(0, 60)}`);
   }
-  sent.push({ email: m.email, business: m.business, subject: m.subject, at: now.toISOString(), messageId: body.messageId ?? null });
-  sentNow.push(m.business);
-  console.log(`sent: ${m.business} (${m.email})`);
+  return out.replace(/(^|\n\n)([a-z])/g, (_, gap, ch) => gap + ch.toUpperCase());
 }
-writeFileSync(SENT_FILE, `${JSON.stringify(sent, null, 2)}\n`);
-await report({ event: "done", sent: sentNow, failed, sentToday: sentToday + sentNow.length, cap: DAILY_CAP, left: queue.length - sentNow.length });
+
+/** The campaign's unsent emails, oldest batch first. */
+export function queueFor(c, { sent, suppressed, today }) {
+  const sentEmails = new Set(sent.map((s) => norm(s.email)));
+  const edits = c.edits && existsSync(c.edits) ? JSON.parse(readFileSync(c.edits, "utf8")) : {};
+  return readdirSync(c.batchDir).filter((f) => /^batch-.*\.json$/.test(f)).sort()
+    .filter((f) => !c.startAt || f >= c.startAt.file)
+    .flatMap((f) => {
+      const rows = JSON.parse(readFileSync(join(c.batchDir, f), "utf8"))
+        .map((m, i) => (m && m.body ? { ...m, body: polish(m.body, edits[f]?.[String(i + 1)]) } : m));
+      return c.startAt && f === c.startAt.file ? rows.slice(c.startAt.row - 1) : rows;
+    })
+    .filter((m) => m && m.email && m.subject && m.body)
+    .filter((m) => !sentEmails.has(norm(m.email)) && !suppressed.has(norm(m.email)))
+    // A batch can wait for a set day (YYYY-MM-DD, campaign time), e.g. to skip a holiday.
+    .filter((m) => !m.notBefore || m.notBefore <= today)
+    // The same address twice in the queue sends once.
+    .filter((m, i, all) => all.findIndex((x) => norm(x.email) === norm(m.email)) === i);
+}
+
+/** Hard bounces and spam complaints Brevo recorded for this campaign in the last 30 days. */
+async function brevoProblems(tag) {
+  const out = [];
+  for (const event of ["hardBounces", "spam"]) {
+    const r = await fetch(`https://api.brevo.com/v3/smtp/statistics/events?event=${event}&tags=${encodeURIComponent(tag)}&days=30&limit=500`, {
+      headers: { "api-key": process.env.BREVO_API_KEY, accept: "application/json" },
+    });
+    if (!r.ok) throw new Error(`Brevo ${event}: HTTP ${r.status}`);
+    const body = await r.json();
+    for (const e of body.events ?? []) if (e.email) out.push({ email: norm(e.email), event, date: e.date ?? "" });
+  }
+  return out;
+}
+
+async function runCampaign(c, now) {
+  if (!existsSync(c.batchDir)) {
+    console.log(`::warning::${c.label}: ${c.batchDir} isn't here; skipping.`);
+    return;
+  }
+  const local = localTime(now, c.window.tz);
+  const suppressed = new Set(c.suppression.flatMap(readList));
+  const sent = existsSync(c.sentFile) ? JSON.parse(readFileSync(c.sentFile, "utf8")) : [];
+  const sentToday = sent.filter((s) => localTime(new Date(s.at), c.window.tz).date === local.date).length;
+  const ownSuppression = c.suppression[c.suppression.length - 1];
+
+  let bouncesToday = 0;
+  if (process.env.BREVO_API_KEY && !dryRun) {
+    try {
+      for (const p of await brevoProblems(c.tag)) {
+        if (p.event === "hardBounces" && localTime(new Date(p.date), c.window.tz).date === local.date) bouncesToday++;
+        if (suppressed.has(p.email)) continue;
+        suppressed.add(p.email);
+        appendFileSync(ownSuppression, `${p.email}  # ${p.event === "spam" ? "spam complaint" : "hard bounce"} (Brevo) ${p.date.slice(0, 10)}\n`);
+        console.log(`${c.label}: suppressed ${p.email} (${p.event})`);
+      }
+    } catch (e) {
+      console.log(`::warning::${c.label}: couldn't read bounces from Brevo: ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  const queue = queueFor(c, { sent, suppressed, today: local.date });
+  const inWindow = WEEKDAYS.includes(local.day) && local.minutes >= c.window.start && local.minutes < c.window.end;
+  console.log(`${c.label}: ${queue.length} queued, ${sentToday}/${c.dailyCap} sent today, ${inWindow ? "inside" : "outside"} the send window.`);
+  if (dryRun) {
+    for (const m of queue) console.log(`  would send: ${m.email} | ${m.subject}`);
+    return;
+  }
+  if (!inWindow && !sendNow) return;
+  if (bouncesToday >= BOUNCE_STOP) {
+    console.log(`${c.label}: ${bouncesToday} hard bounces today; stopping for the day.`);
+    return;
+  }
+
+  const budget = Math.max(0, Math.min(c.perRun, c.dailyCap - sentToday));
+  const batch = queue.slice(0, budget);
+  if (!batch.length) return;
+  if (!process.env.BREVO_API_KEY) {
+    // Not an error: the queue simply waits until the key is added.
+    console.log("BREVO_API_KEY is not set yet; nothing sent.");
+    return;
+  }
+
+  await report({ event: "start", campaign: c.id, planned: batch.length });
+  const sentNow = [];
+  let failed = null;
+  for (const m of batch) {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": process.env.BREVO_API_KEY, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({
+        sender: SENDER, replyTo: SENDER, to: [{ email: m.email, name: m.business }],
+        subject: m.subject, textContent: m.body, tags: [c.tag],
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error(`${c.label}: send failed for ${m.email}: ${res.status} ${body.message ?? ""}`);
+      failed = { business: m.business ?? m.email, error: `${res.status} ${body.message ?? ""}`.trim() };
+      process.exitCode = 1;
+      break;
+    }
+    sent.push({ email: m.email, business: m.business, subject: m.subject, at: new Date().toISOString(), messageId: body.messageId ?? null });
+    sentNow.push(m.business ?? m.email);
+    console.log(`${c.label}: sent ${m.business} (${m.email})`);
+  }
+  writeFileSync(c.sentFile, `${JSON.stringify(sent, null, 2)}\n`);
+  await report({ event: "done", campaign: c.id, sent: sentNow, failed, sentToday: sentToday + sentNow.length, cap: c.dailyCap, left: queue.length - sentNow.length });
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const now = new Date();
+  for (const c of CAMPAIGNS) {
+    if (only && c.id !== only) continue;
+    await runCampaign(c, now);
+  }
+  // The workflow's crash text skips a run that got this far.
+  if (process.env.RUNNER_TEMP) writeFileSync(join(process.env.RUNNER_TEMP, "outreach-reported"), "");
+}

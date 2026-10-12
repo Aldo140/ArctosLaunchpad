@@ -1,9 +1,12 @@
 name: Arctos outreach
 
-# Sends queued outreach (outreach/batch-*.json) from aldo@arctoslaunchpad.com
-# through Brevo, up to ten emails per run (GitHub runs the schedule only a few
-# times a day, so runs are also started by the daily outreach routine), weekdays 9:00-16:30
-# Calgary time, at most 50 a day. The send window is enforced in scripts/send-outreach.mjs.
+# HQ's outreach sender. Sends queued cold email from aldo@arctoslaunchpad.com
+# through Brevo for Arctos (outreach/batch-*.json, weekdays 9:00-16:30 Calgary)
+# and Vow Motion (Aldo140/vow-motion outreach/batch-*.json, weekdays 9:30-17:00
+# US Eastern), at most 50 a day each. HQ's operations clock (ops-clock.yml)
+# starts this every half hour on weekdays, because GitHub runs the schedule
+# below only a few times a day. Windows and caps are enforced in
+# scripts/send-outreach.mjs, so an extra run is harmless.
 on:
   schedule:
     - cron: "11,26,41,56 14-23 * * 1-5"
@@ -13,6 +16,11 @@ on:
         description: Send now, even outside the weekday send window
         type: boolean
         default: false
+      campaign:
+        description: Which campaign to send
+        type: choice
+        options: [all, arctos, vowmotion]
+        default: all
 
 permissions:
   contents: write
@@ -27,14 +35,29 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
+      # The branch as it is now, not as it was when the run was queued, so a run
+      # that waited behind another sees what that one sent.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      # Vow Motion's planner lists and suppression list live in its own repository.
+      - name: Get the Vow Motion lists
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: Aldo140/vow-motion
+          ref: claude/great-sagan-ofu2xe
+          path: vow-motion
+          sparse-checkout: outreach
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Send the next queued email
+      - name: Send the next queued emails
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           OUTREACH_SEND_NOW: ${{ inputs.send_now }}
+          OUTREACH_CAMPAIGN: ${{ inputs.campaign }}
         run: node scripts/send-outreach.mjs
       # The script reports its own start and end; this covers it dying before it could.
       - name: Text Aldo if the run crashed
@@ -50,7 +73,8 @@ jobs:
         run: |
           git config user.name "arctos-outreach"
           git config user.email "aldo@arctoslaunchpad.com"
-          git add outreach/sent.json 2>/dev/null || exit 0
+          git add outreach/sent.json outreach/vow-motion-sent.json outreach/suppression.txt outreach/vow-motion-suppression.txt 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "Record outreach sends [skip ci]"
-          git push
+          for i in 1 2 3; do git pull --rebase -q && git push && exit 0; sleep 5; done
+          exit 1
