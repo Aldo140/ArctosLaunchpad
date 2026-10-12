@@ -177,13 +177,14 @@ export const ROUTINES: Routine[] = [
   },
   { id: "ar-instagram", owner: "arctos", title: "Post to @arctoslaunchpad", cadence: "Planned", done: "Posts drafted in the Arctos voice, approved here, published on schedule.", setup: "Needs the @arctoslaunchpad Instagram token." },
   {
-    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Weekdays, from Gmail",
-    done: "Up to fifteen planners pitched from aldo@vowmotionweddings.com, every reply answered.",
+    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach", cadence: "Weekdays 9:30 am to 5 pm Eastern, up to 50 a day", workflow: "outreach.yml",
+    done: "The day's queued planners have been emailed from aldo@arctoslaunchpad.com.",
     proof: ({ data, dayStart }) => {
-      if (!data.gmail) return { confirmed: false, headline: "waiting for the Gmail sync", items: [] };
-      const items = today(data.gmail.sends.filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url })), dayStart);
-      const wrong = data.gmail.sends.filter((s) => s.wrongAlias === "vowmotion" && s.at >= dayStart).length;
-      return { confirmed: items.length > 0, headline: `${items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today"}${items.length > 15 ? " · over 15" : ""}${wrong ? ` · ${wrong} from the wrong address` : ""}`, items };
+      // HQ sends through Brevo; anything still sent by hand shows up through the Gmail sync.
+      const hq = (data.vowmotion?.sends ?? []).map((s) => ({ at: s.at, text: `${s.business} · ${s.subject}` }));
+      const byHand = (data.gmail?.sends ?? []).filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url }));
+      const items = today([...hq, ...byHand], dayStart);
+      return { confirmed: items.length > 0, headline: items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today", items };
     },
   },
   {

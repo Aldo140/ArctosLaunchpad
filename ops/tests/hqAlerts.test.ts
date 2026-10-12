@@ -174,6 +174,8 @@ describe('outreachAlert', () => {
     const stopped = outreachAlert({ event: 'done', sent: ['Cafe'], failed: { business: 'Bakery', error: 'Invalid email' }, runUrl: 'https://github.com/Aldo140/ArctosLaunchpad/actions/runs/1' });
     assert.match(stopped, /stopped<\/b> after 1 email\. Brevo refused Bakery: Invalid email/);
     assert.match(stopped, /See the run/);
-    assert.match(outreachAlert({ event: 'crashed' }), /❌ <b>Arctos outreach failed/);
+    assert.match(outreachAlert({ event: 'crashed' }), /❌ <b>Outreach failed/);
+    assert.match(outreachAlert({ event: 'start', campaign: 'vowmotion', planned: 6 }), /Vow Motion outreach is starting: sending 6 emails/);
+    assert.match(outreachAlert({ event: 'done', campaign: 'vowmotion', sent: ['Shine Events'], failed: null, sentToday: 6, cap: 50, left: 7 }), /✅ <b>Vow Motion outreach done<\/b>: 1 email sent/);
   });
 });

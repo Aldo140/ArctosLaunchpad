@@ -6,8 +6,8 @@ import { sendText } from "@/lib/hq/telegram";
 import { telegramUsers } from "@/lib/hq/telegramBot";
 
 /**
- * The Arctos outreach workflow (outreach.yml on the arctos-launchpad branch)
- * calls this when a run that has emails to send starts and when it ends, and
+ * The outreach workflow (outreach.yml on the arctos-launchpad branch, which
+ * sends for Arctos and Vow Motion) calls this when a run that has emails to send starts and when it ends, and
  * the HQ bot texts Aldo. The run proves who it is with GitHub's OIDC token.
  */
 
@@ -17,6 +17,7 @@ const WORKFLOWS = ["Aldo140/ArctosLaunchpad/.github/workflows/outreach.yml@"];
 const text = (max: number) => z.string().transform((s) => s.slice(0, max));
 const Run = z.object({
   event: z.enum(["start", "done", "crashed"]),
+  campaign: z.enum(["arctos", "vowmotion"]).optional(),
   planned: z.number().int().min(0).max(1000).optional(),
   sent: z.array(text(120)).max(100).optional(),
   failed: z.object({ business: text(120), error: text(300) }).nullable().optional(),

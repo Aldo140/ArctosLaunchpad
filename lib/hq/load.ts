@@ -12,12 +12,14 @@ import type { ArctosOutreach, CalendarSummary, CommandType, GmailSummary, HqComm
 export type { HqData };
 
 const SENT_URL = "https://raw.githubusercontent.com/Aldo140/ArctosLaunchpad/arctos-launchpad/outreach/sent.json";
+const VOW_SENT_URL = "https://raw.githubusercontent.com/Aldo140/ArctosLaunchpad/arctos-launchpad/outreach/vow-motion-sent.json";
 const DAY = 86_400_000;
 const calgaryDay = (t: number) => new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" });
 
-async function arctosOutreach(now: number): Promise<ArctosOutreach> {
-  const r = await fetch(SENT_URL, { next: { revalidate: 600 } });
-  if (!r.ok) throw new Error(`Arctos sends: HTTP ${r.status}`);
+/** A campaign's send log from outreach.yml (Arctos, or Vow Motion since HQ took it over). */
+async function outreachLog(now: number, url: string): Promise<ArctosOutreach> {
+  const r = await fetch(url, { next: { revalidate: 600 } });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const sends = ((await r.json()) as Array<{ business?: string; subject?: string; at?: string }>)
     .map((s) => ({ business: s.business ?? "", subject: s.subject ?? "", at: Date.parse(s.at ?? "") }))
     .filter((s) => Number.isFinite(s.at))
@@ -66,9 +68,10 @@ export async function loadHq(now: number): Promise<HqData> {
     errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   };
-  const [snapshot, arctos, cmds, workflows, gmail, triage, decisions, calendar, life, mine] = await Promise.all([
+  const [snapshot, arctos, vowmotion, cmds, workflows, gmail, triage, decisions, calendar, life, mine] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
-    arctosOutreach(now).catch(note("Arctos sends")),
+    outreachLog(now, SENT_URL).catch(note("Arctos sends")),
+    outreachLog(now, VOW_SENT_URL).catch(note("Vow Motion sends")),
     commands(now).catch(note("HQ actions")),
     workflowSummaries().catch(note("Agent runs")),
     readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(note("Gmail")),
@@ -78,5 +81,5 @@ export async function loadHq(now: number): Promise<HqData> {
     readLife(now).catch(note("Your log")),
     settings().catch(note("Your settings")),
   ]);
-  return { snapshot, arctos, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [], calendar, life, settings: mine, errors };
+  return { snapshot, arctos, vowmotion, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [], calendar, life, settings: mine, errors };
 }

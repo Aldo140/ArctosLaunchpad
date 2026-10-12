@@ -205,9 +205,11 @@ export function leadAlert(
   ].join("\n");
 }
 
-/** What outreach.yml reports about an Arctos outreach run (app/api/hq/alerts/outreach). */
+/** What outreach.yml reports about an outreach run (app/api/hq/alerts/outreach). */
 export interface OutreachRun {
   event: "start" | "done" | "crashed";
+  /** Which campaign; reports from before Vow Motion joined carry none and are Arctos. */
+  campaign?: "arctos" | "vowmotion";
   /** start: how many it's about to send. */
   planned?: number;
   /** done: the businesses it emailed. */
@@ -224,13 +226,14 @@ export interface OutreachRun {
 /** The text for an outreach run starting or ending. Runs with nothing to send report nothing. */
 export function outreachAlert(r: OutreachRun): string {
   const link = r.runUrl ? `\n<a href="${escapeHtml(r.runUrl)}">See the run</a>` : "";
-  if (r.event === "start") return `📤 Arctos outreach is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from aldo@arctoslaunchpad.com.`;
-  if (r.event === "crashed") return `❌ <b>Arctos outreach failed</b> before it could finish. Nothing more will send until the next run.${link}`;
+  const name = r.campaign === "vowmotion" ? "Vow Motion outreach" : "Arctos outreach";
+  if (r.event === "start") return `📤 ${name} is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from aldo@arctoslaunchpad.com.`;
+  if (r.event === "crashed") return `❌ <b>Outreach failed</b> before it could finish. Nothing more will send until the next run, in about half an hour.${link}`;
   const sent = r.sent ?? [];
   const names = sent.slice(0, 10).map((b) => `• ${escapeHtml(clip(b, 80))}`).join("\n");
   const counts = [r.sentToday !== undefined && r.cap ? `${r.sentToday}/${r.cap} today` : "", r.left !== undefined ? `${r.left} still queued` : ""].filter(Boolean).join(", ");
   if (r.failed) {
-    return `⚠️ <b>Arctos outreach stopped</b> after ${sent.length} email${sent.length === 1 ? "" : "s"}. Brevo refused ${escapeHtml(clip(r.failed.business, 80))}: ${escapeHtml(clip(r.failed.error, 200))}${names ? `\n\nSent:\n${names}` : ""}${counts ? `\n\n${counts}` : ""}${link}`;
+    return `⚠️ <b>${name} stopped</b> after ${sent.length} email${sent.length === 1 ? "" : "s"}. Brevo refused ${escapeHtml(clip(r.failed.business, 80))}: ${escapeHtml(clip(r.failed.error, 200))}${names ? `\n\nSent:\n${names}` : ""}${counts ? `\n\n${counts}` : ""}${link}`;
   }
-  return `✅ <b>Arctos outreach done</b>: ${sent.length} email${sent.length === 1 ? "" : "s"} sent.\n${names}${sent.length > 10 ? `\n…and ${sent.length - 10} more` : ""}${counts ? `\n\n${counts}` : ""}`;
+  return `✅ <b>${name} done</b>: ${sent.length} email${sent.length === 1 ? "" : "s"} sent.\n${names}${sent.length > 10 ? `\n…and ${sent.length - 10} more` : ""}${counts ? `\n\n${counts}` : ""}`;
 }
