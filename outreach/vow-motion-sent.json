@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "email": "leann@shineeventsbend.com",
+    "business": "Shine Events",
+    "subject": "A cleaner RSVP handoff for Shine Events",
+    "at": "2026-10-12T18:42:00.053Z",
+    "messageId": "<202610121841.91955885579@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@emilycoyneevents.com",
+    "business": "Emily Coyne Events",
+    "subject": "Emily — the guest list part, done once",
+    "at": "2026-10-12T18:42:00.308Z",
+    "messageId": "<202610121842.93662125804@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "contact@yourstoryeventshawaii.com",
+    "business": "Your Story Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-12T18:42:00.533Z",
+    "messageId": "<202610121842.52906294099@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "michaela@engagedandinspired.com",
+    "business": "Engaged & Inspired",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-12T18:42:00.775Z",
+    "messageId": "<202610121842.88419866640@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "elizabeth@elementevents.biz",
+    "business": "Element Events",
+    "subject": "A cleaner RSVP handoff for Element Events",
+    "at": "2026-10-12T18:42:00.994Z",
+    "messageId": "<202610121842.84562078642@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "nahid@nahidglobal.com",
+    "business": "Nahid's Global Events",
+    "subject": "Nahid — the guest list part, done once",
+    "at": "2026-10-12T18:42:01.245Z",
+    "messageId": "<202610121842.84169163854@smtp-relay.mailin.fr>"
+  }
+]
