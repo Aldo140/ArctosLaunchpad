@@ -26,6 +26,7 @@ Logging: when Aldo tells you something that belongs in his log, log it with the 
 - Someone owes him: track_owed. When he says they paid, mark_paid with the id from report.totals.owedToAldo.open.
 - Something to do, or "remind me": add_todo. Done with one: complete_todo with its id from report.totals.todos.open.
 - He went to the gym (or worked out): log_gym.
+- He tells the Instagram bot/agent what to post, a theme, or a link to post about: instagram_note. Use hand_to_agent only for code changes.
 Dates: give due dates as YYYY-MM-DD, worked out from today's date below.
 After logging, the bot adds its own confirmation with the updated totals, so don't repeat the amount or totals. Reply with one short line in his voice, or nothing at all if there's nothing to add.
 
@@ -87,6 +88,11 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
     input_schema: { type: "object", properties: { date: { ...DATE, description: "The day he went, if not today." } } },
   },
   {
+    name: "instagram_note",
+    description: "Give the Instagram posting agent (@calgarydaily) a standing note: what to post more or less of, a theme for the week, a link to post about. It reads every note before it plans and writes. Same as Aldo sending /ig.",
+    input_schema: { type: "object", properties: { note: { type: "string", description: "The instruction in Aldo's words, with any link he gave." } }, required: ["note"] },
+  },
+  {
     name: "hand_to_agent",
     description: "Start the HQ agent on a job: kind code (change the ArctosLaunchpad site/HQ, pushed to main if checks pass) or kind mail (search and read Aldo's email to answer). It runs in the background and texts Aldo the result.",
     input_schema: {
@@ -109,6 +115,8 @@ export interface AskActions {
   addNote: (n: { text: string; due: number | null }) => Promise<LifeEntry>;
   completeNote: (id: string) => Promise<void>;
   logGym: (at?: number) => Promise<LifeEntry>;
+  /** A note for the Instagram agent (hq_ig_notes); returns its id. */
+  addIgNote: (text: string) => Promise<string>;
 }
 
 /** Something the bot did, so the webhook can confirm it with fresh numbers and an Undo button. */
@@ -183,6 +191,12 @@ async function run(call: Anthropic.Beta.BetaToolUseBlock, act: AskActions, now: 
       const entry = await act.logGym(pastDay(input.date, now));
       done.push({ kind: "logged", entry });
       return "Logged.";
+    }
+    case "instagram_note": {
+      const note = text(input.note, 600);
+      if (!note) return "The note was empty; nothing was saved.";
+      await act.addIgNote(note);
+      return "Saved. The Instagram agent reads it before it plans and writes; a link gets drafted into a post within the half hour and shows up in /inbox. /ig lists the notes.";
     }
     case "hand_to_agent": {
       if (handed.yes) return "One agent job per text; this one wasn't started.";
