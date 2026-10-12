@@ -2,12 +2,12 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { askConfigured, askHq, type AskActions, type Done } from "@/lib/hq/ask";
 import { AGENT_COLLECTION, cleanTask, startedMessage, type AgentJobKind } from "@/lib/hq/agentJobs";
-import { createDoc, deleteDoc, readFields, setDoc } from "@/lib/hq/google";
+import { createDoc, deleteDoc, queryRecent, readFields, setDoc } from "@/lib/hq/google";
 import { addNote, addOwed, logGym, logMoney, removeLife, setNote, setOwedPaid } from "@/lib/hq/lifeWrites";
 import { loadHq } from "@/lib/hq/load";
 import { answerButton, ensureMenu, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
 import {
-  HELP, briefing, chunks, decodeButton, encodePaid, encodeRemove, encodeTodo, encodeTriage, encodeUndo, escapeHtml, inboxCards, loggedText, moneyCard, telegramUsers,
+  HELP, IG_NOTES, IG_NOTES_MAX, briefing, chunks, igListCards, igNoteText, igSavedText, encodeIgForget, decodeButton, encodePaid, encodeRemove, encodeTodo, encodeTriage, encodeUndo, escapeHtml, inboxCards, loggedText, moneyCard, telegramUsers,
   type Button,
 } from "@/lib/hq/telegramBot";
 import type { HqData, LifeEntry } from "@/lib/hq/types";
@@ -45,6 +45,15 @@ async function sendAnswer(chatId: number, html: string, buttons: Button[] = []) 
     await sendText(chatId, part, keys).catch(() => sendText(chatId, escapeHtml(part.replace(/<[^>]+>/g, "")), keys));
   }
 }
+
+/** The Instagram agent's notes from Aldo, newest first. */
+async function igNotes() {
+  const rows = await queryRecent(IG_NOTES, "at", 0, IG_NOTES_MAX);
+  return rows.map((r) => ({ id: r.id, text: String(r.fields.text ?? ""), at: Number(r.fields.at ?? 0) })).filter((n) => n.text).sort((a, b) => b.at - a.at);
+}
+
+/** Saves a note for the Instagram agent (Calgary-Watch- scripts/ops picks it up on its next run). */
+const saveIgNote = (email: string, text: string) => createDoc(IG_NOTES, { text, by: email, at: Date.now() });
 
 /** Saves a job for the HQ agent; the ops clock starts it within a minute. */
 const jobStarter = (chatId: number, email: string) => (kind: AgentJobKind, task: string) =>
@@ -100,6 +109,7 @@ function actions(chatId: number, email: string): AskActions {
     addNote: (n) => addNote(email, Date.now(), n),
     completeNote: (id) => setNote(id, Date.now(), { done: true }),
     logGym: (at) => logGym(email, Date.now(), at),
+    addIgNote: (text) => saveIgNote(email, text),
   };
 }
 
@@ -120,6 +130,17 @@ async function onMessage(chatId: number, text: string, email: string) {
     if (!task) return sendText(chatId, kind === "mail" ? "Ask about your email, like <i>/mail did the Stampede sponsor ever reply?</i>" : "Tell the agent what to change, like <i>/agent make the Money tab show this month first</i>.");
     await jobStarter(chatId, email)(kind, task);
     return sendText(chatId, startedMessage(kind, task));
+  }
+  if (command === "/ig") {
+    const note = igNoteText(text);
+    if (!note) {
+      for (const c of igListCards(await igNotes(), Date.now())) await sendCard(chatId, c);
+      return;
+    }
+    if ((await igNotes()).length >= IG_NOTES_MAX) return sendText(chatId, `The Instagram agent already has ${IG_NOTES_MAX} notes from you. Send /ig and forget a few first.`);
+    const id = await saveIgNote(email, note);
+    const forget = encodeIgForget(id);
+    return sendText(chatId, igSavedText(note), forget ? [{ text: "Forget this", data: forget }] : []);
   }
   await sendTyping(chatId);
   const now = Date.now();
@@ -209,6 +230,11 @@ async function onButton(q: NonNullable<Update["callback_query"]>, email: string)
       if (!action.done) await setButtons(chat, msg.message_id, []);
       else await setButtons(chat, msg.message_id, [...rest, ...(encodeTodo(action.id, false) ? [{ text: "↩️ Undo", data: encodeTodo(action.id, false)! }] : [])]);
       return answerButton(q.id, action.done ? "Checked off." : "Back on your list.");
+    }
+    case "igforget": {
+      await deleteDoc(`${IG_NOTES}/${action.id}`);
+      await setButtons(chat, msg.message_id, []);
+      return answerButton(q.id, "Forgotten. The Instagram agent drops it on its next run.");
     }
     case "remove": {
       await removeLife(action.id);

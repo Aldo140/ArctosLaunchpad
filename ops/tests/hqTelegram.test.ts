@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
+import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, encodeIgForget, igListCards, igNoteText, igSavedText, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
 import { triageKey } from '../../lib/hq/triage';
 import type { GmailSummary, HqData, HqPost, HqSnapshot, LifeEntry } from '../../lib/hq/types';
 
@@ -169,5 +169,22 @@ describe('reportForQuestion', () => {
     assert.equal(totals.waitingOnAldo.length, 4);
     const tiny = reportForQuestion(data(), now, 10);
     assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'reply check notes']);
+  });
+});
+
+describe("Instagram agent notes (/ig)", () => {
+  it("keeps the text after /ig, and nothing for a bare /ig", () => {
+    assert.equal(igNoteText("/ig  push   Halloween stuff this week "), "push Halloween stuff this week");
+    assert.equal(igNoteText("/ig@Clifford1400bot post this https://cbc.ca/x"), "post this https://cbc.ca/x");
+    assert.equal(igNoteText("/ig"), null);
+  });
+  it("round-trips the Forget button", () => {
+    assert.deepEqual(decodeButton(encodeIgForget("abc123")!), { kind: "igforget", id: "abc123" });
+  });
+  it("says a link becomes a post and a note shapes captions", () => {
+    assert.match(igSavedText("post this https://cbc.ca/x"), /drafts a post from that link/);
+    assert.match(igSavedText("more Flames"), /tomorrow morning's plan/);
+    assert.equal(igListCards([], 0).length, 1);
+    assert.equal(igListCards([{ id: "a", text: "more <b>Flames</b>", at: 0 }], 0)[0].text.includes("&lt;b&gt;"), true);
   });
 });

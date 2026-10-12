@@ -44,7 +44,9 @@ export type ButtonAction =
   /** Take back something the bot logged. */
   | { kind: "remove"; id: string }
   | { kind: "today" }
-  | { kind: "inbox" };
+  | { kind: "inbox" }
+  /** Drop a note the Instagram agent was going by. */
+  | { kind: "igforget"; id: string };
 
 const fit = (data: string) => (Buffer.byteLength(data) <= 64 ? data : null);
 export const encodeQueue = (type: CommandType, targetId: string) => fit(`q:${CODES[type]}:${targetId}`);
@@ -53,6 +55,7 @@ export const encodeTriage = (decision: TriageDecisionKind | "clear", key: string
 export const encodePaid = (id: string, paid = true) => fit(`${paid ? "p" : "pu"}:${id}`);
 export const encodeTodo = (id: string, done = true) => fit(`${done ? "n" : "nu"}:${id}`);
 export const encodeRemove = (id: string) => fit(`x:${id}`);
+export const encodeIgForget = (id: string) => fit(`ig:${id}`);
 
 const ID = "([\\w-]{1,100})";
 export function decodeButton(data: string): ButtonAction | null {
@@ -69,6 +72,8 @@ export function decodeButton(data: string): ButtonAction | null {
   if (m) return { kind: "paid", id: m[2], paid: m[1] === "p" };
   m = new RegExp(`^(n|nu):${ID}$`).exec(data);
   if (m) return { kind: "todo", id: m[2], done: m[1] === "n" };
+  m = new RegExp(`^ig:${ID}$`).exec(data);
+  if (m) return { kind: "igforget", id: m[1] };
   m = new RegExp(`^x:${ID}$`).exec(data);
   return m ? { kind: "remove", id: m[1] } : null;
 }
@@ -96,6 +101,7 @@ export const HELP = [
   "/gym: log today's gym visit",
   "/agent: change the site or HQ, like <i>/agent add a gym streak to Today</i>. The agent pushes it to main once the checks pass and texts you back.",
   "/mail: ask about your email, like <i>/mail did the Stampede sponsor ever reply?</i> The agent reads your calgarywatch.ca inbox and HQ's Gmail summary and texts you back.",
+  "/ig: tell the Instagram agent something, like <i>/ig push Halloween stuff this week</i> or <i>/ig post this https://…</i>. /ig on its own lists what it's going by.",
   "",
   "Or just text me like a person:",
   "• <i>got paid 1200 from the Smith wedding</i> logs it to Vow Motion",
@@ -115,6 +121,7 @@ export const MENU = [
   { command: "gym", description: "Log today's gym visit" },
   { command: "agent", description: "Change the site or HQ" },
   { command: "mail", description: "Ask about your email" },
+  { command: "ig", description: "Tell the Instagram agent something" },
   { command: "help", description: "What HQ can do here" },
 ];
 
@@ -373,4 +380,34 @@ export function reportForQuestion(data: HqData, now: number, maxChars = 300_000)
     json = JSON.stringify(report);
   }
   return { json, omitted };
+}
+
+/** Notes Aldo gives the Instagram agent (/ig), in arctos-hq; Calgary-Watch-'s ops runs copy them to the agent. */
+export const IG_NOTES = "hq_ig_notes";
+export const IG_NOTES_MAX = 20;
+
+export interface IgNote { id: string; text: string; at: number }
+
+/** The text after /ig, tidied, or null when there's nothing to keep. */
+export function igNoteText(message: string): string | null {
+  const t = message.trim().replace(/^\/ig(@\w+)?/i, "").replace(/\s+/g, " ").trim().slice(0, 600);
+  return t.length >= 3 ? t : null;
+}
+
+const hasLink = (t: string) => /https?:\/\/\S+/.test(t);
+
+export function igSavedText(note: string): string {
+  return [
+    "Got it. The Instagram agent goes by this from now on:",
+    `<i>${escapeHtml(note)}</i>`,
+    "",
+    hasLink(note)
+      ? "It drafts a post from that link within the half hour; it shows up in /inbox for one tap."
+      : "Captions written from now on follow it, and tomorrow morning's plan is built around it.",
+  ].join("\n");
+}
+
+export function igListCards(notes: IgNote[], now: number): Card[] {
+  if (!notes.length) return [{ text: "The Instagram agent has no notes from you. Send one like <i>/ig lean into Flames game days</i>.", photo: null, buttons: [] }];
+  return notes.map((n) => ({ text: `<i>${escapeHtml(n.text)}</i>\n${ago(n.at, now)}`, photo: null, buttons: btn("Forget this", encodeIgForget(n.id)) }));
 }
