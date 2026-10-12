@@ -1,3 +1,5 @@
+import { workflowSummaries } from "./github";
+import { outreachLog } from "./load";
 import { HELLO, alertsFor, leadAlert, planAlerts, quietHours, type AlertState } from "./alerts";
 import { readStringField, readStringFieldVersioned, writeStringFieldIf } from "./google";
 import { readLife } from "./lifeStore";
@@ -38,8 +40,12 @@ export async function runAlerts(now = Date.now()): Promise<void> {
     readLife(now).catch(() => []),
     readStringFieldVersioned(STATE, "payload"),
   ]);
+  // Outreach checks need the send logs and runs; if GitHub can't be read, they stay quiet this time.
+  const outreach = await Promise.all([outreachLog(now, "arctos"), outreachLog(now, "vowmotion"), workflowSummaries()])
+    .then(([arctos, vowmotion, workflows]) => ({ snapshot, arctos, vowmotion, workflows }))
+    .catch(() => null);
   const state = stored.value ? (JSON.parse(stored.value) as AlertState) : null;
-  const plan = planAlerts(state, alertsFor({ now, snapshot, gmail, triage, decisions, calendar, life }), now);
+  const plan = planAlerts(state, alertsFor({ now, snapshot, gmail, triage, decisions, calendar, life, outreach }), now);
   if (stored.value === JSON.stringify(plan.state)) return;
   // Saved before sending: if the other sync is checking at the same moment, only one of them sends.
   if (!(await writeStringFieldIf(STATE, "payload", JSON.stringify(plan.state), stored.updateTime))) return;

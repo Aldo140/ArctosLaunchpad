@@ -31,7 +31,7 @@ const statusOf = (r: Run): WorkflowSummary["lastStatus"] =>
 export async function workflowSummaries(): Promise<WorkflowSummary[]> {
   return Promise.all(
     WATCHED.map(async (w) => {
-      const r = await fetch(`https://api.github.com/repos/${w.repo}/actions/workflows/${w.file}/runs?per_page=30`, {
+      const r = await fetch(`https://api.github.com/repos/${w.repo}/actions/workflows/${w.file}/runs?per_page=100`, {
         headers: { Accept: "application/vnd.github+json", "User-Agent": "arctos-hq" },
         next: { revalidate: 300 },
       });

@@ -950,3 +950,29 @@ html:has(.hq) { overscroll-behavior-y: contain; }
   .hq-tabbar { background: color-mix(in srgb, var(--ink-2) 97%, transparent); }
 }
 .hq-form .hq-field--wide { grid-column: 1 / -1; }
+
+/* Outreach calendar: a row per business, a cell per day (components/hq/OutreachCalendar.tsx). */
+.hq-jobcal { display: grid; gap: 4px; overflow-x: auto; }
+.hq-jobcal__row { display: grid; grid-template-columns: minmax(6.5em, 1.3fr) repeat(7, minmax(2.6em, 1fr)); gap: 4px; align-items: center; font-size: 0.86rem; }
+.hq-jobcal__row > span:first-child { color: var(--muted); }
+.hq-jobcal__row .hq-mono { text-align: center; color: var(--faint); font-size: 0.72rem; }
+.hq-jobcal__row .hq-mono[data-today="true"] { color: var(--accent); }
+.hq-jobcal__cell { display: grid; place-items: center; min-height: 2.6em; border-radius: var(--radius); background: var(--bg); line-height: 1.1; text-align: center; }
+.hq-jobcal__cell small { font-size: 0.66rem; color: inherit; opacity: 0.85; }
+.hq-jobcal__cell[data-state="ok"] { color: var(--hq-ok); box-shadow: inset 0 0 0 1px var(--hq-ok-line); }
+.hq-jobcal__cell[data-state="failed"] { color: var(--hq-bad); box-shadow: inset 0 0 0 1px var(--hq-bad-line); }
+.hq-jobcal__cell[data-state="missed"] { color: var(--hq-warn); box-shadow: inset 0 0 0 1px var(--hq-warn-line); }
+.hq-jobcal__cell[data-state="waiting"], .hq-jobcal__cell[data-state="off"] { color: var(--faint); }
+.hq-jobcal__key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; }
+.hq-jobcal__key [data-state="ok"] { color: var(--hq-ok); }
+.hq-jobcal__key [data-state="failed"] { color: var(--hq-bad); }
+.hq-jobcal__key [data-state="missed"] { color: var(--hq-warn); }
+.hq-agenda--timeline li[data-kind="job"] span:last-child { color: var(--hq-ok); }
+.hq-agenda--timeline li[data-kind="job-failed"] { box-shadow: inset 3px 0 0 var(--hq-bad); }
+.hq-agenda--timeline li[data-kind="job-failed"] span:last-child { color: var(--hq-bad); font-weight: 500; }
+.hq-agenda--timeline li[data-kind="job"] a, .hq-agenda--timeline li[data-kind="job-failed"] a { color: inherit; }
+.hq-jobcal__row[data-runs="true"] { margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--line); }
+@media (max-width: 560px) {
+  .hq-jobcal__row { grid-template-columns: 7.4em repeat(7, minmax(0, 1fr)); gap: 3px; font-size: 0.78rem; }
+}
+.hq-agenda--timeline li[data-kind^="job"][data-past="true"] { opacity: 0.85; }

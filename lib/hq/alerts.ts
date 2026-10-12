@@ -1,5 +1,6 @@
 import { GYM_GOAL, gymStats } from "../../components/hq/persona";
 import { encodePaid, encodeTriage, escapeHtml, type Button } from "./telegramBot";
+import { outreachToday, senderRuns, type OutreachInput } from "./outreachDays";
 import type { CalendarSummary, GmailSummary, GmailTriage, HqSnapshot, LifeEntry, TriageDecision } from "./types";
 
 /**
@@ -45,6 +46,8 @@ export interface AlertInput {
   decisions: TriageDecision[];
   calendar: CalendarSummary | null;
   life: LifeEntry[];
+  /** Send logs and runs, for the outreach checks. Left out, those checks stay quiet. */
+  outreach?: OutreachInput | null;
 }
 
 /** What was sent and when (arctos-hq hq/alerts). */
@@ -150,6 +153,26 @@ export function alertsFor(input: AlertInput): Alert[] {
     }
   }
 
+  // Outreach checks, weekdays: the sender went quiet during the day, and the day's tally at 5 pm.
+  const weekday = ![0, 6].includes(new Date(`${today}T12:00:00Z`).getUTCDay());
+  if (input.outreach && weekday) {
+    const mins = hour * 60 + Number(new Intl.DateTimeFormat("en-CA", { timeZone: TZ, minute: "numeric" }).format(new Date(now)));
+    const last = senderRuns(input.outreach, "arctos")[0];
+    if (mins >= 10 * 60 && mins < 16 * 60 + 30 && (!last || last.at < now - 75 * MIN)) {
+      out.push({
+        key: `outreach-stalled:${today}`,
+        text: `⚠️ <b>Outreach hasn't run</b> since ${last ? time(last.at) : "this morning"}. HQ's clock starts it every 30 minutes, so something is stuck. Arctos and Vow Motion emails are waiting.`,
+      });
+    }
+    if (hour >= 17 && hour < 21) {
+      const { campaigns, failedRuns } = outreachToday(input.outreach, now);
+      const lines = campaigns.map((r) => (r.sent ? `✓ ${r.label}: ${r.sent} sent` : `⚠️ ${r.label}: nothing went out`));
+      if (failedRuns) lines.push(`✗ ${failedRuns} send run${failedRuns === 1 ? "" : "s"} failed (the next run picked up where it stopped)`);
+      const total = campaigns.reduce((n, r) => n + r.sent, 0);
+      out.push({ key: `outreach-day:${today}`, text: `📊 <b>Outreach today: ${total} emails</b>\n${lines.join("\n")}` });
+    }
+  }
+
   return out;
 }
 
@@ -209,12 +232,12 @@ export function leadAlert(
 export interface OutreachRun {
   event: "start" | "done" | "crashed";
   /** Which campaign; reports from before Vow Motion joined carry none and are Arctos. */
-  campaign?: "arctos" | "vowmotion";
+  campaign?: "arctos" | "vowmotion" | "calgarywatch";
   /** start: how many it's about to send. */
   planned?: number;
   /** done: the businesses it emailed. */
   sent?: string[];
-  /** done: the send Brevo refused, which stops the run. */
+  /** done: the send that was refused (Brevo stops the run there; CalgaryWatch carries on). */
   failed?: { business: string; error: string } | null;
   sentToday?: number;
   cap?: number;
@@ -226,14 +249,15 @@ export interface OutreachRun {
 /** The text for an outreach run starting or ending. Runs with nothing to send report nothing. */
 export function outreachAlert(r: OutreachRun): string {
   const link = r.runUrl ? `\n<a href="${escapeHtml(r.runUrl)}">See the run</a>` : "";
-  const name = r.campaign === "vowmotion" ? "Vow Motion outreach" : "Arctos outreach";
-  if (r.event === "start") return `📤 ${name} is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from aldo@arctoslaunchpad.com.`;
+  const name = r.campaign === "vowmotion" ? "Vow Motion outreach" : r.campaign === "calgarywatch" ? "CalgaryWatch outreach" : "Arctos outreach";
+  const from = r.campaign === "calgarywatch" ? "aldo@calgarywatch.ca" : "aldo@arctoslaunchpad.com";
+  if (r.event === "start") return `📤 ${name} is starting: sending ${r.planned ?? "the next"} email${r.planned === 1 ? "" : "s"} from ${from}.`;
   if (r.event === "crashed") return `❌ <b>Outreach failed</b> before it could finish. Nothing more will send until the next run, in about half an hour.${link}`;
   const sent = r.sent ?? [];
   const names = sent.slice(0, 10).map((b) => `• ${escapeHtml(clip(b, 80))}`).join("\n");
   const counts = [r.sentToday !== undefined && r.cap ? `${r.sentToday}/${r.cap} today` : "", r.left !== undefined ? `${r.left} still queued` : ""].filter(Boolean).join(", ");
   if (r.failed) {
-    return `⚠️ <b>${name} stopped</b> after ${sent.length} email${sent.length === 1 ? "" : "s"}. Brevo refused ${escapeHtml(clip(r.failed.business, 80))}: ${escapeHtml(clip(r.failed.error, 200))}${names ? `\n\nSent:\n${names}` : ""}${counts ? `\n\n${counts}` : ""}${link}`;
+    return `⚠️ <b>${name} stopped</b> after ${sent.length} email${sent.length === 1 ? "" : "s"}. ${r.campaign === "calgarywatch" ? "Couldn't send to" : "Brevo refused"} ${escapeHtml(clip(r.failed.business, 80))}: ${escapeHtml(clip(r.failed.error, 200))}${names ? `\n\nSent:\n${names}` : ""}${counts ? `\n\n${counts}` : ""}${link}`;
   }
   return `✅ <b>${name} done</b>: ${sent.length} email${sent.length === 1 ? "" : "s"} sent.\n${names}${sent.length > 10 ? `\n…and ${sent.length - 10} more` : ""}${counts ? `\n\n${counts}` : ""}`;
 }

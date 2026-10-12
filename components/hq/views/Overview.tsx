@@ -8,6 +8,8 @@ import { GREETING, GYM_GOAL, agenda, brief, dollars,gymSlot, gymStats, mood, moo
 import { openDecisions } from "../queue";
 import { SkyStrip } from "../Sky";
 import { Icon } from "../ui";
+import { outreachRunsToday } from "@/lib/hq/outreachDays";
+import { OutreachCalendar } from "../OutreachCalendar";
 import { QueueRow } from "./Inbox";
 import { MoneyMoves, TodoCard } from "./Life";
 import { OwedCard } from "./Money";
@@ -39,6 +41,13 @@ export function OverviewView() {
     ...events.map((e) => ({ key: `e${e.start}${e.title}`, at: e.allDay ? 0 : e.start, end: e.end, allDay: e.allDay, kind: "cal" as const, title: e.title, note: e.location })),
     ...posts.map((p) => ({ key: `p${p.id}`, at: p.scheduledFor!, end: p.scheduledFor!, allDay: false, kind: "post" as const, title: p.headline, note: `${BUSINESS_LABEL[p.brand]} post goes out` })),
     ...(free ? [{ key: "gym", at: free, end: free + 90 * 60_000, allDay: false, kind: "gym" as const, title: "Free for the gym", note: "90 minutes clear" }] : []),
+    // Outreach runs that sent email or failed: proof the day's sends happened.
+    ...(filter === "all" || filter === "arctos" || filter === "vowmotion" ? outreachRunsToday({ snapshot: snap, arctos: data.arctos, vowmotion: data.vowmotion, workflows: data.workflows }, now) : []).map((r) => ({
+      key: `j${r.at}`, at: r.at, end: r.end ?? r.at, allDay: false,
+      kind: r.status === "failure" ? ("job-failed" as const) : ("job" as const),
+      title: r.status === "failure" ? "✗ Outreach run failed" : `✓ Outreach sent ${[r.arctos ? `${r.arctos} Arctos` : "", r.vowmotion ? `${r.vowmotion} Vow Motion` : ""].filter(Boolean).join(", ")}`,
+      note: r.status === "failure" ? `${r.arctos + r.vowmotion} went out before it stopped. The next run tries again.` : "From aldo@arctoslaunchpad.com",
+    })),
   ].sort((a, b) => a.at - b.at);
   // What's due today (or late) has no time of its own; it sits under the day.
   const dueToday = [...todos.overdue, ...todos.today];
@@ -124,6 +133,8 @@ export function OverviewView() {
           ) : null}
         </section>
       </div>
+
+      {filter === "all" || filter === "arctos" || filter === "vowmotion" || filter === "calgarywatch" ? <OutreachCalendar /> : null}
 
       <div className="hq-cols-2">
         <TodoCard compact />
