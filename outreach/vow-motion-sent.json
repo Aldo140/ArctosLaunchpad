@@ -40,5 +40,47 @@
     "subject": "Nahid — the guest list part, done once",
     "at": "2026-10-12T18:42:01.245Z",
     "messageId": "<202610121842.84169163854@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@invogueevents.com",
+    "business": "InVogue Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-12T18:42:47.999Z",
+    "messageId": "<202610121842.82543563135@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "shauna@j29events.com",
+    "business": "J29 Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-12T18:42:48.181Z",
+    "messageId": "<202610121842.63235447883@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "emily@coastalroseevents.com",
+    "business": "Coastal Rose Events",
+    "subject": "A cleaner RSVP handoff for Coastal Rose Events",
+    "at": "2026-10-12T18:42:48.334Z",
+    "messageId": "<202610121842.66973806980@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "julia@bijouweddingsbydesign.com",
+    "business": "Bijou Weddings by Design",
+    "subject": "Julia — the guest list part, done once",
+    "at": "2026-10-12T18:42:48.509Z",
+    "messageId": "<202610121842.16864540401@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "admin@oursocietysevents.com",
+    "business": "Our Society's Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-12T18:42:48.668Z",
+    "messageId": "<202610121842.25305547895@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "angie@weddingswithangie.com",
+    "business": "Weddings with Angie",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-12T18:42:48.830Z",
+    "messageId": "<202610121842.80331110341@smtp-relay.mailin.fr>"
   }
 ]

@@ -1104,5 +1104,40 @@
     "subject": "Basement jobs across Calgary area",
     "at": "2026-10-12T18:41:58.124Z",
     "messageId": "<202610121841.38659817967@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "orders@glamorganbakery.com",
+    "business": "Glamorgan Bakery",
+    "subject": "Glamorgan custom cake orders",
+    "at": "2026-10-12T18:42:45.690Z",
+    "messageId": "<202610121842.16811753822@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "adairauto@adairauto.com",
+    "business": "Adair Auto Repair",
+    "subject": "Adair Auto job tracking",
+    "at": "2026-10-12T18:42:46.089Z",
+    "messageId": "<202610121842.90305949593@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@soffiro.ca",
+    "business": "SOFFIRO",
+    "subject": "SOFFIRO reupholstery quotes",
+    "at": "2026-10-12T18:42:46.247Z",
+    "messageId": "<202610121842.44985286818@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@ssrenos.ca",
+    "business": "Solid Solutions Renovations",
+    "subject": "Renovation tracking at Solid Solutions",
+    "at": "2026-10-12T18:42:46.429Z",
+    "messageId": "<202610121842.93353243457@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgaryls.com",
+    "business": "Calgary Landscape Solutions",
+    "subject": "Calgary Landscape Solutions job tracking",
+    "at": "2026-10-12T18:42:46.584Z",
+    "messageId": "<202610121842.15672618568@smtp-relay.mailin.fr>"
   }
 ]
