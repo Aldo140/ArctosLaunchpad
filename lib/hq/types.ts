@@ -178,7 +178,7 @@ export interface HqSnapshot {
   bottlenecks: Bottleneck[];
 }
 
-/** Arctos outreach, read from outreach/sent.json on the arctos-launchpad branch. */
+/** Outreach sent by outreach.yml, read from its send log on the arctos-launchpad branch (outreach/sent.json for Arctos, outreach/vow-motion-sent.json for Vow Motion). */
 export interface ArctosOutreach {
   total: number;
   last30: number;
@@ -361,6 +361,8 @@ export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
   arctos: ArctosOutreach | null;
+  /** Vow Motion sends from HQ (since 2026-10-12; earlier ones went out by hand from Gmail). */
+  vowmotion?: ArctosOutreach | null;
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
   gmail: GmailSummary | null;
