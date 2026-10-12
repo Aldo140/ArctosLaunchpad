@@ -82,5 +82,12 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-12T18:42:48.830Z",
     "messageId": "<202610121842.80331110341@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@tamtasticcreations.com",
+    "business": "Tamtastic Creations",
+    "subject": "A cleaner RSVP handoff for Tamtastic Creations",
+    "at": "2026-10-12T19:12:36.780Z",
+    "messageId": "<202610121912.31482140348@smtp-relay.mailin.fr>"
   }
 ]
