@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createRemoteJWKSet, jwtVerify } from "jose";
 import { AGENT_COLLECTION, jobFromFields, jobMessage } from "@/lib/hq/agentJobs";
 import { readFields } from "@/lib/hq/google";
+import { verifyWorkflow } from "@/lib/hq/githubOidc";
 import { sendText } from "@/lib/hq/telegram";
 
 /**
@@ -11,22 +11,16 @@ import { sendText } from "@/lib/hq/telegram";
  * what the job document already says to the chat that asked.
  */
 
-const ISSUER = "https://token.actions.githubusercontent.com";
 const AGENT_AUDIENCE = "arctos-hq-agent";
 // Code jobs run in this repository; mail jobs in Calgary-Watch-, which holds the Outlook secrets.
-const WORKFLOWS: Record<string, string> = {
-  "Aldo140/ArctosLaunchpad": "Aldo140/ArctosLaunchpad/.github/workflows/hq-agent.yml@",
-  "Aldo140/Calgary-Watch-": "Aldo140/Calgary-Watch-/.github/workflows/hq-agent-mail.yml@",
-};
-const jwks = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks`));
+const WORKFLOWS = [
+  "Aldo140/ArctosLaunchpad/.github/workflows/hq-agent.yml@",
+  "Aldo140/Calgary-Watch-/.github/workflows/hq-agent-mail.yml@",
+];
 
 export async function POST(request: Request) {
-  const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!token) return NextResponse.json({ error: "Not allowed." }, { status: 401 });
   try {
-    const { payload } = await jwtVerify(token, jwks, { issuer: ISSUER, audience: AGENT_AUDIENCE });
-    const prefix = WORKFLOWS[String(payload.repository)];
-    if (!prefix || !String(payload.workflow_ref ?? "").startsWith(prefix)) throw new Error("wrong workflow");
+    await verifyWorkflow(request.headers.get("authorization"), AGENT_AUDIENCE, WORKFLOWS);
   } catch (e) {
     console.warn(`hq/agent/notify: refused (${e instanceof Error ? e.message : e})`);
     return NextResponse.json({ error: "Not allowed." }, { status: 401 });

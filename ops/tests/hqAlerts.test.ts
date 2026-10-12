@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { HELLO, MAX_PER_RUN, alertsFor, gymWeek, leadAlert, planAlerts, quietHours, type AlertInput } from '../../lib/hq/alerts';
+import { HELLO, MAX_PER_RUN, alertsFor, gymWeek, leadAlert, outreachAlert, planAlerts, quietHours, type AlertInput } from '../../lib/hq/alerts';
 import type { HqSnapshot, ReplyTriage } from '../../lib/hq/types';
 
 const MIN = 60_000;
@@ -159,5 +159,20 @@ describe('quiet hours and leads', () => {
     assert.match(text, /Reply to jo@cafe.ca/);
     assert.match(text, /automatic receipt/);
     assert.doesNotMatch(leadAlert({ name: 'Jo', email: 'j@c.ca', company: '', website: '', projectType: 'Website', budget: '', timeline: '', challenge: 'x'.repeat(30), source: '' }, false), /receipt|Came from/);
+  });
+});
+
+describe('outreachAlert', () => {
+  it('says when a run starts and how it ended', () => {
+    assert.match(outreachAlert({ event: 'start', planned: 10 }), /starting: sending 10 emails/);
+    assert.match(outreachAlert({ event: 'start', planned: 1 }), /sending 1 email from/);
+    const done = outreachAlert({ event: 'done', sent: ['Cafe & Co', 'Bakery'], failed: null, sentToday: 20, cap: 50, left: 7 });
+    assert.match(done, /✅ <b>Arctos outreach done<\/b>: 2 emails sent/);
+    assert.match(done, /• Cafe &amp; Co\n• Bakery/);
+    assert.match(done, /20\/50 today, 7 still queued/);
+    const stopped = outreachAlert({ event: 'done', sent: ['Cafe'], failed: { business: 'Bakery', error: 'Invalid email' }, runUrl: 'https://github.com/Aldo140/ArctosLaunchpad/actions/runs/1' });
+    assert.match(stopped, /stopped<\/b> after 1 email\. Brevo refused Bakery: Invalid email/);
+    assert.match(stopped, /See the run/);
+    assert.match(outreachAlert({ event: 'crashed' }), /❌ <b>Arctos outreach failed/);
   });
 });
