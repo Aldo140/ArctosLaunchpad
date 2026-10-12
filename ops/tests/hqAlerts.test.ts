@@ -176,6 +176,8 @@ describe('outreachAlert', () => {
     assert.match(stopped, /See the run/);
     assert.match(outreachAlert({ event: 'crashed' }), /❌ <b>Outreach failed/);
     assert.match(outreachAlert({ event: 'start', campaign: 'vowmotion', planned: 6 }), /Vow Motion outreach is starting: sending 6 emails/);
+    assert.match(outreachAlert({ event: 'start', campaign: 'calgarywatch', planned: 3 }), /CalgaryWatch outreach is starting: sending 3 emails from aldo@calgarywatch\.ca/);
+    assert.match(outreachAlert({ event: 'done', campaign: 'calgarywatch', sent: [], failed: { business: 'Zoo', error: 'Resend 422' } }), /Couldn't send to Zoo/);
     assert.match(outreachAlert({ event: 'done', campaign: 'vowmotion', sent: ['Shine Events'], failed: null, sentToday: 6, cap: 50, left: 7 }), /✅ <b>Vow Motion outreach done<\/b>: 1 email sent/);
   });
 });

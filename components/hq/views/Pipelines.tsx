@@ -6,6 +6,7 @@ import { Columns } from "../Charts";
 import { useHq } from "../context";
 import { LEAD_STAGE, ago, num, when } from "../format";
 import { Empty, Stat } from "../ui";
+import { OutreachCalendar } from "../OutreachCalendar";
 import { GmailPipeline } from "./GmailPipeline";
 
 const rate = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
@@ -157,6 +158,7 @@ export function PipelinesView() {
         
         <h1 className="hq-h1">Who we&apos;ve reached, <em>and who&apos;s reaching back.</em></h1>
       </header>
+      <OutreachCalendar />
       <div className="hq-seg" role="group" aria-label="Business">
         {tabs.map((t) => <button key={t.id} type="button" aria-pressed={t.id === tab} onClick={() => setPicked(t.id)}>{t.label}</button>)}
       </div>

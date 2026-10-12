@@ -17,8 +17,8 @@ const DAY = 86_400_000;
 const calgaryDay = (t: number) => new Date(t).toLocaleDateString("en-CA", { timeZone: "America/Edmonton" });
 
 /** A campaign's send log from outreach.yml (Arctos, or Vow Motion since HQ took it over). */
-async function outreachLog(now: number, url: string): Promise<ArctosOutreach> {
-  const r = await fetch(url, { next: { revalidate: 600 } });
+export async function outreachLog(now: number, campaign: "arctos" | "vowmotion"): Promise<ArctosOutreach> {
+  const r = await fetch(campaign === "arctos" ? SENT_URL : VOW_SENT_URL, { next: { revalidate: 300 } });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const sends = ((await r.json()) as Array<{ business?: string; subject?: string; at?: string }>)
     .map((s) => ({ business: s.business ?? "", subject: s.subject ?? "", at: Date.parse(s.at ?? "") }))
@@ -70,8 +70,8 @@ export async function loadHq(now: number): Promise<HqData> {
   };
   const [snapshot, arctos, vowmotion, cmds, workflows, gmail, triage, decisions, calendar, life, mine] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
-    outreachLog(now, SENT_URL).catch(note("Arctos sends")),
-    outreachLog(now, VOW_SENT_URL).catch(note("Vow Motion sends")),
+    outreachLog(now, "arctos").catch(note("Arctos sends")),
+    outreachLog(now, "vowmotion").catch(note("Vow Motion sends")),
     commands(now).catch(note("HQ actions")),
     workflowSummaries().catch(note("Agent runs")),
     readStringField("hq/gmail", "payload").then((s) => (s ? (JSON.parse(s) as GmailSummary) : null)).catch(note("Gmail")),
