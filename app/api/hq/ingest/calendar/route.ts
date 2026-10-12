@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
+import { runAlertsSafely } from "@/lib/hq/alertsRun";
 import { writeStringField } from "@/lib/hq/google";
 import type { CalendarSummary } from "@/lib/hq/types";
 
@@ -8,7 +9,8 @@ import type { CalendarSummary } from "@/lib/hq/types";
  * The calendar sync (ops/gmail/hq-calendar.gs) posts the next week of Aldo's
  * Google Calendar here every 15 minutes with HQ_CALENDAR_KEY (or the Gmail
  * sync's HQ_GMAIL_KEY when it shares that project). Stored in arctos-hq
- * (hq/calendar).
+ * (hq/calendar). Then the bot texts anything new, like a meeting coming up
+ * (lib/hq/alertsRun.ts).
  */
 
 const text = (max: number) => z.string().transform((s) => s.slice(0, max));
@@ -40,5 +42,6 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues.slice(0, 3).map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") }, { status: 400 });
   const summary: CalendarSummary = { ...parsed.data, events: parsed.data.events.sort((a, b) => a.start - b.start) };
   await writeStringField("hq/calendar", "payload", JSON.stringify(summary));
+  after(runAlertsSafely);
   return NextResponse.json({ ok: true, events: summary.events.length });
 }

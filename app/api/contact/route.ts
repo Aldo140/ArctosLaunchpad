@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { textLead } from "@/lib/hq/alertsRun";
 import { Resend } from "resend";
 import { z } from "zod";
 
@@ -205,6 +206,9 @@ export async function POST(request: Request) {
 
       if (error) throw new Error(error.message);
 
+      /* A text to Aldo's phone through the HQ bot, after the response. */
+      if (!likelySpam) after(() => textLead(submission, Boolean(fromEmail)));
+
       /* Speed-to-lead: the visitor gets an immediate, honest receipt. A failure
          here never fails the enquiry, which has already been delivered. */
       if (fromEmail && !likelySpam) {
@@ -320,6 +324,7 @@ export async function POST(request: Request) {
 
     if (!webhookResponse.ok)
       throw new Error(`Webhook returned ${webhookResponse.status}`);
+    if (!likelySpam) after(() => textLead(submission, false));
   } catch (error) {
     logError("[contact] Webhook delivery failed", {
       requestId,
