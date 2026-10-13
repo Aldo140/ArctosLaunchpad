@@ -1,0 +1,45 @@
+name: Outreach safety audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ops/audit-outreach.ts
+      - .github/workflows/outreach-audit.yml
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      OUTREACH_AUDIT_OUTPUT: ${{ runner.temp }}/outreach-audit.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Sign in to arctos-hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+      - name: Run read-only audit
+        run: npm run ops:audit-outreach
+      - name: Upload private detailed report
+        uses: actions/upload-artifact@v4
+        with:
+          name: outreach-safety-audit
+          path: ${{ runner.temp }}/outreach-audit.json
+          retention-days: 7
+          if-no-files-found: error
+
