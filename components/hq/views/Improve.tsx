@@ -33,6 +33,7 @@ function Focus() {
   const { data, now } = useHq();
   const i = data.intelligence;
   return <>
+    <section className="hq-card hq-daily" data-mode={i.daily.mode}><div className="hq-daily__lead"><p className="hq-eyebrow">Current objective</p><h2 className="hq-h2">{i.daily.outcome}</h2><p>{i.daily.why}</p></div><ol className="hq-daily__moves">{i.daily.actions.map((r,n)=><li key={r.id}><b>{n+1}</b><div><strong>{r.title}</strong><span>{r.reason}</span><small>{r.effort} · {r.source}</small></div>{r.href?<a className="hq-btn" href={r.href}>Open</a>:null}</li>)}</ol></section>
     <div className="hq-pulse"><Stat value={i.workload.urgent} label="urgent" /><Stat value={i.workload.open} label="open" /><Stat value={data.experiments.filter((e) => e.status === "running").length} label="experiments" /><Stat value={i.opportunities.length} label="opportunities" /></div>
     <p className="hq-banner hq-banner--quiet">{i.workload.message}</p>
     <section className="hq-card"><div className="hq-card__head"><div><p className="hq-eyebrow">Expected value × urgency</p><h2 className="hq-h2">Do these next</h2></div></div>

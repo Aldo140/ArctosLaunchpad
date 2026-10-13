@@ -10,7 +10,6 @@ import { SkyStrip } from "../Sky";
 import { Icon } from "../ui";
 import { outreachRunsToday } from "@/lib/hq/outreachDays";
 import { OutreachCalendar } from "../OutreachCalendar";
-import { QueueRow } from "./Inbox";
 import { MoneyMoves, TodoCard } from "./Life";
 import { OwedCard } from "./Money";
 
@@ -33,6 +32,7 @@ export function OverviewView() {
   const owed = owedStats(data, now, filter);
   const todos = todoStats(data, now);
   const [more, setMore] = useState(false);
+  const plan = data.intelligence.daily;
 
   // The day as one timeline: calendar, posts going out, and the gym slot.
   const dayEnd = calgaryDayStart(now) + 86_400_000;
@@ -73,6 +73,18 @@ export function OverviewView() {
         {story.length > 2 ? <button type="button" className="hq-linkbtn hq-brief__more" data-few={story.length <= 4} onClick={() => setMore((m) => !m)} aria-expanded={more}>{more ? "Less" : "The rest of the brief"}</button> : null}
       </header>
 
+      <section className="hq-card hq-daily" data-mode={plan.mode}>
+        <div className="hq-daily__lead">
+          <p className="hq-eyebrow"><span>✦</span> Today&apos;s outcome</p>
+          <h2 className="hq-h2">{plan.outcome}</h2>
+          <p>{plan.why}</p>
+        </div>
+        <ol className="hq-daily__moves">
+          {plan.actions.length ? plan.actions.map((r, i) => <li key={r.id}><b>{i + 1}</b><div><strong>{r.title}</strong><span>{r.reason}</span><small>{r.effort} · {BUSINESS_LABEL[r.business as keyof typeof BUSINESS_LABEL] ?? "HQ"}</small></div>{r.href ? <a className="hq-btn hq-btn--ghost" href={r.href}>Open</a> : null}</li>) : <li><div><strong>Your runway is clear.</strong><span>Protect a block for sales, product work, or recovery.</span></div></li>}
+        </ol>
+        <details className="hq-daily__handled"><summary>What HQ is handling</summary><ul>{plan.handled.map((x) => <li key={x}>{x}</li>)}</ul></details>
+      </section>
+
       <div className="hq-pulse">
         <button type="button" className="hq-tile2" data-sev={waiting ? "warn" : "ok"} onClick={() => go("decide")}>
           <span className="hq-tile2__label"><Icon name="inbox" /> Waiting on you</span>
@@ -99,16 +111,10 @@ export function OverviewView() {
       </div>
 
       <div className="hq-cols-2">
-        <section className="hq-card">
-          <div className="hq-card__head">
-            <h2 className="hq-h2">Clear these first</h2>
-            {waiting ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("decide")}>{waiting > 3 ? `All ${waiting}` : "Open"}</button> : null}
-          </div>
-          {queue.length ? (
-            <ul className="hq-qlist hq-qlist--compact">
-              {queue.slice(0, 3).map((i) => <QueueRow key={i.key} item={i} />)}
-            </ul>
-          ) : <p className="hq-small" style={{ margin: 0 }}>Nothing waiting. Replies, drafts and pitches land here the moment the agents find them.</p>}
+        <section className="hq-card hq-calm">
+          <div className="hq-card__head"><h2 className="hq-h2">Decision queue</h2>{waiting ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("decide")}>Clear {waiting}</button> : null}</div>
+          <b>{waiting ? `${plural(waiting, "decision")} waiting` : "The agents can keep moving."}</b>
+          <p className="hq-small">{waiting ? "Your three highest-value moves are already above. Open the queue when you are ready to batch the rest." : "HQ will interrupt you only for a reply, failure, money due, or a real decision."}</p>
         </section>
         <section className="hq-card">
           <div className="hq-card__head"><h2 className="hq-h2">Your day</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("life")}>Week</button></div>

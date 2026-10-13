@@ -96,6 +96,7 @@ export const HELP = [
   "<b>HQ</b> on your phone. Same numbers as the dashboard.",
   "",
   "/today: your day, the way HQ's Today shows it",
+  "/focus: the three moves that matter most today",
   "/inbox: posts, pitches and replies to decide, one tap each",
   "/money: this month against your goal, and who owes you",
   "/gym: log today's gym visit",
@@ -116,6 +117,7 @@ export const HELP = [
 /** The bot's command menu (Telegram's / button). */
 export const MENU = [
   { command: "today", description: "Your day, like HQ's Today" },
+  { command: "focus", description: "The three moves that matter today" },
   { command: "inbox", description: "Decide posts, pitches and replies" },
   { command: "money", description: "This month, the goal, who owes you" },
   { command: "gym", description: "Log today's gym visit" },
@@ -124,6 +126,20 @@ export const MENU = [
   { command: "ig", description: "Tell the Instagram agent something" },
   { command: "help", description: "What HQ can do here" },
 ];
+
+/** The smallest useful founder brief: one outcome, three moves, and permission to ignore the rest. */
+export function focusCard(data: HqData): Card {
+  const plan = data.intelligence.daily;
+  const lines = [`🎯 <b>${escapeHtml(plan.outcome)}</b>`, escapeHtml(plan.why)];
+  if (plan.actions.length) {
+    lines.push("");
+    plan.actions.forEach((a, i) => lines.push(`${i + 1}. <b>${escapeHtml(clip(a.title, 100))}</b> · ${a.effort}\n   ${escapeHtml(clip(a.reason, 180))}`));
+  } else {
+    lines.push("", "Nothing urgent is visible. Protect a block for sales, product work, or recovery.");
+  }
+  lines.push("", `<i>You can ignore: ${escapeHtml(plan.handled.join(" "))}</i>`);
+  return { text: lines.join("\n"), photo: null, buttons: [{ text: plan.actions.length ? "Open today's plan" : "Open HQ", url: `${HQ_URL}#today` }, { text: "Decisions", data: "i" }] };
+}
 
 export interface Button {
   text: string;

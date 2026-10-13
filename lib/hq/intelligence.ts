@@ -23,13 +23,50 @@ function ranked(data: Omit<HqData, "intelligence">, now: number): HqRecommendati
       business: (e.business as Business) || "all", score: e.due && e.due < now ? 94 : 70,
       effort: "10 min", confidence: "high", source: "Money owed", href: "#money" });
   }
+  for (const e of (data.life ?? []).filter((x) => x.kind === "note" && !x.done && x.due && x.due <= now + DAY).slice(0, 5)) {
+    out.push({ id: `todo-${e.id}`, title: e.text || "Finish today's task", reason: e.due! < now ? "This is overdue." : "Due today.",
+      business: "all", score: e.due! < now ? 88 : 72, effort: "30+ min", confidence: "high", source: "Your to-do list", href: "#life" });
+  }
   if (!data.gmail) out.push({ id: "connect-gmail", title: "Connect mrotiz Gmail",
     reason: "Unlock Vow Motion and Arctos replies, relationship history and opportunity detection.",
     business: "all", score: 100, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#improve/setup" });
+  else if (age(data.gmail.generatedAt, now) > 45 * 60_000) out.push({ id: "restore-gmail", title: "Restore Gmail sync",
+    reason: "HQ cannot safely prioritize replies while its email view is stale.", business: "all", score: 99, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#improve/setup" });
+  if (!data.calendar) out.push({ id: "connect-calendar", title: "Connect Google Calendar", reason: "HQ needs your calendar to protect time and warn you before meetings.",
+    business: "all", score: 91, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#improve/setup" });
+  else if (age(data.calendar.generatedAt, now) > 45 * 60_000) out.push({ id: "restore-calendar", title: "Restore Calendar sync", reason: "HQ is planning the day from an old calendar.",
+    business: "all", score: 93, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#improve/setup" });
+  if (!data.snapshot) out.push({ id: "restore-operations", title: "Restore CalgaryWatch operations", reason: "Publishing, outreach and pipeline status are unavailable.",
+    business: "calgarywatch", score: 100, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#improve/setup" });
+  else if (age(data.snapshot.generatedAt, now) > 90 * 60_000) out.push({ id: "refresh-operations", title: "Refresh CalgaryWatch operations", reason: "The operating report is too old to trust.",
+    business: "calgarywatch", score: 97, effort: "10 min", confidence: "high", source: "Setup doctor", href: "#system" });
   for (const m of data.memories.filter((x) => x.kind === "priority").slice(0, 3)) out.push({
     id: `priority-${m.id}`, title: m.text, reason: `Saved priority · ${label[m.business]}`,
     business: m.business, score: 75, effort: "30+ min", confidence: "high", source: "Your memory", href: "#improve/memory" });
   return out.sort((a, b) => b.score - a.score).slice(0, 12);
+}
+
+function dailyPlan(data: Omit<HqData, "intelligence">, recommendations: HqRecommendation[], now: number): HqIntelligence["daily"] {
+  const missing = recommendations.some((r) => /^(connect|restore|refresh)-(gmail|calendar|operations)$/.test(r.id));
+  const warm = recommendations.filter((r) => /^Reply to |replied|ready to move/i.test(`${r.title} ${r.reason}`));
+  const cash = recommendations.filter((r) => r.id.startsWith("owed-"));
+  const delivery = recommendations.filter((r) => /failed|fix|publish/i.test(`${r.title} ${r.reason}`));
+  const mode: HqIntelligence["daily"]["mode"] = missing ? "restore" : warm.length || cash.length ? "revenue" : delivery.length ? "deliver" : recommendations.length ? "clear" : "grow";
+  const copy = {
+    restore: ["Restore visibility", "HQ is missing a source, so every other recommendation has lower confidence."],
+    revenue: ["Move money forward", "Warm replies and money already earned have the highest value today."],
+    deliver: ["Protect delivery", "Fix the customer-facing break before creating more work."],
+    clear: ["Create a clear runway", "Three decisions will unblock the agents and reduce tomorrow's queue."],
+    grow: ["Make one growth move", "Operations are calm. Use the space for a measurable move that can compound."],
+  } as const;
+  const preferred = mode === "revenue" ? [...warm, ...cash] : mode === "deliver" ? delivery : recommendations;
+  const actions = [...new Map([...preferred, ...recommendations].map((r) => [r.id, r])).values()].slice(0, 3);
+  const handled = [
+    "Healthy agent runs and successful posts stay out of your way.",
+    data.calendar ? "Calendar timing is watched automatically." : "Calendar timing will be watched once its sync returns.",
+    data.gmail ? "Email is filtered before a reply reaches you." : "Email filtering resumes when Gmail reconnects.",
+  ];
+  return { mode, outcome: copy[mode][0], why: copy[mode][1], actions, handled, generatedAt: now };
 }
 
 function relationships(data: Omit<HqData, "intelligence">): HqRelationship[] {
@@ -68,6 +105,7 @@ export function buildIntelligence(data: Omit<HqData, "intelligence">, now: numbe
   const urgent = recommendations.filter((r) => r.score >= 85).length;
   const wins = (data.snapshot?.activity ?? []).filter((a) => a.at >= now - 7 * DAY).slice(0, 4).map((a) => `${label[a.business]}: ${a.text}`);
   return {
+    daily: dailyPlan(data, recommendations, now),
     recommendations, relationships: relationships(data),
     opportunities: [
       ...replies.filter((r) => /interested|quote|price|available|meeting|call|book/i.test(`${r.subject} ${r.snippet}`)).slice(0, 5)

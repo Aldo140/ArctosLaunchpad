@@ -328,6 +328,14 @@ export interface HqRelationship {
   touches: number; state: string; next: string | null; url: string | null;
 }
 export interface HqIntelligence {
+  daily: {
+    mode: "restore" | "revenue" | "deliver" | "grow" | "clear";
+    outcome: string;
+    why: string;
+    actions: HqRecommendation[];
+    handled: string[];
+    generatedAt: number;
+  };
   recommendations: HqRecommendation[];
   relationships: HqRelationship[];
   opportunities: Array<{ title: string; detail: string; business: Business | "all"; confidence: "high" | "medium" | "low"; source: string }>;

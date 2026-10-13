@@ -7,7 +7,7 @@ import { addNote, addOwed, logGym, logMoney, removeLife, setNote, setOwedPaid } 
 import { loadHq } from "@/lib/hq/load";
 import { answerButton, ensureMenu, sendCard, sendText, sendTyping, setButtons, webhookInfo } from "@/lib/hq/telegram";
 import {
-  HELP, IG_NOTES, IG_NOTES_MAX, briefing, chunks, igListCards, igNoteText, igSavedText, encodeIgForget, decodeButton, encodePaid, encodeRemove, encodeTodo, encodeTriage, encodeUndo, escapeHtml, inboxCards, loggedText, moneyCard, telegramUsers,
+  HELP, IG_NOTES, IG_NOTES_MAX, briefing, chunks, focusCard, igListCards, igNoteText, igSavedText, encodeIgForget, decodeButton, encodePaid, encodeRemove, encodeTodo, encodeTriage, encodeUndo, escapeHtml, inboxCards, loggedText, moneyCard, telegramUsers,
   type Button,
 } from "@/lib/hq/telegramBot";
 import type { HqData, LifeEntry } from "@/lib/hq/types";
@@ -147,6 +147,7 @@ async function onMessage(chatId: number, text: string, email: string) {
   const now = Date.now();
   const data = await loadHq(now);
   if (command === "/today") return sendCard(chatId, briefing(data, now));
+  if (command === "/focus") return sendCard(chatId, focusCard(data));
   if (command === "/inbox") return sendInbox(chatId, data, now);
   if (command === "/money") return sendCard(chatId, moneyCard(data, now));
   if (command === "/gym") {

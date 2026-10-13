@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, encodeIgForget, igListCards, igNoteText, igSavedText, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
+import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, encodeIgForget, focusCard, igListCards, igNoteText, igSavedText, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
 import { triageKey } from '../../lib/hq/triage';
 import type { GmailSummary, HqData, HqPost, HqSnapshot, LifeEntry } from '../../lib/hq/types';
 
@@ -52,7 +52,7 @@ const data = (over: Partial<HqData> = {}): HqData => ({
   calendar: { generatedAt: now, events: [{ title: 'Call with Ramsay', start: now + HOUR, end: now + 2 * HOUR, allDay: false, location: '' }] },
   life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [],
   memories: [], experiments: [], productEvents: [],
-  intelligence: { recommendations: [], relationships: [], opportunities: [], weekly: { wins: [], risks: [], focus: [], generatedAt: now }, workload: { open: 0, urgent: 0, message: "" }, connections: [], research: { events7d: 0, topAreas: [], message: "" } },
+  intelligence: { daily: { mode: "grow", outcome: "Make one growth move", why: "Operations are calm.", actions: [], handled: [], generatedAt: now }, recommendations: [], relationships: [], opportunities: [], weekly: { wins: [], risks: [], focus: [], generatedAt: now }, workload: { open: 0, urgent: 0, message: "" }, connections: [], research: { events7d: 0, topAreas: [], message: "" } },
   errors: [], ...over,
 });
 
@@ -112,6 +112,18 @@ describe('briefing', () => {
     const { text } = briefing(data({ snapshot: null, gmail: null }), now);
     assert.match(text, /Nothing needs you/);
     assert.match(text, /report from never/);
+  });
+});
+
+describe('focusCard', () => {
+  it('turns the daily objective into a three-move phone brief', () => {
+    const d = data();
+    d.intelligence.daily = { mode: 'revenue', outcome: 'Move money forward', why: 'Warm replies come first.', actions: [{ id: 'reply', title: 'Reply to the planner', reason: 'They asked for pricing.', business: 'vowmotion', score: 96, effort: '10 min', confidence: 'high', source: 'Gmail', href: 'https://mail/1' }], handled: ['Healthy runs stay quiet.'], generatedAt: now };
+    const card = focusCard(d);
+    assert.match(card.text, /Move money forward/);
+    assert.match(card.text, /1\. <b>Reply to the planner<\/b> · 10 min/);
+    assert.match(card.text, /You can ignore: Healthy runs stay quiet/);
+    assert.equal(card.buttons[0].url, 'https://arctoslaunchpad.com/hq#today');
   });
 });
 
