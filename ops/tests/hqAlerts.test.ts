@@ -180,4 +180,9 @@ describe('outreachAlert', () => {
     assert.match(outreachAlert({ event: 'done', campaign: 'calgarywatch', sent: [], failed: { business: 'Zoo', error: 'Resend 422' } }), /Couldn't send to Zoo/);
     assert.match(outreachAlert({ event: 'done', campaign: 'vowmotion', sent: ['Shine Events'], failed: null, sentToday: 6, cap: 50, left: 7 }), /✅ <b>Vow Motion outreach done<\/b>: 1 email sent/);
   });
+  it('says what the morning prospect research found', () => {
+    assert.equal(outreachAlert({ event: 'prospects', campaign: 'arctos', found: 42, dropped: 3, left: 42 }), '🔎 Found 42 new Arctos prospects, each with an email written for them. 3 more didn\'t pass the checks and were left out. 42 now queued to send.');
+    assert.match(outreachAlert({ event: 'prospects', campaign: 'vowmotion', found: 1, dropped: 0 }), /Found 1 new Vow Motion prospect,/);
+    assert.match(outreachAlert({ event: 'prospects', campaign: 'arctos', error: 'turn limit', left: 0, runUrl: 'https://github.com/Aldo140/ArctosLaunchpad/actions/runs/2' }), /⚠️ <b>Arctos prospect research didn't finish<\/b>: turn limit\. 0 now queued to send\.\n<a href/);
+  });
 });
