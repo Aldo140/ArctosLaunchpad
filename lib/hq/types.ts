@@ -45,6 +45,7 @@ export interface HqPost {
   warnings: string[];
   facts: string;
   note: string;
+  relevantUntil: number | null;
   suggestedFor: number | null;
   scheduledFor: number | null;
   publishedAt: number | null;

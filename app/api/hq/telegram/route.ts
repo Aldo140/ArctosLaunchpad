@@ -116,8 +116,9 @@ function actions(chatId: number, email: string): AskActions {
 async function sendInbox(chatId: number, data: HqData, now: number) {
   const cards = inboxCards(data, now);
   if (!cards.length) return sendText(chatId, "Nothing to decide. Go find money.");
-  for (const c of cards.slice(0, 15)) await sendCard(chatId, c);
-  if (cards.length > 15) await sendText(chatId, `…and ${cards.length - 15} more on the dashboard.`);
+  // A phone inbox should be clearable, not a wall of fifteen long messages.
+  for (const c of cards.slice(0, 5)) await sendCard(chatId, c);
+  if (cards.length > 5) await sendText(chatId, `<b>${cards.length - 5} more decisions</b> are waiting. Clear these five first, then send /inbox again.`, [{ text: "Open full inbox", url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://arctoslaunchpad.com"}/hq#inbox` }]);
 }
 
 async function onMessage(chatId: number, text: string, email: string) {

@@ -158,9 +158,10 @@ export interface HqSnapshot {
 const ADMIN = 'https://calgarywatch.ca/admin';
 
 /** Everything that can't move until a person looks at it, oldest first. */
-export function todayItems(posts: OpsPost[], leads: PartnerLead[], health: OpsHealth | null): TodayItem[] {
+export function todayItems(posts: OpsPost[], leads: PartnerLead[], health: OpsHealth | null, now = Date.now()): TodayItem[] {
   const out: TodayItem[] = [];
   for (const p of posts) {
+    if (p.relevantUntil && p.relevantUntil < now) continue;
     const title = p.imageText?.headline || p.caption.split('\n')[0].slice(0, 80) || 'Untitled post';
     const since = (p as { updatedAt?: number }).updatedAt ?? (p as { createdAt?: number }).createdAt ?? 0;
     if (p.status === 'drafted') out.push({ id: `post-${p.id}`, business: p.brand, kind: 'post-review', title, detail: `${p.template} post waiting for approval${p.warnings?.length ? ` · ${p.warnings[0]}` : ''}`, since, link: ADMIN });
@@ -276,7 +277,7 @@ const OPEN_POSTS = ['drafted', 'approved', 'failed', 'needs-correction', 'redraf
 export function hqPosts(posts: OpsPost[], now: number): HqPost[] {
   const recent = (p: OpsPost) => p.status === 'published' && (p.publishedAt ?? 0) >= now - 14 * DAY;
   return posts
-    .filter(p => OPEN_POSTS.includes(p.status) || recent(p))
+    .filter(p => (OPEN_POSTS.includes(p.status) && (!p.relevantUntil || p.relevantUntil >= now)) || recent(p))
     .map(p => ({
       id: p.id,
       brand: p.brand,
@@ -292,6 +293,7 @@ export function hqPosts(posts: OpsPost[], now: number): HqPost[] {
       warnings: p.warnings ?? [],
       facts: (p.facts ?? '').slice(0, 1500),
       note: p.note ?? '',
+      relevantUntil: p.relevantUntil ?? null,
       suggestedFor: p.suggestedFor ?? null,
       scheduledFor: p.scheduledFor ?? null,
       publishedAt: p.publishedAt ?? null,

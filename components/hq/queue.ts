@@ -16,7 +16,10 @@ export type QueueItem =
 
 export const QUEUE_GROUP: Record<QueueItem["kind"], string> = { reply: "Replies", gmail: "Replies", post: "Posts", pitch: "Pitches" };
 
-const DECIDE = ["drafted", "needs-correction", "failed"];
+// Published-post corrections are intentionally disabled. They must not return
+// as decisions while the cleanup job catches up.
+const DECIDE = ["drafted", "failed"];
+const DAY = 86_400_000;
 
 const TARGET: Record<QueueItem["kind"], CommandType[]> = {
   reply: ["approve-reply", "handled-reply"],
@@ -32,15 +35,21 @@ export function isQueued(data: HqData, i: QueueItem): boolean {
 }
 
 /** What's still yours to decide (queued actions left out). */
-export const openDecisions = (data: HqData, filter: Filter) => decisionQueue(data, filter).filter((i) => !isQueued(data, i));
+export const openDecisions = (data: HqData, filter: Filter, now = Date.now()) => decisionQueue(data, filter, now).filter((i) => !isQueued(data, i));
 
-export function decisionQueue(data: HqData, filter: Filter): QueueItem[] {
+export function decisionQueue(data: HqData, filter: Filter, now = Date.now()): QueueItem[] {
   const snap = data.snapshot;
   const replies: QueueItem[] = (snap?.inbox?.replies ?? [])
     .filter((r) => !r.approved && inFilter(filter, r.business))
     .map((reply) => ({ kind: "reply", key: `r-${reply.leadId}`, at: reply.at, business: reply.business, reply }));
   const gmail: QueueItem[] = replyBoard(data, (r) => inFilter(filter, r.business)).board.map((item) => ({ kind: "gmail", key: `g-${triageKey(item.reply)}`, at: item.reply.at, business: item.reply.business, item }));
-  const posts = (snap?.posts ?? []).filter((p) => DECIDE.includes(p.status) && inFilter(filter, p.brand));
+  const posts = (snap?.posts ?? []).filter((p) =>
+    DECIDE.includes(p.status) &&
+    inFilter(filter, p.brand) &&
+    (!p.relevantUntil || p.relevantUntil >= now) &&
+    // Old failures belong in System history, not an endless approval queue.
+    (p.status !== "failed" || p.updatedAt >= now - 7 * DAY)
+  );
   const fixes: QueueItem[] = posts.filter((p) => p.status !== "drafted").map((post) => ({ kind: "post", key: `p-${post.id}`, at: post.updatedAt, business: post.brand, post }));
   const drafts: QueueItem[] = posts
     .filter((p) => p.status === "drafted")

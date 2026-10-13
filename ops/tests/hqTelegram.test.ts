@@ -13,7 +13,7 @@ const DAY = 24 * HOUR;
 const post = (over: Partial<HqPost>): HqPost => ({
   id: 'p1', brand: 'calgarydaily', status: 'drafted', template: 'event', format: 'image', headline: 'Elk in Banff', caption: 'Caption <b>', altText: 'alt',
   imageUrl: 'https://img/1.png', imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', suggestedFor: null, scheduledFor: null, publishedAt: null,
-  permalink: null, error: null, insights: null, updatedAt: now, ...over,
+  relevantUntil: null, permalink: null, error: null, insights: null, updatedAt: now, ...over,
 });
 
 const snapshot = (over: Partial<HqSnapshot> = {}): HqSnapshot => ({
@@ -149,6 +149,16 @@ describe('inboxCards', () => {
   it('leaves out what was already decided and is waiting for the agents', () => {
     const queued = data({ commands: [{ id: 'c1', type: 'approve-post', targetId: 'p1', by: 'me', at: now, status: 'pending', result: null, appliedAt: null }] });
     assert.equal(inboxCards(queued, now).length, 3);
+  });
+  it('hides expired and obsolete correction posts even when a snapshot is stale', () => {
+    const posts = [
+      post({ id: 'expired', relevantUntil: now - 1, suggestedFor: now - DAY }),
+      post({ id: 'correction', status: 'needs-correction' }),
+      post({ id: 'current', relevantUntil: now + DAY }),
+    ];
+    const cards = inboxCards(data({ snapshot: snapshot({ posts, inbox: { at: now, pitches: [], replies: [] } }), gmail: null }), now);
+    assert.equal(cards.length, 1);
+    assert.match(cards[0].text, /Elk in Banff/);
   });
 });
 

@@ -160,7 +160,7 @@ function gymText(data: HqData, now: number): string {
 /** The /today message: HQ's Today, top to bottom, from the same numbers. */
 export function briefing(data: HqData, now: number): Card {
   const snap = data.snapshot;
-  const queue = openDecisions(data, "all");
+  const queue = openDecisions(data, "all", now);
   const feel = mood(data, now, "all", queue.length);
   const lines: string[] = [
     `<b>${GREETING}</b> ${queue.length ? `${plural(queue.length, "thing")} ${queue.length === 1 ? "needs" : "need"} you.` : "Nothing needs you. Go find money."}`,
@@ -192,9 +192,11 @@ export function briefing(data: HqData, now: number): Card {
     if (queue.length > 5) lines.push(`…and ${queue.length - 5} more`);
   }
 
-  const bad = (snap?.bottlenecks ?? []).filter((b) => b.severity === "bad");
+  // Queue size is already shown above, and publishing-delay averages are a
+  // trend for HQ—not a fresh emergency Aldo can fix from this message.
+  const bad = (snap?.bottlenecks ?? []).filter((b) => b.severity === "bad" && b.id !== "you" && b.id !== "late");
   if (bad.length) {
-    lines.push("", "<b>Broken</b>");
+    lines.push("", "<b>System problems</b>");
     for (const b of bad.slice(0, 4)) lines.push(`• 🔴 ${escapeHtml(b.label)}: ${escapeHtml(b.value)}`);
   }
 
@@ -236,9 +238,11 @@ function queueCard(i: QueueItem, now: number): Card {
   switch (i.kind) {
     case "post": {
       const p = i.post;
-      const flag = p.status === "drafted" ? "" : `\n⚠️ ${escapeHtml(p.error ?? p.warnings[0] ?? p.status)}`;
+      const issue = p.error ?? p.warnings[0] ?? (p.status === "failed" ? "Publishing failed" : null);
+      const flag = issue ? `\n⚠️ ${escapeHtml(clip(issue, 180))}` : "";
+      const due = p.suggestedFor ? `\n<i>Suggested ${escapeHtml(slot(p.suggestedFor))}</i>` : "";
       return {
-        text: `📝 <b>${escapeHtml(label(p.brand))} post</b>: ${escapeHtml(p.headline)}${flag}\n\n${escapeHtml(clip(p.caption, 700))}`,
+        text: `📝 <b>${escapeHtml(label(p.brand))} post</b>: ${escapeHtml(p.headline)}${flag}${due}\n\n${escapeHtml(clip(p.caption, 420))}`,
         photo: p.imageUrl ?? p.imageUrls[0] ?? null,
         buttons: [...btn("Approve", encodeQueue("approve-post", p.id)), ...btn("Reject", encodeQueue("reject-post", p.id))],
       };
@@ -282,7 +286,7 @@ function mailCard(i: Extract<QueueItem, { kind: "gmail" }>, now: number): Card {
 
 /** The /inbox messages: one card per open decision, in the dashboard's order, with its actions. */
 export function inboxCards(data: HqData, now: number): Card[] {
-  return openDecisions(data, "all").map((i) => queueCard(i, now));
+  return openDecisions(data, "all", now).map((i) => queueCard(i, now));
 }
 
 /** What the bot says after logging something, with the number that moved. */
@@ -354,7 +358,7 @@ export function reportForQuestion(data: HqData, now: number, maxChars = 300_000)
   const owed = owedStats(data, now, "all");
   const gym = gymStats(data, now);
   const todos = todoStats(data, now);
-  const queue = openDecisions(data, "all");
+  const queue = openDecisions(data, "all", now);
   const totals = {
     note: "Computed by HQ, exactly as the dashboard shows them. Money is in cents. Quote these rather than adding up entries yourself.",
     waitingOnAldo: queue.map((i) => ({ kind: i.kind, ...describe(i), at: i.at, business: i.business })),

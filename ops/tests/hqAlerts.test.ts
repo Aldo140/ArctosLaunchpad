@@ -50,8 +50,8 @@ describe('alertsFor', () => {
         { leadId: 'l2', business: 'calgarywatch', businessName: 'Done', from: 'c@x.ca', subject: 'Re', text: 'Ok', classification: 'interested', suggestedSubject: 'Re', suggestedBody: 'Ok', approved: true, at: wed10am },
       ] },
       posts: [
-        { id: 'p1', brand: 'calgarydaily', status: 'failed', template: 'event', format: 'image', headline: 'Elk', caption: '', altText: '', imageUrl: null, imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', suggestedFor: null, scheduledFor: null, publishedAt: null, permalink: null, error: 'Media expired', insights: null, updatedAt: wed10am },
-        { id: 'p2', brand: 'calgarydaily', status: 'published', template: 'event', format: 'image', headline: 'Fine', caption: '', altText: '', imageUrl: null, imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', suggestedFor: null, scheduledFor: null, publishedAt: wed10am, permalink: null, error: null, insights: null, updatedAt: wed10am },
+        { id: 'p1', brand: 'calgarydaily', status: 'failed', template: 'event', format: 'image', headline: 'Elk', caption: '', altText: '', imageUrl: null, imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', relevantUntil: null, suggestedFor: null, scheduledFor: null, publishedAt: null, permalink: null, error: 'Media expired', insights: null, updatedAt: wed10am },
+        { id: 'p2', brand: 'calgarydaily', status: 'published', template: 'event', format: 'image', headline: 'Fine', caption: '', altText: '', imageUrl: null, imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', relevantUntil: null, suggestedFor: null, scheduledFor: null, publishedAt: wed10am, permalink: null, error: null, insights: null, updatedAt: wed10am },
       ],
       bottlenecks: [
         { id: 'inbox', label: 'Reply inbox sync', value: '7 h ago', severity: 'bad', detail: 'Outreach stops.' },
