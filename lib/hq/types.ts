@@ -45,6 +45,7 @@ export interface HqPost {
   warnings: string[];
   facts: string;
   note: string;
+  relevantUntil: number | null;
   suggestedFor: number | null;
   scheduledFor: number | null;
   publishedAt: number | null;
@@ -310,6 +311,40 @@ export interface LifeEntry {
 /** Aldo's own settings, saved from HQ. */
 export interface HqSettings { moneyGoal: number | null }
 
+export type HqMemoryKind = "preference" | "rule" | "person" | "decision" | "priority";
+export interface HqMemory { id: string; kind: HqMemoryKind; text: string; business: Business | "all"; at: number; by: string }
+export type HqExperimentStatus = "planned" | "running" | "won" | "lost" | "inconclusive";
+export interface HqExperiment {
+  id: string; title: string; hypothesis: string; metric: string; business: Business;
+  status: HqExperimentStatus; startedAt: number; endsAt: number | null; result: string | null; by: string;
+}
+export interface HqProductEvent { id: string; name: string; area: string; at: number; by: string; detail: string | null }
+export interface HqRecommendation {
+  id: string; title: string; reason: string; business: Business | "all"; score: number;
+  effort: "2 min" | "10 min" | "30+ min"; confidence: "high" | "medium" | "low"; source: string; href: string | null;
+}
+export interface HqRelationship {
+  key: string; name: string; business: Business | "other"; email: string | null; lastAt: number;
+  touches: number; state: string; next: string | null; url: string | null;
+}
+export interface HqIntelligence {
+  daily: {
+    mode: "restore" | "revenue" | "deliver" | "grow" | "clear";
+    outcome: string;
+    why: string;
+    actions: HqRecommendation[];
+    handled: string[];
+    generatedAt: number;
+  };
+  recommendations: HqRecommendation[];
+  relationships: HqRelationship[];
+  opportunities: Array<{ title: string; detail: string; business: Business | "all"; confidence: "high" | "medium" | "low"; source: string }>;
+  weekly: { wins: string[]; risks: string[]; focus: string[]; generatedAt: number };
+  workload: { open: number; urgent: number; message: string };
+  connections: Array<{ id: string; label: string; state: "connected" | "stale" | "missing"; detail: string; action: string | null; href: string | null }>;
+  research: { events7d: number; topAreas: Array<{ area: string; count: number }>; message: string };
+}
+
 /**
  * The reply check: before a Gmail reply reaches the board, an agent reads the
  * thread and what else is going on with that sender and decides whether it
@@ -371,5 +406,9 @@ export interface HqResponse {
   settings?: HqSettings | null;
   triage: GmailTriage | null;
   decisions: TriageDecision[];
+  memories: HqMemory[];
+  experiments: HqExperiment[];
+  productEvents: HqProductEvent[];
+  intelligence: HqIntelligence;
   errors: string[];
 }

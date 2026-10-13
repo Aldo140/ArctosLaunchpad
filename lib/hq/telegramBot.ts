@@ -96,6 +96,7 @@ export const HELP = [
   "<b>HQ</b> on your phone. Same numbers as the dashboard.",
   "",
   "/today: your day, the way HQ's Today shows it",
+  "/focus: the three moves that matter most today",
   "/inbox: posts, pitches and replies to decide, one tap each",
   "/money: this month against your goal, and who owes you",
   "/gym: log today's gym visit",
@@ -116,6 +117,7 @@ export const HELP = [
 /** The bot's command menu (Telegram's / button). */
 export const MENU = [
   { command: "today", description: "Your day, like HQ's Today" },
+  { command: "focus", description: "The three moves that matter today" },
   { command: "inbox", description: "Decide posts, pitches and replies" },
   { command: "money", description: "This month, the goal, who owes you" },
   { command: "gym", description: "Log today's gym visit" },
@@ -124,6 +126,20 @@ export const MENU = [
   { command: "ig", description: "Tell the Instagram agent something" },
   { command: "help", description: "What HQ can do here" },
 ];
+
+/** The smallest useful founder brief: one outcome, three moves, and permission to ignore the rest. */
+export function focusCard(data: HqData): Card {
+  const plan = data.intelligence.daily;
+  const lines = [`🎯 <b>${escapeHtml(plan.outcome)}</b>`, escapeHtml(plan.why)];
+  if (plan.actions.length) {
+    lines.push("");
+    plan.actions.forEach((a, i) => lines.push(`${i + 1}. <b>${escapeHtml(clip(a.title, 100))}</b> · ${a.effort}\n   ${escapeHtml(clip(a.reason, 180))}`));
+  } else {
+    lines.push("", "Nothing urgent is visible. Protect a block for sales, product work, or recovery.");
+  }
+  lines.push("", `<i>You can ignore: ${escapeHtml(plan.handled.join(" "))}</i>`);
+  return { text: lines.join("\n"), photo: null, buttons: [{ text: plan.actions.length ? "Open today's plan" : "Open HQ", url: `${HQ_URL}#today` }, { text: "Decisions", data: "i" }] };
+}
 
 export interface Button {
   text: string;
@@ -160,7 +176,7 @@ function gymText(data: HqData, now: number): string {
 /** The /today message: HQ's Today, top to bottom, from the same numbers. */
 export function briefing(data: HqData, now: number): Card {
   const snap = data.snapshot;
-  const queue = openDecisions(data, "all");
+  const queue = openDecisions(data, "all", now);
   const feel = mood(data, now, "all", queue.length);
   const lines: string[] = [
     `<b>${GREETING}</b> ${queue.length ? `${plural(queue.length, "thing")} ${queue.length === 1 ? "needs" : "need"} you.` : "Nothing needs you. Go find money."}`,
@@ -192,9 +208,11 @@ export function briefing(data: HqData, now: number): Card {
     if (queue.length > 5) lines.push(`…and ${queue.length - 5} more`);
   }
 
-  const bad = (snap?.bottlenecks ?? []).filter((b) => b.severity === "bad");
+  // Queue size is already shown above, and publishing-delay averages are a
+  // trend for HQ—not a fresh emergency Aldo can fix from this message.
+  const bad = (snap?.bottlenecks ?? []).filter((b) => b.severity === "bad" && b.id !== "you" && b.id !== "late");
   if (bad.length) {
-    lines.push("", "<b>Broken</b>");
+    lines.push("", "<b>System problems</b>");
     for (const b of bad.slice(0, 4)) lines.push(`• 🔴 ${escapeHtml(b.label)}: ${escapeHtml(b.value)}`);
   }
 
@@ -236,9 +254,11 @@ function queueCard(i: QueueItem, now: number): Card {
   switch (i.kind) {
     case "post": {
       const p = i.post;
-      const flag = p.status === "drafted" ? "" : `\n⚠️ ${escapeHtml(p.error ?? p.warnings[0] ?? p.status)}`;
+      const issue = p.error ?? p.warnings[0] ?? (p.status === "failed" ? "Publishing failed" : null);
+      const flag = issue ? `\n⚠️ ${escapeHtml(clip(issue, 180))}` : "";
+      const due = p.suggestedFor ? `\n<i>Suggested ${escapeHtml(slot(p.suggestedFor))}</i>` : "";
       return {
-        text: `📝 <b>${escapeHtml(label(p.brand))} post</b>: ${escapeHtml(p.headline)}${flag}\n\n${escapeHtml(clip(p.caption, 700))}`,
+        text: `📝 <b>${escapeHtml(label(p.brand))} post</b>: ${escapeHtml(p.headline)}${flag}${due}\n\n${escapeHtml(clip(p.caption, 420))}`,
         photo: p.imageUrl ?? p.imageUrls[0] ?? null,
         buttons: [...btn("Approve", encodeQueue("approve-post", p.id)), ...btn("Reject", encodeQueue("reject-post", p.id))],
       };
@@ -282,7 +302,7 @@ function mailCard(i: Extract<QueueItem, { kind: "gmail" }>, now: number): Card {
 
 /** The /inbox messages: one card per open decision, in the dashboard's order, with its actions. */
 export function inboxCards(data: HqData, now: number): Card[] {
-  return openDecisions(data, "all").map((i) => queueCard(i, now));
+  return openDecisions(data, "all", now).map((i) => queueCard(i, now));
 }
 
 /** What the bot says after logging something, with the number that moved. */
@@ -354,7 +374,7 @@ export function reportForQuestion(data: HqData, now: number, maxChars = 300_000)
   const owed = owedStats(data, now, "all");
   const gym = gymStats(data, now);
   const todos = todoStats(data, now);
-  const queue = openDecisions(data, "all");
+  const queue = openDecisions(data, "all", now);
   const totals = {
     note: "Computed by HQ, exactly as the dashboard shows them. Money is in cents. Quote these rather than adding up entries yourself.",
     waitingOnAldo: queue.map((i) => ({ kind: i.kind, ...describe(i), at: i.at, business: i.business })),
@@ -364,12 +384,23 @@ export function reportForQuestion(data: HqData, now: number, maxChars = 300_000)
     todos: { open: todos.open, lateCount: todos.overdue.length, dueTodayCount: todos.today.length },
   };
   const life = (data.life ?? []).filter((e) => e.kind !== "note" || !e.done).filter((e) => e.at > now - 120 * 86_400_000);
-  const report: Record<string, unknown> = { totals, calendar: data.calendar, aldoLog: life, snapshot: slim, gmail: data.gmail, replyCheck: data.triage?.items.map((t) => omit(t, ["fingerprint"])) };
+  const report: Record<string, unknown> = {
+    totals,
+    prioritiesAndMemory: data.memories,
+    experiments: data.experiments,
+    intelligence: data.intelligence,
+    calendar: data.calendar,
+    aldoLog: life,
+    snapshot: slim,
+    gmail: data.gmail,
+    replyCheck: data.triage?.items.map((t) => omit(t, ["fingerprint"])),
+  };
   const omitted: string[] = [];
   const drops: Array<[string, () => void]> = [
     ["lead list", () => slim && (slim.pipelineDetail = undefined)],
     ["Instagram inspiration", () => slim && (slim.instagram = undefined)],
     ["Gmail sends", () => (report.gmail = data.gmail && { ...data.gmail, sends: [] })],
+    ["relationship history", () => (report.intelligence = { ...data.intelligence, relationships: [] })],
     ["reply check notes", () => (report.replyCheck = undefined)],
   ];
   let json = JSON.stringify(report);

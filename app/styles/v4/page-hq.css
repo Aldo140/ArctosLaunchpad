@@ -219,6 +219,42 @@
 .hq-state[data-sev="ok"] { border-color: var(--hq-ok-line); }
 .hq-state[data-sev="bad"] { border-color: var(--hq-bad-line); }
 
+/* Improve: one quiet place for decisions, learning and setup. */
+.hq-improve { display: grid; gap: 18px; }
+.hq-ranklist, .hq-memory, .hq-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.hq-ranklist li { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; gap: 13px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+.hq-ranklist li > b { font: 650 1.1rem/1 var(--mono); color: var(--accent); }
+.hq-ranklist strong, .hq-memory strong, .hq-experiments strong { display: block; }
+.hq-ranklist p, .hq-mini p, .hq-experiments p, .hq-connections p { margin: 3px 0; color: var(--muted); }
+.hq-ranklist small, .hq-mini small, .hq-memory small, .hq-experiments small { color: var(--muted); }
+.hq-review { margin-top: 18px; }
+.hq-review > strong { font-family: var(--mono); text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; }
+.hq-review ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 7px; }
+.hq-mini { padding: 13px 0; border-top: 1px solid var(--line); }
+.hq-formrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.hq-memory li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.hq-memory .hq-chip { margin-right: 8px; }
+.hq-experiments { display: grid; gap: 12px; }
+.hq-experiments article { padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); }
+.hq-experiments .hq-chip { float: right; }
+.hq-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hq-bars li { display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 10px 0; }
+.hq-connections { display: grid; gap: 9px; }
+.hq-connections article { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 13px; border: 1px solid var(--line); border-radius: var(--radius); }
+.hq-connections article > span { width: 9px; height: 9px; border-radius: 50%; background: var(--hq-ok); }
+.hq-connections article[data-state="missing"] > span { background: var(--hq-bad); }
+.hq-connections article[data-state="stale"] > span { background: var(--hq-warn); }
+.hq-connections article > b { font: 500 .75rem/1 var(--mono); text-transform: uppercase; color: var(--muted); }
+.hq-steps { list-style: decimal; padding-left: 22px; margin-bottom: 18px; }
+.hq-steps li { padding-left: 6px; line-height: 1.55; }
+@media (max-width: 700px) {
+  .hq-ranklist li { grid-template-columns: 34px minmax(0,1fr); }
+  .hq-ranklist li > a { grid-column: 2; justify-self: start; }
+  .hq-formrow { grid-template-columns: 1fr; }
+  .hq-connections article { grid-template-columns: 10px minmax(0,1fr); }
+  .hq-connections article > a, .hq-connections article > b { grid-column: 2; justify-self: start; }
+}
+
 /* ---- Media ------------------------------------------------------------ */
 .hq-thumb { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: 8px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
 .hq-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -732,6 +768,31 @@ main > .hq-subnav, main > .hq-sysline { margin-bottom: 18px; }
 .hq-brief__more { display: none; justify-self: start; font-size: 0.86rem; }
 .hq-warntext { color: var(--hq-warn); font-weight: 500; }
 .hq-tile2__sub[data-sev="warn"] { color: var(--hq-warn); }
+
+/* One outcome and three moves: the calm command layer shared with Telegram. */
+.hq-daily { display: grid; grid-template-columns: minmax(210px,.72fr) minmax(300px,1.28fr); gap: clamp(18px,3vw,42px); border-top: 3px solid var(--accent); }
+.hq-daily[data-mode="revenue"] { border-top-color: var(--hq-ok); }
+.hq-daily[data-mode="restore"], .hq-daily[data-mode="deliver"] { border-top-color: var(--hq-warn); }
+.hq-daily__lead > p:last-child { color: var(--muted); max-width: 46ch; margin-bottom: 0; }
+.hq-daily__moves { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.hq-daily__moves > li { display: grid; grid-template-columns: 28px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.hq-daily__moves > li:first-child { padding-top: 0; }
+.hq-daily__moves > li:last-child { border-bottom: 0; padding-bottom: 0; }
+.hq-daily__moves > li > b { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--paper); font: 600 .72rem/1 var(--mono); }
+.hq-daily__moves div { display: grid; gap: 3px; min-width: 0; }
+.hq-daily__moves strong, .hq-calm > b { font: 600 1rem/1.3 var(--sans); }
+.hq-daily__moves span { color: var(--muted); font-size: .86rem; overflow-wrap: anywhere; }
+.hq-daily__moves small { color: var(--faint); font: 500 .66rem/1.3 var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.hq-daily__handled { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; color: var(--muted); font-size: .82rem; }
+.hq-daily__handled summary { cursor: pointer; color: var(--faint); font: 500 .68rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.hq-daily__handled ul { margin: 10px 0 0; padding-left: 20px; }
+.hq-calm { align-content: start; }
+.hq-calm > p { margin-bottom: 0; }
+@media (max-width: 720px) {
+  .hq-daily { grid-template-columns: 1fr; gap: 18px; }
+  .hq-daily__moves > li { grid-template-columns: 26px minmax(0,1fr); }
+  .hq-daily__moves .hq-btn { grid-column: 2; justify-self: start; }
+}
 
 /* Due days */
 .hq-due { display: inline-flex; gap: 6px; min-width: 0; }

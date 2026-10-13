@@ -125,16 +125,18 @@ const PitchSchema = z.object({
   reasonRelevant: z.string().describe('One sentence: why this message is relevant to the recipient in their business role.'),
 });
 
-export async function writePitch(cfg: OutreachConfig, lead: { businessName: string; category: string; neighbourhood: string; facts: string; followUp: boolean; previous?: string }, signature: string) {
+export async function writePitch(cfg: OutreachConfig, lead: { businessName: string; category: string; neighbourhood: string; facts: string; followUp: boolean; previous?: string; examples?: string[] }, signature: string) {
   const offer = cfg.paidOfferEnabled ? [...cfg.offer, ...cfg.paidOffer] : cfg.offer;
   const system = [
     `You write short, personal business emails for ${cfg.sender.name}, ${cfg.sender.title}.`,
     'CalgaryWatch is a free Calgary guide to events, markets, local businesses and neighbourhoods, with every listing checked against the organizer\'s own page.',
     `What we can offer (only offer these, word them naturally):\n- ${offer.join('\n- ')}`,
     cfg.paidOfferEnabled ? 'A paid placement may be mentioned once, as optional, and must be described as labelled.' : 'Do not mention prices, paid placement, advertising or sponsorship at all.',
-    'Rules: one specific reason we are writing to this business, taken from the facts. No flattery, no claims about traffic or audience size, no urgency, no invented details. Ask one easy question. Plain text, no bullet lists.',
+    cfg.whyNow ? `Why we're writing now (say this once in a first email, in these words or close to them; don't add numbers or say what the promo includes beyond the offer above):\n${cfg.whyNow}` : '',
+    `Rules: one specific reason we are writing to this business, taken from the facts. Include exactly one link from the facts so they can see what they could have: their own listing if there is one, otherwise the page given. No flattery, no claims about traffic or audience size${cfg.whyNow ? ' beyond the line above' : ''}, no urgency, no invented details. Ask one easy question. Plain text, no bullet lists.`,
+    lead.examples?.length ? `Earlier emails of ours that businesses answered. Learn from what worked (tone, length, the question asked); never copy their details:\n\n${lead.examples.join('\n\n---\n\n')}` : '',
     `The body must end with exactly this sign-off and nothing after it:\n${signature}`,
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
   const user = lead.followUp
     ? `Write a brief, polite follow-up (under 80 words) to an unanswered email.\nBusiness: ${lead.businessName}\nPrevious email:\n${lead.previous ?? ''}`
     : `Business: ${lead.businessName}\nCategory: ${lead.category}\nNeighbourhood: ${lead.neighbourhood}\nWhat CalgaryWatch already lists about them:\n${lead.facts}`;

@@ -6,6 +6,7 @@
 //                                               prints their ids. Code jobs run here (ops-clock.yml); mail
 //                                               jobs in Calgary-Watch-, which holds the Outlook secrets.
 //   node ops/agent-jobs.ts claim <id>           marks the job running, prints its kind (code or mail)
+//   node ops/agent-jobs.ts release <id>         puts a queued job back to pending after dispatch fails
 //   node ops/agent-jobs.ts task <id> <file>     writes the task to <file>
 //   node ops/agent-jobs.ts finish <id> <status> [result file]
 //                                               status: pushed | answered | checks-failed | failed;
@@ -86,6 +87,12 @@ try {
       await patch(token, jobId, { status: 'queued' });
       console.log(jobId);
     }
+  } else if (cmd === 'release') {
+    const jobId = validId(id);
+    const doc = await json(await fetch(`${DOCS}/${COLLECTION}/${jobId}`, { headers: { Authorization: `Bearer ${token}` } }), `Reading job ${jobId}`);
+    const status = doc.fields?.status?.stringValue;
+    if (status !== 'queued') throw new Error(`Job ${jobId} is ${status ?? 'missing a status'}, not queued.`);
+    await patch(token, jobId, { status: 'pending' });
   } else if (cmd === 'claim' || cmd === 'task') {
     const jobId = validId(id);
     const doc = await json(await fetch(`${DOCS}/${COLLECTION}/${jobId}`, { headers: { Authorization: `Bearer ${token}` } }), `Reading job ${jobId}`);
@@ -112,7 +119,7 @@ try {
       run: process.env.RUN_URL || null, finishedAt: Date.now(),
     });
   } else {
-    console.error('Usage: pending [code|mail] | claim <id> | task <id> <file> | finish <id> <status> [result file]');
+    console.error('Usage: pending [code|mail] | release <id> | claim <id> | task <id> <file> | finish <id> <status> [result file]');
     process.exit(2);
   }
 } catch (e) {

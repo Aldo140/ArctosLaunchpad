@@ -33,6 +33,8 @@ export interface HqContextValue {
   setGoal: (cents: number | null) => Promise<void>;
   /** Opens the quick-add sheet on a tab. */
   quickAdd: (tab: "gym" | "money" | "note" | "owed") => void;
+  improve: (body: Record<string, unknown>) => Promise<boolean>;
+  refresh: () => Promise<void>;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }

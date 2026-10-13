@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, encodeIgForget, igListCards, igNoteText, igSavedText, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
+import { briefing, chunks, decodeButton, encodePaid, encodeQueue, encodeRemove, encodeTodo, encodeTriage, encodeUndo, encodeIgForget, focusCard, igListCards, igNoteText, igSavedText, inboxCards, loggedText, moneyCard, reportForQuestion, telegramUsers } from '../../lib/hq/telegramBot';
 import { triageKey } from '../../lib/hq/triage';
 import type { GmailSummary, HqData, HqPost, HqSnapshot, LifeEntry } from '../../lib/hq/types';
 
@@ -13,7 +13,7 @@ const DAY = 24 * HOUR;
 const post = (over: Partial<HqPost>): HqPost => ({
   id: 'p1', brand: 'calgarydaily', status: 'drafted', template: 'event', format: 'image', headline: 'Elk in Banff', caption: 'Caption <b>', altText: 'alt',
   imageUrl: 'https://img/1.png', imageUrls: [], videoUrl: null, warnings: [], facts: '', note: '', suggestedFor: null, scheduledFor: null, publishedAt: null,
-  permalink: null, error: null, insights: null, updatedAt: now, ...over,
+  relevantUntil: null, permalink: null, error: null, insights: null, updatedAt: now, ...over,
 });
 
 const snapshot = (over: Partial<HqSnapshot> = {}): HqSnapshot => ({
@@ -50,7 +50,10 @@ const life: LifeEntry[] = [
 const data = (over: Partial<HqData> = {}): HqData => ({
   snapshot: snapshot(), arctos: null, commands: [], workflows: [], gmail,
   calendar: { generatedAt: now, events: [{ title: 'Call with Ramsay', start: now + HOUR, end: now + 2 * HOUR, allDay: false, location: '' }] },
-  life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [], errors: [], ...over,
+  life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [],
+  memories: [], experiments: [], productEvents: [],
+  intelligence: { daily: { mode: "grow", outcome: "Make one growth move", why: "Operations are calm.", actions: [], handled: [], generatedAt: now }, recommendations: [], relationships: [], opportunities: [], weekly: { wins: [], risks: [], focus: [], generatedAt: now }, workload: { open: 0, urgent: 0, message: "" }, connections: [], research: { events7d: 0, topAreas: [], message: "" } },
+  errors: [], ...over,
 });
 
 describe('telegramUsers', () => {
@@ -112,6 +115,18 @@ describe('briefing', () => {
   });
 });
 
+describe('focusCard', () => {
+  it('turns the daily objective into a three-move phone brief', () => {
+    const d = data();
+    d.intelligence.daily = { mode: 'revenue', outcome: 'Move money forward', why: 'Warm replies come first.', actions: [{ id: 'reply', title: 'Reply to the planner', reason: 'They asked for pricing.', business: 'vowmotion', score: 96, effort: '10 min', confidence: 'high', source: 'Gmail', href: 'https://mail/1' }], handled: ['Healthy runs stay quiet.'], generatedAt: now };
+    const card = focusCard(d);
+    assert.match(card.text, /Move money forward/);
+    assert.match(card.text, /1\. <b>Reply to the planner<\/b> · 10 min/);
+    assert.match(card.text, /You can ignore: Healthy runs stay quiet/);
+    assert.equal(card.buttons[0].url, 'https://arctoslaunchpad.com/hq#today');
+  });
+});
+
 describe('moneyCard', () => {
   it('shows the month, the goal pace and a Paid button per debt', () => {
     const card = moneyCard(data(), now);
@@ -147,6 +162,16 @@ describe('inboxCards', () => {
     const queued = data({ commands: [{ id: 'c1', type: 'approve-post', targetId: 'p1', by: 'me', at: now, status: 'pending', result: null, appliedAt: null }] });
     assert.equal(inboxCards(queued, now).length, 3);
   });
+  it('hides expired and obsolete correction posts even when a snapshot is stale', () => {
+    const posts = [
+      post({ id: 'expired', relevantUntil: now - 1, suggestedFor: now - DAY }),
+      post({ id: 'correction', status: 'needs-correction' }),
+      post({ id: 'current', relevantUntil: now + DAY }),
+    ];
+    const cards = inboxCards(data({ snapshot: snapshot({ posts, inbox: { at: now, pitches: [], replies: [] } }), gmail: null }), now);
+    assert.equal(cards.length, 1);
+    assert.match(cards[0].text, /Elk in Banff/);
+  });
 });
 
 describe('chunks', () => {
@@ -168,7 +193,7 @@ describe('reportForQuestion', () => {
     assert.equal(totals.gym.thisWeek, 1);
     assert.equal(totals.waitingOnAldo.length, 4);
     const tiny = reportForQuestion(data(), now, 10);
-    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'reply check notes']);
+    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'relationship history', 'reply check notes']);
   });
 });
 

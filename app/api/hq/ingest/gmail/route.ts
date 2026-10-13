@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse, after } from "next/server";
 import { z } from "zod";
-import { writeStringField } from "@/lib/hq/google";
+import { readStringField, writeStringField } from "@/lib/hq/google";
+import { mergeGmailSummary } from "@/lib/hq/gmailMerge";
 import { runAlertsSafely } from "@/lib/hq/alertsRun";
 import { runTriage, triageConfigured } from "@/lib/hq/triageAgent";
 import { vercelTriageStore } from "@/lib/hq/triageStore";
@@ -67,12 +68,14 @@ export async function POST(request: Request) {
   if (!keyMatches(request.headers.get("x-hq-key"))) return NextResponse.json({ error: "Not allowed." }, { status: 401 });
   const parsed = Summary.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues.slice(0, 3).map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") }, { status: 400 });
-  const summary: GmailSummary = {
+  const incoming: GmailSummary = {
     ...parsed.data,
-    // Newest first, and small enough for one Firestore document (1 MB).
-    sends: parsed.data.sends.sort((a, b) => b.at - a.at).slice(0, 1200),
-    replies: parsed.data.replies.sort((a, b) => b.at - a.at).slice(0, 400),
   };
+  const stored = await readStringField("hq/gmail", "payload");
+  const current = stored ? (JSON.parse(stored) as GmailSummary) : null;
+  // Apps Script sends only recently active conversations. Keep a rolling
+  // history here so Gmail is not reread thousands of times every day.
+  const summary = mergeGmailSummary(current, incoming);
   await writeStringField("hq/gmail", "payload", JSON.stringify(summary));
   // With a key on Vercel the check runs right away; otherwise the ops agents' hourly run does it.
   after(async () => {

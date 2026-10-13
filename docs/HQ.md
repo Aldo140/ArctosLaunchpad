@@ -149,6 +149,53 @@ the brief and the sign-off.
 - **Pull down** at the top of any tab to refresh; sheets close by dragging
   their handle down (`components/hq/Mobile.tsx`).
 
+## Improve: HQ's learning loop
+
+`/hq#improve` turns the sources HQ already reads into one operating loop:
+
+- **Focus** ranks work by urgency and expected value, exposes its source and
+  confidence, detects likely buying signals and writes a weekly founder review.
+- **Relationships** combines sent Gmail and replies into a current timeline per
+  person. It appears automatically after the mrotiz Gmail connection is live.
+- **Memory** stores explicit, reviewable priorities, preferences, rules, people
+  and decisions in `hq_memories`. Telegram receives the same memories in every
+  question context. Nothing is inferred into permanent memory.
+- **Experiments** records a hypothesis, metric, two-week window and result in
+  `hq_experiments`, so changes are judged instead of merely shipped.
+- **Research** counts minimal private usage events (`hq_product_events`): area,
+  action, time and account, never message text.
+- **Setup** diagnoses source freshness and gives the next exact repair action.
+
+The derived model is `lib/hq/intelligence.ts`; both `/api/hq/snapshot` and
+Telegram receive it through `lib/hq/load.ts`. Writes use
+`POST /api/hq/improve` and the same Firebase allowlist as every private HQ API.
+
+### Connect mrotiz Gmail and Calendar
+
+This is the one step code cannot perform because Google requires the account
+owner to grant access:
+
+1. In [Vercel environment variables](https://vercel.com/aldo140s-projects/arctos-launchpad/settings/environment-variables),
+   create `HQ_GMAIL_KEY` with a random value (`openssl rand -hex 32`). Add
+   `HQ_CALENDAR_KEY` with the same value, or omit it and let Calendar use
+   `HQ_GMAIL_KEY`. Apply it to Production and redeploy.
+2. While signed into `mrotiz14@gmail.com`, create a
+   [Google Apps Script project](https://script.google.com/home/projects/create).
+3. Copy [`ops/gmail/hq-sync.gs`](https://github.com/Aldo140/ArctosLaunchpad/blob/main/ops/gmail/hq-sync.gs)
+   into `Code.gs`. Add a second file and copy
+   [`ops/gmail/hq-calendar.gs`](https://github.com/Aldo140/ArctosLaunchpad/blob/main/ops/gmail/hq-calendar.gs).
+4. Open **Project Settings → Script properties** and add `HQ_KEY` with the
+   exact `HQ_GMAIL_KEY` value.
+5. Select `setup`, press **Run**, choose the mrotiz account and approve Gmail
+   access. Then select and run `setupCalendar` and approve Calendar access.
+6. Open [HQ Setup](https://arctoslaunchpad.com/hq#improve/setup). Gmail and
+   Calendar should show **connected** within one minute.
+
+The direct Apps Script → private HQ API path is canonical. The encrypted
+CalgaryWatch workflow remains a temporary fallback until this connection has
+reported successfully for seven days; remove it only after that observation
+window so email visibility is never lost during migration.
+
 ## On your phone (Telegram)
 
 A private Telegram bot reads everything the dashboard reads (`lib/hq/load.ts`)
