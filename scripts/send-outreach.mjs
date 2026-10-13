@@ -3,7 +3,11 @@
 //
 //   arctos     Calgary businesses, outreach/batch-*.json, weekdays 9:00-16:30 Calgary.
 //   vowmotion  Wedding planners, vow-motion/outreach/batch-*.json (outreach.yml checks
-//              out Aldo140/vow-motion there), weekdays 9:30-17:00 US Eastern.
+//              out Aldo140/vow-motion there) and outreach/vow-motion/batch-*.json,
+//              weekdays 9:30-17:00 US Eastern.
+//
+// New batches come from HQ's morning prospect research (prospects.yml,
+// scripts/prospects.mjs).
 //
 // Run by .github/workflows/outreach.yml, which HQ's operations clock starts
 // every half hour. Each run sends at most `perRun` emails per campaign inside
@@ -29,7 +33,7 @@ export const CAMPAIGNS = [
   {
     id: "arctos",
     label: "Arctos",
-    batchDir: "outreach",
+    batchDirs: ["outreach"],
     suppression: ["outreach/suppression.txt"],
     sentFile: "outreach/sent.json",
     perRun: 10,
@@ -40,7 +44,8 @@ export const CAMPAIGNS = [
   {
     id: "vowmotion",
     label: "Vow Motion",
-    batchDir: "vow-motion/outreach",
+    // The lists written by hand in the Vow Motion repo, then HQ's own research.
+    batchDirs: ["vow-motion/outreach", "outreach/vow-motion"],
     // The Vow Motion repo's own list, plus bounces this script finds.
     suppression: ["vow-motion/outreach/suppression.txt", "outreach/vow-motion-suppression.txt"],
     sentFile: "outreach/vow-motion-sent.json",
@@ -76,7 +81,7 @@ export const localTime = (d, tz) => {
 const REPORT_URL = "https://arctoslaunchpad.com/api/hq/alerts/outreach";
 
 /** Tells HQ how the run is going. Never fails the run; does nothing outside GitHub Actions. */
-async function report(body) {
+export async function report(body) {
   const { ACTIONS_ID_TOKEN_REQUEST_URL: url, ACTIONS_ID_TOKEN_REQUEST_TOKEN: bearer, GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
   if (!url || !bearer) return;
   try {
@@ -95,7 +100,7 @@ async function report(body) {
 
 export const norm = (email) => String(email).trim().toLowerCase();
 
-const readList = (file) => existsSync(file)
+export const readList = (file) => existsSync(file)
   ? readFileSync(file, "utf8").split("\n").map((l) => l.replace(/#.*/, "").trim()).filter(Boolean).map(norm)
   : [];
 
@@ -109,14 +114,19 @@ export function polish(body, fixes = []) {
   return out.replace(/(^|\n\n)([a-z])/g, (_, gap, ch) => gap + ch.toUpperCase());
 }
 
+/** Every batch file of a campaign, as [dir, file], oldest first. */
+export const batchFiles = (c) => c.batchDirs.filter((d) => existsSync(d))
+  .flatMap((d) => readdirSync(d).filter((f) => /^batch-.*\.json$/.test(f)).map((f) => [d, f]))
+  .sort((a, b) => a[1].localeCompare(b[1]) || c.batchDirs.indexOf(a[0]) - c.batchDirs.indexOf(b[0]));
+
 /** The campaign's unsent emails, oldest batch first. */
 export function queueFor(c, { sent, suppressed, today }) {
   const sentEmails = new Set(sent.map((s) => norm(s.email)));
   const edits = c.edits && existsSync(c.edits) ? JSON.parse(readFileSync(c.edits, "utf8")) : {};
-  return readdirSync(c.batchDir).filter((f) => /^batch-.*\.json$/.test(f)).sort()
-    .filter((f) => !c.startAt || f >= c.startAt.file)
-    .flatMap((f) => {
-      const rows = JSON.parse(readFileSync(join(c.batchDir, f), "utf8"))
+  return batchFiles(c)
+    .filter(([, f]) => !c.startAt || f >= c.startAt.file)
+    .flatMap(([d, f]) => {
+      const rows = JSON.parse(readFileSync(join(d, f), "utf8"))
         .map((m, i) => (m && m.body ? { ...m, body: polish(m.body, edits[f]?.[String(i + 1)]) } : m));
       return c.startAt && f === c.startAt.file ? rows.slice(c.startAt.row - 1) : rows;
     })
@@ -143,8 +153,8 @@ async function brevoProblems(tag) {
 }
 
 async function runCampaign(c, now) {
-  if (!existsSync(c.batchDir)) {
-    console.log(`::warning::${c.label}: ${c.batchDir} isn't here; skipping.`);
+  if (!c.batchDirs.some((d) => existsSync(d))) {
+    console.log(`::warning::${c.label}: none of ${c.batchDirs.join(", ")} is here; skipping.`);
     return;
   }
   const local = localTime(now, c.window.tz);

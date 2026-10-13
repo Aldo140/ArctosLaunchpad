@@ -24,6 +24,22 @@ custom bakeries).
 - Footer on every email: name, Arctos, mailing address, reply-to-unsubscribe.
   Add every opt-out or bounce to `suppression.txt` the same day.
 
+## New prospects
+
+HQ finds them. At 4 am Calgary on weekdays the clock starts
+`.github/workflows/prospects.yml`, which tops each campaign up to a full day
+(50 minus what is still queued). Claude Code researches the businesses with
+web search and page reads only, following `prospect-brief-arctos.md` and
+`prospect-brief-vowmotion.md`, and returns facts: who, the page showing their
+address, and one true detail with its page. `scripts/prospects.mjs` then
+drops anyone already emailed, listed or suppressed (by address, business name
+or domain), anyone whose domain has no mail server and anything that breaks
+the copy rules, writes each email around those facts (the introduction, case
+studies and footer are fixed in the script) and commits the batch:
+`batch-<date>-hq.json` here for Arctos, `vow-motion/batch-<date>.json` for
+Vow Motion. Every row keeps `emailSource` and `detailSource` so it can be
+checked. The HQ bot texts Aldo how many were found.
+
 ## Vow Motion
 
 The same workflow sends Vow Motion's planner outreach (signed "Arctos,
