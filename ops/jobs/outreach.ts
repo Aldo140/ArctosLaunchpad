@@ -54,6 +54,40 @@ export function showcaseFor(lead: Pick<PartnerLead, 'entityKind'>): string {
   return pages[lead.entityKind ?? ''] ?? pages.default ?? cfg.sender.site;
 }
 
+/** Only a current business/market/event entity is an own listing that may be claimed. */
+export function hasOwnListing(lead: Pick<PartnerLead, 'entityId' | 'entityKind'>): boolean {
+  return Boolean(lead.entityId && lead.entityKind !== 'prospect' && lead.entityKind !== 'organizer');
+}
+
+const FALSE_LISTING_CLAIM = /\b(?:your|their|its) listing\b|\bexisting listing\b|\blisting on CalgaryWatch\b|\balready (?:have )?listed\b|\balready on CalgaryWatch\b|\bCalgaryWatch has listed\b|\bwe(?:'ve| have) (?:added|listed)\b|\/claim\//i;
+
+/** Factual checks that apply after drafting and again at the last possible moment before delivery. */
+export function listingClaimProblems(
+  lead: Pick<PartnerLead, 'entityId' | 'entityKind' | 'draftSubject' | 'draftBody'>,
+  currentEntityIds?: ReadonlySet<string> | null,
+): string[] {
+  const problems: string[] = [];
+  const message = `${lead.draftSubject}\n${lead.draftBody}`;
+  if (!hasOwnListing(lead) && FALSE_LISTING_CLAIM.test(message)) problems.push('Claims an existing listing for a lead that has no own listing.');
+  if (hasOwnListing(lead) && currentEntityIds !== undefined) {
+    if (!currentEntityIds) problems.push('Current CalgaryWatch listing inventory is unavailable.');
+    else if (!currentEntityIds.has(lead.entityId!)) problems.push('The CalgaryWatch listing no longer exists in the current inventory.');
+  }
+  return problems;
+}
+
+export function followUpTemplate(lead: Pick<PartnerLead, 'businessName' | 'entityId' | 'entityKind'>, sig: string): string {
+  const topic = hasOwnListing(lead)
+    ? `the CalgaryWatch listing I sent for ${lead.businessName}`
+    : `my invitation to include ${lead.businessName}'s public events on CalgaryWatch`;
+  return `Hello again,\n\nJust following up on ${topic}. If you'd like us to use a particular calendar page, a one-line reply is plenty.\n\n${sig}`;
+}
+
+export function sentHistorySummary(lead: Pick<PartnerLead, 'contactEmail' | 'draftSubject'>, followUp: boolean, viaResend: boolean): string {
+  const transport = viaResend ? ' via Resend (not stored in Outlook Sent Items)' : ' via Outlook';
+  return `${followUp ? 'Follow-up' : 'First email'} sent${transport} to ${lead.contactEmail}: "${lead.draftSubject}"`;
+}
+
 export function templatePitch(lead: PartnerLead, facts: string, sig: string): { subject: string; body: string; reasonRelevant: string } {
   const why = cfg.whyNow ? `${cfg.whyNow}\n\n` : '';
   if (!facts.startsWith('Listing: ')) {
@@ -79,9 +113,9 @@ export function templatePitch(lead: PartnerLead, facts: string, sig: string): { 
  * update our listings" and "a form for dates and production photos"; this is
  * that, with a verified sender attached.
  */
-export function withClaimLink(body: string, lead: Pick<PartnerLead, 'entityId'>, sig: string): string {
-  if (!lead.entityId || body.includes('/claim/')) return body;
-  const line = `Prefer to keep it up to date yourself? You can claim the listing for free and send changes directly: https://calgarywatch.ca/claim/${encodeURIComponent(lead.entityId)}`;
+export function withClaimLink(body: string, lead: Pick<PartnerLead, 'entityId' | 'entityKind'>, sig: string): string {
+  if (!hasOwnListing(lead) || body.includes('/claim/')) return body;
+  const line = `Prefer to keep it up to date yourself? You can claim the listing for free and send changes directly: https://calgarywatch.ca/claim/${encodeURIComponent(lead.entityId!)}`;
   const at = body.lastIndexOf(sig);
   return at > 0 ? `${body.slice(0, at)}${line}\n\n${body.slice(at)}` : `${body}\n\n${line}`;
 }
@@ -188,7 +222,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   if (cfg.autoSend) {
     for (const doc of (await db.collection(COLLECTIONS.leads).where('status', 'in', ['ready', 'follow-up-ready']).get()).docs) {
       const lead = doc.data() as PartnerLead;
-      if (lead.reviewedByEmail || checkPitch(lead.draftBody, cfg, address).length || sendBlocker(lead, sup.emails, sup.domains)) continue;
+      if (lead.reviewedByEmail || checkPitch(lead.draftBody, cfg, address).length || listingClaimProblems(lead, new Set(byId.keys())).length || sendBlocker(lead, sup.emails, sup.domains)) continue;
       await doc.ref.update({ status: 'approved', updatedAt: now, history: push(autoApproved()) });
       log(`queued to send: ${lead.businessName}`);
     }
@@ -198,7 +232,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   let examples: string[] | undefined;
   for (const doc of fresh) {
     const lead = doc.data() as PartnerLead;
-    const entity = lead.entityId ? byId.get(lead.entityId) : undefined;
+    const entity = hasOwnListing(lead) && lead.entityId ? byId.get(lead.entityId) : undefined;
     let found: { email: string; url: string } | null = null, notice = false;
     if (lead.contactEmail && lead.emailSourceUrl) {
       // Entered by hand in the admin: still confirm the address is on that page and there's no notice.
@@ -249,16 +283,21 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
     const withEmail: PartnerLead = { ...lead, contactEmail: found.email };
     let pitch = templatePitch(withEmail, facts, sig);
     const warnings: string[] = [];
-    if (claudeConfigured()) {
+    // Invitations stay deterministic. This prevents examples from listed businesses
+    // teaching the model to claim that a prospect or organizer already has a listing.
+    if (claudeConfigured() && hasOwnListing(lead)) {
       try {
         examples ??= await answeredPitches(db).catch(() => []);
         const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false, examples }, sig);
-        const problems = checkPitch(w.body, cfg, address);
+        const problems = [...checkPitch(w.body, cfg, address), ...listingClaimProblems({ ...lead, draftSubject: w.subject, draftBody: w.body }, new Set(byId.keys()))];
         if (problems.length) warnings.push(`Claude's draft was replaced by the template: ${problems.join(' ')}`); else pitch = w;
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }
     }
     pitch = { ...pitch, body: withClaimLink(pitch.body, lead, sig) };
-    const problems = checkPitch(pitch.body, cfg, address);
+    const problems = [
+      ...checkPitch(pitch.body, cfg, address),
+      ...listingClaimProblems({ ...lead, draftSubject: pitch.subject, draftBody: pitch.body }, new Set(byId.keys())),
+    ];
     const status = problems.length ? 'blocked' : cfg.autoSend ? 'approved' : 'ready';
     await doc.ref.update({
       contactEmail: found.email, emailSourceUrl: found.url, emailFoundAt: now, consentBasis: consentBasisFor(found.url),
@@ -284,15 +323,15 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       await doc.ref.update({ status: 'no-response', nextFollowUpAt: null, updatedAt: now, history: push(event('status', 'No reply after follow-up; closed.')) });
       continue;
     }
-    let body = `Hello again,\n\nJust following up on my note about ${lead.businessName}'s listing on CalgaryWatch. If anything needs changing, a one-line reply is plenty.\n\n${sig}`;
-    if (claudeConfigured()) {
+    let body = followUpTemplate(lead, sig);
+    if (claudeConfigured() && hasOwnListing(lead)) {
       try {
         const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts: '', followUp: true, previous: lead.draftBody }, sig);
-        if (!checkPitch(w.body, cfg, address).length) body = w.body;
+        if (![...checkPitch(w.body, cfg, address), ...listingClaimProblems({ ...lead, draftSubject: lead.draftSubject, draftBody: w.body })].length) body = w.body;
       } catch { /* keep the template follow-up */ }
     }
     body = withClaimLink(body, lead, sig);
-    const ok = !checkPitch(body, cfg, address).length;
+    const ok = ![...checkPitch(body, cfg, address), ...listingClaimProblems({ ...lead, draftSubject: lead.draftSubject, draftBody: body })].length;
     const status = ok && cfg.autoSend ? 'approved' : 'follow-up-ready';
     await doc.ref.update({
       status, draftSubject: `Re: ${lead.draftSubject.replace(/^Re:\s*/i, '')}`, draftBody: body, updatedAt: now,
@@ -306,7 +345,8 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
 const INBOX_STALE_AFTER = 6 * 60 * 60_000;
 
 /** Send approved first emails and follow-ups (within the send window), and approved replies (any time). */
-export async function sendApproved(db: Firestore, now: number, log: Log): Promise<void> {
+export async function sendApproved(db: Firestore, now: number, log: Log, currentEntityIds?: ReadonlySet<string> | null): Promise<void> {
+  if (cfg.paused) { log('Outreach is paused in brand/outreach.json; nothing sent.'); return; }
   if (!outlookConfigured()) { log('Outlook is not connected (MS_TENANT_ID / MS_CLIENT_ID / MS_CLIENT_SECRET); nothing sent.'); return; }
   const viaResend = cfg.transport === 'resend';
   if (viaResend) {
@@ -348,6 +388,13 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     const lead = doc.data() as PartnerLead;
     const blocker = sendBlocker(lead, sup.emails, sup.domains);
     if (blocker) { await doc.ref.update({ status: 'blocked', notes: blocker, updatedAt: now, history: push(event('status', `Not sent: ${blocker}`)) }); log(`not sent to ${lead.businessName}: ${blocker}`); continue; }
+    const factual = listingClaimProblems(lead, currentEntityIds);
+    if (factual.length) {
+      const reason = factual.join(' ');
+      await doc.ref.update({ status: 'blocked', notes: reason, updatedAt: now, history: push(event('status', `Not sent: ${reason}`)) });
+      log(`not sent to ${lead.businessName}: ${reason}`);
+      continue;
+    }
     try {
       // A follow-up goes out as its own "Re:" message; the first conversation id is kept for matching replies.
       const isFollowUp = Boolean(lead.conversationId);
@@ -356,7 +403,7 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
       await doc.ref.update({
         status: 'contacted', conversationId: sent.conversationId, lastContactAt: now,
         nextFollowUpAt: now + cfg.limits.followUpAfterDays * DAY, followUps: isFollowUp ? lead.followUps + 1 : lead.followUps,
-        updatedAt: now, history: push(event('sent', `${isFollowUp ? 'Follow-up' : 'First email'} sent to ${lead.contactEmail}: "${lead.draftSubject}"`)),
+        updatedAt: now, history: push(event('sent', sentHistorySummary(lead, isFollowUp, viaResend))),
       });
       budget--;
       log(`sent: ${lead.businessName} (${lead.contactEmail})`);

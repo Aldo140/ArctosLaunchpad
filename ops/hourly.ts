@@ -7,6 +7,7 @@ import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from
 import { sendApproved, syncReplies } from './jobs/outreach';
 import { exitForQuota, isQuotaExhausted } from './lib/quota';
 import { flushUsage } from './jobs/usage';
+import { loadDiscoveryIndex } from './lib/discovery';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
 if (!hasFirebase()) {
@@ -32,7 +33,18 @@ await step('one post per slot', () => resolveDoubleBookings(db, now, log));
 await step('publish', () => publishDue(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 await step('replies', () => syncReplies(db, now, log));
-await step('send', () => sendApproved(db, now, log));
+await step('send', async () => {
+  // Delivery fails closed when the current inventory cannot be loaded: an old
+  // approved draft must never claim a listing that has since disappeared.
+  let currentEntityIds: Set<string> | null = null;
+  try {
+    const index = await loadDiscoveryIndex(log);
+    currentEntityIds = new Set(index.entities.filter(e => e.status === 'published' && !e.fixture).map(e => e.id));
+  } catch (e) {
+    log(`Current CalgaryWatch inventory unavailable: ${e instanceof Error ? e.message : e}`);
+  }
+  await sendApproved(db, now, log, currentEntityIds);
+});
 await flushUsage(db, now, 'hourly', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
 if (failed) process.exitCode = 1;
 else if (quota) exitForQuota('Operations hourly');
