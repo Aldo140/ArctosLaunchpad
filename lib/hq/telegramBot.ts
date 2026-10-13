@@ -364,12 +364,23 @@ export function reportForQuestion(data: HqData, now: number, maxChars = 300_000)
     todos: { open: todos.open, lateCount: todos.overdue.length, dueTodayCount: todos.today.length },
   };
   const life = (data.life ?? []).filter((e) => e.kind !== "note" || !e.done).filter((e) => e.at > now - 120 * 86_400_000);
-  const report: Record<string, unknown> = { totals, calendar: data.calendar, aldoLog: life, snapshot: slim, gmail: data.gmail, replyCheck: data.triage?.items.map((t) => omit(t, ["fingerprint"])) };
+  const report: Record<string, unknown> = {
+    totals,
+    prioritiesAndMemory: data.memories,
+    experiments: data.experiments,
+    intelligence: data.intelligence,
+    calendar: data.calendar,
+    aldoLog: life,
+    snapshot: slim,
+    gmail: data.gmail,
+    replyCheck: data.triage?.items.map((t) => omit(t, ["fingerprint"])),
+  };
   const omitted: string[] = [];
   const drops: Array<[string, () => void]> = [
     ["lead list", () => slim && (slim.pipelineDetail = undefined)],
     ["Instagram inspiration", () => slim && (slim.instagram = undefined)],
     ["Gmail sends", () => (report.gmail = data.gmail && { ...data.gmail, sends: [] })],
+    ["relationship history", () => (report.intelligence = { ...data.intelligence, relationships: [] })],
     ["reply check notes", () => (report.replyCheck = undefined)],
   ];
   let json = JSON.stringify(report);

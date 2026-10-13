@@ -50,7 +50,10 @@ const life: LifeEntry[] = [
 const data = (over: Partial<HqData> = {}): HqData => ({
   snapshot: snapshot(), arctos: null, commands: [], workflows: [], gmail,
   calendar: { generatedAt: now, events: [{ title: 'Call with Ramsay', start: now + HOUR, end: now + 2 * HOUR, allDay: false, location: '' }] },
-  life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [], errors: [], ...over,
+  life: life.map((e) => ({ ...e })), settings: { moneyGoal: 500_000 }, triage: null, decisions: [],
+  memories: [], experiments: [], productEvents: [],
+  intelligence: { recommendations: [], relationships: [], opportunities: [], weekly: { wins: [], risks: [], focus: [], generatedAt: now }, workload: { open: 0, urgent: 0, message: "" }, connections: [], research: { events7d: 0, topAreas: [], message: "" } },
+  errors: [], ...over,
 });
 
 describe('telegramUsers', () => {
@@ -168,7 +171,7 @@ describe('reportForQuestion', () => {
     assert.equal(totals.gym.thisWeek, 1);
     assert.equal(totals.waitingOnAldo.length, 4);
     const tiny = reportForQuestion(data(), now, 10);
-    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'reply check notes']);
+    assert.deepEqual(tiny.omitted, ['lead list', 'Instagram inspiration', 'Gmail sends', 'relationship history', 'reply check notes']);
   });
 });
 

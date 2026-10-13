@@ -2,7 +2,8 @@ import { workflowSummaries } from "./github";
 import { queryRecent, readFields, readStringField } from "./google";
 import { readLife } from "./lifeStore";
 import { readDecisions, readTriage } from "./triageStore";
-import type { ArctosOutreach, CalendarSummary, CommandType, GmailSummary, HqCommandRecord, HqData, HqSettings, HqSnapshot } from "./types";
+import { buildIntelligence } from "./intelligence";
+import type { ArctosOutreach, CalendarSummary, CommandType, GmailSummary, HqCommandRecord, HqData, HqExperiment, HqMemory, HqProductEvent, HqSettings, HqSnapshot } from "./types";
 
 /**
  * Everything HQ knows, read once. The dashboard (/api/hq/snapshot) and the
@@ -62,13 +63,36 @@ async function settings(): Promise<HqSettings> {
   return { moneyGoal: typeof f?.moneyGoal === "number" ? f.moneyGoal : null };
 }
 
+async function memories(): Promise<HqMemory[]> {
+  return (await queryRecent("hq_memories", "at", 0, 300)).map((r) => ({
+    id: r.id, kind: String(r.fields.kind) as HqMemory["kind"], text: String(r.fields.text ?? ""),
+    business: String(r.fields.business ?? "all") as HqMemory["business"], at: Number(r.fields.at ?? 0), by: String(r.fields.by ?? ""),
+  })).filter((x) => x.text).sort((a, b) => b.at - a.at);
+}
+
+async function experiments(): Promise<HqExperiment[]> {
+  return (await queryRecent("hq_experiments", "startedAt", 0, 100)).map((r) => ({
+    id: r.id, title: String(r.fields.title ?? ""), hypothesis: String(r.fields.hypothesis ?? ""), metric: String(r.fields.metric ?? ""),
+    business: String(r.fields.business ?? "arctos") as HqExperiment["business"], status: String(r.fields.status ?? "planned") as HqExperiment["status"],
+    startedAt: Number(r.fields.startedAt ?? 0), endsAt: typeof r.fields.endsAt === "number" ? r.fields.endsAt : null,
+    result: typeof r.fields.result === "string" ? r.fields.result : null, by: String(r.fields.by ?? ""),
+  })).filter((x) => x.title).sort((a, b) => b.startedAt - a.startedAt);
+}
+
+async function productEvents(now: number): Promise<HqProductEvent[]> {
+  return (await queryRecent("hq_product_events", "at", now - 30 * DAY, 1000)).map((r) => ({
+    id: r.id, name: String(r.fields.name ?? ""), area: String(r.fields.area ?? "unknown"),
+    at: Number(r.fields.at ?? 0), by: String(r.fields.by ?? ""), detail: typeof r.fields.detail === "string" ? r.fields.detail : null,
+  })).filter((x) => x.name).sort((a, b) => b.at - a.at);
+}
+
 export async function loadHq(now: number): Promise<HqData> {
   const errors: string[] = [];
   const note = (label: string) => (e: unknown) => {
     errors.push(`${label}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   };
-  const [snapshot, arctos, vowmotion, cmds, workflows, gmail, triage, decisions, calendar, life, mine] = await Promise.all([
+  const [snapshot, arctos, vowmotion, cmds, workflows, gmail, triage, decisions, calendar, life, mine, memory, tests, events] = await Promise.all([
     readStringField("hq/snapshot", "payload").then((s) => (s ? (JSON.parse(s) as HqSnapshot) : null)).catch(note("Agents' report")),
     outreachLog(now, "arctos").catch(note("Arctos sends")),
     outreachLog(now, "vowmotion").catch(note("Vow Motion sends")),
@@ -80,6 +104,13 @@ export async function loadHq(now: number): Promise<HqData> {
     readStringField("hq/calendar", "payload").then((s) => (s ? (JSON.parse(s) as CalendarSummary) : null)).catch(note("Calendar")),
     readLife(now).catch(note("Your log")),
     settings().catch(note("Your settings")),
+    memories().catch(note("HQ memory")),
+    experiments().catch(note("Experiments")),
+    productEvents(now).catch(note("HQ research")),
   ]);
-  return { snapshot, arctos, vowmotion, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [], calendar, life, settings: mine, errors };
+  const base = {
+    snapshot, arctos, vowmotion, commands: cmds ?? [], workflows, gmail, triage, decisions: decisions ?? [],
+    calendar, life, settings: mine, memories: memory ?? [], experiments: tests ?? [], productEvents: events ?? [], errors,
+  };
+  return { ...base, intelligence: buildIntelligence(base, now) };
 }
