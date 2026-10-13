@@ -34,6 +34,10 @@ export interface OutreachConfig {
   /** "resend" sends through Resend (Reply-To the Outlook mailbox); default "outlook" sends through Microsoft Graph. */
   transport?: 'outlook' | 'resend';
   offer: string[];
+  /** Why we're writing now, said once in every first email. */
+  whyNow?: string;
+  /** The page to link when a lead has no listing of its own, by lead kind (entityKind), with a "default". */
+  showcasePages?: Record<string, string>;
   paidOffer: string[];
   limits: {
     sendsPerDay: number;

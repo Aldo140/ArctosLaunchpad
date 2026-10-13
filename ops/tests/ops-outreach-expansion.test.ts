@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { organizerLeads, prospectLeads, checkPitch, hostOf, signature, type Prospect } from '../lib/leads';
-import { templatePitch } from '../jobs/outreach';
+import { showcaseFor, templatePitch } from '../jobs/outreach';
 import { outreachConfig } from '../lib/brand';
 import type { Entity } from '../lib/posts';
 import type { PartnerLead } from '../types';
@@ -39,5 +39,15 @@ describe('outreach to organizers and prospects', () => {
     assert.match(t.subject, /Listing Vertigo Theatre's events/);
     assert.doesNotMatch(t.body, /We've added/);
     assert.deepEqual(checkPitch(t.body, cfg, ADDRESS), []);
+  });
+  it('every first email says why now and links to what they could have', () => {
+    const cfg = outreachConfig();
+    const sig = signature(cfg, '123 Test St SW, Calgary AB');
+    const prospect = templatePitch({ businessName: 'Vertigo Theatre', entityKind: 'prospect' } as PartnerLead, 'Business: Vertigo Theatre', sig);
+    assert.ok(cfg.whyNow && prospect.body.includes(cfg.whyNow));
+    assert.match(prospect.body, /https:\/\/calgarywatch\.ca\/events/);
+    const listed = templatePitch({ businessName: 'Test Market' } as PartnerLead, 'Listing: Test Market (market) — https://calgarywatch.ca/markets/test', sig);
+    assert.match(listed.body, /https:\/\/calgarywatch\.ca\/markets\/test/);
+    assert.equal(showcaseFor({ entityKind: 'market' }), 'https://calgarywatch.ca/markets');
   });
 });

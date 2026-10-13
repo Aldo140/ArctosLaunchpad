@@ -16,6 +16,15 @@
     "A direct line for schedule corrections, cancellations and approved photos.",
     "Inclusion in relevant CalgaryWatch posts when the dates fit, always free and never ranked by payment."
   ],
+  "whyNow": "CalgaryWatch just passed 10,000 views and 100 people on our weekly digest, so we're doing special promos and reaching out to our personal favourites and the places readers have asked us about.",
+  "whyNowNote": "Owner decision 2026-10-13 (Aldo, by text): every first email says why we're writing now (this line) and includes one link that shows them what they could have: their own listing when we have one, otherwise the page in showcasePages for their kind of lead.",
+  "showcasePages": {
+    "market": "https://calgarywatch.ca/markets",
+    "event": "https://calgarywatch.ca/events",
+    "organizer": "https://calgarywatch.ca/events",
+    "prospect": "https://calgarywatch.ca/events",
+    "default": "https://calgarywatch.ca/local"
+  },
   "paidOffer": [
     "Invitation-only Featured partner placement for six months, one business per category.",
     "Always labelled 'Featured partner' and kept separate from CalgaryWatch picks."

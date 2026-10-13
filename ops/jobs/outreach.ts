@@ -48,19 +48,27 @@ function factsFor(e: Entity): string {
   ].filter(Boolean).join('\n');
 }
 
+/** The page that shows a lead without a listing of its own what they could have (brand/outreach.json). */
+export function showcaseFor(lead: Pick<PartnerLead, 'entityKind'>): string {
+  const pages = cfg.showcasePages ?? {};
+  return pages[lead.entityKind ?? ''] ?? pages.default ?? cfg.sender.site;
+}
+
 export function templatePitch(lead: PartnerLead, facts: string, sig: string): { subject: string; body: string; reasonRelevant: string } {
+  const why = cfg.whyNow ? `${cfg.whyNow}\n\n` : '';
   if (!facts.startsWith('Listing: ')) {
     // An organization we haven't listed yet (brand/partner-prospects.json): an invitation, not a "we listed you".
     return {
       subject: `Listing ${lead.businessName}'s events on CalgaryWatch`,
-      body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses, with a sister Instagram account, @calgarydaily. I'd like to list ${lead.businessName}'s public events, built from the details on your own website and linking straight back to you.\n\nIs there a calendar page or feed you'd like us to use, and someone I should send questions to?\n\nThe listing is free and always will be.\n\n${sig}`,
+      body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses, with a sister Instagram account, @calgarydaily. ${why}I'd like to list ${lead.businessName}'s public events, built from the details on your own website and linking straight back to you. This is what that looks like: ${showcaseFor(lead)}\n\nIs there a calendar page or feed you'd like us to use, and someone I should send questions to?\n\nThe listing is free and always will be.\n\n${sig}`,
       reasonRelevant: `The message is about listing ${lead.businessName}'s public events on CalgaryWatch.`,
     };
   }
   const listing = facts.split('\n')[0].replace(/^Listing: /, '');
+  const url = listing.match(/https:\/\/\S+/)?.[0];
   return {
     subject: `CalgaryWatch has listed ${lead.businessName}`,
-    body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses. We've added ${listing.split(' (')[0]} using the details on your own website, and the listing links straight back to you.\n\nCould you take a quick look and tell me if anything is wrong or missing? You're also welcome to send schedule changes, cancellations or photos you'd like us to use.\n\nThe listing is free and always will be.\n\n${sig}`,
+    body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses. ${why}We've added ${listing.split(' (')[0]} using the details on your own website, and the listing links straight back to you${url ? `: ${url}` : '.'}\n\nCould you take a quick look and tell me if anything is wrong or missing? You're also welcome to send schedule changes, cancellations or photos you'd like us to use.\n\nThe listing is free and always will be.\n\n${sig}`,
     reasonRelevant: `The message is about ${lead.businessName}'s own listing on CalgaryWatch.`,
   };
 }
@@ -93,6 +101,17 @@ async function loadSuppression(db: Firestore): Promise<{ emails: Set<string>; do
     if (d.get('domain')) domains.add(String(d.get('domain')).toLowerCase());
   });
   return { emails, domains };
+}
+
+/** Our emails that people answered (not opt-outs), newest first: what to learn from when writing the next one. */
+async function answeredPitches(db: Firestore, max = 3): Promise<string[]> {
+  const docs = (await db.collection(COLLECTIONS.leads).where('status', 'in', ['interested', 'replied', 'partner']).get()).docs;
+  return docs
+    .map(d => d.data() as PartnerLead)
+    .filter(l => l.draftBody)
+    .sort((a, b) => (b.lastReply?.at ?? b.updatedAt) - (a.lastReply?.at ?? a.updatedAt))
+    .slice(0, max)
+    .map(l => `To ${l.businessName}${l.lastReply ? ` (they replied: ${l.lastReply.classification})` : ''}:\n${l.draftBody.split('\nThank you,')[0].trim()}`);
 }
 
 /** New leads come only from businesses and markets already listed on the site. */
@@ -176,6 +195,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   }
 
   const fresh = (await db.collection(COLLECTIONS.leads).where('status', '==', 'new').limit(10).get()).docs;
+  let examples: string[] | undefined;
   for (const doc of fresh) {
     const lead = doc.data() as PartnerLead;
     const entity = lead.entityId ? byId.get(lead.entityId) : undefined;
@@ -225,13 +245,14 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       continue;
     }
 
-    const facts = entity ? factsFor(entity) : `Business: ${lead.businessName}`;
+    const facts = entity ? factsFor(entity) : `Business: ${lead.businessName}\nPage that shows what they could have: ${showcaseFor(lead)}`;
     const withEmail: PartnerLead = { ...lead, contactEmail: found.email };
     let pitch = templatePitch(withEmail, facts, sig);
     const warnings: string[] = [];
     if (claudeConfigured()) {
       try {
-        const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false }, sig);
+        examples ??= await answeredPitches(db).catch(() => []);
+        const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false, examples }, sig);
         const problems = checkPitch(w.body, cfg, address);
         if (problems.length) warnings.push(`Claude's draft was replaced by the template: ${problems.join(' ')}`); else pitch = w;
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }
