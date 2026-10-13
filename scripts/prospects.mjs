@@ -224,7 +224,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   } else if (cmd === "report") {
     const result = summary && existsSync(summary) ? JSON.parse(readFileSync(summary, "utf8")) : null;
     const error = arg || result?.error;
-    await report({ event: "prospects", campaign: id, found: result?.found ?? 0, dropped: result?.dropped.length ?? 0, left: result?.left ?? queued(campaign(id)), ...(error ? { error } : {}) });
+    // A list that wasn't saved never joins the queue.
+    const left = error ? queued(campaign(id)) - (result?.file && arg ? result.found : 0) : result?.left ?? queued(campaign(id));
+    await report({ event: "prospects", campaign: id, found: error ? 0 : result?.found ?? 0, dropped: error ? 0 : result?.dropped.length ?? 0, left: Math.max(0, left), ...(error ? { error } : {}) });
   } else {
     console.error("usage: node scripts/prospects.mjs plan|check|report <arctos|vowmotion> [file|error]");
     process.exitCode = 2;
