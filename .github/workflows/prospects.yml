@@ -1,0 +1,120 @@
+name: Outreach prospects
+
+# HQ's prospect research: finds new businesses for the Arctos and Vow Motion
+# cold email, so the sender (outreach.yml) always has a full day queued. HQ's
+# operations clock (ops-clock.yml) starts this at 4 am Calgary on weekdays;
+# the schedule below only covers a broken clock. For each campaign it works
+# out how many the day needs (50 minus what is still queued), has Claude Code
+# research them with web search and page reads only, then
+# scripts/prospects.mjs checks every one (already contacted, address source,
+# mail server, copy rules), writes the email around the facts and commits a
+# new batch file. The HQ bot texts Aldo what was found.
+#
+# Public repository: Claude's answer stays in a file, never in this log.
+on:
+  schedule:
+    - cron: "5 10 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: Which campaign to find prospects for
+        type: choice
+        options: [all, arctos, vowmotion]
+        default: all
+
+permissions:
+  contents: write
+  # Keyless sign-in to HQ, to text Aldo what was found.
+  id-token: write
+
+concurrency:
+  group: prospects
+  cancel-in-progress: false
+
+env:
+  CLAUDE_CODE: '@anthropic-ai/claude-code@2.1.290'
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      # One at a time, so each sees the other's commit.
+      max-parallel: 1
+      matrix:
+        campaign: [arctos, vowmotion]
+    steps:
+      - name: Is this campaign asked for?
+        id: asked
+        run: echo "yes=${{ inputs.campaign == '' || inputs.campaign == 'all' || inputs.campaign == matrix.campaign }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.asked.outputs.yes == 'true'
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: false
+      # Vow Motion's own lists, so nobody on them is found again.
+      - name: Get the Vow Motion lists
+        if: steps.asked.outputs.yes == 'true'
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: Aldo140/vow-motion
+          ref: claude/great-sagan-ofu2xe
+          path: vow-motion
+          sparse-checkout: outreach
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        if: steps.asked.outputs.yes == 'true'
+        with:
+          node-version: 24
+      - name: How many does today need?
+        id: plan
+        if: steps.asked.outputs.yes == 'true'
+        run: |
+          need=$(node scripts/prospects.mjs plan "${{ matrix.campaign }}" "$RUNNER_TEMP/prompt.txt")
+          echo "need=$need" >> "$GITHUB_OUTPUT"
+          echo "${{ matrix.campaign }}: $need needed today."
+      - name: Research (Claude Code)
+        id: research
+        if: steps.asked.outputs.yes == 'true' && steps.plan.outputs.need != '0'
+        continue-on-error: true
+        timeout-minutes: 90
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WORKSPACE: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          CLAUDE_CODE_MAX_OUTPUT_TOKENS: '64000'
+        run: |
+          [ -n "$WORKSPACE" ] && export ANTHROPIC_CUSTOM_HEADERS="anthropic-workspace-id: $WORKSPACE"
+          # Web search and page reads only: no files, no commands. The answer is the only output.
+          cd "$RUNNER_TEMP"
+          npx -y "$CLAUDE_CODE" -p "$(cat prompt.txt)" \
+            --model claude-opus-5-5 --max-turns 400 --output-format json \
+            --allowedTools "WebSearch" "WebFetch" \
+            --disallowedTools "Bash" "Edit" "Write" "NotebookEdit" "Read" "Glob" "Grep" "Task" \
+            > claude.json 2> /dev/null || echo "Claude Code exited with $?"
+          jq -e '.result | length > 0' claude.json > /dev/null || { echo "::error::The research stopped before it answered."; exit 1; }
+      - name: Check them and queue the ones that pass
+        if: steps.asked.outputs.yes == 'true' && steps.plan.outputs.need != '0' && steps.research.outcome == 'success'
+        run: node scripts/prospects.mjs check "${{ matrix.campaign }}" "$RUNNER_TEMP/claude.json"
+      - name: Save the new batch
+        if: steps.asked.outputs.yes == 'true' && steps.plan.outputs.need != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add outreach/batch-*.json outreach/vow-motion/ 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git -c user.name="arctos-outreach" -c user.email="aldo@arctoslaunchpad.com" commit -q -m "New ${{ matrix.campaign }} prospects from HQ research [skip ci]"
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          for i in 1 2 3; do
+            git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin "$GITHUB_REF_NAME" &&
+              git -c http.https://github.com/.extraheader="$auth" push -q origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: Text Aldo what was found
+        if: always() && steps.asked.outputs.yes == 'true' && steps.plan.outputs.need != '0' && steps.plan.outputs.need != ''
+        run: |
+          error=""
+          [ "${{ steps.research.outcome }}" = success ] || error="the research stopped before it answered"
+          node scripts/prospects.mjs report "${{ matrix.campaign }}" "$error"
