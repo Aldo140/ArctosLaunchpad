@@ -425,5 +425,19 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-14T16:48:37.973Z",
     "messageId": "<202610141648.47839510449@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@so-eventful.com",
+    "business": "So Eventful",
+    "subject": "A cleaner RSVP handoff for So Eventful",
+    "at": "2026-10-14T17:12:55.175Z",
+    "messageId": "<202610141712.75956559832@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "lindsey@lovelydayevents.com",
+    "business": "Lovely Day Events",
+    "subject": "Lindsey — the guest list part, done once",
+    "at": "2026-10-14T17:12:55.378Z",
+    "messageId": "<202610141712.89571557474@smtp-relay.mailin.fr>"
   }
 ]
