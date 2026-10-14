@@ -89,5 +89,47 @@
     "subject": "A cleaner RSVP handoff for Tamtastic Creations",
     "at": "2026-10-12T19:12:36.780Z",
     "messageId": "<202610121912.31482140348@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "caitlin@eastmanevents.com",
+    "business": "Eastman Events",
+    "subject": "A cleaner RSVP handoff for Eastman Events",
+    "at": "2026-10-14T13:43:01.488Z",
+    "messageId": "<202610141343.62723580086@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@eventscherished.com",
+    "business": "Events Cherished",
+    "subject": "Sonia — the guest list part, done once",
+    "at": "2026-10-14T13:43:01.651Z",
+    "messageId": "<202610141343.90661422381@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@deekayevents.com",
+    "business": "Dee Kay Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T13:43:01.867Z",
+    "messageId": "<202610141343.81222211208@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "janet@serenityeventplanning.com",
+    "business": "Serenity Event Planning",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T13:43:02.027Z",
+    "messageId": "<202610141343.77947178049@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "nitty@marigoldwedding.com",
+    "business": "Marigold Wedding Planners",
+    "subject": "A cleaner RSVP handoff for Marigold Wedding Planners",
+    "at": "2026-10-14T13:43:02.231Z",
+    "messageId": "<202610141343.72492210928@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "johanne@jpeventsanddesign.com",
+    "business": "JP Events And Design",
+    "subject": "Johanne — the guest list part, done once",
+    "at": "2026-10-14T13:43:02.385Z",
+    "messageId": "<202610141343.22577637691@smtp-relay.mailin.fr>"
   }
 ]
