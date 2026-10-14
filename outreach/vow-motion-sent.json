@@ -299,5 +299,47 @@
     "subject": "Melissa — the guest list part, done once",
     "at": "2026-10-14T15:42:36.545Z",
     "messageId": "<202610141542.31060969903@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@eventistryct.com",
+    "business": "Eventistry",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T16:12:54.499Z",
+    "messageId": "<202610141612.95713653949@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "meg@megcritchellevents.com",
+    "business": "Meg Critchell Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T16:12:54.658Z",
+    "messageId": "<202610141612.59863276356@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sarah@sarahbrehantevents.com",
+    "business": "Sarah Brehant Events",
+    "subject": "A cleaner RSVP handoff for Sarah Brehant Events",
+    "at": "2026-10-14T16:12:54.854Z",
+    "messageId": "<202610141612.55977738593@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "eileen@eileensmithevents.com",
+    "business": "Eileen Smith Events",
+    "subject": "Eileen — the guest list part, done once",
+    "at": "2026-10-14T16:12:55.015Z",
+    "messageId": "<202610141612.75157161644@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jenn@soireesandrevelry.com",
+    "business": "Soirees and Revelry",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T16:12:55.205Z",
+    "messageId": "<202610141612.13009975092@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "corinne@canvaswedding.com",
+    "business": "Canvas Weddings",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T16:12:55.368Z",
+    "messageId": "<202610141612.72001788603@smtp-relay.mailin.fr>"
   }
 ]

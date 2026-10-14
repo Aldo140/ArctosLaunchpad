@@ -1279,5 +1279,75 @@
     "subject": "AC Glass quotes and job tracking",
     "at": "2026-10-14T15:42:33.828Z",
     "messageId": "<202610141542.94606916498@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@theglassguyscalgary.com",
+    "business": "The Glass Guys",
+    "subject": "The Glass Guys quotes",
+    "at": "2026-10-14T16:12:51.024Z",
+    "messageId": "<202610141612.54172382955@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@southprairietshirts.com",
+    "business": "South Prairie T-Shirt Co.",
+    "subject": "South Prairie quotes and print runs",
+    "at": "2026-10-14T16:12:51.432Z",
+    "messageId": "<202610141612.16642287318@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@coyotetshirts.ca",
+    "business": "Coyote T-Shirts & More",
+    "subject": "Coyote T-Shirts quotes and orders",
+    "at": "2026-10-14T16:12:51.623Z",
+    "messageId": "<202610141612.43189804637@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "fatherandsonyyc@gmail.com",
+    "business": "Father & Son YYC",
+    "subject": "Father & Son YYC estimates and projects",
+    "at": "2026-10-14T16:12:51.786Z",
+    "messageId": "<202610141612.64580659316@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@alchemylandscape.com",
+    "business": "Alchemy Landscape",
+    "subject": "Alchemy Landscape scope and job tracking",
+    "at": "2026-10-14T16:12:51.969Z",
+    "messageId": "<202610141612.51169253076@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "garret@food-works.ca",
+    "business": "Food Works Craft Catering",
+    "subject": "Food Works event orders and planning",
+    "at": "2026-10-14T16:12:52.133Z",
+    "messageId": "<202610141612.94600043909@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@transformrenovations.com",
+    "business": "Transform Renovations",
+    "subject": "Transform Renovations job tracking",
+    "at": "2026-10-14T16:12:52.321Z",
+    "messageId": "<202610141612.14821348424@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@theoriginalworkshop.com",
+    "business": "The Original Workshop",
+    "subject": "The Original Workshop quotes and production",
+    "at": "2026-10-14T16:12:52.479Z",
+    "messageId": "<202610141612.80811465274@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "degreeve@telus.net",
+    "business": "DeGreeve Auto Upholstery",
+    "subject": "DeGreeve Upholstery quotes and jobs",
+    "at": "2026-10-14T16:12:52.667Z",
+    "messageId": "<202610141612.29896622190@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "admin@customlaserworks.ca",
+    "business": "Custom Laser Works",
+    "subject": "Custom Laser Works team orders",
+    "at": "2026-10-14T16:12:52.840Z",
+    "messageId": "<202610141612.51050407993@smtp-relay.mailin.fr>"
   }
 ]
