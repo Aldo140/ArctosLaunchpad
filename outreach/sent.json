@@ -1419,5 +1419,75 @@
     "subject": "W&B Automotive inspections and jobs",
     "at": "2026-10-14T16:43:16.094Z",
     "messageId": "<202610141643.45856721992@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "abe@riverstonekitchens.ca",
+    "business": "Riverstone Kitchens",
+    "subject": "Riverstone Kitchens quotes and jobs",
+    "at": "2026-10-14T16:48:33.567Z",
+    "messageId": "<202610141648.27083166014@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@ruschdesignbuild.com",
+    "business": "Rusch Design Build",
+    "subject": "Rusch Design Build project tracking",
+    "at": "2026-10-14T16:48:34.011Z",
+    "messageId": "<202610141648.94209132431@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "monique@blsyyc.com",
+    "business": "Butter Love Sugar",
+    "subject": "Butter Love Sugar cake orders",
+    "at": "2026-10-14T16:48:34.233Z",
+    "messageId": "<202610141648.49516424472@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@ironwoodstairs.com",
+    "business": "Ironwood Stair & Rail",
+    "subject": "Ironwood Stair & Rail job tracking",
+    "at": "2026-10-14T16:48:34.396Z",
+    "messageId": "<202610141648.93413194661@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@thestairshoppe.ca",
+    "business": "The Stair Shoppe",
+    "subject": "The Stair Shoppe orders and lead times",
+    "at": "2026-10-14T16:48:34.601Z",
+    "messageId": "<202610141648.84292589499@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "cakehousecalgary@gmail.com",
+    "business": "The Cake House Calgary",
+    "subject": "The Cake House custom cake orders",
+    "at": "2026-10-14T16:48:34.772Z",
+    "messageId": "<202610141648.20622072011@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "f.f.flooring@telus.net",
+    "business": "F.F. Flooring",
+    "subject": "F.F. Flooring quotes and installs",
+    "at": "2026-10-14T16:48:34.974Z",
+    "messageId": "<202610141648.63211411187@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@kowskiconstruction.ca",
+    "business": "Kowski Construction",
+    "subject": "Kowski Construction quote requests",
+    "at": "2026-10-14T16:48:35.152Z",
+    "messageId": "<202610141648.87736155961@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "mail@allcanadianprinting.com",
+    "business": "All Canadian Printing",
+    "subject": "All Canadian Printing job tracking",
+    "at": "2026-10-14T16:48:35.349Z",
+    "messageId": "<202610141648.61286958077@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@dicksupholstery.ca",
+    "business": "Dick's Upholstery",
+    "subject": "Dick's Upholstery quotes and jobs",
+    "at": "2026-10-14T16:48:35.533Z",
+    "messageId": "<202610141648.27536168742@smtp-relay.mailin.fr>"
   }
 ]
