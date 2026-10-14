@@ -215,5 +215,47 @@
     "subject": "Sarah — the guest list part, done once",
     "at": "2026-10-14T14:42:50.722Z",
     "messageId": "<202610141442.28554662178@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "kelly@lesliejamesevents.com",
+    "business": "LeslieJames Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T15:13:15.209Z",
+    "messageId": "<202610141513.12780727585@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@firgunevents.com",
+    "business": "Firgun Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T15:13:15.461Z",
+    "messageId": "<202610141513.18318623462@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jasmine@jasmineroseevents.com",
+    "business": "Jasmine Rose Events",
+    "subject": "A cleaner RSVP handoff for Jasmine Rose Events",
+    "at": "2026-10-14T15:13:15.716Z",
+    "messageId": "<202610141513.80342003688@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "katie@katydydevents.com",
+    "business": "Katydyd Events",
+    "subject": "Katie — the guest list part, done once",
+    "at": "2026-10-14T15:13:15.970Z",
+    "messageId": "<202610141513.76930132651@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "office@kgeventsdesign.com",
+    "business": "KG Events & Design",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T15:13:16.219Z",
+    "messageId": "<202610141513.20969662041@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "keri@alwaysyoursevents.com",
+    "business": "Always Yours Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T15:13:16.469Z",
+    "messageId": "<202610141513.27174138969@smtp-relay.mailin.fr>"
   }
 ]

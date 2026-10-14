@@ -1139,5 +1139,75 @@
     "subject": "Calgary Landscape Solutions job tracking",
     "at": "2026-10-12T18:42:46.584Z",
     "messageId": "<202610121842.15672618568@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@singhcustoms.ca",
+    "business": "Singh Customs",
+    "subject": "Singh Customs quotes and order tracking",
+    "at": "2026-10-14T15:13:10.658Z",
+    "messageId": "<202610141513.92509136454@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "calgarycustomupholstery@yahoo.ca",
+    "business": "Calgary Custom Upholstery",
+    "subject": "Calgary Custom Upholstery project tracking",
+    "at": "2026-10-14T15:13:11.305Z",
+    "messageId": "<202610141513.64529907541@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@bravikitchens.ca",
+    "business": "BRAVI Kitchens",
+    "subject": "BRAVI Kitchens job tracking",
+    "at": "2026-10-14T15:13:11.567Z",
+    "messageId": "<202610141513.13121586576@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@modcraftkitchens.ca",
+    "business": "ModCraft Kitchens & Millwork",
+    "subject": "ModCraft Kitchens quotes and job tracking",
+    "at": "2026-10-14T15:13:11.818Z",
+    "messageId": "<202610141513.60353867550@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "afsheed.pastry@gmail.com",
+    "business": "Afsheed Home-made Pastry",
+    "subject": "Afsheed cake orders and requests",
+    "at": "2026-10-14T15:13:12.076Z",
+    "messageId": "<202610141513.36791226040@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "amanda@sweetnd.ca",
+    "business": "Sweetnd",
+    "subject": "Sweetnd cake orders",
+    "at": "2026-10-14T15:13:12.335Z",
+    "messageId": "<202610141513.50647381263@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@twscalgary.com",
+    "business": "The Welding Shop",
+    "subject": "The Welding Shop quotes and job tracking",
+    "at": "2026-10-14T15:13:12.581Z",
+    "messageId": "<202610141513.74830795636@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "admin@evolutionwelding.ca",
+    "business": "Evolution Welding",
+    "subject": "Evolution Welding quotes and job tracking",
+    "at": "2026-10-14T15:13:12.831Z",
+    "messageId": "<202610141513.94287361924@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@macleodauto.com",
+    "business": "Macleod Auto & Truck Repair",
+    "subject": "Macleod Auto job and estimate tracking",
+    "at": "2026-10-14T15:13:13.097Z",
+    "messageId": "<202610141513.25969142721@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "aplustailorcalgary@gmail.com",
+    "business": "A Plus Tailor",
+    "subject": "A Plus Tailor orders and pickups",
+    "at": "2026-10-14T15:13:13.345Z",
+    "messageId": "<202610141513.68559515430@smtp-relay.mailin.fr>"
   }
 ]
