@@ -1349,5 +1349,75 @@
     "subject": "Custom Laser Works team orders",
     "at": "2026-10-14T16:12:52.840Z",
     "messageId": "<202610141612.51050407993@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "larry@solocraft.ca",
+    "business": "Solocraft",
+    "subject": "Solocraft engraving orders",
+    "at": "2026-10-14T16:43:13.949Z",
+    "messageId": "<202610141643.31185667162@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "mjsfineupholstery@gmail.com",
+    "business": "M.J's Fine Upholstery",
+    "subject": "M.J's Fine Upholstery quote requests",
+    "at": "2026-10-14T16:43:14.444Z",
+    "messageId": "<202610141643.90950151881@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@kendallcreations.ca",
+    "business": "Kendall Creations",
+    "subject": "Kendall Creations corporate orders",
+    "at": "2026-10-14T16:43:14.641Z",
+    "messageId": "<202610141643.30425476864@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "albagranite@shaw.ca",
+    "business": "Alba Granite",
+    "subject": "Alba Granite quotes and job tracking",
+    "at": "2026-10-14T16:43:14.850Z",
+    "messageId": "<202610141643.53267318743@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "crescentcabinets0@gmail.com",
+    "business": "Crescent Granite & Marble",
+    "subject": "Crescent Granite job scheduling",
+    "at": "2026-10-14T16:43:15.054Z",
+    "messageId": "<202610141643.30508372123@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "meghan@signconceptsltd.com",
+    "business": "Sign Concepts Ltd.",
+    "subject": "Sign Concepts quotes and proofs",
+    "at": "2026-10-14T16:43:15.258Z",
+    "messageId": "<202610141643.52021723658@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "mari@marisbridal.ca",
+    "business": "Mari's Bridal",
+    "subject": "Mari's Bridal fittings and orders",
+    "at": "2026-10-14T16:43:15.461Z",
+    "messageId": "<202610141643.22257550460@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "service@allfittsauto.com",
+    "business": "All Fitts Automotive",
+    "subject": "All Fitts estimates and repair updates",
+    "at": "2026-10-14T16:43:15.668Z",
+    "messageId": "<202610141643.86154772350@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "gm@highwoodcatering.com",
+    "business": "Highwood Catering",
+    "subject": "Highwood Catering event orders",
+    "at": "2026-10-14T16:43:15.885Z",
+    "messageId": "<202610141643.44808240149@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@wbauto.ca",
+    "business": "W&B Automotive Repair",
+    "subject": "W&B Automotive inspections and jobs",
+    "at": "2026-10-14T16:43:16.094Z",
+    "messageId": "<202610141643.45856721992@smtp-relay.mailin.fr>"
   }
 ]
