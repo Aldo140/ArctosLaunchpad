@@ -173,5 +173,47 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-14T14:12:25.261Z",
     "messageId": "<202610141412.33656624545@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@copperandchloe.com",
+    "business": "Copper & Chloe",
+    "subject": "A cleaner RSVP handoff for Copper & Chloe",
+    "at": "2026-10-14T14:42:49.679Z",
+    "messageId": "<202610141442.51517780901@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "inquiries@kylemichelleweddings.com",
+    "business": "Kyle Michelle Weddings + Events",
+    "subject": "Quick one — the guest list part, done once",
+    "at": "2026-10-14T14:42:49.890Z",
+    "messageId": "<202610141442.78142639921@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "feyisola@comms.weddeddetails.com",
+    "business": "Wedded Details",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T14:42:50.097Z",
+    "messageId": "<202610141442.98902291434@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "tanya@teginternational.com",
+    "business": "The Event Group International",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T14:42:50.305Z",
+    "messageId": "<202610141442.38742368965@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "marissa@marissapedoneevents.com",
+    "business": "Marissa Pedone Events",
+    "subject": "A cleaner RSVP handoff for Marissa Pedone Events",
+    "at": "2026-10-14T14:42:50.508Z",
+    "messageId": "<202610141442.53633390180@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sarahg@brillianteventplanning.com",
+    "business": "Brilliant Event Planning",
+    "subject": "Sarah — the guest list part, done once",
+    "at": "2026-10-14T14:42:50.722Z",
+    "messageId": "<202610141442.28554662178@smtp-relay.mailin.fr>"
   }
 ]
