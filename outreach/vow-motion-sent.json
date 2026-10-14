@@ -131,5 +131,47 @@
     "subject": "Johanne — the guest list part, done once",
     "at": "2026-10-14T13:43:02.385Z",
     "messageId": "<202610141343.22577637691@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@peonyeventsco.com",
+    "business": "Peony Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T14:12:24.491Z",
+    "messageId": "<202610141412.85541268037@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "kristina@harlowevents.co",
+    "business": "Harlow Events Co.",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T14:12:24.647Z",
+    "messageId": "<202610141412.97697180093@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "letsplan@kbarnerevents.com",
+    "business": "K. Barner Events",
+    "subject": "A cleaner RSVP handoff for K. Barner Events",
+    "at": "2026-10-14T14:12:24.798Z",
+    "messageId": "<202610141412.67206580847@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "eventsbysrishti@gmail.com",
+    "business": "Events by Srishti",
+    "subject": "Srishti — the guest list part, done once",
+    "at": "2026-10-14T14:12:24.951Z",
+    "messageId": "<202610141412.70930296944@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jenny@jennyorsinievents.com",
+    "business": "Jenny Orsini Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T14:12:25.099Z",
+    "messageId": "<202610141412.85351981305@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@weddingswithverve.com",
+    "business": "Weddings with Verve",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T14:12:25.261Z",
+    "messageId": "<202610141412.33656624545@smtp-relay.mailin.fr>"
   }
 ]
