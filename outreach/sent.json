@@ -1209,5 +1209,75 @@
     "subject": "A Plus Tailor orders and pickups",
     "at": "2026-10-14T15:13:13.345Z",
     "messageId": "<202610141513.68559515430@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "culinarybycolin@gmail.com",
+    "business": "Culinary By Colin",
+    "subject": "Culinary By Colin bookings and menus",
+    "at": "2026-10-14T15:42:31.633Z",
+    "messageId": "<202610141542.28637146170@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@premierlandworks.com",
+    "business": "Premier Landworks",
+    "subject": "Premier Landworks quotes and job tracking",
+    "at": "2026-10-14T15:42:32.131Z",
+    "messageId": "<202610141542.34612105899@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "service@hi-techclosets.ca",
+    "business": "Hi-Tech Cabinets & Closets",
+    "subject": "Hi-Tech Closets job tracking",
+    "at": "2026-10-14T15:42:32.361Z",
+    "messageId": "<202610141542.68235820545@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "calgaryeconomy@gmail.com",
+    "business": "Calgary Economy Printers",
+    "subject": "Calgary Economy Printers order tracking",
+    "at": "2026-10-14T15:42:32.550Z",
+    "messageId": "<202610141542.54544172223@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "iroscakes@gmail.com",
+    "business": "Iro's Cakes",
+    "subject": "Iro's Cakes custom orders",
+    "at": "2026-10-14T15:42:32.780Z",
+    "messageId": "<202610141542.32118999504@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "corina@theblackforestbaker.ca",
+    "business": "The Black Forest Baker",
+    "subject": "The Black Forest Baker orders",
+    "at": "2026-10-14T15:42:32.983Z",
+    "messageId": "<202610141542.30846353720@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "office@columbiacarpentry.ca",
+    "business": "Columbia Carpentry",
+    "subject": "Columbia Carpentry quotes and job tracking",
+    "at": "2026-10-14T15:42:33.204Z",
+    "messageId": "<202610141542.57362318924@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@thirdgenbuilders.com",
+    "business": "Third Gen Builders",
+    "subject": "Third Gen Builders quotes and timelines",
+    "at": "2026-10-14T15:42:33.395Z",
+    "messageId": "<202610141542.16124588923@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@glamdetailing.com",
+    "business": "Glam Detailing",
+    "subject": "Glam Detailing bookings and quotes",
+    "at": "2026-10-14T15:42:33.631Z",
+    "messageId": "<202610141542.95545876400@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@acglass.ca",
+    "business": "AC Glass and Mirror",
+    "subject": "AC Glass quotes and job tracking",
+    "at": "2026-10-14T15:42:33.828Z",
+    "messageId": "<202610141542.94606916498@smtp-relay.mailin.fr>"
   }
 ]

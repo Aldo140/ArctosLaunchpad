@@ -257,5 +257,47 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-14T15:13:16.469Z",
     "messageId": "<202610141513.27174138969@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@primaveradreams.com",
+    "business": "Primavera Dreams Weddings",
+    "subject": "A cleaner RSVP handoff for Primavera Dreams Weddings",
+    "at": "2026-10-14T15:42:35.508Z",
+    "messageId": "<202610141542.71242908508@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "ido@capecodcelebrations.com",
+    "business": "Cape Cod Celebrations",
+    "subject": "Quick one — the guest list part, done once",
+    "at": "2026-10-14T15:42:35.701Z",
+    "messageId": "<202610141542.77426684750@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@handydallaireevents.com",
+    "business": "Handy & Dallaire Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-14T15:42:35.931Z",
+    "messageId": "<202610141542.50017340869@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "maggie@stewartandcoevents.com",
+    "business": "Maggie Stewart Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-14T15:42:36.128Z",
+    "messageId": "<202610141542.77815163884@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "irene@irenecoevents.com",
+    "business": "Irene + Co Events",
+    "subject": "A cleaner RSVP handoff for Irene + Co Events",
+    "at": "2026-10-14T15:42:36.352Z",
+    "messageId": "<202610141542.47637373816@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@eventsbymissyco.com",
+    "business": "Events by Missy & Company",
+    "subject": "Melissa — the guest list part, done once",
+    "at": "2026-10-14T15:42:36.545Z",
+    "messageId": "<202610141542.31060969903@smtp-relay.mailin.fr>"
   }
 ]
