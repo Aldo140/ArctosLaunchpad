@@ -1489,5 +1489,75 @@
     "subject": "Dick's Upholstery quotes and jobs",
     "at": "2026-10-14T16:48:35.533Z",
     "messageId": "<202610141648.27536168742@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@vargakustom.com",
+    "business": "Varga Kustom",
+    "subject": "Varga Kustom quotes and job tracking",
+    "at": "2026-10-15T15:12:42.052Z",
+    "messageId": "<202610151512.97169939182@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@yyccabinets.ca",
+    "business": "YYC Cabinets",
+    "subject": "YYC Cabinets quotes and job tracking",
+    "at": "2026-10-15T15:12:42.496Z",
+    "messageId": "<202610151512.30197076508@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "dave@hallmarkcabinetry.com",
+    "business": "Hallmark Custom Cabinetry",
+    "subject": "Hallmark Custom Cabinetry job tracking",
+    "at": "2026-10-15T15:12:42.657Z",
+    "messageId": "<202610151512.57913268618@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "nnennaumehal@gmail.com",
+    "business": "Chef Neynah",
+    "subject": "Chef Neynah bookings and custom menus",
+    "at": "2026-10-15T15:12:42.850Z",
+    "messageId": "<202610151512.72947405414@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "purposebuiltfabworks@gmail.com",
+    "business": "Purpose Built Fabworks",
+    "subject": "Purpose Built Fabworks build tracking",
+    "at": "2026-10-15T15:12:42.999Z",
+    "messageId": "<202610151512.83134608720@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "zahir@zrauto.com",
+    "business": "ZR Auto",
+    "subject": "ZR Auto quotes and job tracking",
+    "at": "2026-10-15T15:12:43.184Z",
+    "messageId": "<202610151512.51553933131@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@velwindowsandglass.ca",
+    "business": "VEL Windows and Glass",
+    "subject": "VEL Windows and Glass quote tracking",
+    "at": "2026-10-15T15:12:43.330Z",
+    "messageId": "<202610151512.19722750122@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@allandavidbespoke.com",
+    "business": "Allan David Bespoke",
+    "subject": "Allan David Bespoke orders and fittings",
+    "at": "2026-10-15T15:12:43.521Z",
+    "messageId": "<202610151512.47503634422@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@theprimestone.ca",
+    "business": "The Prime Stone",
+    "subject": "The Prime Stone job tracking",
+    "at": "2026-10-15T15:12:43.684Z",
+    "messageId": "<202610151512.53433599395@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@curtispandl.com",
+    "business": "Curtis Properties and Landscaping",
+    "subject": "Curtis Properties quotes and job tracking",
+    "at": "2026-10-15T15:12:43.882Z",
+    "messageId": "<202610151512.77683011639@smtp-relay.mailin.fr>"
   }
 ]

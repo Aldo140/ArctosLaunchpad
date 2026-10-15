@@ -565,5 +565,47 @@
     "subject": "Aimée — the guest list part, done once",
     "at": "2026-10-15T14:42:28.444Z",
     "messageId": "<202610151442.50253944101@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "angela@angiandco.com",
+    "business": "Angi & Co",
+    "subject": "A cleaner RSVP handoff for Angi & Co",
+    "at": "2026-10-15T15:12:45.121Z",
+    "messageId": "<202610151512.70169853679@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@diwanbydesign.com",
+    "business": "Diwan by Design",
+    "subject": "Sneh — the guest list part, done once",
+    "at": "2026-10-15T15:12:45.300Z",
+    "messageId": "<202610151512.21345398607@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "joann.elegantoccasions@gmail.com",
+    "business": "Elegant Occasions by JoAnn Gregoli",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T15:12:45.448Z",
+    "messageId": "<202610151512.63759667464@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jglenn@6degreesofcelebration.com",
+    "business": "6 Degrees of Celebration",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T15:12:45.628Z",
+    "messageId": "<202610151512.74459088747@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@devotedwolfevents.com",
+    "business": "Devoted Wolf Events",
+    "subject": "A cleaner RSVP handoff for Devoted Wolf Events",
+    "at": "2026-10-15T15:12:45.770Z",
+    "messageId": "<202610151512.63084923898@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@avsevent.com",
+    "business": "A Votre Service Events",
+    "subject": "Quick one — the guest list part, done once",
+    "at": "2026-10-15T15:12:45.951Z",
+    "messageId": "<202610151512.10445884832@smtp-relay.mailin.fr>"
   }
 ]
