@@ -607,5 +607,47 @@
     "subject": "Quick one — the guest list part, done once",
     "at": "2026-10-15T15:12:45.951Z",
     "messageId": "<202610151512.10445884832@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "ido@juneberi.com",
+    "business": "June Beri Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T15:43:00.362Z",
+    "messageId": "<202610151543.61783269531@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "kate@simplysapphireevents.com",
+    "business": "Simply Sapphire Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T15:43:00.519Z",
+    "messageId": "<202610151543.61105699835@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@pinkbowtienyc.com",
+    "business": "Pink Bowtie Events",
+    "subject": "A cleaner RSVP handoff for Pink Bowtie Events",
+    "at": "2026-10-15T15:43:00.687Z",
+    "messageId": "<202610151543.89361312421@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "events@lauriearons.com",
+    "business": "Laurie Arons Special Events",
+    "subject": "Laurie — the guest list part, done once",
+    "at": "2026-10-15T15:43:00.847Z",
+    "messageId": "<202610151543.96518663865@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@burkevents.com",
+    "business": "Burke Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T15:43:01.003Z",
+    "messageId": "<202610151543.14412033454@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@oohlalaweddings.com",
+    "business": "Ooh La La Weddings & Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T15:43:01.160Z",
+    "messageId": "<202610151543.56094152468@smtp-relay.mailin.fr>"
   }
 ]
