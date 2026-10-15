@@ -481,5 +481,47 @@
     "subject": "Soraya — the guest list part, done once",
     "at": "2026-10-15T13:42:57.607Z",
     "messageId": "<202610151342.30538844339@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "elaina@cruandcoevents.com",
+    "business": "Cru & Co. Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T14:13:21.131Z",
+    "messageId": "<202610151413.16019709659@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "team@consiliumevents.com",
+    "business": "Consilium Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T14:13:21.380Z",
+    "messageId": "<202610151413.89800526622@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "kelly@themaineventbykelly.com",
+    "business": "The Main Event by Kelly",
+    "subject": "A cleaner RSVP handoff for The Main Event by Kelly",
+    "at": "2026-10-15T14:13:21.638Z",
+    "messageId": "<202610151413.84948593745@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "stacey@roganandcoevents.com",
+    "business": "Rogan & Co. Events",
+    "subject": "Stacey — the guest list part, done once",
+    "at": "2026-10-15T14:13:21.887Z",
+    "messageId": "<202610151413.84466032143@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@kroccasions.com",
+    "business": "KR Occasions",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T14:13:22.130Z",
+    "messageId": "<202610151413.14803574346@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@alivelyevent.com",
+    "business": "A Lively Event",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T14:13:22.364Z",
+    "messageId": "<202610151413.38137229694@smtp-relay.mailin.fr>"
   }
 ]
