@@ -691,5 +691,47 @@
     "subject": "Steve — the guest list part, done once",
     "at": "2026-10-15T15:50:14.872Z",
     "messageId": "<202610151550.98939041301@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hey@welldressedevents.com",
+    "business": "Well-Dressed Events",
+    "subject": "A cleaner RSVP handoff for Well-Dressed Events",
+    "at": "2026-10-15T16:12:28.403Z",
+    "messageId": "<202610151612.19639376134@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@theperfectshindig.com",
+    "business": "The Perfect Shindig",
+    "subject": "Aimee — the guest list part, done once",
+    "at": "2026-10-15T16:12:28.593Z",
+    "messageId": "<202610151612.72236538379@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "brielle@ido-planning.com",
+    "business": "I Do Planning",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T16:12:28.750Z",
+    "messageId": "<202610151612.93368471016@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "contact@aliciamargaretevents.com",
+    "business": "Alicia Margaret Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T16:12:28.926Z",
+    "messageId": "<202610151612.15661512315@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@petiteplanningcompany.com",
+    "business": "Petite Planning Company",
+    "subject": "A cleaner RSVP handoff for Petite Planning Company",
+    "at": "2026-10-15T16:12:29.085Z",
+    "messageId": "<202610151612.20332249882@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@letsgrooveevents.com",
+    "business": "Let's Groove Events",
+    "subject": "Monica — the guest list part, done once",
+    "at": "2026-10-15T16:12:29.254Z",
+    "messageId": "<202610151612.48318399196@smtp-relay.mailin.fr>"
   }
 ]

@@ -1699,5 +1699,75 @@
     "subject": "JBLeatherSupply custom belt orders",
     "at": "2026-10-15T15:50:12.965Z",
     "messageId": "<202610151550.62401641972@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "neto@hnbuilders.ca",
+    "business": "HN Builders",
+    "subject": "HN Builders project tracking",
+    "at": "2026-10-15T16:12:25.108Z",
+    "messageId": "<202610151612.55342842163@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@gtgcatering.ca",
+    "business": "GTG Catering",
+    "subject": "GTG Catering event orders",
+    "at": "2026-10-15T16:12:25.550Z",
+    "messageId": "<202610151612.61631158812@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@gingerandspicecakery.com",
+    "business": "Ginger & Spice Cakery",
+    "subject": "Ginger & Spice Cakery custom cake orders",
+    "at": "2026-10-15T16:12:25.717Z",
+    "messageId": "<202610151612.75481157463@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "autoexpertsinfo@shaw.ca",
+    "business": "Auto Experts",
+    "subject": "Auto Experts bookings and loaners",
+    "at": "2026-10-15T16:12:25.906Z",
+    "messageId": "<202610151612.27605432507@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@wrightrestyling.ca",
+    "business": "Wright ReStyling",
+    "subject": "Wright ReStyling bookings and installs",
+    "at": "2026-10-15T16:12:26.059Z",
+    "messageId": "<202610151612.68133249678@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@mrwroughtiron.ca",
+    "business": "Mr. Wrought Iron",
+    "subject": "Mr. Wrought Iron quote requests",
+    "at": "2026-10-15T16:12:26.228Z",
+    "messageId": "<202610151612.27108074064@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@pineforcedar.com",
+    "business": "Pine for Cedar",
+    "subject": "Pine for Cedar wedding orders",
+    "at": "2026-10-15T16:12:26.383Z",
+    "messageId": "<202610151612.41615307286@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@boldbitescatering.com",
+    "business": "Bold Bites Catering",
+    "subject": "Bold Bites Catering custom menus",
+    "at": "2026-10-15T16:12:26.563Z",
+    "messageId": "<202610151612.36013821854@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgaryconcretecoating.ca",
+    "business": "Calgary Concrete Coating",
+    "subject": "Calgary Concrete Coating quotes",
+    "at": "2026-10-15T16:12:26.719Z",
+    "messageId": "<202610151612.24690044877@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@flowersbyjanie.com",
+    "business": "Flowers by Janie",
+    "subject": "Flowers by Janie proposals and bookings",
+    "at": "2026-10-15T16:12:26.910Z",
+    "messageId": "<202610151612.38534587330@smtp-relay.mailin.fr>"
   }
 ]
