@@ -733,5 +733,47 @@
     "subject": "Monica — the guest list part, done once",
     "at": "2026-10-15T16:12:29.254Z",
     "messageId": "<202610151612.48318399196@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "contact@yaadeinevents.com",
+    "business": "Yaadein Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T16:42:47.235Z",
+    "messageId": "<202610151642.78166239224@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "mandy@hummingbirdbridal.com",
+    "business": "Hummingbird Events & Design",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T16:42:47.434Z",
+    "messageId": "<202610151642.94140819049@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@elegantpairings.com",
+    "business": "Elegant Pairings",
+    "subject": "A cleaner RSVP handoff for Elegant Pairings",
+    "at": "2026-10-15T16:42:47.626Z",
+    "messageId": "<202610151642.60162953824@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@kkerkorianevents.com",
+    "business": "K. Kerkorian Events",
+    "subject": "Kristyn — the guest list part, done once",
+    "at": "2026-10-15T16:42:47.835Z",
+    "messageId": "<202610151642.90328468715@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "kait@bykaitelleevents.com",
+    "business": "By Kait Elle Events",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T16:42:48.016Z",
+    "messageId": "<202610151642.97155439431@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jillian@jillianjevents.com",
+    "business": "Jillian J Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T16:42:48.212Z",
+    "messageId": "<202610151642.34295353917@smtp-relay.mailin.fr>"
   }
 ]
