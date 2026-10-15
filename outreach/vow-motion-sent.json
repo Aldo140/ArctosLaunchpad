@@ -649,5 +649,47 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-15T15:43:01.160Z",
     "messageId": "<202610151543.56094152468@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "jessica@corkandvows.com",
+    "business": "Cork & Vows",
+    "subject": "A cleaner RSVP handoff for Cork & Vows",
+    "at": "2026-10-15T15:50:14.131Z",
+    "messageId": "<202610151550.36578524911@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "k@katefordevents.com",
+    "business": "Kate Ford Events",
+    "subject": "Kate — the guest list part, done once",
+    "at": "2026-10-15T15:50:14.301Z",
+    "messageId": "<202610151550.12776738620@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@amorologyweddings.com",
+    "business": "Amorology",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T15:50:14.428Z",
+    "messageId": "<202610151550.18575971721@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@brookekeegan.com",
+    "business": "Brooke Keegan Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T15:50:14.573Z",
+    "messageId": "<202610151550.21673347347@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "engage@sterlingengagements.com",
+    "business": "Sterling Engagements",
+    "subject": "A cleaner RSVP handoff for Sterling Engagements",
+    "at": "2026-10-15T15:50:14.702Z",
+    "messageId": "<202610151550.44738265048@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "steve@sinclairandmoore.com",
+    "business": "Sinclair & Moore",
+    "subject": "Steve — the guest list part, done once",
+    "at": "2026-10-15T15:50:14.872Z",
+    "messageId": "<202610151550.98939041301@smtp-relay.mailin.fr>"
   }
 ]
