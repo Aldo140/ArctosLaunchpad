@@ -523,5 +523,47 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-15T14:13:22.364Z",
     "messageId": "<202610151413.38137229694@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@passionate-weddings.com",
+    "business": "Passionate Weddings",
+    "subject": "A cleaner RSVP handoff for Passionate Weddings",
+    "at": "2026-10-15T14:42:27.503Z",
+    "messageId": "<202610151442.10728176267@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "rebecca@thomaseventproduction.com",
+    "business": "Rebecca Thomas Events",
+    "subject": "Rebecca — the guest list part, done once",
+    "at": "2026-10-15T14:42:27.686Z",
+    "messageId": "<202610151442.22178344365@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@eventsbykhatera.com",
+    "business": "Events by Khatera",
+    "subject": "Kitchen sheet, shuttle manifest, place cards — from the replies",
+    "at": "2026-10-15T14:42:27.865Z",
+    "messageId": "<202610151442.28740574679@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@tonyaszele.com",
+    "business": "Tonya Szele Events",
+    "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
+    "at": "2026-10-15T14:42:28.058Z",
+    "messageId": "<202610151442.60056937864@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@loveandlaughterweddings.com",
+    "business": "Love & Laughter Weddings",
+    "subject": "A cleaner RSVP handoff for Love & Laughter Weddings",
+    "at": "2026-10-15T14:42:28.250Z",
+    "messageId": "<202610151442.10517410534@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "aimee.weddingsbyaimee@gmail.com",
+    "business": "Weddings By Aimée",
+    "subject": "Aimée — the guest list part, done once",
+    "at": "2026-10-15T14:42:28.444Z",
+    "messageId": "<202610151442.50253944101@smtp-relay.mailin.fr>"
   }
 ]
