@@ -775,5 +775,19 @@
     "subject": "Built the guest side so you don't rebuild it in four spreadsheets",
     "at": "2026-10-15T16:42:48.212Z",
     "messageId": "<202610151642.34295353917@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "nicole@simeralco.com",
+    "business": "Nicole Simeral & Company",
+    "subject": "A cleaner RSVP handoff for Nicole Simeral & Company",
+    "at": "2026-10-15T17:13:05.654Z",
+    "messageId": "<202610151713.29811366553@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "hello@samarajosephineevents.com",
+    "business": "Samara Josephine Events",
+    "subject": "Samara — the guest list part, done once",
+    "at": "2026-10-15T17:13:05.875Z",
+    "messageId": "<202610151713.27838320196@smtp-relay.mailin.fr>"
   }
 ]

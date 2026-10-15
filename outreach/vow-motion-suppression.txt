@@ -1,3 +1,4 @@
 # Vow Motion addresses HQ found bouncing or complaining in Brevo (added automatically).
 # The main Vow Motion list is outreach/suppression.txt in Aldo140/vow-motion.
 info@detailedeventsbylo.com  # hard bounce (Brevo) 2026-10-15
+contact@yaadeinevents.com  # hard bounce (Brevo) 2026-10-15
