@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useHq } from "../context";
 import { BUSINESS_LABEL, ago } from "../format";
 import { Empty, Stat } from "../ui";
-import { OWNER_LABEL, OWNER_ORDER, STATE, calgaryDayStart, clock, cronFire, evaluateAll, reliability, type TaskStatus } from "../tasks";
+import { STATE, calgaryDayStart, clock, cronFire, evaluateAll, reliability, type TaskStatus } from "../tasks";
 
 const DAY = 86_400_000;
 const RUN_WORD = { success: "Done", failure: "Failed", running: "Running", queued: "Waiting for GitHub", cancelled: "Cancelled", skipped: "Skipped", unknown: "Unknown" } as const;
@@ -90,6 +90,7 @@ function Task({ t, now }: { t: TaskStatus; now: number }) {
 
 export function TasksView() {
   const { data, now, filter } = useHq();
+  const [mode, setMode] = useState<"status" | "calendar">("status");
   const all = useMemo(() => evaluateAll(data, now), [data, now]);
   const tasks = all.filter((t) => filter === "all" || t.routine.owner === filter || t.routine.owner === "shared");
   const count = (...states: TaskStatus["state"][]) => tasks.filter((t) => states.includes(t.state)).length;
@@ -105,6 +106,37 @@ export function TasksView() {
     .filter((t) => t.wf && t.state !== "setup")
     .map((t) => ({ t, at: cronFire(t.wf!.cron, now, 1) ?? Infinity }))
     .sort((a, b) => a.at - b.at)[0];
+  const active = tasks.filter((t) => ["running", "late", "failed", "missed", "unknown"].includes(t.state));
+  const completed = tasks.filter((t) => t.state === "confirmed" || t.state === "done");
+  const upcoming = tasks.filter((t) => t.state === "later" || t.state === "setup");
+  const dayKey = (at: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(at));
+  const calendar = Array.from({ length: 7 }, (_, i) => {
+    const at = now - (6 - i) * DAY;
+    const key = dayKey(at);
+    const runs = tasks.flatMap((t) => (t.wf?.runs ?? [])
+      .filter((r) => dayKey(r.at) === key)
+      .map((r) => ({ at: r.at, title: t.routine.title, detail: RUN_WORD[r.status], sev: SEV[r.status], href: r.url })));
+    const events = activity.filter((a) => dayKey(a.at) === key).map((a) => ({
+      at: a.at, title: a.text, detail: BUSINESS_LABEL[a.business], sev: "ok" as const, href: null,
+    }));
+    const entries = [...runs, ...events].sort((a, b) => b.at - a.at);
+    return {
+      key, entries,
+      today: key === dayKey(now),
+      day: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", weekday: "short" }).format(new Date(at)),
+      date: new Intl.DateTimeFormat("en-CA", { timeZone: "America/Edmonton", month: "short", day: "numeric" }).format(new Date(at)),
+    };
+  });
+
+  const lane = (title: string, note: string, group: TaskStatus[], state: "active" | "done" | "later") => (
+    <section className="hq-card hq-tasklane" data-lane={state}>
+      <div className="hq-card__head">
+        <div><p className="hq-eyebrow">{note}</p><h2 className="hq-h2">{title}</h2></div>
+        <span className="hq-tasklane__count">{group.length}</span>
+      </div>
+      {group.length ? <div className="hq-tasks">{group.map((t) => <Task key={t.routine.id} t={t} now={now} />)}</div> : <p className="hq-small hq-tasklane__empty">Nothing here.</p>}
+    </section>
+  );
 
   return (
     <div className="hq-view">
@@ -115,6 +147,11 @@ export function TasksView() {
         </h1>
         <p className="hq-lede" style={{ marginTop: 10 }}>Every recurring job the agents own. <b style={{ color: "var(--fg)" }}>Confirmed</b> means the result shows up in the data: the email is in the send log, the post is live, the read landed. <b style={{ color: "var(--fg)" }}>Ran clean</b> means the job finished with nothing to prove today. Open any job for its proof and run history.</p>
       </header>
+
+      <div className="hq-seg hq-taskmodes" role="tablist" aria-label="Jobs view">
+        <button type="button" role="tab" aria-selected={mode === "status"} onClick={() => setMode("status")}>Status</button>
+        <button type="button" role="tab" aria-selected={mode === "calendar"} onClick={() => setMode("calendar")}>7-day calendar</button>
+      </div>
 
       <div className="hq-card">
         <div className="hq-stats">
@@ -155,21 +192,38 @@ export function TasksView() {
         </section>
       ) : null}
 
-      {OWNER_ORDER.filter((o) => filter === "all" || o === filter || o === "shared").map((owner) => {
-        const group = tasks.filter((t) => t.routine.owner === owner);
-        if (!group.length) return null;
-        const ok = group.filter((t) => t.state === "confirmed" || t.state === "done").length;
-        const live = group.filter((t) => !["later", "setup", "unknown"].includes(t.state)).length;
-        return (
-          <section className="hq-card" key={owner}>
-            <div className="hq-card__head">
-              <h2 className="hq-h2">{OWNER_LABEL[owner]}</h2>
-              <span className="hq-mono">{live ? `${ok}/${live} done today` : "nothing due today"}</span>
-            </div>
-            <div className="hq-tasks">{group.map((t) => <Task key={t.routine.id} t={t} now={now} />)}</div>
-          </section>
-        );
-      })}
+      {mode === "status" ? (
+        <div className="hq-taskboard">
+          {lane("In progress and needs attention", "Do these first", active, "active")}
+          {lane("Done today", "Confirmed results and clean runs", completed, "done")}
+          {lane("Later", "Not due or waiting for setup", upcoming, "later")}
+        </div>
+      ) : (
+        <section className="hq-card">
+          <div className="hq-card__head">
+            <div><p className="hq-eyebrow">Daily activity</p><h2 className="hq-h2">Last seven days</h2></div>
+            <span className="hq-mono">Calgary time</span>
+          </div>
+          <div className="hq-taskcal">
+            {calendar.map((day) => (
+              <article key={day.key} className="hq-taskcal__day" data-today={day.today}>
+                <header><span>{day.day}</span><strong>{day.date}</strong><b>{day.entries.length}</b></header>
+                {day.entries.length ? (
+                  <ol>
+                    {day.entries.slice(0, 8).map((entry, i) => (
+                      <li key={`${entry.at}-${entry.title}-${i}`} data-sev={entry.sev}>
+                        <span className="hq-mono">{clock(entry.at, now)}</span>
+                        <div>{entry.href ? <a href={entry.href} target="_blank" rel="noreferrer">{entry.title}</a> : <strong>{entry.title}</strong>}<small>{entry.detail}</small></div>
+                      </li>
+                    ))}
+                    {day.entries.length > 8 ? <li className="hq-taskcal__more">+{day.entries.length - 8} more</li> : null}
+                  </ol>
+                ) : <p>No activity</p>}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {!data.workflows ? <Empty title="Couldn't reach GitHub for the run history.">It retries on the next refresh; proof from the agents&apos; report still shows.</Empty> : null}
 
