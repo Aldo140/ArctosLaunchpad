@@ -21,6 +21,10 @@ custom bakeries).
 - Every email names one true detail about that business and cites only real
   Arctos work: True North Kromes (case-intake site), Nicsdelite (multi-order
   dessert form and admin), Fresh Prep (internal reporting tool).
+- The proposition is diagnostic: learn how the owner currently turns enquiries
+  into paid work, then recommend only what would help. That may be intake,
+  tracking, follow-up, the offer, a website or optional ads. The CTA is one
+  20-minute working call; a reply of "yes" gets two proposed times.
 - Footer on every email: name, Arctos, mailing address, reply-to-unsubscribe.
   Add every opt-out or bounce to `suppression.txt` the same day.
 

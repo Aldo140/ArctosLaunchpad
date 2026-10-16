@@ -12,6 +12,11 @@ name: Outreach prospects
 #
 # Public repository: Claude's answer stays in a file, never in this log.
 on:
+  push:
+    branches: [arctos-launchpad]
+    paths:
+      - scripts/prospects.mjs
+      - outreach/prospect-brief-arctos.md
   schedule:
     - cron: "5 10 * * 1-5"
   workflow_dispatch:
@@ -21,6 +26,10 @@ on:
         type: choice
         options: [all, arctos, vowmotion]
         default: all
+      count:
+        description: How many prospects to queue per selected campaign
+        type: number
+        default: 10
 
 permissions:
   contents: write
@@ -33,6 +42,7 @@ concurrency:
 
 env:
   CLAUDE_CODE: '@anthropic-ai/claude-code@2.1.290'
+  OUTREACH_PROSPECT_COUNT: ${{ github.event_name == 'push' && '10' || inputs.count }}
 
 jobs:
   research:
@@ -47,7 +57,7 @@ jobs:
     steps:
       - name: Is this campaign asked for?
         id: asked
-        run: echo "yes=${{ inputs.campaign == '' || inputs.campaign == 'all' || inputs.campaign == matrix.campaign }}" >> "$GITHUB_OUTPUT"
+        run: echo "yes=${{ (github.event_name == 'push' && matrix.campaign == 'arctos') || (github.event_name != 'push' && (inputs.campaign == '' || inputs.campaign == 'all' || inputs.campaign == matrix.campaign)) }}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         if: steps.asked.outputs.yes == 'true'
         with:

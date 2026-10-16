@@ -89,9 +89,14 @@ function queued(c, now = new Date()) {
   return queueFor(c, { sent, suppressed, today: localTime(now, c.window.tz).date }).length;
 }
 
+function targetCount(c) {
+  const requested = Number(process.env.OUTREACH_PROSPECT_COUNT);
+  return Number.isInteger(requested) && requested > 0 ? Math.min(requested, c.dailyCap) : c.dailyCap;
+}
+
 export function plan(id, promptOut, now = new Date()) {
   const c = campaign(id);
-  const need = Math.max(0, c.dailyCap - queued(c, now));
+  const need = Math.max(0, targetCount(c) - queued(c, now));
   if (!need) return 0;
   const k = known();
   // A few extra, since some won't pass the checks; the batch keeps at most `need`.
@@ -155,7 +160,7 @@ export function compose(id, p, i, seen) {
     if ([opening, question, pain].some((s) => LINK.test(s))) return { reason: "contains a link" };
     subject = str(p.subject, 70);
     if (subject.length < 10) return { reason: "no subject" };
-    text = `${opening} ${question.startsWith("Quick question") ? question : `Quick question: ${question}`}\n\nI'm Aldo — I run Arctos, a small Calgary studio that builds intake forms, job tracking and reporting around how a shop already works. Recently: ${WORK[p.work]}\n\nIf ${pain} takes more of your week than it should, I'm happy to look at how it runs today and tell you honestly whether anything is worth changing. No cost — just reply.`;
+    text = `${opening} ${question.startsWith("Quick question") ? question : `Quick question: ${question}`}\n\nI'm Aldo — I run Arctos, a small Calgary studio. We help owner-run businesses turn more enquiries into paid work by improving how leads are delivered, tracked and followed through. Sometimes the missing piece is a website or optional ads; sometimes it is the offer, intake or follow-up. We first learn how the business runs, then recommend only what would actually help.\n\nRelevant work: ${WORK[p.work]}\n\nWould a 20-minute working call next week be useful? Reply "yes" and I'll send two times. If nothing needs changing, I'll say that too.`;
   } else {
     const detail = str(p.detail, 220).replace(/[.!]+$/, "");
     if (detail.length < 25) return { reason: "no specific detail about the business" };
@@ -176,7 +181,7 @@ const hasMailServer = async (domain) => {
 
 export async function check(id, answerFile, now = new Date(), { mx = hasMailServer } = {}) {
   const c = campaign(id);
-  const need = Math.max(0, c.dailyCap - queued(c, now));
+  const need = Math.max(0, targetCount(c) - queued(c, now));
   const answer = JSON.parse(readFileSync(answerFile, "utf8"));
   const rows = parseAnswer(String(answer.result ?? ""));
   const seen = known();
