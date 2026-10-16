@@ -21,7 +21,18 @@ import { calgaryDate, nextSlot } from '../lib/time';
 import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 
 type Log = (m: string) => void;
+const DAY = 86_400_000;
 const postId = (fingerprint: string) => `post-${createHash('sha256').update(fingerprint).digest('hex').slice(0, 20)}`;
+
+/** The only CalgaryDaily series the owner currently permits. */
+export function allowedCalgaryDailyPost(p: Pick<OpsPost, 'brand' | 'fingerprint' | 'imageText' | 'imageUrls' | 'videoUrl'>): boolean {
+  if (p.brand !== 'calgarydaily') return true;
+  const allowed = /\|(week|best-of|headline)\|/.test(p.fingerprint);
+  if (!allowed) return false;
+  // A relevant visual is mandatory: weekly plans are multi-slide video/carousel;
+  // rankings are carousels; news carries a credited photo or multiple sourced slides.
+  return Boolean(p.videoUrl || (p.imageUrls?.length ?? 0) > 1 || p.imageText.photo);
+}
 
 /** Claude's draft checked against the brand; the template draft when there is no key or it fails. */
 async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
@@ -205,6 +216,11 @@ export async function redraftAndBriefs(db: Firestore, now: number, log: Log): Pr
 export async function monitorPosts(db: Firestore, now: number, log: Log): Promise<void> {
   const stale = await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'approved', 'redraft']).get();
   for (const d of stale.docs) {
+    if (d.get('brand') === 'calgarydaily' && !allowedCalgaryDailyPost(d.data() as OpsPost)) {
+      await d.ref.update({ status: 'rejected', note: 'Stopped by the CalgaryDaily editorial policy (weekly plans, sourced Best of Calgary rankings and major Calgary news only).', updatedAt: now });
+      log(`retired ${d.id} (format is no longer part of CalgaryDaily)`);
+      continue;
+    }
     if (!BRANDS.includes(d.get('brand'))) {
       await d.ref.update({ status: 'rejected', note: `${brandKit(d.get('brand')).name} no longer posts on its own account.`, updatedAt: now });
       log(`retired ${d.id} (account switched off)`);
@@ -235,12 +251,29 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
   const due = (await db.collection(COLLECTIONS.posts).where('status', '==', 'approved').get()).docs.filter(d => force || (d.get('scheduledFor') ?? Infinity) <= now);
   const publishedToday = new Map<BrandId, number>();
   const today = calgaryDate(now);
-  const recent = await db.collection(COLLECTIONS.posts).where('publishedAt', '>=', now - 36 * 3_600_000).get();
+  const recent = await db.collection(COLLECTIONS.posts).where('publishedAt', '>=', now - 7 * DAY).get();
   for (const d of recent.docs) if (calgaryDate(d.get('publishedAt')) === today) publishedToday.set(d.get('brand'), (publishedToday.get(d.get('brand')) ?? 0) + 1);
+  let headlinesThisWeek = recent.docs.filter(d => d.get('brand') === 'calgarydaily' && String(d.get('fingerprint') ?? '').includes('|headline|')).length;
+  let bestOfToday = recent.docs.filter(d => d.get('brand') === 'calgarydaily' && String(d.get('fingerprint') ?? '').includes('|best-of|') && calgaryDate(d.get('publishedAt')) === today).length;
 
   for (const doc of due) {
     const p = doc.data() as OpsPost;
     const kit = brandKit(p.brand);
+    if (!allowedCalgaryDailyPost(p)) {
+      await doc.ref.update({ status: 'rejected', note: 'Stopped by the CalgaryDaily editorial policy.', updatedAt: now });
+      log(`held ${p.id}: format is no longer permitted`);
+      continue;
+    }
+    if (p.brand === 'calgarydaily' && p.fingerprint.includes('|headline|') && headlinesThisWeek >= 2) {
+      await doc.ref.update({ status: 'rejected', note: 'Stopped by the CalgaryDaily limit of two major-news posts in a rolling seven-day period.', updatedAt: now });
+      log(`held ${p.id}: weekly major-news limit reached`);
+      continue;
+    }
+    if (p.brand === 'calgarydaily' && p.fingerprint.includes('|best-of|') && bestOfToday >= 1) {
+      await doc.ref.update({ status: 'rejected', note: 'Stopped by the CalgaryDaily limit of one Best of Calgary ranking per day.', updatedAt: now });
+      log(`held ${p.id}: daily Best of Calgary limit reached`);
+      continue;
+    }
     const token = await currentToken(db, p.brand);
     const hold = async (error: string) => { await doc.ref.update({ error, updatedAt: now }); log(`held ${p.id}: ${error}`); };
     if (!token) { await hold(`No Instagram token for ${kit.name} yet (IG_TOKEN_${p.brand.toUpperCase()}).`); continue; }
@@ -277,6 +310,8 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
           : await publishImage(token, kit.handle, imageUrl, p.caption, p.altText);
       await doc.ref.update({ status: 'published', publishedAt: Date.now(), igMediaId: r.mediaId, permalink: r.permalink, error: null, publishingAt: null, updatedAt: Date.now() });
       publishedToday.set(p.brand, (publishedToday.get(p.brand) ?? 0) + 1);
+      if (p.brand === 'calgarydaily' && p.fingerprint.includes('|headline|')) headlinesThisWeek++;
+      if (p.brand === 'calgarydaily' && p.fingerprint.includes('|best-of|')) bestOfToday++;
       log(`published ${p.id} → ${r.permalink ?? r.mediaId}`);
     } catch (e) {
       const attempts = (p.attempts ?? 0) + 1;
@@ -296,6 +331,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
 export function autoPublishable(p: OpsPost): boolean {
   const kit = brandKit(p.brand);
   if (!kit.confirmed || p.status !== 'drafted') return false;
+  if (!allowedCalgaryDailyPost(p)) return false;
   if (checkDraft({ caption: p.caption, altText: p.altText, imageText: p.imageText }, kit, { sponsored: p.sponsored }).length) return false;
   if (p.template === 'roundup') return kit.autoPublish.roundups;
   if (p.template === 'event') return p.fingerprint.includes('|market|') ? kit.autoPublish.markets : kit.autoPublish.events;

@@ -81,33 +81,20 @@ describe('choosing posts', () => {
     assert.ok(again.every(x => !c.some(y => y.fingerprint === x.fingerprint)));
   });
 
-  it('gives CalgaryDaily a morning roundup, spotlights in the other slots and a Tonight Reel', () => {
+  it('gives CalgaryDaily one weekly Reel of top events and markets, and nothing else', () => {
     const friday = calgaryToEpoch('2026-09-25', '06:30');
-    // One thing on today: no Today/Tonight roundup; on a Friday the weekend Reel takes the midday slot.
     const quiet = selectCandidates(index, cd, friday, new Set());
-    assert.ok(quiet.every(x => x.template === 'event' || x.format === 'reel'));
+    assert.equal(quiet.length, 1);
+    assert.match(quiet[0].fingerprint, /\|week\|/);
+    assert.equal(quiet[0].format, 'reel');
     const busy = { ...index, entities: [...index.entities,
       event('e', '2026-09-25T12:00:00-06:00'), event('h', '2026-09-25T10:00:00-06:00'), event('f', '2026-09-25T18:00:00-06:00'), event('g', '2026-09-25T19:30:00-06:00')] };
     const c = selectCandidates(busy, cd, friday, new Set());
-    assert.deepEqual(c.map(x => x.template), ['roundup', 'event', 'event', 'roundup']);
-    assert.match(c[0].title, /^Today/);
-    assert.match(c[3].title, /^Tonight/);
-    assert.equal(c[3].format, 'reel');
-    assert.deepEqual(c.map(x => new Date(x.suggestedFor).toISOString()), ['2026-09-25T14:00:00.000Z', '2026-09-25T18:00:00.000Z', '2026-09-25T21:00:00.000Z', '2026-09-25T23:00:00.000Z']);
-    // No listing appears in two of the day's posts.
-    const ids = c.flatMap(x => x.items.map(i => i.entity.id));
-    assert.equal(new Set(ids).size, ids.length);
-    // A spotlight never repeats something featured in the last couple of days.
-    const spotlight = c[1].items[0].entity.id;
-    const again = selectCandidates(busy, cd, friday, new Set(), new Set([spotlight]));
-    assert.ok(again.filter(x => x.template === 'event').every(x => x.items[0].entity.id !== spotlight));
-    // A later run that finds today's slots booked adds nothing (the 2026-09-25 double-spotlight bug).
-    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['08:00', '12:00', '15:00', '17:00', '20:00'])).length, 0);
-    const onlyNoonTaken = selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['12:00']));
-    assert.ok(onlyNoonTaken.every(x => new Date(x.suggestedFor).toISOString() !== '2026-09-25T18:00:00.000Z'));
-    assert.ok(onlyNoonTaken.length <= cd.postsPerDay - 1);
-    // Running again the same day adds nothing new.
-    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup' && !x.format).length, 0);
+    assert.equal(c.length, 1);
+    assert.equal(c[0].template, 'roundup');
+    assert.match(c[0].title, /What's happening this week/);
+    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).length, 0);
+    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['12:00'])).length, 0);
   });
 
   // CalgaryWatch publishes the index; `npm run ops:index` caches a copy here.
@@ -132,15 +119,15 @@ describe('automatic posting', () => {
     imageUrl: 'https://x', imagePath: null, warnings: [], sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: null,
     draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
   });
-  it('lets every CalgaryDaily listing post go out on their own', () => {
-    assert.ok(autoPublishable(post({})));
-    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
-    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
-    assert.ok(autoPublishable(post({ warnings: ['Sensitive story'] })), 'a warning alone no longer holds a post');
+  it('publishes only the three CalgaryDaily series with a relevant visual asset', () => {
+    assert.ok(autoPublishable(post({ fingerprint: 'calgarydaily|week|2026-10-12', videoUrl: 'https://video' })));
+    assert.ok(autoPublishable(post({ fingerprint: 'calgarydaily|best-of|coffee', imageUrls: ['a', 'b'] })));
+    assert.ok(!autoPublishable(post({ fingerprint: 'calgarydaily|event|x', videoUrl: 'x' })));
+    assert.ok(!autoPublishable(post({ fingerprint: 'calgarydaily|headline|x' })), 'plain text card');
   });
-  it('posts news and opinion on their own only from credible sources', () => {
-    assert.ok(autoPublishable(post({ template: 'update', sourceUrls: ['https://www.cbc.ca/news/canada/calgary/x'] })));
-    assert.ok(autoPublishable(post({ template: 'news', sourceUrls: ['https://newsroom.calgary.ca/x', 'https://calgaryherald.com/y'] })));
+  it('posts permitted major news only from credible sources', () => {
+    const photo = { file: 'brand/photos/x.jpg', credit: 'Photo: source' };
+    assert.ok(autoPublishable(post({ fingerprint: 'calgarydaily|headline|x', template: 'news', sourceUrls: ['https://newsroom.calgary.ca/x'], imageText: { eyebrow: '', headline: 'h', details: [], footer: '', photo } })));
     assert.ok(!autoPublishable(post({ template: 'update', sourceUrls: [] })), 'no source');
     assert.ok(!autoPublishable(post({ template: 'take', sourceUrls: ['https://www.instagram.com/p/x'] })), 'social media');
     assert.ok(!autoPublishable(post({ template: 'update', sourceUrls: ['https://cbc.ca/a', 'https://someblog.example/b'] })), 'one source is unknown');
@@ -273,7 +260,7 @@ describe('one Instagram account', () => {
     assert.equal(cw.enabled, false);
   });
   it('points CalgaryDaily readers to CalgaryWatch', () => {
-    const c = selectCandidates({ entities: [event('a', '2026-09-26T11:00:00-06:00')], occurrences: [] }, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set());
+    const c = selectCandidates({ entities: [event('a', '2026-09-26T11:00:00-06:00'), event('b', '2026-09-27T11:00:00-06:00'), event('c', '2026-09-28T11:00:00-06:00')], occurrences: [] }, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set());
     assert.match(templateDraft(c[0], cd).caption, /CalgaryWatch/);
   });
   it('serves post images to the site through the CDN', () => {
@@ -282,7 +269,7 @@ describe('one Instagram account', () => {
   });
 });
 
-describe('weekend Reel', () => {
+describe('weekly Reel', () => {
   const index: DiscoveryIndex = {
     entities: [
       event('fri', '2026-09-25T19:00:00-06:00'), event('sat1', '2026-09-26T11:00:00-06:00'),
@@ -292,18 +279,20 @@ describe('weekend Reel', () => {
     occurrences: [],
   };
   const friday = calgaryToEpoch('2026-09-25', '06:30');
-  it('takes the Friday midday slot, once, from weekend plans only', () => {
+  it('takes the midday slot once with the coming week', () => {
     const c = selectCandidates(index, cd, friday, new Set());
     const reels = c.filter(x => x.format === 'reel');
     assert.equal(reels.length, 1);
     assert.equal(new Date(reels[0].suggestedFor).toISOString(), '2026-09-25T18:00:00.000Z');
-    assert.ok(!reels[0].items.some(i => i.entity.id === 'friday-lunch'), 'Friday daytime is not "the weekend"');
-    assert.ok(autoPublishable({ ...reels[0], id: 'r', status: 'drafted', entityIds: [], entityStarts: {}, sourceUrls: [], caption: 'x', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' }, imageUrl: 'x', imagePath: null, warnings: [], sponsored: false, scheduledFor: null, draftedBy: 'template', createdAt: 0, updatedAt: 0 } as OpsPost));
+    assert.ok(reels[0].items.some(i => i.entity.id === 'friday-lunch'));
+    assert.ok(autoPublishable({ ...reels[0], id: 'r', status: 'drafted', entityIds: [], entityStarts: {}, sourceUrls: [], caption: 'x', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' }, imageUrl: 'x', videoUrl: 'https://video', imagePath: null, warnings: [], sponsored: false, scheduledFor: null, draftedBy: 'template', createdAt: 0, updatedAt: 0 } as OpsPost));
     assert.equal(selectCandidates(index, cd, friday, new Set(reels.map(r => r.fingerprint))).filter(x => x.format === 'reel').length, 0);
     assert.equal(c.length <= cd.postsPerDay, true);
   });
-  it('is not made on other days', () => {
-    assert.equal(selectCandidates(index, cd, calgaryToEpoch('2026-09-24', '06:30'), new Set()).filter(x => x.format === 'reel').length, 0);
+  it('uses one stable fingerprint for the week', () => {
+    const thursday = selectCandidates(index, cd, calgaryToEpoch('2026-09-24', '06:30'), new Set()).filter(x => x.format === 'reel');
+    assert.equal(thursday.length, 1);
+    assert.match(thursday[0].fingerprint, /\|week\|2026-09-21$/);
   });
   it('has a cover, one slide per plan and a follow card, all within the brand checks', () => {
     const [reel] = selectCandidates(index, cd, friday, new Set()).filter(x => x.format === 'reel');
@@ -380,8 +369,8 @@ describe('sounding like a person', () => {
   });
 });
 
-describe('date night', () => {
-  it('on Thursdays, the 3 pm slot is a date-night roundup of Friday and Saturday evenings, no kids’ events', () => {
+describe('retired formats', () => {
+  it('does not create date-night, spotlight, Today or Tonight posts', () => {
     const cd = brandKit('calgarydaily');
     const thursday = calgaryToEpoch('2026-10-15', '06:30');
     const ev = (id: string, iso: string, categories: string[]) => event(id, iso, { categories, pricing: 'paid', venue: `Venue ${id}` });
@@ -390,15 +379,6 @@ describe('date night', () => {
       ev('k', '2026-10-17T18:00:00-06:00', ['family', 'arts']), ev('m', '2026-10-16T10:00:00-06:00', ['arts']),
     ], occurrences: [] } as unknown as DiscoveryIndex;
     const c = selectCandidates(index, cd, thursday, new Set());
-    const date = c.find(x => x.fingerprint.includes('|date-night-weekend|'));
-    assert.ok(date, 'a date-night post');
-    assert.deepEqual(date!.items.map(i => i.entity.id).sort(), ['a', 'b']);
-    assert.equal(new Date(date!.suggestedFor).toISOString(), '2026-10-15T21:00:00.000Z');
-    assert.match(date!.link, /\/date-night\?/);
-    const draft = templateDraft(date!, cd);
-    assert.deepEqual(checkDraft(draft, cd), []);
-    assert.equal(draft.imageText.headline, 'Date night this weekend');
-    // Other days of the week get no date-night post.
-    assert.ok(!selectCandidates(index, cd, calgaryToEpoch('2026-10-14', '06:30'), new Set()).some(x => x.fingerprint.includes('date-night')));
+    assert.ok(c.every(x => /\|week\|/.test(x.fingerprint)));
   });
 });

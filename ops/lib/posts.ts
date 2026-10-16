@@ -207,118 +207,27 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
   const campaign = (s: string) => `${kit.id}_${s}`;
 
   if (kit.id === 'calgarydaily') {
-    // The daily program: a morning "Today" roundup, an evening "Tonight" Reel (or a
-    // spotlight when the evening is quiet), and spotlights in every other slot.
+    // Owner's program from 2026-10-15: one weekly events-and-markets roundup.
+    // Daily sourced rankings and twice-weekly major news are supplied as researched
+    // editorial drafts; the old Today, Tonight, spotlight and date-night program below
+    // is intentionally bypassed.
     const slots = [...kit.postingSlots].sort();
-    // Tonight takes the first slot from 4 pm on; the Friday weekend Reel takes slot 1 (midday).
-    const firstEvening = slots.findIndex(s => s >= '16:00');
-    const TONIGHT = firstEvening >= 0 ? firstEvening : slots.length - 1;
-    const at = (i: number) => {
-      const t = calgaryToEpoch(today, slots[Math.min(i, slots.length - 1)]);
-      return t > now ? t : now + 10 * 60_000;
-    };
-    const until = (items: Happening[]) => Math.max(...items.map(i => i.end ?? i.start));
-    // Spotlights never repeat a listing the account featured in the last couple of days.
-    const used = new Set<string>(recentlyPosted);
-    const onToday = all.filter(h => calgaryDate(h.start) === today && (h.end ?? h.start) > now);
-    const isEvening = (h: Happening) => calgaryMinutes(h.start) >= 17 * 60;
-    // With enough evening plans for their own post, the morning roundup keeps to the daytime.
-    const eveningPost = !queued.has(`${kit.id}|tonight|${today}`) && onToday.filter(isEvening).length >= 2;
-    const morningPool = eveningPost ? onToday.filter(h => !isEvening(h)) : onToday;
-
-    const fpToday = `${kit.id}|today|${today}`;
-    if (!queued.has(fpToday) && !bookedSlots.has(slots[0]) && morningPool.length >= 2) {
-      const items = diverse(morningPool, 4, undefined, true).sort((a, b) => a.start - b.start);
-      items.forEach(i => used.add(i.entity.id));
-      out.push({
-        brand: kit.id, template: 'roundup', fingerprint: fpToday, items,
-        title: `Today in Calgary — ${shortDay(now)}`, facts: factsFor(items),
-        link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('today')}`,
-        relevantUntil: until(items), suggestedFor: at(0),
-      });
-    }
-
-    const fpTonight = `${kit.id}|tonight|${today}`;
-    const evening = onToday.filter(h => isEvening(h) && !used.has(h.entity.id));
-    let tonight: Candidate | null = null;
-    if (!queued.has(fpTonight) && evening.length >= 2) {
-      const items = diverse(evening, 4, undefined, true).sort((a, b) => a.start - b.start);
-      items.forEach(i => used.add(i.entity.id));
-      tonight = {
-        brand: kit.id, template: 'roundup', fingerprint: fpTonight, items,
-        title: `Tonight in Calgary — ${shortDay(now)}`, facts: factsFor(items),
-        link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('tonight')}`,
-        relevantUntil: until(items), suggestedFor: at(TONIGHT), format: 'reel',
-      };
-    }
-
-    const free = (i: number) => !bookedSlots.has(slots[Math.min(i, slots.length - 1)]);
-    if (tonight && !free(TONIGHT)) tonight = null;
-
-    // Fridays: the midday slot is a "this weekend" Reel. Reels reach far more people
-    // on this account than image posts (median 243 vs 150 views, 2026-09-25).
-    let reel: Candidate | null = null;
-    const fpReel = `${kit.id}|weekend-reel|${today}`;
-    if (calgaryWeekday(now) === 5 && free(1) && !queued.has(fpReel)) {
-      const weekendDays = [today, addDays(today, 1), addDays(today, 2)];
-      const weekend = all.filter(h => weekendDays.includes(calgaryDate(h.start)) && (h.end ?? h.start) > now && (calgaryDate(h.start) !== today || isEvening(h)) && !used.has(h.entity.id));
-      if (weekend.length >= 3) {
-        // One of each thing: two games of the same series read as a repeat ("Women's Soccer — …" twice).
-        const series = (h: Happening) => normalize(h.entity.title.replace(/\([^)]*\)/g, ' ').split(/\s*[—–-]\s|\svs\.?\s/i)[0]);
-        const bySeries = new Map<string, Happening>();
-        for (const h of diverse(weekend, 8)) if (!bySeries.has(series(h))) bySeries.set(series(h), h);
-        const items = [...bySeries.values()].slice(0, 5).sort((a, b) => a.start - b.start);
-        if (items.length >= 3) {
-          items.forEach(i => used.add(i.entity.id));
-          reel = {
-            brand: kit.id, template: 'roundup', format: 'reel', fingerprint: fpReel, items,
-            title: `This weekend in Calgary — ${shortDay(now)}`, facts: factsFor(items),
-            link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('weekend_reel')}`,
-            relevantUntil: Math.max(...items.map(i => i.end ?? i.start)), suggestedFor: at(1),
-          };
-          out.push(reel);
-        }
-      }
-    }
-
-    // Thursdays: the 3 pm slot is date night for the weekend, Friday and Saturday evenings
-    // (arts and nights out, nothing aimed at kids). Links to /date-night.
-    let dateNight: Candidate | null = null;
-    const DATE_SLOT = slots.indexOf('15:00');
-    const fpDate = `${kit.id}|date-night-weekend|${today}`;
-    if (calgaryWeekday(now) === 4 && DATE_SLOT > 0 && DATE_SLOT !== TONIGHT && free(DATE_SLOT) && !queued.has(fpDate)) {
-      const nights = [addDays(today, 1), addDays(today, 2)];
-      const grownUp = (h: Happening) => (h.entity.categories ?? [] as string[]).some((c: string) => ['arts', 'nightlife', 'music', 'food'].includes(c)) && !(h.entity.categories ?? [] as string[]).includes('family');
-      const pool = all.filter(h => nights.includes(calgaryDate(h.start)) && isEvening(h) && grownUp(h) && !used.has(h.entity.id));
-      if (pool.length >= 2) {
-        const items = diverse(pool, 4, undefined, true).sort((a, b) => a.start - b.start);
-        items.forEach(i => used.add(i.entity.id));
-        dateNight = {
-          brand: kit.id, template: 'roundup', fingerprint: fpDate, items,
-          title: `Date night this weekend — ${shortDay(now)}`, facts: factsFor(items),
-          link: `${kit.site}/date-night?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('date_night')}`,
-          relevantUntil: until(items), suggestedFor: at(DATE_SLOT),
-        };
-        out.push(dateNight);
-      }
-    }
-
-    // Spotlights fill the remaining slots: one listing each, today or the next two days.
-    const fpFor = (h: Happening) => h.entity.kind === 'market'
-      ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
-      : `${kit.id}|event|${normalize(h.entity.title)}`;
-    // Every other slot (midday, afternoon, late evening) takes a spotlight; slot 0 is the Today roundup.
-    const spotlightSlots = slots.map((_, i) => i).filter(i => i !== 0 && !(tonight && i === TONIGHT) && free(i) && !(reel && i === 1) && !(dateNight && i === DATE_SLOT));
-    const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
-    const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
-    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
-    picks.forEach((h, i) => {
-      out.push({
-        brand: kit.id, template: 'event', fingerprint: fpFor(h), items: [h], title: h.entity.title, facts: factsFor([h]),
-        link: entityUrl(kit.site, h.entity, campaign('spotlight')), relevantUntil: h.end ?? h.start, suggestedFor: at(spotlightSlots[i]),
-      });
+    const weekday = calgaryWeekday(now);
+    const weekStart = addDays(today, weekday === 0 ? -6 : 1 - weekday);
+    const fingerprint = `${kit.id}|week|${weekStart}`;
+    if (queued.has(fingerprint) || bookedSlots.has(slots[0])) return out;
+    const end = calgaryToEpoch(addDays(today, 7), '23:59');
+    const pool = all.filter(h => (h.end ?? h.start) > now && h.start <= end);
+    const markets = diverse(pool.filter(h => h.entity.kind === 'market'), 2);
+    const events = diverse(pool.filter(h => h.entity.kind === 'event'), 4, new Set(markets.map(h => h.entity.id)));
+    const items = [...markets, ...events].sort((a, b) => a.start - b.start);
+    if (items.length >= 3) out.push({
+      brand: kit.id, template: 'roundup', format: 'reel', fingerprint, items,
+      title: "What's happening this week in Calgary", facts: factsFor(items),
+      link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('week')}`,
+      relevantUntil: Math.max(...items.map(i => i.end ?? i.start)),
+      suggestedFor: calgaryToEpoch(today, slots[0]),
     });
-    if (tonight) out.push(tonight);
     return out;
   }
 
@@ -401,8 +310,9 @@ const isFree = (e: Entity) => e.pricing === 'free';
 export function reelSlides(c: Pick<Candidate, 'items' | 'fingerprint'>): Array<PostImageText & { template: PostTemplate }> {
   const shows = mergeShowings(c.items);
   const tonight = c.fingerprint.includes('|tonight|');
+  const week = c.fingerprint.includes('|week|');
   return [
-    { template: 'roundup', eyebrow: roundupEyebrow(c), headline: tonight ? 'Tonight in Calgary' : 'This weekend', blurb: tonight ? `${shows.length} things on tonight.` : `${shows.length} plans worth saving.`, details: [], footer: 'Times checked with each organizer' },
+    { template: 'roundup', eyebrow: roundupEyebrow(c), headline: week ? "What's happening this week" : tonight ? 'Tonight in Calgary' : 'This weekend', blurb: week ? `${shows.length} top events and markets.` : tonight ? `${shows.length} things on tonight.` : `${shows.length} plans worth saving.`, details: [], footer: 'Times checked with each organizer' },
     ...shows.map(s => ({
       template: 'event' as const,
       eyebrow: `${tonight ? joinTimes(s.times) : dayName(s.first.start)}${isFree(s.first.entity) ? ' · Free' : ''}`,
