@@ -1,7 +1,7 @@
-import type { HqResponse, LifeEntry } from "@/lib/hq/types";
-import { inFilter, type Filter } from "./context";
+import type { HqData, LifeEntry } from "../../lib/hq/types";
+import { inFilter, type Filter } from "./filter";
 import { calgaryDayStart, evaluateAll } from "./tasks";
-import { replyBoard } from "@/lib/hq/triage";
+import { replyBoard } from "../../lib/hq/triage";
 import { BUSINESS_LABEL, num, plural, slot } from "./format";
 
 /**
@@ -31,11 +31,12 @@ const SIGNOFFS = [
 export const signoff = (now: number) => SIGNOFFS[Math.floor(calgaryDayStart(now) / DAY) % SIGNOFFS.length];
 
 /**
- * Two or three plain sentences on what happened since this morning and what's
- * next, written from the live data. Each clause only appears when it has
- * something true to say.
+ * A few plain sentences on what happened today and what's next, written from
+ * the live data. Each clause only appears when it has something true to say,
+ * and nothing the Today tiles already show (waiting count, money, owed that's
+ * late, the calendar, what's due): the brief is the story around them.
  */
-export function brief(data: HqResponse, now: number, filter: Filter): string[] {
+export function brief(data: HqData, now: number, filter: Filter): string[] {
   const snap = data.snapshot;
   const dayStart = calgaryDayStart(now);
   const out: string[] = [];
@@ -45,42 +46,28 @@ export function brief(data: HqResponse, now: number, filter: Filter): string[] {
   for (const p of published) byBrand.set(p.brand, (byBrand.get(p.brand) ?? 0) + 1);
   const postBits = [...byBrand].map(([b, n]) => `${BUSINESS_LABEL[b] ?? b} posted ${n}`);
 
-  const weekday = !["Sat", "Sun"].includes(new Date(now).toLocaleDateString("en-CA", { timeZone: "America/Edmonton", weekday: "short" }));
-  const arctosBit = inFilter(filter, "arctos") && data.arctos && weekday ? `Arctos has sent ${data.arctos.today} of ${ARCTOS_DAILY_CAP} emails` : null;
+  // Only once something went out: "0 of 50" every morning says nothing.
+  const arctosBit = inFilter(filter, "arctos") && data.arctos?.today ? `Arctos has sent ${data.arctos.today} of ${ARCTOS_DAILY_CAP} emails` : null;
 
   const done = [...postBits, arctosBit].filter(Boolean) as string[];
   if (done.length) out.push(`${joinList(done)} today.`);
 
-  const replies = replyBoard(data, (r) => inFilter(filter, r.business)).board.length + (snap?.inbox?.replies ?? []).filter((r) => !r.approved && inFilter(filter, r.business)).length;
   const failing = evaluateAll(data, now).filter((t) => (t.state === "failed" || t.state === "missed") && (filter === "all" || t.routine.owner === filter || t.routine.owner === "shared")).length;
-  const asks: string[] = [];
-  if (replies) asks.push(`${plural(replies, "person", "people")} wrote back and ${replies === 1 ? "is" : "are"} waiting on you`);
-  if (failing) asks.push(`${plural(failing, "job")} need${failing === 1 ? "s" : ""} a look`);
-  if (asks.length) out.push(`${capital(joinList(asks))}.`);
+  if (failing) out.push(`${capital(plural(failing, "job"))} need${failing === 1 ? "s" : ""} a look on System.`);
 
-  const today = agenda(data, now).filter((e) => !e.allDay && e.end > now);
-  if (today.length) out.push(`${plural(today.length, "thing")} left on your calendar, next is ${today[0].title} at ${slot(today[0].start).split(" ").slice(1).join(" ")}.`);
-
-  const money = moneyLine(moneyStats(data, now, filter));
-  if (money) out.push(money);
   const owed = owedStats(data, now, filter);
-  if (owed.overdue.length) out.push(`${dollars(owed.overdueTotal)} owed to you is past due, chase ${owed.overdue.length === 1 ? owed.overdue[0].text : `${plural(owed.overdue.length, "person", "people")}`}.`);
-  else if (owed.dueSoon.length) out.push(`${dollars(owed.dueSoon.reduce((n, e) => n + (e.amount ?? 0), 0))} is due to come in this week.`);
-
-  const t = todoStats(data, now);
-  if (t.overdue.length || t.today.length) out.push(`${plural(t.overdue.length + t.today.length, "to-do")} due${t.overdue.length ? `, ${t.overdue.length} late` : " today"}.`);
+  if (!owed.overdue.length && owed.dueSoon.length) out.push(`${dollars(owed.dueSoon.reduce((n, e) => n + (e.amount ?? 0), 0))} is due to come in this week.`);
 
   const next = (snap?.posts ?? []).filter((p) => p.status === "approved" && p.scheduledFor && p.scheduledFor > now && inFilter(filter, p.brand)).sort((a, b) => a.scheduledFor! - b.scheduledFor!)[0];
   if (next) out.push(`Next post goes out ${slot(next.scheduledFor)}.`);
 
-  if (!out.length) out.push("Quiet so far. The agents are on it.");
   return out;
 }
 
 export interface Win { key: string; at: number; text: string; business: string }
 
 /** Good news from the last week, newest first: people who said yes, replies, milestones. */
-export function wins(data: HqResponse, now: number, filter: Filter): Win[] {
+export function wins(data: HqData, now: number, filter: Filter): Win[] {
   const since = now - 7 * DAY;
   const out: Win[] = [];
   for (const r of data.gmail?.replies ?? []) {
@@ -160,17 +147,34 @@ export interface GymStats {
   lastAt: number | null;
   daysSince: number | null;
   week: number;
+  /** Days since Monday: 0 on Monday, 6 on Sunday. */
+  sinceMonday: number;
   month: number;
   weekStreak: number;
   costPerVisit: number | null;
 }
 
-/** Gym days come from the HQ log and from calendar events that look like a workout and already ended. */
-export function gymStats(data: HqResponse, now: number): GymStats {
+/**
+ * Each day Aldo went, with the time: from the HQ log and from calendar events
+ * that look like a workout and already ended. The one source for every gym
+ * number HQ and the bot show.
+ */
+export function gymDays(data: Pick<HqData, "life" | "calendar">, now: number): Map<string, number> {
+  const days = new Map<string, number>();
+  const add = (t: number) => {
+    const k = dayKey(t);
+    if ((days.get(k) ?? -1) < t) days.set(k, t);
+  };
+  for (const e of data.life ?? []) if (e.kind === "gym") add(e.at);
+  for (const e of data.calendar?.events ?? []) if (!e.allDay && e.end <= now && GYM_WORDS.test(e.title)) add(e.start);
+  return days;
+}
+
+export function gymStats(data: Pick<HqData, "life" | "calendar">, now: number): GymStats {
   const logged = (data.life ?? []).filter((e) => e.kind === "gym");
-  const fromCal = (data.calendar?.events ?? []).filter((e) => !e.allDay && e.end <= now && GYM_WORDS.test(e.title)).map((e) => e.start);
-  const times = [...logged.map((e) => e.at), ...fromCal].sort((a, b) => b - a);
-  const days = new Set(times.map(dayKey));
+  const byDay = gymDays(data, now);
+  const days = new Set(byDay.keys());
+  const times = [...byDay.values()].sort((a, b) => b - a);
   const today = dayKey(now);
   const todayStart = calgaryDayStart(now);
   const lastAt = times[0] ?? null;
@@ -198,6 +202,7 @@ export function gymStats(data: HqResponse, now: number): GymStats {
     lastAt,
     daysSince: lastAt === null ? null : Math.round((todayStart - calgaryDayStart(lastAt)) / DAY),
     week,
+    sinceMonday,
     month,
     weekStreak,
     costPerVisit: GYM_MONTHLY && month ? GYM_MONTHLY / month : null,
@@ -205,13 +210,13 @@ export function gymStats(data: HqResponse, now: number): GymStats {
 }
 
 /** Today's events, all-day ones first. */
-export function agenda(data: HqResponse, now: number) {
+export function agenda(data: HqData, now: number) {
   const start = calgaryDayStart(now);
   return (data.calendar?.events ?? []).filter((e) => e.start < start + DAY && e.end > start).sort((a, b) => Number(b.allDay) - Number(a.allDay) || a.start - b.start);
 }
 
 /** The first free 90 minutes today between 6 am and 10 pm, if the calendar has one. */
-export function gymSlot(data: HqResponse, now: number): number | null {
+export function gymSlot(data: HqData, now: number): number | null {
   if (!data.calendar) return null;
   const start = calgaryDayStart(now);
   const busy = agenda(data, now).filter((e) => !e.allDay).map((e) => [e.start, e.end] as const);
@@ -232,7 +237,7 @@ export type MoodKey = "late" | "slammed" | "gym" | "winning" | "quiet" | "steady
  * HQ reads the room: how much is waiting, what just went right, the hour,
  * and the gym. The line closes the brief; the sign-off closes the page.
  */
-export function mood(data: HqResponse, now: number, filter: Filter, waiting: number): { key: MoodKey; line: string } {
+export function mood(data: HqData, now: number, filter: Filter, waiting: number): { key: MoodKey; line: string } {
   const hour = Number(new Date(now).toLocaleString("en-CA", { timeZone: TZ, hour: "numeric", hour12: false })) % 24;
   const failing = evaluateAll(data, now).filter((t) => t.state === "failed" || t.state === "missed").length;
   const gym = gymStats(data, now);
@@ -267,7 +272,7 @@ export interface MoneyMove { key: string; at: number; business: string; title: s
  * Who is closest to paying, closest first: people who wrote back to a pitch
  * and haven't heard from Aldo, warm CalgaryWatch leads, then follow-ups due.
  */
-export function moneyMoves(data: HqResponse, now: number, filter: Filter): MoneyMove[] {
+export function moneyMoves(data: HqData, now: number, filter: Filter): MoneyMove[] {
   const out: MoneyMove[] = [];
   /* Only replies the reply check says need Aldo; its subtask, when there is one, says what to do. */
   for (const { reply: r, triage, decision } of replyBoard(data, (x) => inFilter(filter, x.business)).board) {
@@ -301,7 +306,7 @@ export interface MoneyStats {
   daysLeft: number;
 }
 
-export function moneyStats(data: HqResponse, now: number, filter: Filter): MoneyStats {
+export function moneyStats(data: HqData, now: number, filter: Filter): MoneyStats {
   const today = dayKey(now);
   const monthKey = today.slice(0, 7);
   const [y, m] = monthKey.split("-").map(Number);
@@ -321,7 +326,8 @@ export function moneyStats(data: HqResponse, now: number, filter: Filter): Money
     year: sum(entries.filter((e) => dayKey(e.at).startsWith(String(y)))),
     goal,
     progress: goal ? Math.min(1, month / goal) : null,
-    perDayToGoal: goal && goal > month ? Math.ceil((goal - month) / Math.max(1, daysLeft)) : null,
+    // Whole dollars, rounded up: "$159 a day" is a target, "$158.34" is noise.
+    perDayToGoal: goal && goal > month ? Math.ceil((goal - month) / Math.max(1, daysLeft) / 100) * 100 : null,
     byBusiness: [...by].map(([business, amount]) => ({ business, amount })).sort((a, b) => b.amount - a.amount),
     entries,
     daysLeft,
@@ -343,7 +349,7 @@ export function dollars(cents: number): string {
 }
 
 /** Cumulative money by day of the month, this month and last, for the pace chart. Cents. */
-export function moneyPace(data: HqResponse, now: number, filter: Filter): { days: number; today: number; month: number[]; last: number[] } {
+export function moneyPace(data: HqData, now: number, filter: Filter): { days: number; today: number; month: number[]; last: number[] } {
   const today = dayKey(now);
   const [y, m] = today.slice(0, 7).split("-").map(Number);
   const ly = m === 1 ? y - 1 : y;
@@ -379,7 +385,7 @@ export interface OwedStats {
 }
 
 /** Money people owe Aldo: late first, then by due day, undated last. */
-export function owedStats(data: HqResponse, now: number, filter: Filter): OwedStats {
+export function owedStats(data: HqData, now: number, filter: Filter): OwedStats {
   const all = (data.life ?? []).filter((e) => e.kind === "owed" && inFilter(filter, e.business ?? "other"));
   const todayStart = calgaryDayStart(now);
   const open = all.filter((e) => !e.done).sort((a, b) => (a.due ?? Infinity) - (b.due ?? Infinity) || a.at - b.at);
@@ -391,7 +397,7 @@ export function owedStats(data: HqResponse, now: number, filter: Filter): OwedSt
 
 /* ---------- to-dos ---------- */
 
-export const openNotes = (data: HqResponse) => (data.life ?? []).filter((e) => e.kind === "note" && !e.done).sort((a, b) => b.at - a.at);
+export const openNotes = (data: HqData) => (data.life ?? []).filter((e) => e.kind === "note" && !e.done).sort((a, b) => b.at - a.at);
 
 /** Noon on a Calgary day, from "2026-10-09". Due days are stored this way so they never slip across midnight. */
 export const noonOf = (key: string) => Date.parse(`${key}T12:00:00-06:00`);
@@ -420,7 +426,7 @@ export function dueLabel(due: number, now: number): string {
 }
 
 /** Open to-dos sorted the way you'd do them: late, today, this week, later, then undated newest first. */
-export function todoStats(data: HqResponse, now: number) {
+export function todoStats(data: HqData, now: number) {
   const open = (data.life ?? []).filter((e) => e.kind === "note" && !e.done);
   const dated = open.filter((e) => e.due).sort((a, b) => a.due! - b.due!);
   const undated = open.filter((e) => !e.due).sort((a, b) => b.at - a.at);
@@ -439,7 +445,7 @@ export interface ScoreLine { key: string; label: string; value: number; last: nu
  * This week so far against last week up to the same moment, so a Tuesday
  * isn't measured against a whole week.
  */
-export function weekScore(data: HqResponse, now: number, filter: Filter): { lines: ScoreLine[]; weekStart: number } {
+export function weekScore(data: HqData, now: number, filter: Filter): { lines: ScoreLine[]; weekStart: number } {
   const todayStart = calgaryDayStart(now);
   const dow = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(new Date(now).toLocaleDateString("en-CA", { timeZone: TZ, weekday: "short" }));
   const weekStart = todayStart - dow * DAY;
@@ -458,10 +464,7 @@ export function weekScore(data: HqResponse, now: number, filter: Filter): { line
   const decided = [...data.commands.map((c) => c.at), ...(data.decisions ?? []).map((d) => d.at)];
 
   // Gym days, counted once a day, from the log and the calendar.
-  const gymDays = new Map<string, number>();
-  for (const e of data.life ?? []) if (e.kind === "gym") gymDays.set(dayKey(e.at), e.at);
-  for (const e of data.calendar?.events ?? []) if (!e.allDay && e.end <= now && GYM_WORDS.test(e.title)) gymDays.set(dayKey(e.start), e.start);
-  const gym = [...gymDays.values()];
+  const gym = [...gymDays(data, now).values()];
 
   return {
     weekStart,

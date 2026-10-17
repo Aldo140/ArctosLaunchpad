@@ -67,7 +67,7 @@ if (!prev || (prev.version ?? 1) < SNAPSHOT_VERSION || now - pipelinesAt > PIPEL
   pipelinesAt = now;
 }
 // Replies and pitches waiting on you need fresh lead data; between lead reads, keep the previous ones.
-const today = todayItems(open, waitingLeads, health);
+const today = todayItems(open, waitingLeads, health, now);
 const postActivity = activity([], [...open, ...recent14], now);
 const leadActivity = leads ? activity(leads, [], now) : (prev?.activity ?? []).filter(a => a.type !== 'Posted' && a.type !== 'Post failed' && a.at >= now - 72 * 3_600_000);
 

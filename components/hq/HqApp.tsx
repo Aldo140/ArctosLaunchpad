@@ -21,8 +21,9 @@ import { openDecisions } from "./queue";
 import { dollars } from "./persona";
 import { buzz } from "./Swipe";
 import { InstallTip, PullToRefresh, useDragToClose } from "./Mobile";
+import { ImproveView, type ImproveTab } from "./views/Improve";
 
-type ViewId = "today" | "decide" | "money" | "life" | "growth" | "pipelines" | "system";
+type ViewId = "today" | "decide" | "money" | "life" | "growth" | "pipelines" | "improve" | "system";
 type Route = { view: ViewId; sub: string | null };
 
 const VIEWS: Record<ViewId, { label: string; icon: string; keys: string; render: (sub: string | null) => React.ReactNode }> = {
@@ -30,8 +31,9 @@ const VIEWS: Record<ViewId, { label: string; icon: string; keys: string; render:
   decide: { label: "Decide", icon: "inbox", keys: "g i", render: (sub) => <InboxView focus={sub ?? undefined} /> },
   money: { label: "Money", icon: "money", keys: "g m", render: () => <MoneyView /> },
   life: { label: "Life", icon: "gym", keys: "g l", render: () => <LifeView /> },
-  growth: { label: "Growth", icon: "instagram", keys: "g s", render: (sub) => <GrowthView tab={(sub as GrowthTab) ?? "instagram"} /> },
+  growth: { label: "Growth", icon: "instagram", keys: "g s", render: (sub) => <GrowthView tab={(sub as GrowthTab) ?? "week"} /> },
   pipelines: { label: "Pipelines", icon: "pipelines", keys: "g p", render: () => <PipelinesView /> },
+  improve: { label: "Improve", icon: "spark", keys: "g r", render: (sub) => <ImproveView tab={(sub as ImproveTab) ?? "focus"} /> },
   system: { label: "System", icon: "health", keys: "g h", render: (sub) => <SystemView tab={(sub as SystemTab) ?? "tasks"} /> },
 };
 
@@ -40,6 +42,7 @@ const ALIASES: Record<string, Route> = {
   overview: { view: "today", sub: null },
   inbox: { view: "decide", sub: null },
   instagram: { view: "growth", sub: "instagram" },
+  week: { view: "growth", sub: "week" },
   inspiration: { view: "growth", sub: "inspiration" },
   performance: { view: "growth", sub: "performance" },
   tasks: { view: "system", sub: "tasks" },
@@ -51,11 +54,11 @@ const ALIASES: Record<string, Route> = {
 /** The rail: your life first, then the businesses, then the engine room. */
 const GROUPS: Array<{ label: string; views: ViewId[] }> = [
   { label: "You", views: ["today", "decide", "money", "life"] },
-  { label: "The businesses", views: ["growth", "pipelines"] },
+  { label: "The businesses", views: ["growth", "pipelines", "improve"] },
   { label: "Engine room", views: ["system"] },
 ];
 const TABBAR: ViewId[] = ["today", "decide", "money", "life"];
-const MORE: ViewId[] = ["growth", "pipelines", "system"];
+const MORE: ViewId[] = ["growth", "pipelines", "improve", "system"];
 
 const subscribeHash = (cb: () => void) => {
   window.addEventListener("hashchange", cb);
@@ -422,6 +425,18 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
     [saveDecision, toast, fail],
   );
 
+  const improve = useCallback(async (body: Record<string, unknown>) => {
+    try {
+      await call("/api/hq/improve", body);
+      await load();
+      toast("Saved.");
+      return true;
+    } catch (e) {
+      fail(e, "Couldn't save that.");
+      return false;
+    }
+  }, [call, load, toast, fail]);
+
   const go = useCallback((v: string) => {
     window.location.hash = v;
     setSheet(false);
@@ -439,7 +454,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
   const age = snap ? now - snap.generatedAt : null;
   const fresh = age === null ? "bad" : age < 30 * 60_000 ? "ok" : age < 3 * 3_600_000 ? "warn" : "bad";
   const ctx: HqContextValue | null = data
-    ? { data, now, filter, act, cancel, decide, go, logGym, undoGym, logMoney, addNote, toggleNote, setNoteDue, addOwed, markPaid, removeLife, setGoal, quickAdd: setQuick, preview: !!preview }
+    ? { data, now, filter, act, cancel, decide, go, logGym, undoGym, logMoney, addNote, toggleNote, setNoteDue, addOwed, markPaid, removeLife, setGoal, quickAdd: setQuick, improve, refresh: load, preview: !!preview }
     : null;
 
   const commands = useMemo<PaletteItem[]>(
@@ -548,6 +563,7 @@ export function HqDashboard({ email, token, onSignOut, preview }: { email: strin
             <p className="hq-rail__label">The businesses</p>
             {navLink("growth", () => setSheet(false))}
             {navLink("pipelines", () => setSheet(false))}
+            {navLink("improve", () => setSheet(false))}
             <p className="hq-rail__label" style={{ marginTop: 10 }}>Engine room</p>
             {navLink("system", () => setSheet(false))}
           </div>

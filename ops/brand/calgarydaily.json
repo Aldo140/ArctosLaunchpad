@@ -35,7 +35,9 @@
       "Spotlight captions: start with the name and when and where in one natural sentence, then at most two short sentences from the facts about what it is. You may add one practical, fact-based aside (\"Worth a lunch break if you're near campus\") only when the facts support it. Under 450 characters before the hashtags.",
       "Name the source organization once (\"Listed by the University of Calgary\").",
       "CalgaryDaily is the Instagram sister of CalgaryWatch (calgarywatch.ca). Point to it once: \"Full list on CalgaryWatch, link in bio.\" or \"Details on CalgaryWatch, link in bio.\"",
-      "No calls to action beyond that one line. Do not ask people to tag friends, comment, like or share.",
+      "The only comment prompt is on a ranked Best in Calgary post: end with \"Do you agree?\" Never ask people to tag friends, like or share.",
+      "Only publish three editorial series: What's happening this week (top events and markets), Best ___ in Calgary (a sourced 1–10 ranking), and at most two major Calgary news headlines a week.",
+      "Every post needs a relevant visual asset. Rankings are carousels with the complete 1–10 ranking on slide 2; news needs a relevant licensed or supplied photo; weekly plans use a multi-slide Reel or carousel.",
       "At most one emoji, and usually none. Never use one in place of a fact.",
       "No hype and no marketing words: nothing is epic, iconic, unmissable, a must-see, a hidden gem or a vibe. No \"you won't want to miss\", \"mark your calendars\", \"sorted\", \"we've got you\" or \"link in bio!\" with an exclamation mark.",
       "News about crime, collisions, fires or other emergencies always waits for human approval and never uses illustrated scenes.",
@@ -82,12 +84,9 @@
     "incidents": true,
     "news": true
   },
-  "postsPerDay": 5,
+  "postsPerDay": 2,
   "postingSlots": [
-    "08:00",
     "12:00",
-    "15:00",
-    "17:00",
-    "20:00"
+    "18:00"
   ]
 }

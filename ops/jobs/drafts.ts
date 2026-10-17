@@ -22,6 +22,8 @@ interface DraftFile {
   posts: Array<{
     id: string;
     kind: 'news' | 'take' | 'event' | 'repost';
+    /** Required CalgaryDaily editorial series under the current posting policy. */
+    series?: 'week' | 'best-of' | 'headline';
     /** Someone else's video, shared only with their permission (see repostProblems). */
     repost?: RepostInfo;
     title: string;
@@ -114,6 +116,12 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
       }
       if (relevantUntil && relevantUntil < now) continue;
       const blocked = repostProblems(d);
+      if (data.brand === 'calgarydaily' && !d.series) blocked.push('CalgaryDaily draft is not one of the three allowed editorial series.');
+      if (data.brand === 'calgarydaily' && d.series === 'best-of') {
+        if (d.slides.length < 2 || (d.slides[1]?.details?.length ?? 0) < 10) blocked.push('Best in Calgary needs the complete 1–10 ranking on slide 2.');
+        if (!/Do you agree\?\s*(?:\n|$)/i.test(d.caption)) blocked.push('Best in Calgary caption must end with “Do you agree?” before hashtags.');
+      }
+      if (data.brand === 'calgarydaily' && d.series === 'headline' && !d.slides.some(s => s.photo)) blocked.push('Major Calgary news needs a relevant credited photo.');
       if (blocked.length) { log(`not queued: ${d.title}: ${blocked.join(' ')}`); continue; }
 
       const imageUrls: string[] = [];
@@ -139,7 +147,7 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
       ];
       const post: OpsPost = {
         id, brand: data.brand, template: first.template, status: d.approved ? 'approved' : 'drafted',
-        fingerprint: `${data.brand}|draft|${file}|${d.id}`, entityIds: [], entityStarts: {},
+        fingerprint: d.series ? `${data.brand}|${d.series}|${file}|${d.id}` : `${data.brand}|draft|${file}|${d.id}`, entityIds: [], entityStarts: {},
         sourceUrls: d.sources.map(s => s.url), facts: d.sources.map(s => `${s.name}: ${s.url}`).join('\n'),
         caption: d.caption, altText: d.altText, link: kit.linkInBio, imageText: first,
         imageUrl: imageUrls[0], imageUrls: !videoUrl && imageUrls.length > 1 ? imageUrls : null, videoUrl, imagePath: null,

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { organizerLeads, prospectLeads, checkPitch, hostOf, signature, type Prospect } from '../lib/leads';
-import { templatePitch } from '../jobs/outreach';
+import { followUpTemplate, hasOwnListing, listingClaimProblems, sentHistorySummary, showcaseFor, templatePitch, withClaimLink } from '../jobs/outreach';
 import { outreachConfig } from '../lib/brand';
 import type { Entity } from '../lib/posts';
 import type { PartnerLead } from '../types';
@@ -39,5 +39,48 @@ describe('outreach to organizers and prospects', () => {
     assert.match(t.subject, /Listing Vertigo Theatre's events/);
     assert.doesNotMatch(t.body, /We've added/);
     assert.deepEqual(checkPitch(t.body, cfg, ADDRESS), []);
+  });
+  it('every first email says why now and links to what they could have', () => {
+    const cfg = outreachConfig();
+    const sig = signature(cfg, '123 Test St SW, Calgary AB');
+    const prospect = templatePitch({ businessName: 'Vertigo Theatre', entityKind: 'prospect' } as PartnerLead, 'Business: Vertigo Theatre', sig);
+    assert.ok(cfg.whyNow && prospect.body.includes(cfg.whyNow));
+    assert.match(prospect.body, /https:\/\/calgarywatch\.ca\/events/);
+    const listed = templatePitch({ businessName: 'Test Market' } as PartnerLead, 'Listing: Test Market (market) — https://calgarywatch.ca/markets/test', sig);
+    assert.match(listed.body, /https:\/\/calgarywatch\.ca\/markets\/test/);
+    assert.equal(showcaseFor({ entityKind: 'market' }), 'https://calgarywatch.ca/markets');
+  });
+
+  it('blocks Downstage-style false listing claims for prospects', () => {
+    const lead = {
+      businessName: 'Downstage', entityId: null, entityKind: 'prospect',
+      draftSubject: 'Downstage listing on CalgaryWatch — which page should we link?',
+      draftBody: "We've added your listing. You can claim it at https://calgarywatch.ca/claim/downstage",
+    } as PartnerLead;
+    assert.equal(hasOwnListing(lead), false);
+    assert.deepEqual(listingClaimProblems(lead), ['Claims an existing listing for a lead that has no own listing.']);
+  });
+
+  it('uses invitation language for prospect and organizer follow-ups', () => {
+    const sig = signature(outreachConfig(), '123 Test St SW, Calgary AB');
+    for (const entityKind of ['prospect', 'organizer']) {
+      const lead = { businessName: 'Downstage', entityId: entityKind === 'organizer' ? 'event-1' : null, entityKind } as PartnerLead;
+      const body = followUpTemplate(lead, sig);
+      assert.match(body, /invitation to include Downstage's public events/);
+      assert.doesNotMatch(body, /Downstage's listing/);
+      assert.equal(withClaimLink(body, lead, sig), body);
+    }
+  });
+
+  it('fails closed for a stale or unavailable listing at send time', () => {
+    const lead = { entityId: 'market-gone', entityKind: 'market', draftSubject: 'Listing', draftBody: 'Body' } as PartnerLead;
+    assert.deepEqual(listingClaimProblems(lead, new Set()), ['The CalgaryWatch listing no longer exists in the current inventory.']);
+    assert.deepEqual(listingClaimProblems(lead, null), ['Current CalgaryWatch listing inventory is unavailable.']);
+  });
+
+  it('records where sent mail can be found', () => {
+    const lead = { contactEmail: 'hello@example.com', draftSubject: 'Hello' } as PartnerLead;
+    assert.match(sentHistorySummary(lead, false, true), /Resend \(not stored in Outlook Sent Items\)/);
+    assert.match(sentHistorySummary(lead, false, false), /via Outlook/);
   });
 });

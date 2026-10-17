@@ -8,7 +8,8 @@ import { GREETING, GYM_GOAL, agenda, brief, dollars,gymSlot, gymStats, mood, moo
 import { openDecisions } from "../queue";
 import { SkyStrip } from "../Sky";
 import { Icon } from "../ui";
-import { QueueRow } from "./Inbox";
+import { outreachRunsToday } from "@/lib/hq/outreachDays";
+import { OutreachCalendar } from "../OutreachCalendar";
 import { MoneyMoves, TodoCard } from "./Life";
 import { OwedCard } from "./Money";
 
@@ -31,6 +32,7 @@ export function OverviewView() {
   const owed = owedStats(data, now, filter);
   const todos = todoStats(data, now);
   const [more, setMore] = useState(false);
+  const plan = data.intelligence.daily;
 
   // The day as one timeline: calendar, posts going out, and the gym slot.
   const dayEnd = calgaryDayStart(now) + 86_400_000;
@@ -39,6 +41,13 @@ export function OverviewView() {
     ...events.map((e) => ({ key: `e${e.start}${e.title}`, at: e.allDay ? 0 : e.start, end: e.end, allDay: e.allDay, kind: "cal" as const, title: e.title, note: e.location })),
     ...posts.map((p) => ({ key: `p${p.id}`, at: p.scheduledFor!, end: p.scheduledFor!, allDay: false, kind: "post" as const, title: p.headline, note: `${BUSINESS_LABEL[p.brand]} post goes out` })),
     ...(free ? [{ key: "gym", at: free, end: free + 90 * 60_000, allDay: false, kind: "gym" as const, title: "Free for the gym", note: "90 minutes clear" }] : []),
+    // Outreach runs that sent email or failed: proof the day's sends happened.
+    ...(filter === "all" || filter === "arctos" || filter === "vowmotion" ? outreachRunsToday({ snapshot: snap, arctos: data.arctos, vowmotion: data.vowmotion, workflows: data.workflows }, now) : []).map((r) => ({
+      key: `j${r.at}`, at: r.at, end: r.end ?? r.at, allDay: false,
+      kind: r.status === "failure" ? ("job-failed" as const) : ("job" as const),
+      title: r.status === "failure" ? "✗ Outreach run failed" : `✓ Outreach sent ${[r.arctos ? `${r.arctos} Arctos` : "", r.vowmotion ? `${r.vowmotion} Vow Motion` : ""].filter(Boolean).join(", ")}`,
+      note: r.status === "failure" ? `${r.arctos + r.vowmotion} went out before it stopped. The next run tries again.` : "From aldo@arctoslaunchpad.com",
+    })),
   ].sort((a, b) => a.at - b.at);
   // What's due today (or late) has no time of its own; it sits under the day.
   const dueToday = [...todos.overdue, ...todos.today];
@@ -63,6 +72,18 @@ export function OverviewView() {
         </ul>
         {story.length > 2 ? <button type="button" className="hq-linkbtn hq-brief__more" data-few={story.length <= 4} onClick={() => setMore((m) => !m)} aria-expanded={more}>{more ? "Less" : "The rest of the brief"}</button> : null}
       </header>
+
+      <section className="hq-card hq-daily" data-mode={plan.mode}>
+        <div className="hq-daily__lead">
+          <p className="hq-eyebrow"><span>✦</span> Today&apos;s outcome</p>
+          <h2 className="hq-h2">{plan.outcome}</h2>
+          <p>{plan.why}</p>
+        </div>
+        <ol className="hq-daily__moves">
+          {plan.actions.length ? plan.actions.map((r, i) => <li key={r.id}><b>{i + 1}</b><div><strong>{r.title}</strong><span>{r.reason}</span><small>{r.effort} · {BUSINESS_LABEL[r.business as keyof typeof BUSINESS_LABEL] ?? "HQ"}</small></div>{r.href ? <a className="hq-btn hq-btn--ghost" href={r.href}>Open</a> : null}</li>) : <li><div><strong>Your runway is clear.</strong><span>Protect a block for sales, product work, or recovery.</span></div></li>}
+        </ol>
+        <details className="hq-daily__handled"><summary>What HQ is handling</summary><ul>{plan.handled.map((x) => <li key={x}>{x}</li>)}</ul></details>
+      </section>
 
       <div className="hq-pulse">
         <button type="button" className="hq-tile2" data-sev={waiting ? "warn" : "ok"} onClick={() => go("decide")}>
@@ -90,16 +111,10 @@ export function OverviewView() {
       </div>
 
       <div className="hq-cols-2">
-        <section className="hq-card">
-          <div className="hq-card__head">
-            <h2 className="hq-h2">Clear these first</h2>
-            {waiting ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("decide")}>{waiting > 3 ? `All ${waiting}` : "Open"}</button> : null}
-          </div>
-          {queue.length ? (
-            <ul className="hq-qlist hq-qlist--compact">
-              {queue.slice(0, 3).map((i) => <QueueRow key={i.key} item={i} />)}
-            </ul>
-          ) : <p className="hq-small" style={{ margin: 0 }}>Nothing waiting. Replies, drafts and pitches land here the moment the agents find them.</p>}
+        <section className="hq-card hq-calm">
+          <div className="hq-card__head"><h2 className="hq-h2">Decision queue</h2>{waiting ? <button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("decide")}>Clear {waiting}</button> : null}</div>
+          <b>{waiting ? `${plural(waiting, "decision")} waiting` : "The agents can keep moving."}</b>
+          <p className="hq-small">{waiting ? "Your three highest-value moves are already above. Open the queue when you are ready to batch the rest." : "HQ will interrupt you only for a reply, failure, money due, or a real decision."}</p>
         </section>
         <section className="hq-card">
           <div className="hq-card__head"><h2 className="hq-h2">Your day</h2><button type="button" className="hq-btn hq-btn--ghost" onClick={() => go("life")}>Week</button></div>
@@ -124,6 +139,8 @@ export function OverviewView() {
           ) : null}
         </section>
       </div>
+
+      {filter === "all" || filter === "arctos" || filter === "vowmotion" || filter === "calgarywatch" ? <OutreachCalendar /> : null}
 
       <div className="hq-cols-2">
         <TodoCard compact />

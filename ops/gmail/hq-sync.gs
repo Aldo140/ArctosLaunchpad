@@ -21,6 +21,9 @@
 var HQ_URL = 'https://arctoslaunchpad.com/api/hq/ingest/gmail';
 var HQ_KEY = ''; // or Script properties → HQ_KEY
 var DAYS = 30;
+// Only conversations active in this window are reread. HQ merges them into
+// its rolling DAYS-day history. This stays far below Google's daily quota.
+var LOOKBACK_DAYS = 2;
 
 var ALIASES = {
   'aldo@vowmotionweddings.com': 'vowmotion',
@@ -38,7 +41,7 @@ function setup() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
     if (t.getHandlerFunction() === 'sync') ScriptApp.deleteTrigger(t);
   });
-  ScriptApp.newTrigger('sync').timeBased().everyMinutes(15).create();
+  ScriptApp.newTrigger('sync').timeBased().everyMinutes(30).create();
   sync();
 }
 
@@ -47,19 +50,18 @@ function sync() {
   if (!key) throw new Error('Put the HQ key in HQ_KEY first.');
   var me = Session.getActiveUser().getEmail().toLowerCase();
   var mine = Object.keys(ALIASES).concat([me]);
-  var since = Date.now() - DAYS * 86400000;
   var sends = [];
   var replies = [];
   var seen = {};
 
-  var query = 'newer_than:' + DAYS + 'd (' + Object.keys(ALIASES).map(function (a) { return 'from:' + a + ' OR to:' + a + ' OR deliveredto:' + a; }).join(' OR ') + ')';
-  for (var start = 0; start < 1500; start += 100) {
+  var query = 'newer_than:' + LOOKBACK_DAYS + 'd (' + Object.keys(ALIASES).map(function (a) { return 'from:' + a + ' OR to:' + a + ' OR deliveredto:' + a; }).join(' OR ') + ')';
+  for (var start = 0; start < 500; start += 100) {
     var threads = GmailApp.search(query, start, 100);
     if (!threads.length) break;
     threads.forEach(function (thread) {
       if (seen[thread.getId()]) return;
       seen[thread.getId()] = true;
-      readThread(thread, mine, me, since, sends, replies);
+      readThread(thread, mine, me, sends, replies);
     });
     if (threads.length < 100) break;
   }
@@ -76,7 +78,7 @@ function sync() {
   Logger.log('Synced ' + sends.length + ' sends and ' + replies.length + ' replies.');
 }
 
-function readThread(thread, mine, me, since, sends, replies) {
+function readThread(thread, mine, me, sends, replies) {
   var messages = thread.getMessages();
   var firstReply = replies.length;
   var url = 'https://mail.google.com/mail/u/0/#all/' + thread.getId();
@@ -86,7 +88,6 @@ function readThread(thread, mine, me, since, sends, replies) {
   var threadBusiness = ours ? brandOf(ours.getPlainBody().slice(0, 4000)) || ALIASES[address(ours.getFrom())] || null : null;
   messages.forEach(function (m, i) {
     var at = m.getDate().getTime();
-    if (at < since) return;
     var from = address(m.getFrom());
     var later = messages.slice(i + 1);
     if (isMine(from, mine)) {

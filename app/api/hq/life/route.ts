@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
-import { createDoc, deleteDoc, readFields, setDoc } from "@/lib/hq/google";
+import { BUSINESSES, LifeGone, addNote, addOwed, logGym, logMoney, removeLife, setMoneyGoal, setNote, setOwedPaid } from "@/lib/hq/lifeWrites";
 
 /**
  * Aldo's personal log, written from HQ: gym visits (today or a day he forgot
  * to log), money that came in, money someone owes him (and marking it paid),
  * to-dos with an optional due day, the monthly money goal, and undo. Entries live in arctos-hq (hq_life, settings in hq_settings/me) and
- * come back with /api/hq/snapshot.
+ * come back with /api/hq/snapshot. The Telegram bot writes the same entries (lib/hq/lifeWrites.ts).
  */
 
-const DAY = 86_400_000;
-const BUSINESS = z.enum(["calgarywatch", "calgarydaily", "vowmotion", "arctos", "other"]);
+const BUSINESS = z.enum(BUSINESSES);
 
 /** A due day: within a year either side, sent as noon Calgary time. */
 const DUE = z.number().int().nullable().optional();
@@ -28,12 +27,6 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("undo"), id: z.string().min(1).max(100) }),
 ]);
 
-/** A past day is fine (a forgotten log), the future and the distant past aren't. */
-const when = (at: number | undefined, now: number) => (at === undefined ? now : Math.min(now, Math.max(now - 90 * DAY, at)));
-const dueDay = (due: number | null | undefined, now: number) => (typeof due === "number" ? Math.min(now + 366 * DAY, Math.max(now - 366 * DAY, due)) : null);
-/** Created a while ago (an undo putting it back) or now; never the future. */
-const created = (at: number | undefined, now: number) => (at === undefined ? now : Math.min(now, Math.max(now - 366 * DAY, at)));
-
 export async function POST(request: Request) {
   let email: string;
   try {
@@ -49,64 +42,32 @@ export async function POST(request: Request) {
   try {
     switch (input.action) {
       case "undo":
-        await deleteDoc(`hq_life/${input.id}`);
+        await removeLife(input.id);
         return NextResponse.json({ ok: true });
       case "goal":
-        await setDoc("hq_settings/me", { moneyGoal: input.amount, by: email, at: now });
+        await setMoneyGoal(input.amount, email, now);
         return NextResponse.json({ ok: true });
-      case "note-done": {
-        const doc = await readFields(`hq_life/${input.id}`);
-        if (!doc || doc.kind !== "note") return NextResponse.json({ error: "That note is gone." }, { status: 404 });
-        await setDoc(`hq_life/${input.id}`, { ...doc, done: input.done ? 1 : 0 });
+      case "note-done":
+        await setNote(input.id, now, { done: input.done });
         return NextResponse.json({ ok: true });
-      }
-      case "note-due": {
-        const doc = await readFields(`hq_life/${input.id}`);
-        if (!doc || doc.kind !== "note") return NextResponse.json({ error: "That to-do is gone." }, { status: 404 });
-        await setDoc(`hq_life/${input.id}`, { ...doc, due: dueDay(input.due, now) });
+      case "note-due":
+        await setNote(input.id, now, { due: input.due ?? null });
         return NextResponse.json({ ok: true });
-      }
-      case "note": {
-        const at = created(input.at, now);
-        const due = dueDay(input.due, now);
-        const id = await createDoc("hq_life", { kind: "note", at, text: input.text, done: 0, due, by: email });
-        return NextResponse.json({ entry: { id, kind: "note", at, text: input.text, done: false, due } });
-      }
-      case "owed": {
-        const at = created(input.at, now);
-        const due = dueDay(input.due, now);
-        const id = await createDoc("hq_life", { kind: "owed", at, amount: input.amount, business: input.business, text: input.text, due, done: 0, paidId: null, by: email });
-        return NextResponse.json({ entry: { id, kind: "owed", at, amount: input.amount, business: input.business, text: input.text, due, done: false, paidId: null } });
-      }
+      case "note":
+        return NextResponse.json({ entry: await addNote(email, now, input) });
+      case "owed":
+        return NextResponse.json({ entry: await addOwed(email, now, input) });
       case "owed-paid": {
-        // Paid: the money lands in the log like any payment, linked back here. Unpaid takes that payment out again.
-        const doc = await readFields(`hq_life/${input.id}`);
-        if (!doc || doc.kind !== "owed") return NextResponse.json({ error: "That's gone." }, { status: 404 });
-        const amount = Number(doc.amount ?? 0);
-        const business = String(doc.business ?? "other");
-        const text = String(doc.text ?? "");
-        if (input.paid) {
-          if (doc.paidId) return NextResponse.json({ ok: true, paidId: doc.paidId });
-          const paidId = await createDoc("hq_life", { kind: "money", at: now, amount, business, text, from: input.id, by: email });
-          await setDoc(`hq_life/${input.id}`, { ...doc, done: 1, paidId });
-          return NextResponse.json({ entry: { id: paidId, kind: "money", at: now, amount, business, text }, paidId });
-        }
-        if (typeof doc.paidId === "string") await deleteDoc(`hq_life/${doc.paidId}`);
-        await setDoc(`hq_life/${input.id}`, { ...doc, done: 0, paidId: null });
-        return NextResponse.json({ ok: true });
+        const { entry, paidId } = await setOwedPaid(input.id, input.paid, email, now);
+        return NextResponse.json(entry ? { entry, paidId } : paidId ? { ok: true, paidId } : { ok: true });
       }
-      case "money": {
-        const at = when(input.at, now);
-        const id = await createDoc("hq_life", { kind: "money", at, amount: input.amount, business: input.business, text: input.text, by: email });
-        return NextResponse.json({ entry: { id, kind: "money", at, amount: input.amount, business: input.business, text: input.text } });
-      }
-      case "log": {
-        const at = when(input.at, now);
-        const id = await createDoc("hq_life", { kind: input.kind, at, by: email });
-        return NextResponse.json({ entry: { id, kind: input.kind, at } });
-      }
+      case "money":
+        return NextResponse.json({ entry: await logMoney(email, now, input) });
+      case "log":
+        return NextResponse.json({ entry: await logGym(email, now, input.at) });
     }
   } catch (e) {
+    if (e instanceof LifeGone) return NextResponse.json({ error: e.message }, { status: 404 });
     return NextResponse.json({ error: e instanceof Error ? e.message : "Couldn't save that." }, { status: 502 });
   }
 }

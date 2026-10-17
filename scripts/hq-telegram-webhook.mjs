@@ -30,8 +30,13 @@ const url = `${origin}/api/hq/telegram`;
 await call("setWebhook", { url, secret_token: secret, allowed_updates: ["message", "callback_query"], drop_pending_updates: true });
 await call("setMyCommands", {
   commands: [
-    { command: "today", description: "What's waiting on you" },
-    { command: "inbox", description: "Approve posts, pitches and replies" },
+    // Same list as MENU in lib/hq/telegramBot.ts (the webhook also sets it on its first message).
+    { command: "today", description: "Your day, like HQ's Today" },
+    { command: "inbox", description: "Decide posts, pitches and replies" },
+    { command: "money", description: "This month, the goal, who owes you" },
+    { command: "gym", description: "Log today's gym visit" },
+    { command: "agent", description: "Change the site or HQ" },
+    { command: "mail", description: "Ask about your email" },
     { command: "help", description: "What HQ can do here" },
   ],
 });

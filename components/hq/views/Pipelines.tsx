@@ -6,6 +6,7 @@ import { Columns } from "../Charts";
 import { useHq } from "../context";
 import { LEAD_STAGE, ago, num, when } from "../format";
 import { Empty, Stat } from "../ui";
+import { OutreachCalendar } from "../OutreachCalendar";
 import { GmailPipeline } from "./GmailPipeline";
 
 const rate = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
@@ -105,17 +106,18 @@ function CalgaryWatchPipeline({ p, d }: { p: Pipeline | undefined; d: PipelineDe
   );
 }
 
-function ArctosPipeline({ a }: { a: ArctosOutreach | null }) {
+/** A campaign's HQ send log (outreach.yml through Brevo): Arctos, and Vow Motion since HQ took it over. */
+function SendLogPipeline({ a, business, title }: { a: ArctosOutreach | null | undefined; business: "arctos" | "vowmotion"; title: string }) {
   const { now, data } = useHq();
-  const gmailReplies = data.gmail ? data.gmail.replies.filter((r) => r.business === "arctos" && r.toPitch && r.kind === "reply").length : null;
+  const gmailReplies = data.gmail ? data.gmail.replies.filter((r) => r.business === business && r.toPitch && r.kind === "reply").length : null;
   const [q, setQ] = useState("");
-  if (!a) return <Empty title="Couldn't read the Arctos send log." />;
+  if (!a) return <Empty title={`Couldn't read the ${title} send log.`} />;
   const needle = q.trim().toLowerCase();
   const sends = a.sends.filter((s) => !needle || `${s.business} ${s.subject}`.toLowerCase().includes(needle));
   return (
     <>
       <section className="hq-card">
-        <div className="hq-card__head"><div><p className="hq-eyebrow">aldo@arctoslaunchpad.com · Brevo</p><h2 className="hq-h2">Arctos Launchpad</h2></div></div>
+        <div className="hq-card__head"><div><p className="hq-eyebrow">aldo@arctoslaunchpad.com · Brevo · sent by HQ</p><h2 className="hq-h2">{title}</h2></div></div>
         <div className="hq-stats">
           <Stat value={num(a.today)} label="sent today" />
           <Stat value={num(a.last30)} label="sent, 30 days" />
@@ -123,11 +125,11 @@ function ArctosPipeline({ a }: { a: ArctosOutreach | null }) {
           <Stat value={ago(a.lastSentAt, now)} label="last send" />
           <Stat value={gmailReplies === null ? "—" : num(gmailReplies)} label={gmailReplies === null ? "replies (Gmail sync)" : "real replies, from Gmail"} />
         </div>
-        <Columns data={a.sendsByDay.map((x) => ({ x: x.date.slice(5), y: x.sent }))} format={(n) => String(Math.round(n))} label="Arctos emails sent per day, last 30 days" />
+        <Columns data={a.sendsByDay.map((x) => ({ x: x.date.slice(5), y: x.sent }))} format={(n) => String(Math.round(n))} label={`${title} emails sent per day, last 30 days`} />
       </section>
       <section className="hq-card">
         <div className="hq-card__head"><h3 className="hq-h3">Every send · {sends.length} shown</h3></div>
-        <div className="hq-toolbar"><input className="hq-input" type="search" placeholder="Search business or subject" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search Arctos sends" /></div>
+        <div className="hq-toolbar"><input className="hq-input" type="search" placeholder="Search business or subject" value={q} onChange={(e) => setQ(e.target.value)} aria-label={`Search ${title} sends`} /></div>
         <div className="hq-tablewrap">
           <table className="hq-table" style={{ minWidth: 620 }}>
             <thead><tr><th>Business</th><th>Subject</th><th>Sent</th></tr></thead>
@@ -156,12 +158,13 @@ export function PipelinesView() {
         
         <h1 className="hq-h1">Who we&apos;ve reached, <em>and who&apos;s reaching back.</em></h1>
       </header>
+      <OutreachCalendar />
       <div className="hq-seg" role="group" aria-label="Business">
         {tabs.map((t) => <button key={t.id} type="button" aria-pressed={t.id === tab} onClick={() => setPicked(t.id)}>{t.label}</button>)}
       </div>
       {tab === "calgarywatch" ? <CalgaryWatchPipeline p={snap?.pipelines.find((p) => p.business === "calgarywatch")} d={snap?.pipelineDetail?.calgarywatch ?? null} /> : null}
-      {tab === "arctos" ? <><ArctosPipeline a={data.arctos} /><GmailPipeline business="arctos" address="aldo@arctoslaunchpad.com" title="Arctos, sent from Gmail" /></> : null}
-      {tab === "vowmotion" ? <GmailPipeline business="vowmotion" address="aldo@vowmotionweddings.com" title="Vow Motion" /> : null}
+      {tab === "arctos" ? <><SendLogPipeline a={data.arctos} business="arctos" title="Arctos Launchpad" /><GmailPipeline business="arctos" address="aldo@arctoslaunchpad.com" title="Arctos, sent from Gmail" /></> : null}
+      {tab === "vowmotion" ? <><SendLogPipeline a={data.vowmotion} business="vowmotion" title="Vow Motion" /><GmailPipeline business="vowmotion" address="aldo@vowmotionweddings.com" title="Vow Motion, sent from Gmail" /></> : null}
       {!tabs.length ? <Empty title="No outreach for this business." /> : null}
     </div>
   );

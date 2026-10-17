@@ -45,6 +45,7 @@ export interface HqPost {
   warnings: string[];
   facts: string;
   note: string;
+  relevantUntil: number | null;
   suggestedFor: number | null;
   scheduledFor: number | null;
   publishedAt: number | null;
@@ -140,6 +141,15 @@ export interface InspirationAnalysis {
   ideas: Array<{ title: string; format: string; hook: string; why: string }>;
 }
 
+/** The posting agent's week (Calgary-Watch- scripts/ops/jobs/coordinator.ts). */
+export interface ContentPlan {
+  at: number;
+  direction: string;
+  plan: Array<{ date: string; slot: string; pillar: string; format: string; idea: string; hook: string; asset: string; listing: string }>;
+  shootList: Array<{ what: string; where: string; when: string; why: string }>;
+  outreach: Array<{ handle: string; postUrl: string; why: string; dm: string }>;
+}
+
 export interface HistoryGroup { key: string; label: string; posts: number; medianViews: number; medianEngagement: number; best: number }
 
 export interface Bottleneck { id: string; label: string; value: string; severity: Severity; detail: string }
@@ -164,12 +174,12 @@ export interface HqSnapshot {
   activity?: ActivityItem[];
   pipelines: Pipeline[];
   pipelineDetail?: { calgarywatch: PipelineDetail | null };
-  instagram?: { accounts: OwnAccount[]; inspiration: Outperformer[]; analysis: InspirationAnalysis | null; updatedAt: number | null };
+  instagram?: { accounts: OwnAccount[]; inspiration: Outperformer[]; analysis: InspirationAnalysis | null; updatedAt: number | null; coordinator?: ContentPlan | null };
   pipelinesAt: number;
   bottlenecks: Bottleneck[];
 }
 
-/** Arctos outreach, read from outreach/sent.json on the arctos-launchpad branch. */
+/** Outreach sent by outreach.yml, read from its send log on the arctos-launchpad branch (outreach/sent.json for Arctos, outreach/vow-motion-sent.json for Vow Motion). */
 export interface ArctosOutreach {
   total: number;
   last30: number;
@@ -301,6 +311,40 @@ export interface LifeEntry {
 /** Aldo's own settings, saved from HQ. */
 export interface HqSettings { moneyGoal: number | null }
 
+export type HqMemoryKind = "preference" | "rule" | "person" | "decision" | "priority";
+export interface HqMemory { id: string; kind: HqMemoryKind; text: string; business: Business | "all"; at: number; by: string }
+export type HqExperimentStatus = "planned" | "running" | "won" | "lost" | "inconclusive";
+export interface HqExperiment {
+  id: string; title: string; hypothesis: string; metric: string; business: Business;
+  status: HqExperimentStatus; startedAt: number; endsAt: number | null; result: string | null; by: string;
+}
+export interface HqProductEvent { id: string; name: string; area: string; at: number; by: string; detail: string | null }
+export interface HqRecommendation {
+  id: string; title: string; reason: string; business: Business | "all"; score: number;
+  effort: "2 min" | "10 min" | "30+ min"; confidence: "high" | "medium" | "low"; source: string; href: string | null;
+}
+export interface HqRelationship {
+  key: string; name: string; business: Business | "other"; email: string | null; lastAt: number;
+  touches: number; state: string; next: string | null; url: string | null;
+}
+export interface HqIntelligence {
+  daily: {
+    mode: "restore" | "revenue" | "deliver" | "grow" | "clear";
+    outcome: string;
+    why: string;
+    actions: HqRecommendation[];
+    handled: string[];
+    generatedAt: number;
+  };
+  recommendations: HqRecommendation[];
+  relationships: HqRelationship[];
+  opportunities: Array<{ title: string; detail: string; business: Business | "all"; confidence: "high" | "medium" | "low"; source: string }>;
+  weekly: { wins: string[]; risks: string[]; focus: string[]; generatedAt: number };
+  workload: { open: number; urgent: number; message: string };
+  connections: Array<{ id: string; label: string; state: "connected" | "stale" | "missing"; detail: string; action: string | null; href: string | null }>;
+  research: { events7d: number; topAreas: Array<{ area: string; count: number }>; message: string };
+}
+
 /**
  * The reply check: before a Gmail reply reaches the board, an agent reads the
  * thread and what else is going on with that sender and decides whether it
@@ -345,10 +389,15 @@ export interface TriageDecision {
   at: number;
 }
 
+/** Everything HQ knows, minus who is looking: what the dashboard and the Telegram bot both read. */
+export type HqData = Omit<HqResponse, "viewer">;
+
 export interface HqResponse {
   viewer: string;
   snapshot: HqSnapshot | null;
   arctos: ArctosOutreach | null;
+  /** Vow Motion sends from HQ (since 2026-10-12; earlier ones went out by hand from Gmail). */
+  vowmotion?: ArctosOutreach | null;
   commands: HqCommandRecord[];
   workflows: WorkflowSummary[] | null;
   gmail: GmailSummary | null;
@@ -357,5 +406,9 @@ export interface HqResponse {
   settings?: HqSettings | null;
   triage: GmailTriage | null;
   decisions: TriageDecision[];
+  memories: HqMemory[];
+  experiments: HqExperiment[];
+  productEvents: HqProductEvent[];
+  intelligence: HqIntelligence;
   errors: string[];
 }

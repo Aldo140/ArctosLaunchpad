@@ -6,7 +6,12 @@ name: Operations clock
 # Operations hourly at :07 and :37 and Operations daily at 3, 6, 7 and 8 am
 # Calgary (09, 12, 13, 14 UTC), then starts the next clock before it ends.
 # Every minute it also starts hq-agent.yml for each new HQ agent job (jobs
-# the HQ bot saves in arctos-hq; ops/agent-jobs.ts). Its own schedule only
+# the HQ bot saves in arctos-hq; ops/agent-jobs.ts). On weekdays it starts
+# outreach.yml (Arctos and Vow Motion cold email) at :12 and :42 from 7 am to
+# 5 pm Calgary; that script keeps each campaign's own send window and cap,
+# so these are the only starts outreach needs. At 4 am Calgary on weekdays it
+# starts prospects.yml, which researches the day's new outreach prospects
+# before the first sends. Its own schedule only
 # restarts the chain if it ever breaks. A dispatch made
 # with the workflow's token is one of the few events GitHub lets start a run.
 # Public repository: runner minutes are free.
@@ -49,7 +54,7 @@ jobs:
           [ "$READY" = true ] || echo "::notice title=Ops idle::The ops secrets aren't in this repository yet; only HQ agent jobs run."
           start() { gh workflow run "$1" && echo "$(date -u +%H:%M) started $1" || echo "::warning::couldn't start $1"; }
           end=$((SECONDS + 5 * 3600 + 45 * 60))
-          last_hourly=""; last_daily=""
+          last_hourly=""; last_daily=""; last_outreach=""; last_prospects=""
           while [ "$SECONDS" -lt "$end" ]; do
             h=$(date -u +%H); m=$((10#$(date -u +%M)))
             if [ "$READY" = true ] && [ $((m % 30)) -ge 7 ]; then
@@ -63,6 +68,17 @@ jobs:
                   [ "$key" != "$last_daily" ] && { start ops-daily.yml; last_daily=$key; }
                 fi;;
               esac
+            fi
+            # Outreach: weekdays 13:00-23:59 UTC (7 am-5 pm Calgary), twice an hour.
+            dow=$(date -u +%u)
+            if [ "$dow" -le 5 ] && [ $((10#$h)) -ge 13 ] && [ $((m % 30)) -ge 12 ]; then
+              key="$(date -u +%Y%m%d)$h-$((m / 30))"
+              [ "$key" != "$last_outreach" ] && { gh workflow run outreach.yml --ref arctos-launchpad && echo "$(date -u +%H:%M) started outreach" || echo "::warning::couldn't start outreach"; last_outreach=$key; }
+            fi
+            # Prospect research: weekdays at 10 UTC (4 am Calgary), once a day.
+            if [ "$dow" -le 5 ] && [ "$h" = 10 ] && [ "$m" -ge 5 ]; then
+              key="$(date -u +%Y%m%d)"
+              [ "$key" != "$last_prospects" ] && { gh workflow run prospects.yml --ref arctos-launchpad && echo "$(date -u +%H:%M) started prospects" || echo "::warning::couldn't start prospects"; last_prospects=$key; }
             fi
             for job in $(node ops/agent-jobs.ts pending || true); do
               gh workflow run hq-agent.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ agent job" || echo "::warning::couldn't start HQ agent job $job"

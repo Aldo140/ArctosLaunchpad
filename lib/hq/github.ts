@@ -7,11 +7,15 @@ import type { WorkflowSummary } from "./types";
  */
 
 const WATCHED: Array<{ repo: string; file: string; name: string; job: string; cron: string }> = [
-  { repo: "Aldo140/ArctosLaunchpad", file: "ops-hourly.yml", cron: "7,37 * * * *", name: "Operations hourly", job: "Applies your HQ actions, publishes due posts, reads replies and sends approved email." },
-  { repo: "Aldo140/ArctosLaunchpad", file: "ops-daily.yml", cron: "5 9,12,13,14 * * *", name: "Operations daily", job: "Drafts posts, runs the Scout and inspiration analysis, finds leads, checks health." },
+  // The ops agents run from Calgary-Watch-, where their secrets are. ArctosLaunchpad has copies of these
+  // workflows that finish in seconds doing nothing until the secrets move, so watching those showed green for no work.
+  { repo: "Aldo140/Calgary-Watch-", file: "ops-hourly.yml", cron: "7,37 * * * *", name: "Operations hourly", job: "Applies your HQ actions, publishes due posts, reads replies and sends approved email." },
+  { repo: "Aldo140/Calgary-Watch-", file: "ops-daily.yml", cron: "5 9,12,13,14 * * *", name: "Operations daily", job: "Drafts posts, runs the Scout and inspiration analysis, finds leads, checks health." },
   { repo: "Aldo140/Calgary-Watch-", file: "ops-maintenance.yml", cron: "40 9 * * *", name: "Nightly maintenance", job: "Type check, tests and audit; opens a fix pull request when something breaks." },
-  { repo: "Aldo140/ArctosLaunchpad", file: "ops-clock.yml", cron: "23 */6 * * *", name: "Operations clock", job: "Starts the agents on time: hourly at :07 and :37, daily at 3, 6, 7 and 8 am." },
-  { repo: "Aldo140/ArctosLaunchpad", file: "outreach.yml", cron: "11,26,41,56 14-23 * * 1-5", name: "Arctos outreach", job: "Sends the queued Arctos emails through Brevo, weekdays 9 to 4:30." },
+  { repo: "Aldo140/Calgary-Watch-", file: "hq-agent-clock.yml", cron: "53 */6 * * *", name: "Operations clock", job: "Starts Operations hourly at :07 and :37 (GitHub's own schedule fires a few times a day), and the bot's email jobs within a minute." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "ops-clock.yml", cron: "23 */6 * * *", name: "Code agent clock", job: "Starts the bot's /agent code jobs within a minute of your text." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "outreach.yml", cron: "11,26,41,56 14-23 * * 1-5", name: "Arctos outreach", job: "Sends the queued Arctos and Vow Motion emails through Brevo. HQ's clock starts it twice an hour on weekdays." },
+  { repo: "Aldo140/ArctosLaunchpad", file: "prospects.yml", cron: "5 10 * * 1-5", name: "Outreach prospects", job: "Finds new Arctos and Vow Motion prospects each weekday at 4 am, writes each one's email and checks it before it joins the send queue." },
   { repo: "Aldo140/Calgary-Watch-", file: "weekly-digest.yml", cron: "0 15 * * 1", name: "Monday digest", job: "CalgaryWatch's weekly email to members." },
   { repo: "Aldo140/Calgary-Watch-", file: "events-digest.yml", cron: "0 14 * * 4", name: "Thursday event picks", job: "CalgaryWatch's event email." },
   { repo: "Aldo140/Calgary-Watch-", file: "sync-email-replies.yml", cron: "7/10 * * * *", name: "Digest replies", job: "Reads replies to CalgaryWatch emails into the admin inbox." },
@@ -28,7 +32,7 @@ const statusOf = (r: Run): WorkflowSummary["lastStatus"] =>
 export async function workflowSummaries(): Promise<WorkflowSummary[]> {
   return Promise.all(
     WATCHED.map(async (w) => {
-      const r = await fetch(`https://api.github.com/repos/${w.repo}/actions/workflows/${w.file}/runs?per_page=30`, {
+      const r = await fetch(`https://api.github.com/repos/${w.repo}/actions/workflows/${w.file}/runs?per_page=100`, {
         headers: { Accept: "application/vnd.github+json", "User-Agent": "arctos-hq" },
         next: { revalidate: 300 },
       });

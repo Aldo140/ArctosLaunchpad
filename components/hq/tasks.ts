@@ -1,5 +1,5 @@
-import type { Business, HqResponse, WorkflowSummary } from "@/lib/hq/types";
-import { COMMAND_LABEL } from "./context";
+import type { Business, HqData, WorkflowSummary } from "../../lib/hq/types";
+import { COMMAND_LABEL } from "./filter";
 import { slot } from "./format";
 
 /**
@@ -97,7 +97,7 @@ export function cronFire(expr: string, t: number, dir: 1 | -1): number | null {
 export type Owner = Business | "shared";
 export interface ProofItem { at: number; text: string; href?: string | null }
 export interface Proof { confirmed: boolean; headline: string; items: ProofItem[] }
-interface ProofCtx { data: HqResponse; dayStart: number; now: number }
+interface ProofCtx { data: HqData; dayStart: number; now: number }
 
 export interface Routine {
   id: string;
@@ -167,7 +167,7 @@ export const ROUTINES: Routine[] = [
   { id: "cw-thursday", owner: "calgarywatch", title: "Thursday event picks", cadence: "Thursdays, 8 am", workflow: "events-digest.yml", done: "The event email went out." },
   { id: "cw-deploy", owner: "calgarywatch", title: "Site rebuild", cadence: "Twice a day", workflow: "deploy-firebase.yml", done: "calgarywatch.ca is rebuilt with the latest events." },
   {
-    id: "ar-outreach", owner: "arctos", title: "Arctos outreach", cadence: "Weekdays, every 15 minutes, 8 am to 6 pm", workflow: "outreach.yml",
+    id: "ar-outreach", owner: "arctos", title: "Arctos outreach", cadence: "Weekdays 9 am to 4:30 pm, up to 50 a day", workflow: "outreach.yml",
     done: "The day's queued emails have gone out from aldo@arctoslaunchpad.com.",
     proof: ({ data, dayStart }) => {
       const a = data.arctos;
@@ -177,13 +177,14 @@ export const ROUTINES: Routine[] = [
   },
   { id: "ar-instagram", owner: "arctos", title: "Post to @arctoslaunchpad", cadence: "Planned", done: "Posts drafted in the Arctos voice, approved here, published on schedule.", setup: "Needs the @arctoslaunchpad Instagram token." },
   {
-    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach, 15 a day", cadence: "Weekdays, from Gmail",
-    done: "Up to fifteen planners pitched from aldo@vowmotionweddings.com, every reply answered.",
+    id: "vm-outreach", owner: "vowmotion", title: "Vow Motion outreach", cadence: "Weekdays 9:30 am to 5 pm Eastern, up to 50 a day", workflow: "outreach.yml",
+    done: "The day's queued planners have been emailed from aldo@arctoslaunchpad.com.",
     proof: ({ data, dayStart }) => {
-      if (!data.gmail) return { confirmed: false, headline: "waiting for the Gmail sync", items: [] };
-      const items = today(data.gmail.sends.filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url })), dayStart);
-      const wrong = data.gmail.sends.filter((s) => s.wrongAlias === "vowmotion" && s.at >= dayStart).length;
-      return { confirmed: items.length > 0, headline: `${items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today"}${items.length > 15 ? " · over 15" : ""}${wrong ? ` · ${wrong} from the wrong address` : ""}`, items };
+      // HQ sends through Brevo; anything still sent by hand shows up through the Gmail sync.
+      const hq = (data.vowmotion?.sends ?? []).map((s) => ({ at: s.at, text: `${s.business} · ${s.subject}` }));
+      const byHand = (data.gmail?.sends ?? []).filter((s) => s.business === "vowmotion" && s.first).map((s) => ({ at: s.at, text: `${s.domain} · ${s.subject}`, href: s.url }));
+      const items = today([...hq, ...byHand], dayStart);
+      return { confirmed: items.length > 0, headline: items.length ? `${n(items.length, "pitch", "pitches")} today` : "no pitches yet today", items };
     },
   },
   {
@@ -240,7 +241,8 @@ export const ROUTINES: Routine[] = [
       };
     },
   },
-  { id: "sh-clock", owner: "shared", title: "Keep the agents on time", cadence: "Always on, one run every 6 hours", workflow: "ops-clock.yml", done: "The clock is awake and starting hourly and daily runs on schedule, not when GitHub gets to it." },
+  { id: "sh-clock", owner: "shared", title: "Keep the agents on time", cadence: "Always on, one run every 6 hours", workflow: "hq-agent-clock.yml", done: "The clock is awake, starting the hourly run at :07 and :37 and the bot's email jobs, not when GitHub gets to it." },
+  { id: "sh-agent", owner: "shared", title: "Bot's code agent on call", cadence: "Always on, one run every 6 hours", workflow: "ops-clock.yml", done: "An /agent text from Telegram starts within a minute." },
   { id: "sh-maintenance", owner: "shared", title: "Nightly maintenance", cadence: "Nightly, 3:40 am", workflow: "ops-maintenance.yml", done: "Type check, tests and audit pass; a fix pull request opens if not." },
 ];
 
@@ -272,7 +274,7 @@ export interface TaskStatus {
   runsToday: WorkflowSummary["runs"];
 }
 
-export function evaluate(routine: Routine, data: HqResponse, now: number): TaskStatus {
+export function evaluate(routine: Routine, data: HqData, now: number): TaskStatus {
   const dayStart = calgaryDayStart(now);
   const wf = routine.workflow ? (data.workflows ?? []).find((w) => w.file === routine.workflow) ?? null : null;
   const proof = routine.proof ? routine.proof({ data, dayStart, now }) : null;
@@ -309,7 +311,8 @@ export function reliability(wf: WorkflowSummary, now: number): { expected: numbe
   let expected = 0;
   const delays: number[] = [];
   for (let f = cronFire(wf.cron, now - DAY, 1); f && f <= now && expected < 300; f = cronFire(wf.cron, f, 1)) expected++;
-  const runs = wf.runs.filter((r) => r.event === "schedule" && r.at > now - DAY);
+  // A clock's dispatch is a scheduled run too: it's how the ops runs keep time when GitHub's scheduler doesn't.
+  const runs = wf.runs.filter((r) => (r.event === "schedule" || r.event === "workflow_dispatch") && r.at > now - DAY);
   for (const r of runs) {
     const fire = cronFire(wf.cron, r.at, -1);
     if (fire) delays.push((r.at - fire) / MIN);
@@ -318,4 +321,4 @@ export function reliability(wf: WorkflowSummary, now: number): { expected: numbe
   return { expected, actual: runs.length, medianDelayMin: delays.length ? Math.round(delays[Math.floor(delays.length / 2)]) : null };
 }
 
-export const evaluateAll = (data: HqResponse, now: number) => ROUTINES.map((r) => evaluate(r, data, now));
+export const evaluateAll = (data: HqData, now: number) => ROUTINES.map((r) => evaluate(r, data, now));

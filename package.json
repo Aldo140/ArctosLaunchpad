@@ -24,7 +24,8 @@
     "ops:index": "tsx ops/fetch-index.ts",
     "ops:preview": "tsx ops/preview.ts",
     "ops:check": "tsx ops/check-access.ts",
-    "ops:import-leads": "tsx ops/import-leads.ts"
+    "ops:import-leads": "tsx ops/import-leads.ts",
+    "ops:audit-outreach": "tsx ops/audit-outreach.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

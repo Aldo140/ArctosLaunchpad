@@ -1,9 +1,10 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { Business, CommandType, HqCommandRecord, HqResponse, LifeEntry, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
+import type { CommandType, HqCommandRecord, HqResponse, LifeEntry, TriageDecision, TriageDecisionKind } from "@/lib/hq/types";
+import type { Filter } from "./filter";
 
-export type Filter = Business | "all";
+export { COMMAND_LABEL, inFilter, type Filter } from "./filter";
 
 export interface HqContextValue {
   data: HqResponse;
@@ -32,6 +33,8 @@ export interface HqContextValue {
   setGoal: (cents: number | null) => Promise<void>;
   /** Opens the quick-add sheet on a tab. */
   quickAdd: (tab: "gym" | "money" | "note" | "owed") => void;
+  improve: (body: Record<string, unknown>) => Promise<boolean>;
+  refresh: () => Promise<void>;
   /** Rendering from sample data: nothing leaves the page. */
   preview?: boolean;
 }
@@ -44,20 +47,7 @@ export function useHq(): HqContextValue {
   return v;
 }
 
-export const inFilter = (filter: Filter, business: string) => filter === "all" || filter === business;
-
 /** The newest action taken on this item from HQ, if any. */
 export function latestCommand(commands: HqCommandRecord[], targetId: string, types: CommandType[]): HqCommandRecord | null {
   return commands.find((c) => c.targetId === targetId && types.includes(c.type)) ?? null;
 }
-
-export const COMMAND_LABEL: Record<CommandType, string> = {
-  "approve-post": "Approve",
-  "reject-post": "Reject",
-  "redraft-post": "Redraft",
-  "unschedule-post": "Unschedule",
-  "approve-pitch": "Send pitch",
-  "skip-pitch": "Skip pitch",
-  "approve-reply": "Send reply",
-  "handled-reply": "Mark handled",
-};
