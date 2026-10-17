@@ -140,6 +140,15 @@ export const calgaryLandingPages = [
     summary:
       "Enquiry routing, document classification, summarisation, and AI workflows with human review.",
   },
+  {
+    slug: "calgary-basement-builders",
+    route: "/calgary-basement-builders" as const,
+    title: "Calgary Basement Builders",
+    headline: "15 booked consultations in 90 days, or we work free.",
+    serviceSlug: "paid-media-lead-generation",
+    summary:
+      "Google ads, 24/7 call answering and quote follow-up for Calgary basement development and legal suite builders.",
+  },
 ] as const;
 
 /**

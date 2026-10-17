@@ -8,7 +8,38 @@ import { googleAdsLead } from "@/components/site/GoogleAdsTag";
 type FieldName = "name" | "email" | "challenge" | "company" | "sample";
 type FieldErrors = Partial<Record<FieldName | "form", string>>;
 
-const PROJECT_TYPE = "Free reporting teardown";
+/** Words that change between the reporting teardown and other free checks
+ *  built on the same form (the basement builders' Missed Lead Check). */
+export type TeardownCopy = {
+  projectType: "Free reporting teardown" | "Free Missed Lead Check";
+  title: string;
+  challengeLabel: string;
+  challengePlaceholder: string;
+  challengeError: string;
+  sampleLabel: string;
+  samplePlaceholder: string;
+  submit: string;
+  micro: string;
+  done: readonly [string, string, string];
+};
+
+const REPORTING: TeardownCopy = {
+  projectType: "Free reporting teardown",
+  title: "Free reporting teardown",
+  challengeLabel: "What do you report on by hand today?",
+  challengePlaceholder: "Weekly campaign numbers, event signups, production runs…",
+  challengeError:
+    "Tell us a little more about what you report on by hand. A sentence or two is plenty.",
+  sampleLabel: "Link to a sample",
+  samplePlaceholder: "Drive, Dropbox…",
+  submit: "Get a free reporting teardown",
+  micro: "30 minutes. No obligation. Reply within two business days.",
+  done: [
+    "We read what you sent, in full.",
+    "You get a reply to book the 30 minutes, within two business days.",
+    "We show you the one-screen mock, the first three steps, and a straight answer.",
+  ],
+};
 const fieldOrder: FieldName[] = [
   "name",
   "email",
@@ -21,7 +52,7 @@ function valueOf(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
 }
 
-function validate(formData: FormData): FieldErrors {
+function validate(formData: FormData, copy: TeardownCopy): FieldErrors {
   const errors: FieldErrors = {};
   const name = valueOf(formData, "name");
   const email = valueOf(formData, "email");
@@ -33,8 +64,7 @@ function validate(formData: FormData): FieldErrors {
   if (!/^\S+@\S+\.\S+$/.test(email))
     errors.email = "Enter a valid email address.";
   if (challenge.length < 20)
-    errors.challenge =
-      "Tell us a little more about what you report on by hand. A sentence or two is plenty.";
+    errors.challenge = copy.challengeError;
   if (company && company.length < 2)
     errors.company = "Enter your company, or leave this one blank.";
   if (sample.length > 300)
@@ -66,7 +96,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export function TeardownForm() {
+export function TeardownForm({ copy = REPORTING }: { copy?: TeardownCopy }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
   const successHeading = useRef<HTMLHeadingElement>(null);
@@ -88,7 +118,7 @@ export function TeardownForm() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const clientErrors = validate(formData);
+    const clientErrors = validate(formData, copy);
 
     if (Object.keys(clientErrors).length > 0) {
       setErrors(clientErrors);
@@ -114,7 +144,7 @@ export function TeardownForm() {
     }
 
     const sample = valueOf(formData, "sample");
-    const message = [sample ? `Sample: ${sample}` : "", attribution()]
+    const message = [sample ? `${copy.sampleLabel}: ${sample}` : "", attribution()]
       .filter(Boolean)
       .join("\n");
 
@@ -126,7 +156,7 @@ export function TeardownForm() {
       email: valueOf(formData, "email"),
       company: valueOf(formData, "company"),
       website: "",
-      projectType: PROJECT_TYPE,
+      projectType: copy.projectType,
       budget: "",
       timeline: "",
       challenge: valueOf(formData, "challenge"),
@@ -165,7 +195,7 @@ export function TeardownForm() {
         return;
       }
 
-      metaTrack("Lead", { content_name: PROJECT_TYPE });
+      metaTrack("Lead", { content_name: copy.projectType });
       googleAdsLead();
       form.reset();
       setReady({ name: false, email: false, challenge: false });
@@ -202,18 +232,15 @@ export function TeardownForm() {
         <ol className="tdn-done__list">
           <li>
             <span className="index">01</span>
-            <span>We read what you sent, in full.</span>
+            <span>{copy.done[0]}</span>
           </li>
           <li>
             <span className="index">02</span>
-            <span>You get a reply to book the 30 minutes, within two business days.</span>
+            <span>{copy.done[1]}</span>
           </li>
           <li>
             <span className="index">03</span>
-            <span>
-              We show you the one-screen mock, the first three steps, and a
-              straight answer.
-            </span>
+            <span>{copy.done[2]}</span>
           </li>
         </ol>
         <p className="tdn-done__foot">
@@ -256,7 +283,7 @@ export function TeardownForm() {
       {live}
       <div className="tdn-sheet__head">
         <p className="eyebrow" id="tdn-form-title">
-          Free reporting teardown
+          {copy.title}
         </p>
         <p className="tdn-sheet__req mono" data-filled={filled}>
           <span className="tdn-pips" aria-hidden="true">
@@ -334,7 +361,7 @@ export function TeardownForm() {
 
       <div className="tdn-field">
         <label className="tdn-label" htmlFor="tdn-challenge">
-          What do you report on by hand today?
+          {copy.challengeLabel}
         </label>
         <span className="tdn-control">
           <textarea
@@ -343,7 +370,7 @@ export function TeardownForm() {
             rows={4}
             maxLength={1500}
             required
-            placeholder="Weekly campaign numbers, event signups, production runs…"
+            placeholder={copy.challengePlaceholder}
             {...describedBy("challenge", "tdn-challenge-help")}
           />
           <span className="tdn-ink" aria-hidden="true" />
@@ -375,7 +402,7 @@ export function TeardownForm() {
         </div>
         <div className="tdn-field">
           <label className="tdn-label" htmlFor="tdn-sample">
-            Link to a sample <span className="tdn-opt">Optional</span>
+            {copy.sampleLabel} <span className="tdn-opt">Optional</span>
           </label>
           <span className="tdn-control">
             <input
@@ -387,7 +414,7 @@ export function TeardownForm() {
               autoCapitalize="off"
               spellCheck={false}
               maxLength={300}
-              placeholder="Drive, Dropbox…"
+              placeholder={copy.samplePlaceholder}
               {...describedBy("sample")}
             />
             <span className="tdn-ink" aria-hidden="true" />
@@ -406,14 +433,14 @@ export function TeardownForm() {
       <div className="tdn-act">
         <button className="tdn-submit" type="submit" disabled={status === "sending"}>
           <span>
-            {status === "sending" ? "Sending…" : "Get a free reporting teardown"}
+            {status === "sending" ? "Sending…" : copy.submit}
           </span>
           <span className="tdn-submit__arrow" aria-hidden="true">
             →
           </span>
         </button>
         <p className="tdn-micro">
-          30 minutes. No obligation. Reply within two business days.
+          {copy.micro}
         </p>
       </div>
     </form>

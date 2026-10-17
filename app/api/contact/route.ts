@@ -11,6 +11,7 @@ function logError(message: string, details: Record<string, unknown>) {
 
 const projectTypes = [
   "Free reporting teardown",
+  "Free Missed Lead Check",
   "Website",
   "SEO or AI search",
   "Paid advertising",
