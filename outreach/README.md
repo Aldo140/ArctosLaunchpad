@@ -63,3 +63,4 @@ before HQ took over.
 - `batch-2026-10-13.json` — 9 Calgary caterers, a test run; sent early on Aldo's request (Saturday 2026-10-10 evening) with the manual "send now" option.
 - `batch-2026-10-12.json` — 35 businesses (cabinets, metal, signs, stone, railings, furniture, print, embroidery, auto repair and detailing, renovation, landscaping, upholstery, a bakery).
 - `batch-2026-10-07.json` — 50 businesses (glass, closets, flooring, millwork, welding, print, signs, furniture, framing, wraps, landscaping, cakes, catering, auto repair, tailoring).
+- `batch-2026-10-21-basement.json` — 30 Calgary basement and legal suite builders from the /calgary-basement-builders prospect list, each offered a free Missed Lead Check; one real website detail per builder. Sent from 2026-10-21 on Aldo's request.
