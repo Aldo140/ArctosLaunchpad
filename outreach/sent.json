@@ -2469,5 +2469,75 @@
     "subject": "After-hours calls at SOS Drain Cleaning",
     "at": "2026-10-22T16:43:07.841Z",
     "messageId": "<202610221643.75488147391@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgaryplumberanddrains.com",
+    "business": "Calgary Plumber and Drains",
+    "subject": "After-hours calls at Calgary Plumber and Drains",
+    "at": "2026-10-22T17:12:26.657Z",
+    "messageId": "<202610221712.98635680327@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "contact@jackdupplumbing.ca",
+    "business": "Jack'd Up Plumbing",
+    "subject": "After-hours calls at Jack'd Up Plumbing",
+    "at": "2026-10-22T17:12:26.959Z",
+    "messageId": "<202610221712.56882648982@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@mycalgaryplumber.ca",
+    "business": "My Calgary Plumber",
+    "subject": "After-hours calls at My Calgary Plumber",
+    "at": "2026-10-22T17:12:27.101Z",
+    "messageId": "<202610221712.29919357654@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@thedraindoctor.ca",
+    "business": "The Drain Doctor",
+    "subject": "After-hours calls at The Drain Doctor",
+    "at": "2026-10-22T17:12:27.230Z",
+    "messageId": "<202610221712.91877232814@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "services@purcellheating.ca",
+    "business": "Purcell Heating & Air",
+    "subject": "Furnace calls at Purcell Heating & Air",
+    "at": "2026-10-22T17:12:27.371Z",
+    "messageId": "<202610221712.72260928253@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@son-riseplumbing.ca",
+    "business": "Son-Rise Plumbing & Gasfitting",
+    "subject": "After-hours calls at Son-Rise Plumbing & Gasfitting",
+    "at": "2026-10-22T17:12:27.497Z",
+    "messageId": "<202610221712.81390500713@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "calorisheating@yahoo.ca",
+    "business": "Caloris HVAC",
+    "subject": "Furnace calls at Caloris HVAC",
+    "at": "2026-10-22T17:12:27.629Z",
+    "messageId": "<202610221712.86141404142@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@tiptopplumbing.ca",
+    "business": "TipTop Plumbing & Heating",
+    "subject": "After-hours calls at TipTop Plumbing & Heating",
+    "at": "2026-10-22T17:12:27.767Z",
+    "messageId": "<202610221712.75681727610@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "scott@scottcogas.ca",
+    "business": "Scottco Gas",
+    "subject": "Furnace calls at Scottco Gas",
+    "at": "2026-10-22T17:12:27.909Z",
+    "messageId": "<202610221712.96883420778@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "sales@calgaryhomecomfort.ca",
+    "business": "Calgary Home Comfort",
+    "subject": "Furnace calls at Calgary Home Comfort",
+    "at": "2026-10-22T17:12:28.051Z",
+    "messageId": "<202610221712.55146283290@smtp-relay.mailin.fr>"
   }
 ]
