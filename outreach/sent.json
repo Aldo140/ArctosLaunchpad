@@ -2399,5 +2399,75 @@
     "subject": "Furnace calls at Alberta Mountain Air",
     "at": "2026-10-22T16:12:44.639Z",
     "messageId": "<202610221612.71386251812@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@yychvac.com",
+    "business": "YYC Heating & Cooling Pros",
+    "subject": "Furnace calls at YYC Heating & Cooling Pros",
+    "at": "2026-10-22T16:43:06.298Z",
+    "messageId": "<202610221643.91480287203@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "alpinefurnaceac@gmail.com",
+    "business": "Alpine Furnace & AC",
+    "subject": "Furnace calls at Alpine Furnace & AC",
+    "at": "2026-10-22T16:43:06.641Z",
+    "messageId": "<202610221643.94155844559@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@andersonplumbing.ca",
+    "business": "Anderson Plumbing & Heating",
+    "subject": "After-hours calls at Anderson Plumbing & Heating",
+    "at": "2026-10-22T16:43:06.798Z",
+    "messageId": "<202610221643.44838601169@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@kmwheatandac.com",
+    "business": "K.M.W Heating & Air Conditioning",
+    "subject": "Furnace calls at K.M.W Heating & Air Conditioning",
+    "at": "2026-10-22T16:43:06.952Z",
+    "messageId": "<202610221643.75129032672@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "service@stretchplumbing.com",
+    "business": "Stretch Plumbing and Heating",
+    "subject": "After-hours calls at Stretch Plumbing and Heating",
+    "at": "2026-10-22T16:43:07.094Z",
+    "messageId": "<202610221643.10981500607@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@erplumbingnheating.ca",
+    "business": "ER Plumbing & Heating",
+    "subject": "After-hours calls at ER Plumbing & Heating",
+    "at": "2026-10-22T16:43:07.244Z",
+    "messageId": "<202610221643.50162998687@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "admin@brotech.ca",
+    "business": "Bro-Tech Plumbing & Heating",
+    "subject": "After-hours calls at Bro-Tech Plumbing & Heating",
+    "at": "2026-10-22T16:43:07.388Z",
+    "messageId": "<202610221643.48501916248@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "joe@gmmech.ca",
+    "business": "GM Mechanical",
+    "subject": "Furnace calls at GM Mechanical",
+    "at": "2026-10-22T16:43:07.552Z",
+    "messageId": "<202610221643.54402460463@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@flametechplumbing.ca",
+    "business": "FlameTech Plumbing & Heating",
+    "subject": "After-hours calls at FlameTech Plumbing & Heating",
+    "at": "2026-10-22T16:43:07.685Z",
+    "messageId": "<202610221643.15328683630@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@sosdraincleaning.ca",
+    "business": "SOS Drain Cleaning",
+    "subject": "After-hours calls at SOS Drain Cleaning",
+    "at": "2026-10-22T16:43:07.841Z",
+    "messageId": "<202610221643.75488147391@smtp-relay.mailin.fr>"
   }
 ]
