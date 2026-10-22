@@ -2189,5 +2189,75 @@
     "subject": "Furnace calls at Bluerock Heating & Air",
     "at": "2026-10-21T20:42:28.024Z",
     "messageId": "<202610212042.85708922339@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@elegantwoodwork.com",
+    "business": "Elegant Woodwork",
+    "subject": "Elegant Woodwork quotes and follow-up",
+    "at": "2026-10-22T15:12:53.933Z",
+    "messageId": "<202610221512.25148851568@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "gls@knottywoodwork.com",
+    "business": "Knotty Woodwork",
+    "subject": "Knotty Woodwork quotes and follow-up",
+    "at": "2026-10-22T15:12:54.264Z",
+    "messageId": "<202610221512.55235452797@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "steve@perfectd.ca",
+    "business": "Perfect Dimensions",
+    "subject": "Perfect Dimensions quotes and follow-up",
+    "at": "2026-10-22T15:12:54.430Z",
+    "messageId": "<202610221512.45707220751@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "terry@catuso.ca",
+    "business": "Catuso",
+    "subject": "Catuso quotes and follow-up",
+    "at": "2026-10-22T15:12:54.574Z",
+    "messageId": "<202610221512.47060206610@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "westthorn@shaw.ca",
+    "business": "West Thorn Cabinetry",
+    "subject": "West Thorn Cabinetry quotes and follow-up",
+    "at": "2026-10-22T15:12:54.750Z",
+    "messageId": "<202610221512.24160261305@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "tyler@fifthmeridianservices.ca",
+    "business": "Fifth Meridian Services",
+    "subject": "Fifth Meridian Services quotes and follow-up",
+    "at": "2026-10-22T15:12:54.887Z",
+    "messageId": "<202610221512.74859810642@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@crtechniques.ca",
+    "business": "C.R. Techniques",
+    "subject": "C.R. Techniques quotes and follow-up",
+    "at": "2026-10-22T15:12:55.043Z",
+    "messageId": "<202610221512.45744816783@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@lendrixhvac.com",
+    "business": "Lendrix HVAC Services",
+    "subject": "Furnace calls at Lendrix HVAC Services",
+    "at": "2026-10-22T15:12:55.190Z",
+    "messageId": "<202610221512.65557413345@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "homecomfort@airforceheating.com",
+    "business": "Air Force Heating & Air Conditioning",
+    "subject": "Furnace calls at Air Force Heating & Air Conditioning",
+    "at": "2026-10-22T15:12:55.342Z",
+    "messageId": "<202610221512.93428167624@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@legacyheating.ca",
+    "business": "Legacy Heating & Cooling",
+    "subject": "Furnace calls at Legacy Heating & Cooling",
+    "at": "2026-10-22T15:12:55.483Z",
+    "messageId": "<202610221512.92850411969@smtp-relay.mailin.fr>"
   }
 ]
