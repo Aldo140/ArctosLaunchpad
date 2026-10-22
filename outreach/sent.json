@@ -2329,5 +2329,75 @@
     "subject": "After-hours calls at Prostar Plumbing & Heating",
     "at": "2026-10-22T15:42:18.286Z",
     "messageId": "<202610221542.37952726024@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@lonestarplumbing.ca",
+    "business": "Lone Star Plumbing",
+    "subject": "After-hours calls at Lone Star Plumbing",
+    "at": "2026-10-22T16:12:42.441Z",
+    "messageId": "<202610221612.59856342563@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@ezplumbingandheating.com",
+    "business": "EZ Plumbing & Heating",
+    "subject": "After-hours calls at EZ Plumbing & Heating",
+    "at": "2026-10-22T16:12:42.962Z",
+    "messageId": "<202610221612.90487249944@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info.vandyck@telus.net",
+    "business": "A. Van Dyck Plumbing & Heating",
+    "subject": "Furnace calls at A. Van Dyck Plumbing & Heating",
+    "at": "2026-10-22T16:12:43.181Z",
+    "messageId": "<202610221612.14955028439@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "steve@hometown-h2o.com",
+    "business": "Hometown Plumbing & Heating",
+    "subject": "After-hours calls at Hometown Plumbing & Heating",
+    "at": "2026-10-22T16:12:43.391Z",
+    "messageId": "<202610221612.53640770201@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@rayzplumbing.ca",
+    "business": "Rayz Plumbing",
+    "subject": "After-hours calls at Rayz Plumbing",
+    "at": "2026-10-22T16:12:43.607Z",
+    "messageId": "<202610221612.33252498252@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgaryair.ca",
+    "business": "Calgary Air Heating and Cooling",
+    "subject": "Furnace calls at Calgary Air Heating and Cooling",
+    "at": "2026-10-22T16:12:43.815Z",
+    "messageId": "<202610221612.56352772582@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@statclimate.ca",
+    "business": "STAT Climate Control Solutions",
+    "subject": "Furnace calls at STAT Climate Control Solutions",
+    "at": "2026-10-22T16:12:44.017Z",
+    "messageId": "<202610221612.20350535249@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@mccanceplumbingheating.ca",
+    "business": "McCance Plumbing and Heating",
+    "subject": "After-hours calls at McCance Plumbing and Heating",
+    "at": "2026-10-22T16:12:44.234Z",
+    "messageId": "<202610221612.50585643476@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@levelupplumbing.ca",
+    "business": "Level Up Plumbing Heating and Gas",
+    "subject": "After-hours calls at Level Up Plumbing Heating and Gas",
+    "at": "2026-10-22T16:12:44.428Z",
+    "messageId": "<202610221612.66383635379@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@albertamountainair.com",
+    "business": "Alberta Mountain Air",
+    "subject": "Furnace calls at Alberta Mountain Air",
+    "at": "2026-10-22T16:12:44.639Z",
+    "messageId": "<202610221612.71386251812@smtp-relay.mailin.fr>"
   }
 ]
