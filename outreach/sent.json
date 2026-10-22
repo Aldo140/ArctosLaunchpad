@@ -2259,5 +2259,75 @@
     "subject": "Furnace calls at Legacy Heating & Cooling",
     "at": "2026-10-22T15:12:55.483Z",
     "messageId": "<202610221512.92850411969@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "Autumn-air@outlook.com",
+    "business": "Autumn Air",
+    "subject": "Furnace calls at Autumn Air",
+    "at": "2026-10-22T15:42:16.688Z",
+    "messageId": "<202610221542.56781448606@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@calgaryheatingservices.ca",
+    "business": "Calgary Heating Services",
+    "subject": "Furnace calls at Calgary Heating Services",
+    "at": "2026-10-22T15:42:16.998Z",
+    "messageId": "<202610221542.90780083732@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@ajfurnace.ca",
+    "business": "AJ Furnace & Air Conditioning",
+    "subject": "Furnace calls at AJ Furnace & Air Conditioning",
+    "at": "2026-10-22T15:42:17.183Z",
+    "messageId": "<202610221542.40236173152@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "Leads@harmonyheating.ca",
+    "business": "Harmony Heating",
+    "subject": "Furnace calls at Harmony Heating",
+    "at": "2026-10-22T15:42:17.348Z",
+    "messageId": "<202610221542.94371026024@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "wjheat@telus.net",
+    "business": "W&J Heating",
+    "subject": "Furnace calls at W&J Heating",
+    "at": "2026-10-22T15:42:17.518Z",
+    "messageId": "<202610221542.39179725279@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "quickerrooterplumbing@shaw.ca",
+    "business": "Quicker Rooter Plumbing & Heating",
+    "subject": "After-hours calls at Quicker Rooter Plumbing & Heating",
+    "at": "2026-10-22T15:42:17.671Z",
+    "messageId": "<202610221542.29574808906@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@rpgcalgary.ca",
+    "business": "RPG Calgary",
+    "subject": "After-hours calls at RPG Calgary",
+    "at": "2026-10-22T15:42:17.847Z",
+    "messageId": "<202610221542.20821819185@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "morgan@harpersplumbing.ca",
+    "business": "Harper's Plumbing",
+    "subject": "After-hours calls at Harper's Plumbing",
+    "at": "2026-10-22T15:42:17.973Z",
+    "messageId": "<202610221542.40562439266@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@hpah.ca",
+    "business": "Home Plumbing and Heating",
+    "subject": "After-hours calls at Home Plumbing and Heating",
+    "at": "2026-10-22T15:42:18.134Z",
+    "messageId": "<202610221542.16905369466@smtp-relay.mailin.fr>"
+  },
+  {
+    "email": "info@prostarplumbing.ca",
+    "business": "Prostar Plumbing & Heating",
+    "subject": "After-hours calls at Prostar Plumbing & Heating",
+    "at": "2026-10-22T15:42:18.286Z",
+    "messageId": "<202610221542.37952726024@smtp-relay.mailin.fr>"
   }
 ]
