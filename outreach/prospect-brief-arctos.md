@@ -10,14 +10,24 @@ Your answer is the list described below and nothing else.
 
 ## Who to find
 
-Find {{count}} owner-run businesses in Calgary, Alberta (Airdrie, Cochrane,
-Chestermere and Okotoks count too) where the work is custom orders, quotes or
-job tracking. Examples: cabinet and millwork shops, metal fabrication and
-welding, sign and print shops, stone and countertops, railings, glass, closets,
-flooring, upholstery, custom furniture, framing, vehicle wraps, embroidery,
-landscaping and renovation contractors, auto repair and detailing, custom
-bakeries and cake makers, caterers, tailoring. Vary the trades; don't return
-twenty of one kind.
+Find {{count}} independent businesses in Calgary, Alberta (Airdrie, Cochrane,
+Chestermere and Okotoks count too). Research a varied mix: trades and custom
+manufacturing, professional practices, health and wellness, salons, independent
+retail, hospitality, tourism and local service companies. Select businesses
+with a specific, publicly observable reason a digital improvement may help.
+
+Arctos can help with websites and redesigns, inquiry and booking flows,
+ecommerce and ordering, business automation, reporting and measurement, and
+outreach planning and follow-through. Match ONE relevant opportunity to the
+business rather than pitching every service. A good-looking existing website
+is not a reason to exclude a company: it may have a different digital need.
+Treat possible needs as questions, never established faults. Do not invent
+lost revenue, low conversion, broken systems, budgets or readiness to buy.
+Do not use CalgaryWatch editorial coverage or claims as sales leverage.
+
+Use at least four business sectors per batch when enough verified prospects
+are available, and avoid filling the batch with one trade. Prefer businesses
+where the question is concrete over businesses that merely have an email.
 
 Skip franchises, chains, national brands, businesses that look closed, and
 anything in the "Already contacted" list at the end.
@@ -40,13 +50,15 @@ address, a name or a detail. If you can't find one of them, skip the business.
   it started, who runs it, what it makes, how a job works there. Not praise,
   not generic ("you do great work"). No links, no web addresses.
 - `detailSource`: the URL of the page that detail came from.
-- `question`: one question about how they handle quotes, orders or job
-  tracking today, tied to that detail, ending in "?". Example: "Quick
+- `question`: one question about the relevant digital or operational workflow, tied to
+  that detail, ending in "?". Example: "Quick
   question: how do you keep track of quotes and jobs once a design moves from
   the home visit to the shop floor?"
 - `pain`: a short phrase that completes the sentence "If ___ takes more of
   your week than it should", tied to the question. Example: "chasing quotes and
   job status between design and the shop". No full stop.
+- `opportunity`: exactly one of `website`, `redesign`, `intake`, `commerce`,
+  `automation`, `outreach`, `measurement`. Choose the most relevant next conversation.
 - `work`: which past project is closest to what they'd need, exactly one of
   `truenorth` (a case-intake website so customers submit work online instead of
   by phone and email), `nicsdelite` (an order form for several items at once,
@@ -55,7 +67,7 @@ address, a name or a detail. If you can't find one of them, skip the business.
   the question, like "Casa Flores quotes and job tracking". No exclamation
   marks, no hype.
 
-The email around these is fixed: a clear description of Arctos, the relevant
+The email around these uses the selected opportunity: a clear description of Arctos, the relevant
 past project you choose, an invitation to a 20-minute working call, and the
 footer. Don't write them.
 
