@@ -149,6 +149,15 @@ export const calgaryLandingPages = [
     summary:
       "Google ads, 24/7 call answering and quote follow-up for Calgary basement development and legal suite builders.",
   },
+  {
+    slug: "calgary-website-security",
+    route: "/calgary-website-security" as const,
+    title: "Calgary Website Security",
+    headline: "Reduce the chance that one missed update becomes an incident.",
+    serviceSlug: "web-design-development",
+    summary:
+      "Website security reviews, patch planning, access hardening, backups, monitoring and incident-readiness work for Calgary organizations.",
+  },
 ] as const;
 
 /**
@@ -156,6 +165,13 @@ export const calgaryLandingPages = [
  * carries the date its facts were last checked, which the sitemap reports.
  */
 export const guides = [
+  {
+    route: "/guides/php-vulnerability-canada" as const,
+    title: "PHP security incident in Canada: what website owners should verify and do",
+    label: "Security advisory",
+    summary: "How to verify reports of critical PHP flaws, determine exposure, patch safely, look for compromise and communicate without spreading unconfirmed claims.",
+    checked: "2026-10-23",
+  },
   {
     route: "/guides/alberta-digital-funding" as const,
     title: "Funding for software and AI in Calgary and Alberta (2026)",
