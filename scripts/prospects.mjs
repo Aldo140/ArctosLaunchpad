@@ -137,6 +137,16 @@ const URL_RE = /^https?:\/\/\S+$/;
  * takes ({business, email, greeting, subject, body}), or the reason it can't be.
  * Mail-server lookups happen in check(), not here.
  */
+export const OPPORTUNITIES = Object.freeze({
+  website: "We build websites around what a visitor needs to do next, whether that is enquiring, booking or placing an order.",
+  redesign: "We help businesses improve an existing website's content, navigation and enquiry flow, starting with what already works.",
+  intake: "We connect enquiry, booking and intake steps so the team gets useful information and can follow through.",
+  commerce: "We help with online ordering and ecommerce flows, from what customers select to what the team needs to fulfil it.",
+  automation: "We help connect forms, internal tools and follow-up steps to reduce repetitive work and keep information together.",
+  outreach: "We help plan relevant outreach and organize enquiries and follow-up, with a clear offer and a practical way to track replies.",
+  measurement: "We help businesses see where enquiries come from and what happens next, using practical reporting and tracking.",
+});
+
 export function compose(id, p, i, seen) {
   const business = str(p.business, 100);
   const email = norm(str(p.email, 200));
@@ -153,6 +163,7 @@ export function compose(id, p, i, seen) {
   let subject, text;
   if (id === "arctos") {
     const opening = str(p.opening, 500), question = str(p.question, 300), pain = str(p.pain, 160).replace(/^if\s+/i, "");
+    if (p.opportunity !== undefined && !Object.hasOwn(OPPORTUNITIES, p.opportunity)) return { reason: "unknown digital opportunity" };
     if (!WORK[p.work]) return { reason: "cites work that isn't one of the three real projects" };
     if (opening.length < 40) return { reason: "no specific detail about the business" };
     if (!/\?$/.test(question)) return { reason: "the question doesn't end in a question mark" };
@@ -160,7 +171,7 @@ export function compose(id, p, i, seen) {
     if ([opening, question, pain].some((s) => LINK.test(s))) return { reason: "contains a link" };
     subject = str(p.subject, 70);
     if (subject.length < 10) return { reason: "no subject" };
-    text = `${opening} ${question.startsWith("Quick question") ? question : `Quick question: ${question}`}\n\nI'm Aldo — I run Arctos, a small Calgary studio. We help owner-run businesses turn more enquiries into paid work by improving how leads are delivered, tracked and followed through. Sometimes the missing piece is a website or optional ads; sometimes it is the offer, intake or follow-up. We first learn how the business runs, then recommend only what would actually help.\n\nRelevant work: ${WORK[p.work]}\n\nWould a 20-minute working call next week be useful? Reply "yes" and I'll send two times. If nothing needs changing, I'll say that too.`;
+    text = `${opening} ${question.startsWith("Quick question") ? question : `Quick question: ${question}`}\n\nI'm Aldo — I run Arctos, a small Calgary studio. ${p.opportunity ? OPPORTUNITIES[p.opportunity] : 'We help owner-run businesses turn more enquiries into paid work by improving how leads are delivered, tracked and followed through. Sometimes the missing piece is a website or optional ads; sometimes it is the offer, intake or follow-up.'} We first learn how the business runs, then recommend only what would actually help.\n\nRelevant work: ${WORK[p.work]}\n\nWould a 20-minute working call next week be useful? Reply "yes" and I'll send two times. If nothing needs changing, I'll say that too.`;
   } else {
     const detail = str(p.detail, 220).replace(/[.!]+$/, "");
     if (detail.length < 25) return { reason: "no specific detail about the business" };
@@ -172,7 +183,7 @@ export function compose(id, p, i, seen) {
   }
   const words = text.split(/\s+/).length;
   if (words > 190) return { reason: "email too long" };
-  return { row: { business, email, greeting: first, subject, body: `Hi ${first},\n\n${text}\n\n${FOOTER[id]}`, emailSource: str(p.emailSource, 400), detailSource: str(p.detailSource, 400) } };
+  return { row: { business, email, greeting: first, subject, body: `Hi ${first},\n\n${text}\n\n${FOOTER[id]}`, emailSource: str(p.emailSource, 400), detailSource: str(p.detailSource, 400), ...(id === "arctos" && p.opportunity ? { opportunity: p.opportunity } : {}) } };
 }
 
 const hasMailServer = async (domain) => {
