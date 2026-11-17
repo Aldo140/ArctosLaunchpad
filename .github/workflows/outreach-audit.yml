@@ -2,11 +2,10 @@ name: Outreach safety audit
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ops/audit-outreach.ts
-      - .github/workflows/outreach-audit.yml
+
+# Run manually after the arctos-hq GitHub service account has Firestore Viewer
+# access to CalgaryWatch's separate project. Keeping this off push prevents an
+# optional cross-project audit from reporting normal app deployments as failed.
 
 permissions:
   contents: read
