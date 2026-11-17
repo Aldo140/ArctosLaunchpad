@@ -9,6 +9,26 @@ import { loadDiscoveryIndex } from './lib/discovery';
 import { listingClaimProblems } from './jobs/outreach';
 import type { PartnerLead } from './types';
 
+// Keep failures diagnosable from the workflow summary without printing lead data,
+// credentials, stack traces or the private report itself.
+function annotateFailure(reason: unknown): void {
+  const raw = reason instanceof Error ? reason.message : String(reason);
+  const safe = raw
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/([?&](?:key|token|secret|signature)=)[^&\s]+/gi, '$1[redacted]')
+    .slice(0, 500);
+  console.log(`::error title=Outreach safety audit failed::${safe || 'Unknown error'}`);
+}
+
+process.once('uncaughtException', error => {
+  annotateFailure(error);
+  process.exitCode = 1;
+});
+process.once('unhandledRejection', error => {
+  annotateFailure(error);
+  process.exitCode = 1;
+});
+
 const output = process.env.OUTREACH_AUDIT_OUTPUT ?? '/tmp/outreach-audit.json';
 const db = opsDb();
 const index = await loadDiscoveryIndex(m => console.log(`[audit] ${m}`));
