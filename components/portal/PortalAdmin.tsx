@@ -1,0 +1,27 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, type User } from "firebase/auth";
+import { hqAuth } from "@/lib/hq/firebaseClient";
+import type { ClientAccount } from "@/lib/portal/types";
+
+const blank = { email:"", company:"", clientName:"", firstName:"", projectName:"", projectSummary:"", planName:"Monthly care", monthly:"", currency:"cad", services:"Website care", documentName:"", documentUrl:"" };
+
+export function PortalAdmin() {
+  const auth = hqAuth();
+  const [user,setUser] = useState<User|null|undefined>(auth ? undefined : null);
+  const [accounts,setAccounts] = useState<ClientAccount[]>([]);
+  const [form,setForm] = useState(blank);
+  const [error,setError] = useState<string|null>(null);
+  const [busy,setBusy] = useState(false);
+  useEffect(() => auth ? onAuthStateChanged(auth,setUser) : undefined,[auth]);
+  const call = useCallback(async(body:unknown) => { if(!user) throw new Error("Sign in first."); const r=await fetch("/api/hq/clients",{method:"POST",headers:{Authorization:`Bearer ${await user.getIdToken()}`,"Content-Type":"application/json"},body:JSON.stringify(body)}); const j=await r.json(); if(!r.ok) throw new Error(j.error??"Request failed."); return j; },[user]);
+  const load=useCallback(async()=>{try{const j=await call({action:"list"});setAccounts(j.accounts);setError(null)}catch(e){setError(e instanceof Error?e.message:"Could not load clients.")}},[call]);
+  useEffect(()=>{if(user)queueMicrotask(()=>void load())},[user,load]);
+  const edit=(a:ClientAccount)=>setForm({email:a.email,company:a.company,clientName:a.clientName,firstName:a.firstName,projectName:a.projectName,projectSummary:a.projectSummary,planName:a.billing.planName,monthly:String(a.billing.monthlyAmount/100),currency:a.billing.currency,services:a.services.join(", "),documentName:"",documentUrl:""});
+  const save=async()=>{setBusy(true);try{await call({action:"save",email:form.email,company:form.company,clientName:form.clientName,firstName:form.firstName,projectName:form.projectName,projectSummary:form.projectSummary,planName:form.planName,monthlyAmount:Math.round(Number(form.monthly)*100),currency:form.currency,services:form.services.split(",").map(s=>s.trim()).filter(Boolean),documentName:form.documentName||undefined,documentUrl:form.documentUrl||undefined});setForm(blank);await load()}catch(e){setError(e instanceof Error?e.message:"Could not save client.")}finally{setBusy(false)}};
+  if(!user)return <div className="portal-app portal-admin-login"><div><span className="portal-mark">A</span><p className="portal-kicker">Arctos internal</p><h1>Client workspace setup</h1><button className="portal-primary" onClick={()=>auth&&void signInWithPopup(auth,new GoogleAuthProvider())}>Sign in with HQ Google account</button>{error?<p className="portal-error">{error}</p>:null}</div></div>;
+  return <div className="portal-app portal-admin"><header><div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>CLIENT ADMIN</b></span></div><a href="/portal">Open client portal</a></header><main><section><p className="portal-kicker">Workspace setup</p><h1>Create or update a client.</h1><p>Saving creates the private account and, when needed, its Stripe monthly price. Send the client to <b>arctoslaunchpad.com/portal</b>.</p>{error?<div className="portal-error">{error}</div>:null}<div className="portal-admin__form">{[
+    ["Company","company"],["Client's full name","clientName"],["First name","firstName"],["Client email","email"],["Project name","projectName"],["Plan name","planName"],["Monthly amount","monthly"],["Services, comma separated","services"],["Contract name (optional)","documentName"],["Secure contract URL (optional)","documentUrl"],
+  ].map(([label,key])=><label key={key}><span>{label}</span><input type={key==="email"?"email":key==="monthly"?"number":"text"} value={form[key as keyof typeof form]} onChange={e=>setForm({...form,[key]:e.target.value})}/></label>)}<label className="portal-admin__wide"><span>Project summary</span><textarea value={form.projectSummary} onChange={e=>setForm({...form,projectSummary:e.target.value})}/></label><label><span>Currency</span><select value={form.currency} onChange={e=>setForm({...form,currency:e.target.value})}><option value="cad">CAD</option><option value="usd">USD</option></select></label></div><button className="portal-primary portal-admin__save" disabled={busy} onClick={()=>void save()}>{busy?"Saving…":"Save client workspace"}</button></section><aside><div className="portal-card__head"><div><p>Client workspaces</p><h2>{accounts.length} accounts</h2></div><button onClick={()=>setForm(blank)}>New</button></div><ol>{accounts.map(a=><li key={a.id}><button onClick={()=>edit(a)}><span>{a.firstName.slice(0,1)}{a.company.slice(0,1)}</span><div><b>{a.company}</b><small>{a.projectName} · {a.billing.status}</small></div><strong>${(a.billing.monthlyAmount/100).toLocaleString()}<small>/mo</small></strong></button></li>)}</ol></aside></main></div>;
+}

@@ -26,10 +26,11 @@ export function allowedEmails(): string[] {
     .filter(Boolean);
 }
 
-export async function requireHqUser(request: Request): Promise<{ email: string }> {
+/** Verify any Firebase user. Product areas apply their own authorization after this. */
+export async function requireFirebaseUser(request: Request): Promise<{ email: string; uid: string; name: string | null }> {
   const header = request.headers.get("authorization") ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-  if (!token) throw new HqAuthError("Sign in to open HQ.", 401);
+  if (!token) throw new HqAuthError("Sign in to continue.", 401);
   const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "arctos-hq";
   let payload;
   try {
@@ -41,8 +42,12 @@ export async function requireHqUser(request: Request): Promise<{ email: string }
     throw new HqAuthError("Your sign-in expired. Sign in again.", 401);
   }
   const email = String(payload.email ?? "").toLowerCase();
-  if (!email || payload.email_verified !== true || !allowedEmails().includes(email)) {
-    throw new HqAuthError(`${email || "This account"} isn't on the HQ list.`, 403);
-  }
+  if (!email || payload.email_verified !== true) throw new HqAuthError("Use a verified email address.", 403);
+  return { email, uid: String(payload.sub ?? ""), name: typeof payload.name === "string" ? payload.name : null };
+}
+
+export async function requireHqUser(request: Request): Promise<{ email: string }> {
+  const { email } = await requireFirebaseUser(request);
+  if (!allowedEmails().includes(email)) throw new HqAuthError(`${email} isn't on the HQ list.`, 403);
   return { email };
 }
