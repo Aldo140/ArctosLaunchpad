@@ -18,7 +18,6 @@ jobs:
     timeout-minutes: 10
     env:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      OUTREACH_AUDIT_OUTPUT: ${{ runner.temp }}/outreach-audit.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +34,9 @@ jobs:
           service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
       - name: Run read-only audit
         run: npm run ops:audit-outreach
+        env:
+          # The runner context is available to steps, but not job-level env.
+          OUTREACH_AUDIT_OUTPUT: ${{ runner.temp }}/outreach-audit.json
       - name: Upload private detailed report
         uses: actions/upload-artifact@v4
         with:

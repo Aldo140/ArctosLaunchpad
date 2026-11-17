@@ -15,7 +15,9 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    # Playwright 1.56 supports Ubuntu 24.04. Pin the image so GitHub's
+    # ubuntu-latest migration to Ubuntu 26 cannot break browser setup.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
