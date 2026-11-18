@@ -74,6 +74,14 @@ link. Use expiring or account-restricted links for confidential contracts.
 
 ## Launch checklist
 
+- In Vercel Production, confirm every item below exists; never paste values into
+  source control or chat: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `NEXT_PUBLIC_SITE_URL`, all `NEXT_PUBLIC_FIREBASE_*` values,
+  `HQ_ALLOWED_EMAILS`, and the existing `GCP_*` workload-identity values.
+- Set `NEXT_PUBLIC_SITE_URL` exactly to `https://arctoslaunchpad.com`. Checkout
+  deliberately refuses to start without a canonical HTTPS return origin.
+- Open `/portal/admin` in production. Its readiness panel must be fully green
+  before inviting a client.
 - Use Stripe test mode first and complete a card subscription, failed payment,
   payment-method update and cancellation.
 - If using ACSS debit, test the delayed settlement and mandate experience.
@@ -83,3 +91,24 @@ link. Use expiring or account-restricted links for confidential contracts.
 - Add the first contract and verify its source permissions with a logged-out
   browser.
 - Move to live Stripe keys only after the test-mode path passes.
+
+## Release and incident runbook
+
+1. Create one internal test client at `/portal/admin` using a separate email.
+2. Complete Checkout and confirm `customer.subscription.*` and `invoice.paid`
+   are HTTP 200 in Stripe Workbench. `checkout.session.completed` records the
+   authorization but does not falsely mark delayed ACSS debit as paid.
+3. Retry the same webhook in Stripe. The activity entry must appear once.
+4. Open Billing Portal, replace the payment method, download an invoice, then
+   cancel at period end. Confirm each status appears in `/portal`.
+5. If billing is impaired, disable the affected Price or payment method in
+   Stripe; do not delete client records. Stripe remains the payment source of
+   truth and retries webhook delivery automatically.
+6. Rotate a leaked Stripe key in Stripe, replace the matching Vercel secret,
+   redeploy, then revoke the old key. Rotate a webhook secret by temporarily
+   accepting both endpoints during the Stripe-controlled transition.
+
+The account store uses conditional Firestore writes for webhook updates, so
+simultaneous invoice and subscription events retry instead of overwriting one
+another. Checkout and Stripe product creation use idempotency keys to make
+double taps and network retries safe.

@@ -32,7 +32,10 @@ function Icon({ name }: { name: IconName }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true">{path[name]}</svg>;
 }
 
-const money = (amount: number, currency: string) => new Intl.NumberFormat("en-CA", { style: "currency", currency: currency.toUpperCase(), maximumFractionDigits: 0 }).format(amount / 100);
+const money = (amount: number, currency: string) => new Intl.NumberFormat("en-CA", {
+  style: "currency", currency: currency.toUpperCase(),
+  minimumFractionDigits: amount % 100 ? 2 : 0, maximumFractionDigits: 2,
+}).format(amount / 100);
 const date = (at: number | null) => at ? new Intl.DateTimeFormat("en-CA", { month: "short", day: "numeric", year: "numeric", timeZone: "America/Edmonton" }).format(at) : "—";
 const relative = (at: number) => {
   const days = Math.floor((Date.now() - at) / 86_400_000);

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { HqAuthError, requireHqUser } from "@/lib/hq/auth";
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
     const input = parsed.data;
     if (input.action === "list") return NextResponse.json({ accounts: await listAccounts() });
     if (!input.email || !input.company || !input.clientName || !input.firstName || !input.projectName || !input.projectSummary || !input.planName || input.monthlyAmount === undefined || !input.currency) return NextResponse.json({ error: "Complete every required client and billing field." }, { status: 400 });
+    if (input.documentUrl && new URL(input.documentUrl).protocol !== "https:") return NextResponse.json({ error: "Document links must use HTTPS." }, { status: 400 });
 
     const email = input.email.toLowerCase();
     const existing = await accountByEmail(email);
@@ -29,8 +31,9 @@ export async function POST(request: Request) {
     if (priceChanged && existing?.billing.stripeSubscriptionId && existing.billing.status !== "cancelled") return NextResponse.json({ error: "This client has a live subscription. Change its price in Stripe or cancel it before assigning a different portal plan." }, { status: 409 });
     if (input.monthlyAmount === 0) priceId = null;
     if (input.monthlyAmount > 0 && (!priceId || priceChanged)) {
-      const product = await stripePost<{ id: string }>("/products", new URLSearchParams({ name: `${input.company} — ${input.planName}`, "metadata[client_email]": email }));
-      const price = await stripePost<{ id: string }>("/prices", new URLSearchParams({ product: product.id, unit_amount: String(input.monthlyAmount), currency: input.currency, "recurring[interval]": "month" }));
+      const version = createHash("sha256").update(`${email}\0${input.planName}\0${input.monthlyAmount}\0${input.currency}`).digest("hex").slice(0, 20);
+      const product = await stripePost<{ id: string }>("/products", new URLSearchParams({ name: `${input.company} — ${input.planName}`, "metadata[client_email]": email }), `portal-product-${version}`);
+      const price = await stripePost<{ id: string }>("/prices", new URLSearchParams({ product: product.id, unit_amount: String(input.monthlyAmount), currency: input.currency, "recurring[interval]": "month" }), `portal-price-${version}`);
       priceId = price.id;
     }
     const now = Date.now();
