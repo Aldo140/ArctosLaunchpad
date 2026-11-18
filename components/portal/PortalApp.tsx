@@ -126,7 +126,9 @@ function BillingCard({ data, act }: { data: PortalSnapshot["account"]; act: (act
     <div><p>Your plan</p><h2>{b.planName}</h2><strong>{money(b.monthlyAmount, b.currency)} <small>/ month</small></strong></div>
     <div className="portal-billinghero__foot">
       <span><small>{active ? "Next payment" : "Billing"}</small><b>{active ? date(b.nextPaymentAt) : "Not started"}</b></span>
-      <button type="button" onClick={() => b.canManage ? void act("manage") : setAuthorize(true)}>{b.canManage ? "Manage billing" : "Authorize payments"}<Icon name="arrow"/></button>
+      {b.canStart && <button type="button" onClick={() => setAuthorize(true)}>Authorize payments<Icon name="arrow"/></button>}
+      {b.canManage && <button type="button" onClick={() => void act("manage")}>Manage billing<Icon name="arrow"/></button>}
+      {!b.canStart && !b.canManage && <b>No payment setup required</b>}
     </div>
     {authorize ? <div className="portal-modal" role="dialog" aria-modal="true" aria-labelledby="authorize-title"><div className="portal-modal__sheet">
       <button className="portal-modal__close" onClick={() => setAuthorize(false)} aria-label="Close">×</button>
@@ -140,14 +142,17 @@ function BillingCard({ data, act }: { data: PortalSnapshot["account"]; act: (act
   </section>;
 }
 
-function Home({ account, setTab, billing }: { account: PortalSnapshot["account"]; setTab: (tab: Tab) => void; billing: (action: "start" | "manage", accepted?: boolean) => Promise<void> }) {
+function Home({ account, setTab }: { account: PortalSnapshot["account"]; setTab: (tab: Tab) => void }) {
   const done = account.milestones.filter((m) => m.status === "done").length;
   return <>
-    <header className="portal-welcome"><div><p>Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, {account.firstName}.</p><h1>Here&apos;s where things stand.</h1></div><span className="portal-avatar">{account.firstName.slice(0,1)}{account.company.slice(0,1)}</span></header>
+    <header className="portal-welcome"><div><p>{account.company}</p><h1>Hi, {account.firstName}.</h1></div><a href={`mailto:${account.leadContact.email}`}>Contact {account.leadContact.name}</a></header>
     {account.nextStep ? <section className="portal-next"><span><Icon name="spark"/></span><div><p>Next move</p><h2>{account.nextStep.title}</h2><small>{account.nextStep.detail}</small></div>{account.nextStep.due ? <b>{account.nextStep.due}</b> : null}</section> : null}
     <div className="portal-homegrid">
       <section className="portal-card portal-project"><div className="portal-card__head"><div><p>Current project</p><h2>{account.projectName}</h2></div><span className="portal-project__state">{account.status.replace("-", " ")}</span></div><p>{account.projectSummary}</p><div className="portal-progress"><span style={{ width: `${Math.max(8, account.milestones.length ? (done / account.milestones.length) * 100 : 0)}%` }}/></div><div className="portal-progress__meta"><b>{done} of {account.milestones.length} milestones complete</b><span>{account.services.join(" · ")}</span></div></section>
-      <BillingCard data={account} act={billing}/>
+      <div className="portal-shortcuts">
+        <button onClick={() => setTab("documents")}><Icon name="file"/><span><b>Project files</b><small>{account.documents.length ? `${account.documents.length} shared` : "No files shared yet"}</small></span><Icon name="arrow"/></button>
+        <button onClick={() => setTab("billing")}><Icon name="card"/><span><b>Billing</b><small>{account.billing.status === "past-due" ? "Payment needs attention" : account.billing.canManage ? "Invoices and payment settings" : account.billing.canStart ? "Set up monthly payments" : "No payment setup required"}</small></span><Icon name="arrow"/></button>
+      </div>
     </div>
     <section className="portal-card"><div className="portal-card__head"><div><p>Project path</p><h2>From here to live</h2></div><button className="portal-textbtn" onClick={() => setTab("documents")}>Documents <Icon name="arrow"/></button></div><ol className="portal-milestones">{account.milestones.map((m) => <li key={m.id} data-status={m.status}><span>{m.status === "done" ? <Icon name="check"/> : m.status === "current" ? <i/> : null}</span><div><b>{m.title}</b><small>{m.detail}</small></div><time>{m.date ?? "TBD"}</time></li>)}</ol></section>
     <section className="portal-card"><div className="portal-card__head"><div><p>Latest activity</p><h2>What changed</h2></div></div><ol className="portal-activity">{account.activity.slice(0,5).map((a) => <li key={a.id}><span data-kind={a.kind}><Icon name={a.kind === "billing" ? "card" : a.kind === "document" ? "file" : "spark"}/></span><div><b>{a.title}</b><small>{a.detail}</small></div><time>{relative(a.at)}</time></li>)}</ol></section>
@@ -190,11 +195,21 @@ export function PortalApp() {
   useEffect(() => { if (user) queueMicrotask(() => void load()); }, [user, load]);
 
   const billing = async (action: "start" | "manage", accepted?: boolean) => { try { const result = await call("/api/portal/billing", { action, accepted }); if (result.url) window.location.assign(result.url); } catch(e) { setError(e instanceof Error ? e.message : "Could not open billing."); } };
-  const document = async (id: string) => { try { const result = await call("/api/portal/document", { id }); if (result.url) window.open(result.url, "_blank", "noopener,noreferrer"); } catch(e) { setError(e instanceof Error ? e.message : "Could not open the document."); } };
+  const document = async (id: string) => { try { const result = await call("/api/portal/document", { id }); if (result.url) window.location.assign(result.url); } catch(e) { setError(e instanceof Error ? e.message : "Could not open the document."); } };
   const tabs = useMemo(() => ([['home','home','Home'],['billing','card','Billing'],['documents','file','Files'],['account','user','Account']] as [Tab,IconName,string][]), []);
 
   if (user && accessDenied) return <div className="portal-app"><NoWorkspace email={user.email ?? "this account"} logout={() => auth && void signOut(auth).then(() => { setAccessDenied(false); setError(null); })}/></div>;
-  if (!user || !snapshot) return <div className="portal-app">{user && loading ? <div className="portal-loading"><span className="portal-mark">A</span><p>Opening your workspace…</p></div> : <SignIn error={error}/>}</div>;
+  if (!user) return <div className="portal-app"><SignIn error={error}/></div>;
+  if (!snapshot) return <div className="portal-app"><div className="portal-loading" role="status">
+    <span className="portal-mark">A</span>
+    <p>{error ?? (loading ? "Opening your workspace…" : "Getting your workspace ready…")}</p>
+    {error && <><button className="portal-primary" onClick={() => void load()}>Try again</button>
+      <button className="portal-google" onClick={() => auth && void signOut(auth)}>Switch account</button></>}
+  </div></div>;
   const account = snapshot.account;
-  return <div className="portal-app"><aside className="portal-side"><div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div><nav>{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => setTab(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav><div className="portal-side__contact"><p>Your project lead</p><b>{account.leadContact.name}</b><a href={`mailto:${account.leadContact.email}`}>Send a message <Icon name="arrow"/></a></div></aside><main className="portal-main">{error ? <div className="portal-toast" onClick={() => setError(null)}>{error}<button>×</button></div> : null}{tab==='home' ? <Home account={account} setTab={setTab} billing={billing}/> : tab==='billing' ? <Billing account={account} act={billing}/> : tab==='documents' ? <Documents account={account} open={document}/> : <Account account={account} logout={() => auth && void signOut(auth)}/>}</main><nav className="portal-mobile-nav">{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => setTab(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav></div>;
+  const navigate = (next: Tab) => {
+    setTab(next);
+    window.document.querySelector(".portal-app")?.scrollTo({ top: 0 });
+  };
+  return <div className="portal-app"><aside className="portal-side"><div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div><nav>{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => navigate(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav><div className="portal-side__contact"><p>Your project lead</p><b>{account.leadContact.name}</b><a href={`mailto:${account.leadContact.email}`}>Send a message <Icon name="arrow"/></a></div></aside><main className="portal-main">{error ? <div className="portal-toast" onClick={() => setError(null)}>{error}<button>×</button></div> : null}{tab==='home' ? <Home account={account} setTab={navigate}/> : tab==='billing' ? <Billing account={account} act={billing}/> : tab==='documents' ? <Documents account={account} open={document}/> : <Account account={account} logout={() => auth && void signOut(auth)}/>}</main><nav className="portal-mobile-nav">{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => navigate(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav></div>;
 }

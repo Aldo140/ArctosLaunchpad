@@ -59,3 +59,41 @@ body:has(.portal-app)>.skip-link,body:has(.portal-app) .hdr,body:has(.portal-app
 /* Signed-in workspace: calm paper surface, dark navigation, clear financial contrast. */
 .portal-main{min-height:100%;color:#102022;background:#efede4}.portal-main:before{content:"";position:fixed;inset:0 0 0 248px;z-index:-1;background:#efede4;background-image:linear-gradient(rgba(16,32,34,.035) 1px,transparent 1px);background-size:100% 64px}.portal-main .portal-welcome p,.portal-main .portal-pagehead p,.portal-main .portal-card__head p,.portal-main .portal-billinghero p{color:#6f7975}.portal-main .portal-card{border-color:#d5d2c8;background:#f8f6ef;box-shadow:0 8px 30px rgba(16,32,34,.035)}.portal-main .portal-project>p,.portal-main .portal-progress__meta,.portal-main .portal-milestones small,.portal-main .portal-activity small,.portal-main .portal-milestones time,.portal-main .portal-activity time,.portal-main .portal-docs li small,.portal-main .portal-profile p,.portal-main .portal-assurance p{color:#69736f}.portal-main .portal-progress{background:#ddd9ce}.portal-main .portal-progress__meta b{color:#263734}.portal-main .portal-next{border-color:#c5d3c5;background:#dde6dc}.portal-main .portal-next>span{background:#cbd9cb;color:#28483b}.portal-main .portal-next p,.portal-main .portal-next>b{color:#355b4a}.portal-main .portal-next>b{background:#cbd9cb}.portal-main .portal-milestones li:not(:last-child):before,.portal-main .portal-profile__hero,.portal-main .portal-profile dl div,.portal-main .portal-activity li{border-color:#ddd9ce}.portal-main .portal-milestones li>span{background:#f8f6ef;border-color:#c9c6bb}.portal-main .portal-activity>li>span{background:#e9e5da;color:#556c62}.portal-main .portal-docs li:hover{background:#eeebe2}.portal-main .portal-docs li button,.portal-main .portal-signout{border-color:#c9c6bb;color:#102022}.portal-main .portal-fileicon{background:#f1ddd3}.portal-main .portal-profile dd a,.portal-main .portal-textbtn{color:#446b59}.portal-main .portal-assurance li{color:#273734}.portal-main .portal-billinghero{border-color:#203538;box-shadow:0 18px 45px rgba(16,32,34,.13)}
 @media(max-width:900px){.portal-main:before{inset:0;bottom:64px}.portal-main{padding-top:max(30px,env(safe-area-inset-top))}.portal-mobile-nav{border-color:rgba(243,240,230,.14)}}
+.portal-app .portal-welcome {
+  padding: clamp(22px, 5vw, 55px);
+  gap: 16px;
+  border-radius: 24px;
+  background: radial-gradient(ellipse at 100% 100%, #39584d, transparent 70%), #142824;
+  color: #fff9ec;
+}
+.portal-app .portal-welcome p { color: #c0d2c7; overflow-wrap: anywhere; }
+.portal-welcome a { color: #fff9ec; font-size: 13px; padding: 12px; border: 1px solid #75877d; border-radius: 12px; }
+.portal-shortcuts { display: grid; gap: 10px; }
+.portal-shortcuts button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  text-align: left;
+  background: #fbf9f0;
+  border: 1px solid #d5d2c8;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.portal-shortcuts span { display: grid; gap: 3px; }
+.portal-shortcuts small { color: #50615a; font-size: 13px; }
+.portal-shortcuts svg { color: #8d4729; }
+.portal-app button:focus-visible, .portal-app a:focus-visible { outline: 3px solid #dd773d; outline-offset: 3px; }
+.portal-app .portal-loading { padding: 24px; text-align: center; }
+.portal-app .portal-login__entry .portal-error { color: #8b301c !important; }
+.portal-app .portal-main .portal-billinghero { color: #fff9ec; }
+.portal-app .portal-main .portal-billinghero p { color: #b3c6bd; }
+@media (max-width: 900px) {
+  .portal-app .portal-welcome { align-items: flex-start; flex-direction: column; margin-bottom: 0; }
+  .portal-app .portal-mobile-nav button { font-size: 12px; }
+  .portal-app .portal-docs li button { width: 44px; height: 44px; }
+  .portal-app .portal-login__storycopy { margin-top: 18px; }
+  .portal-app .portal-login__storycopy > span { display: none; }
+  .portal-app .portal-login__storycopy h1 { margin-bottom: 0; font-size: clamp(29px, 8vw, 42px); }
+}
