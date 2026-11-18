@@ -14,6 +14,7 @@ export class HqAuthError extends Error {
   constructor(
     message: string,
     readonly status: 401 | 403,
+    readonly code?: "hq-admin" | "no-workspace",
   ) {
     super(message);
   }

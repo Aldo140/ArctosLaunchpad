@@ -8,7 +8,7 @@ export const privateJson = (body: unknown, init: ResponseInit = {}) => NextRespo
 });
 
 export function portalError(error: unknown, fallback: string) {
-  if (error instanceof HqAuthError) return privateJson({ error: error.message }, { status: error.status });
+  if (error instanceof HqAuthError) return privateJson({ error: error.message, code: error.code }, { status: error.status });
   if (error instanceof StripeRequestError) {
     console.error("Stripe request failed", { status: error.status, requestId: error.requestId });
     return privateJson({ error: error.status >= 500 ? fallback : error.message }, { status: 502 });

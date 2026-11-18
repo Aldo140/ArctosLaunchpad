@@ -2,20 +2,24 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  GoogleAuthProvider,
   isSignInWithEmailLink,
   onAuthStateChanged,
   sendSignInLinkToEmail,
   signInWithEmailLink,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from "firebase/auth";
-import { hqAuth } from "@/lib/hq/firebaseClient";
+import { googleProvider, hqAuth } from "@/lib/hq/firebaseClient";
 import type { PortalSnapshot } from "@/lib/portal/types";
 
 type Tab = "home" | "billing" | "documents" | "account";
 type IconName = "home" | "card" | "file" | "user" | "arrow" | "check" | "clock" | "lock" | "spark" | "download";
+
+class PortalApiError extends Error {
+  constructor(message: string, readonly code?: string) { super(message); }
+}
 
 function Icon({ name }: { name: IconName }) {
   const path: Record<IconName, React.ReactNode> = {
@@ -42,39 +46,74 @@ const relative = (at: number) => {
   return days <= 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`;
 };
 
+const authMessage = (error: unknown) => {
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  if (code.includes("unauthorized-domain")) return "This domain has not been authorized for sign-in yet. Arctos has been notified.";
+  if (code.includes("invalid-email")) return "Enter a valid email address.";
+  if (code.includes("too-many-requests")) return "Too many attempts. Wait a moment and try again.";
+  if (code.includes("user-disabled")) return "This account cannot sign in. Contact Arctos for help.";
+  return error instanceof Error ? error.message.replace(/^Firebase: /, "") : "Sign-in could not be completed.";
+};
+
 function SignIn({ error }: { error: string | null }) {
   const auth = hqAuth();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const completing = Boolean(auth && typeof window !== "undefined" && isSignInWithEmailLink(auth, window.location.href) && !localStorage.getItem("portalEmail"));
   const magic = async () => {
     if (!auth || !email.trim()) return;
     setBusy(true); setLocalError(null);
     try {
-      localStorage.setItem("portalEmail", email.trim().toLowerCase());
-      await sendSignInLinkToEmail(auth, email.trim(), { url: `${window.location.origin}/portal`, handleCodeInApp: true });
-      setSent(true);
-    } catch (e) { setLocalError(e instanceof Error ? e.message.replace(/^Firebase: /, "") : "Could not send the sign-in link."); }
+      const normalized = email.trim().toLowerCase();
+      if (completing) {
+        await signInWithEmailLink(auth, normalized, window.location.href);
+        history.replaceState({}, "", "/portal");
+      } else {
+        localStorage.setItem("portalEmail", normalized);
+        await sendSignInLinkToEmail(auth, normalized, { url: `${window.location.origin}/portal`, handleCodeInApp: true });
+        setSent(true);
+      }
+    } catch (e) { setLocalError(authMessage(e)); }
     finally { setBusy(false); }
   };
+  const google = async () => {
+    if (!auth) return;
+    setBusy(true); setLocalError(null);
+    try { await signInWithPopup(auth, googleProvider()); }
+    catch (e) {
+      const code = typeof e === "object" && e && "code" in e ? String(e.code) : "";
+      if (code.includes("popup-blocked") || code.includes("cancelled-popup-request")) await signInWithRedirect(auth, googleProvider());
+      else setLocalError(authMessage(e));
+    } finally { setBusy(false); }
+  };
   return <div className="portal-login">
-    <div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div>
+    <section className="portal-login__story" aria-label="Arctos client portal">
+      <div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div>
+      <div className="portal-login__storycopy"><p>Client workspace</p><h1>One clear view of the work.</h1><span>Progress, decisions, documents and billing—without digging through another email thread.</span></div>
+      <div className="portal-login__proof"><span><Icon name="check"/><b>Project status</b><small>Know what moved and what happens next.</small></span><span><Icon name="file"/><b>Shared documents</b><small>Contracts and deliverables stay together.</small></span><span><Icon name="lock"/><b>Secure billing</b><small>Payments remain protected by Stripe.</small></span></div>
+    </section>
+    <section className="portal-login__entry">
     <div className="portal-login__card">
-      <p className="portal-kicker"><Icon name="lock"/> Private client workspace</p>
-      <h1>{sent ? <>Check your <em>inbox.</em></> : <>Everything about your project, <em>in one place.</em></>}</h1>
-      <p>{sent ? `We sent a private sign-in link to ${email}. It expires automatically.` : "Projects, contracts, invoices and recurring payments—clear on your phone and secure by default."}</p>
+      <p className="portal-kicker"><Icon name="lock"/> Private access</p>
+      <h2>{sent ? <>Check your inbox.</> : completing ? <>Finish signing in.</> : <>Welcome back.</>}</h2>
+      <p>{sent ? `A secure link is on its way to ${email}. It expires automatically.` : completing ? "Confirm the email address that received this link." : "Use the email connected to your Arctos workspace."}</p>
       {!sent ? <>
-        <label className="portal-field"><span>Email address</span><input type="email" autoComplete="email" placeholder="you@company.ca" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void magic()}/></label>
-        <button className="portal-primary" type="button" disabled={busy || !email.trim()} onClick={() => void magic()}>{busy ? "Sending…" : "Email me a sign-in link"}<Icon name="arrow"/></button>
-        <div className="portal-or"><span>or</span></div>
-        <button className="portal-google" type="button" disabled={!auth || busy} onClick={() => auth && void signInWithPopup(auth, new GoogleAuthProvider()).catch((e) => setLocalError(e.message))}><b>G</b> Continue with Google</button>
+        <label className="portal-field"><span>Email address</span><input type="email" inputMode="email" autoCapitalize="none" autoComplete="email" placeholder="you@company.ca" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void magic()}/></label>
+        <button className="portal-primary" type="button" disabled={busy || !email.trim() || !auth} onClick={() => void magic()}>{busy ? "Working…" : completing ? "Complete secure sign-in" : "Send secure sign-in link"}<Icon name="arrow"/></button>
+        {!completing ? <><div className="portal-or"><span>or</span></div><button className="portal-google" type="button" disabled={!auth || busy} onClick={() => void google()}><b>G</b> Continue with Google</button></> : null}
       </> : <button className="portal-google" type="button" onClick={() => setSent(false)}>Use another email</button>}
-      {(localError || error) ? <p className="portal-error">{localError || error}</p> : null}
-      <p className="portal-login__fine"><Icon name="lock"/> Payment details are handled by Stripe. Arctos never sees or stores your full card or bank information.</p>
+      {!auth ? <p className="portal-error">Sign-in is temporarily unavailable because the production identity configuration is incomplete.</p> : (localError || error) ? <p className="portal-error">{localError || error}</p> : null}
+      <p className="portal-login__fine"><Icon name="lock"/> Your payment details stay with Stripe. Arctos never stores your full card or bank information.</p>
     </div>
-    <p className="portal-login__help">Need access? <a href="mailto:aldo@arctoslaunchpad.com">aldo@arctoslaunchpad.com</a></p>
+    <p className="portal-login__help"><a href="/portal/admin">Arctos owner? Open client administration</a><span>·</span><a href="mailto:aldo@arctoslaunchpad.com">Get access help</a></p>
+    </section>
   </div>;
+}
+
+function NoWorkspace({ email, logout }: { email: string; logout: () => void }) {
+  return <div className="portal-access"><div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div><section><span className="portal-iconbox portal-iconbox--large"><Icon name="user"/></span><p className="portal-kicker">Signed in successfully</p><h1>Your workspace isn&apos;t connected yet.</h1><p><b>{email}</b> is authenticated, but it has not been invited to a client workspace. Ask Arctos to connect this address, or use a different account.</p><a className="portal-primary" href="mailto:aldo@arctoslaunchpad.com?subject=Client%20portal%20access">Request access <Icon name="arrow"/></a><button className="portal-google" onClick={logout}>Sign in with another account</button></section></div>;
 }
 
 function BillingCard({ data, act }: { data: PortalSnapshot["account"]; act: (action: "start" | "manage", accepted?: boolean) => Promise<void> }) {
@@ -134,25 +173,27 @@ export function PortalApp() {
   const [snapshot, setSnapshot] = useState<PortalSnapshot | null>(null);
   const [tab, setTab] = useState<Tab>("home");
   const [error, setError] = useState<string | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const call = useCallback(async (path: string, body?: unknown) => {
     if (!user) throw new Error("Sign in first.");
     const response = await fetch(path, { method:"POST", headers:{ Authorization:`Bearer ${await user.getIdToken()}`, "Content-Type":"application/json" }, body:JSON.stringify(body ?? {}) });
-    const json = await response.json().catch(() => ({})) as { error?: string; url?: string };
-    if (!response.ok) throw new Error(json.error ?? `Request failed (${response.status}).`);
+    const json = await response.json().catch(() => ({})) as { error?: string; url?: string; code?: string };
+    if (!response.ok) throw new PortalApiError(json.error ?? `Request failed (${response.status}).`, json.code);
     return json;
   }, [user]);
-  const load = useCallback(async () => { setLoading(true); try { setSnapshot(await call("/api/portal/snapshot") as unknown as PortalSnapshot); setError(null); } catch(e) { setError(e instanceof Error ? e.message : "Could not load the workspace."); } finally { setLoading(false); } }, [call]);
+  const load = useCallback(async () => { setLoading(true); try { setSnapshot(await call("/api/portal/snapshot") as unknown as PortalSnapshot); setAccessDenied(false); setError(null); } catch(e) { if (e instanceof PortalApiError && e.code === "hq-admin") { window.location.replace("/portal/admin"); return; } if (e instanceof PortalApiError && e.code === "no-workspace") setAccessDenied(true); setError(e instanceof Error ? e.message : "Could not load the workspace."); } finally { setLoading(false); } }, [call]);
 
   useEffect(() => auth ? onAuthStateChanged(auth, setUser) : undefined, [auth]);
-  useEffect(() => { if (!auth || !isSignInWithEmailLink(auth, window.location.href)) return; const email = localStorage.getItem("portalEmail"); if (!email) { queueMicrotask(() => setError("Open the sign-in link on the same device, or enter your email again.")); return; } void signInWithEmailLink(auth, email, window.location.href).then(() => { localStorage.removeItem("portalEmail"); history.replaceState({}, "", "/portal"); }).catch((e) => setError(e.message)); }, [auth]);
+  useEffect(() => { if (!auth || !isSignInWithEmailLink(auth, window.location.href)) return; const email = localStorage.getItem("portalEmail"); if (!email) return; void signInWithEmailLink(auth, email, window.location.href).then(() => { localStorage.removeItem("portalEmail"); history.replaceState({}, "", "/portal"); }).catch((e) => setError(authMessage(e))); }, [auth]);
   useEffect(() => { if (user) queueMicrotask(() => void load()); }, [user, load]);
 
   const billing = async (action: "start" | "manage", accepted?: boolean) => { try { const result = await call("/api/portal/billing", { action, accepted }); if (result.url) window.location.assign(result.url); } catch(e) { setError(e instanceof Error ? e.message : "Could not open billing."); } };
   const document = async (id: string) => { try { const result = await call("/api/portal/document", { id }); if (result.url) window.open(result.url, "_blank", "noopener,noreferrer"); } catch(e) { setError(e instanceof Error ? e.message : "Could not open the document."); } };
   const tabs = useMemo(() => ([['home','home','Home'],['billing','card','Billing'],['documents','file','Files'],['account','user','Account']] as [Tab,IconName,string][]), []);
 
+  if (user && accessDenied) return <div className="portal-app"><NoWorkspace email={user.email ?? "this account"} logout={() => auth && void signOut(auth).then(() => { setAccessDenied(false); setError(null); })}/></div>;
   if (!user || !snapshot) return <div className="portal-app">{user && loading ? <div className="portal-loading"><span className="portal-mark">A</span><p>Opening your workspace…</p></div> : <SignIn error={error}/>}</div>;
   const account = snapshot.account;
   return <div className="portal-app"><aside className="portal-side"><div className="portal-login__brand"><span className="portal-mark">A</span><span>ARCTOS <b>LAUNCHPAD</b></span></div><nav>{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => setTab(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav><div className="portal-side__contact"><p>Your project lead</p><b>{account.leadContact.name}</b><a href={`mailto:${account.leadContact.email}`}>Send a message <Icon name="arrow"/></a></div></aside><main className="portal-main">{error ? <div className="portal-toast" onClick={() => setError(null)}>{error}<button>×</button></div> : null}{tab==='home' ? <Home account={account} setTab={setTab} billing={billing}/> : tab==='billing' ? <Billing account={account} act={billing}/> : tab==='documents' ? <Documents account={account} open={document}/> : <Account account={account} logout={() => auth && void signOut(auth)}/>}</main><nav className="portal-mobile-nav">{tabs.map(([id,icon,label]) => <button key={id} aria-current={tab===id ? 'page':undefined} onClick={() => setTab(id)}><Icon name={icon}/><span>{label}</span></button>)}</nav></div>;
