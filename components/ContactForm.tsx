@@ -6,6 +6,7 @@ import { FormEvent, useRef, useState } from "react";
 import { LANDING_KEY, PREV_KEY } from "@/components/site/ConversionTracking";
 import { metaTrack } from "@/components/site/MetaPixel";
 import { googleAdsLead } from "@/components/site/GoogleAdsTag";
+import { budgetRanges } from "@/lib/contact-budget";
 
 type FieldName =
   | "name"
@@ -70,15 +71,6 @@ export function islandFor(type: string): IslandKey | null {
   }
   return null;
 }
-
-const budgetRanges = [
-  "Under $10,000",
-  "$10,000 to $25,000",
-  "$25,000 to $50,000",
-  "$50,000 to $100,000",
-  "$100,000+",
-  "Not sure yet",
-] as const;
 
 const timelines = [
   "As soon as practical",
@@ -286,7 +278,10 @@ export function ContactForm({
       if (draft) {
         for (const f of DRAFT_FIELDS) {
           const el = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${f}"]`);
-          if (f !== "projectType" && el && draft[f]) el.value = draft[f]!;
+          if (f !== "projectType" && el && draft[f]) {
+            if (f === "budget" && !budgetRanges.some(range => range === draft[f])) continue;
+            el.value = draft[f]!;
+          }
         }
         if (!selected && draft.projectType && projectTypes.includes(draft.projectType as (typeof projectTypes)[number])) {
           setType(draft.projectType);

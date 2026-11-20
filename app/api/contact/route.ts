@@ -2,6 +2,7 @@ import { NextResponse, after } from "next/server";
 import { textLead } from "@/lib/hq/alertsRun";
 import { Resend } from "resend";
 import { z } from "zod";
+import { acceptedBudgetRanges } from "@/lib/contact-budget";
 
 /** Logged in production too (request id and reason only, never the
  *  visitor's details) so a failed delivery shows up in the host's logs. */
@@ -23,15 +24,6 @@ const projectTypes = [
   "Dashboard or reporting",
   "Ongoing support",
   "Pro bono (Keystone)",
-  "Not sure yet",
-] as const;
-
-const budgetRanges = [
-  "Under $10,000",
-  "$10,000 to $25,000",
-  "$25,000 to $50,000",
-  "$50,000 to $100,000",
-  "$100,000+",
   "Not sure yet",
 ] as const;
 
@@ -75,7 +67,7 @@ const contactSchema = z
     budget: z
       .union([
         z.literal(""),
-        z.enum(budgetRanges, { error: "Choose an estimated budget range." }),
+        z.enum(acceptedBudgetRanges, { error: "Choose an estimated budget range." }),
       ])
       .default(""),
     timeline: z
