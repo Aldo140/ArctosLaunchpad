@@ -29,6 +29,18 @@ Use at least four business sectors per batch when enough verified prospects
 are available, and avoid filling the batch with one trade. Prefer businesses
 where the question is concrete over businesses that merely have an email.
 
+Prioritize a recurring workflow the owner already handles: quotes waiting on
+follow-up, appointment intake, or custom orders moving into fulfillment.
+Look for publicly described steps or requirements and ask about one point
+where an inquiry changes hands. Use a website opportunity only when it directly
+supports that workflow. The goal is a useful conversation about one measurable
+improvement, with ongoing support offered only where there is ongoing work.
+
+Use a published business address only where the proposal is relevant to the
+recipient's business role and the publication has no no-solicitation notice.
+Skip addresses reserved for bookings, customer support or another purpose
+when the page indicates that restriction.
+
 Skip franchises, chains, national brands, businesses that look closed, and
 anything in the "Already contacted" list at the end.
 
